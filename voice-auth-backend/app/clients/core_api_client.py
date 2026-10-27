@@ -185,6 +185,228 @@ class CoreApiClient:
             },
         )
 
+    def record_login_failure(
+        self,
+        *,
+        user_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserLoginFailure",
+            {
+                "UserID": str(user_id),
+            },
+        )
+
+    def record_login_success(
+        self,
+        *,
+        user_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserLoginSuccess",
+            {
+                "UserID": str(user_id),
+            },
+        )
+
+    def unlock_user(
+        self,
+        *,
+        user_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserUnlock",
+            {
+                "UserID": str(user_id),
+            },
+        )
+
+    def add_login_log(
+        self,
+        *,
+        username: Optional[str],
+        auth_method: str,
+        is_success: bool,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+        failure_code: Optional[str] = None,
+        failure_detail: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreLoginLogAdd",
+            {
+                "UserID": str(user_id) if user_id else None,
+                "SessionID": str(session_id) if session_id else None,
+                "Username": username,
+                "AuthMethod": str(auth_method or "PASSWORD").upper(),
+                "IsSuccess": bool(is_success),
+                "FailureCode": failure_code,
+                "FailureDetail": failure_detail,
+                "IPAddress": ip_address,
+                "UserAgent": user_agent,
+            },
+        )
+
+    # =========================================================
+    # USER GROUP / EFFECTIVE ACCESS
+    # =========================================================
+
+    def get_user_groups(
+        self,
+        user_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserGroupGet",
+            {
+                "UserID": str(user_id),
+            },
+        )
+
+    def save_user_groups(
+        self,
+        *,
+        user_id: str,
+        group_ids: list[str],
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserGroupSave",
+            {
+                "UserID": str(user_id),
+                "GroupIDs": [
+                    str(group_id)
+                    for group_id in group_ids
+                ],
+            },
+        )
+
+    def get_user_access(
+        self,
+        user_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserAccessGet",
+            {
+                "UserID": str(user_id),
+            },
+        )
+
+    # =========================================================
+    # GROUP MANAGEMENT / MENU ACCESS
+    # =========================================================
+
+    def list_groups(
+        self,
+        *,
+        page: int = 1,
+        page_size: int = 20,
+        search: str = "",
+        status: str = "all",
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupList",
+            {
+                "Page": int(page),
+                "PageSize": int(page_size),
+                "Search": str(search or ""),
+                "Status": str(status or "all"),
+            },
+        )
+
+    def get_group(
+        self,
+        group_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupGet",
+            {
+                "GroupID": str(group_id),
+            },
+        )
+
+    def create_group(
+        self,
+        *,
+        group_code: str,
+        group_name: str,
+        description: str = "",
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupCreate",
+            {
+                "GroupCode": str(group_code),
+                "GroupName": str(group_name),
+                "Description": str(description or ""),
+            },
+        )
+
+    def update_group(
+        self,
+        *,
+        group_id: str,
+        group_name: str,
+        description: str = "",
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupUpdate",
+            {
+                "GroupID": str(group_id),
+                "GroupName": str(group_name),
+                "Description": str(description or ""),
+            },
+        )
+
+    def set_group_active(
+        self,
+        *,
+        group_id: str,
+        is_active: bool,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupSetActive",
+            {
+                "GroupID": str(group_id),
+                "IsActive": bool(is_active),
+            },
+        )
+
+    def list_menus(
+        self,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreMenuList",
+            {},
+        )
+
+    def get_group_menus(
+        self,
+        group_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupMenuGet",
+            {
+                "GroupID": str(group_id),
+            },
+        )
+
+    def save_group_menus(
+        self,
+        *,
+        group_id: str,
+        menu_ids: list[str],
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreGroupMenuSave",
+            {
+                "GroupID": str(group_id),
+                "MenuIDs": [
+                    str(menu_id)
+                    for menu_id in menu_ids
+                ],
+            },
+        )
+
     # =========================================================
     # VOICE PROFILE
     # =========================================================

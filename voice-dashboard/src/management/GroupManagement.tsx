@@ -159,9 +159,9 @@ function MetricCard({
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-[8px] font-black tracking-[0.18em] text-slate-500 uppercase">{label}</div>
+          <div className="text-[10px] font-black tracking-[0.18em] text-slate-500 uppercase">{label}</div>
           <div className={`mt-1.5 text-2xl font-black tracking-tight ${style.value}`}>{value}</div>
-          <div className="mt-1 text-[8px] tracking-[0.10em] text-slate-400 uppercase">{subtitle}</div>
+          <div className="mt-1 text-[10px] tracking-[0.10em] text-slate-400 uppercase">{subtitle}</div>
         </div>
         <span className={`mt-1 h-2 w-2 rounded-full ${style.dot} shadow-[0_0_12px_currentColor]`} />
       </div>
@@ -171,7 +171,7 @@ function MetricCard({
 
 function StatusBadge({ active }: { active: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[8px] font-black tracking-[0.14em] uppercase ${
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-black tracking-[0.14em] uppercase ${
       active
         ? 'border-emerald-400/25 bg-emerald-950/25 text-emerald-300'
         : 'border-rose-400/20 bg-rose-950/20 text-rose-300/85'
@@ -223,10 +223,10 @@ function GroupFormModal({
       <form onSubmit={submit} className="w-full max-w-[500px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
         <div className="flex items-center justify-between border-b border-cyan-400/12 px-4 py-3">
           <div>
-            <div className="text-[8px] font-black tracking-[0.18em] text-cyan-400 uppercase">
+            <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">
               {mode === 'create' ? 'Register Group' : 'Edit Group'}
             </div>
-            <div className="mt-0.5 text-[8px] text-slate-400">
+            <div className="mt-0.5 text-[10px] text-slate-400">
               {mode === 'create' ? 'Create a new access group' : 'Update group identity'}
             </div>
           </div>
@@ -237,38 +237,38 @@ function GroupFormModal({
 
         <div className="p-4">
           <label className="block">
-            <span className="text-[8px] font-black tracking-[0.14em] text-slate-500 uppercase">Group Name</span>
+            <span className="text-[10px] font-black tracking-[0.14em] text-slate-500 uppercase">Group Name</span>
             <input
               autoFocus
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="Example: Executive Management"
-              className="mt-2 h-11 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 text-[11px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
+              className="mt-2 h-11 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
             />
           </label>
 
           <label className="mt-4 block">
-            <span className="text-[8px] font-black tracking-[0.14em] text-slate-500 uppercase">Description</span>
+            <span className="text-[10px] font-black tracking-[0.14em] text-slate-500 uppercase">Description</span>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe this group's purpose..."
               rows={4}
-              className="mt-2 w-full resize-none rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 py-3 text-[11px] leading-relaxed text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
+              className="mt-2 w-full resize-none rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 py-3 text-[13px] leading-relaxed text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
             />
           </label>
 
           {localError && (
-            <div className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2 text-[9px] text-rose-200">
+            <div className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2 text-[11px] text-rose-200">
               {localError}
             </div>
           )}
 
           <div className="mt-5 flex justify-end gap-2">
-            <button type="button" disabled={busy} onClick={onClose} className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2 text-[9px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40">
+            <button type="button" disabled={busy} onClick={onClose} className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2 text-[11px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40">
               Cancel
             </button>
-            <button type="submit" disabled={busy} className="rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-4 py-2 text-[9px] font-black tracking-[0.10em] text-cyan-100 uppercase transition hover:border-cyan-200/60 hover:bg-cyan-500/15 disabled:opacity-40">
+            <button type="submit" disabled={busy} className="rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-4 py-2 text-[11px] font-black tracking-[0.10em] text-cyan-100 uppercase transition hover:border-cyan-200/60 hover:bg-cyan-500/15 disabled:opacity-40">
               {busy ? 'Saving...' : mode === 'create' ? 'Create Group' : 'Save Changes'}
             </button>
           </div>
@@ -564,7 +564,7 @@ export default function GroupManagement() {
         {/* HEADER */}
         <div className="flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
-            <div className="text-[8px] font-black tracking-[0.22em] text-cyan-400 uppercase">
+            <div className="text-[10px] font-black tracking-[0.22em] text-cyan-400 uppercase">
               CoreAnalytics · Management Center
             </div>
             <div className="mt-1 flex items-center gap-2">
@@ -572,7 +572,7 @@ export default function GroupManagement() {
                 Group Directory
               </h2>
             </div>
-            <p className="mt-1 text-[9px] tracking-[0.07em] text-slate-500">
+            <p className="mt-1 text-[11px] tracking-[0.07em] text-slate-500">
               Manage access groups and prepare application permissions.
             </p>
           </div>
@@ -591,7 +591,7 @@ export default function GroupManagement() {
             <button
               type="button"
               onClick={openCreate}
-              className="inline-flex h-9 items-center gap-2 rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-3.5 text-[9px] font-black tracking-[0.14em] text-cyan-100 uppercase shadow-[0_0_20px_rgba(34,211,238,.07)] transition hover:border-cyan-200/60 hover:bg-cyan-500/15"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-3.5 text-[11px] font-black tracking-[0.14em] text-cyan-100 uppercase shadow-[0_0_20px_rgba(34,211,238,.07)] transition hover:border-cyan-200/60 hover:bg-cyan-500/15"
             >
               <span className="text-base leading-none">+</span>
               Register Group
@@ -617,12 +617,12 @@ export default function GroupManagement() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search group name or description..."
-                className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[11px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
+                className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
               />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <div className="text-[8px] font-black tracking-[0.14em] text-slate-400 uppercase">Status</div>
+              <div className="text-[10px] font-black tracking-[0.14em] text-slate-400 uppercase">Status</div>
               {(['all', 'active', 'inactive'] as GroupStatusFilter[]).map((value) => (
                 <button
                   key={value}
@@ -631,7 +631,7 @@ export default function GroupManagement() {
                     setPage(1);
                     setStatusFilter(value);
                   }}
-                  className={`rounded-lg border px-3 py-2 text-[8px] font-black tracking-[0.12em] uppercase transition ${
+                  className={`rounded-lg border px-3 py-2 text-[10px] font-black tracking-[0.12em] uppercase transition ${
                     statusFilter === value
                       ? 'border-cyan-300/40 bg-cyan-500/10 text-cyan-100'
                       : 'border-slate-600/20 bg-[#071422]/45 text-slate-500 hover:border-sky-500/25 hover:text-slate-300'
@@ -644,7 +644,7 @@ export default function GroupManagement() {
           </div>
 
           {error && (
-            <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-rose-400/25 bg-rose-950/15 px-3 py-2.5 text-[10px] text-rose-200">
+            <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-rose-400/25 bg-rose-950/15 px-3 py-2.5 text-[12px] text-rose-200">
               <span>{error}</span>
               <button type="button" onClick={() => setError('')} className="text-rose-300/70 hover:text-rose-100">
                 <CloseIcon />
@@ -656,13 +656,13 @@ export default function GroupManagement() {
           <div className="mt-3 overflow-hidden rounded-xl border border-sky-500/15 bg-[#020b17]/52 shadow-[0_12px_40px_rgba(0,0,0,.16)] backdrop-blur-md">
             <div className="flex items-center justify-between border-b border-sky-500/12 px-3 py-2">
               <div>
-                <div className="text-[9px] font-black tracking-[0.16em] text-cyan-100 uppercase">{statusLabel}</div>
-                <div className="mt-0.5 text-[8px] tracking-[0.08em] text-slate-400">
+                <div className="text-[11px] font-black tracking-[0.16em] text-cyan-100 uppercase">{statusLabel}</div>
+                <div className="mt-0.5 text-[10px] tracking-[0.08em] text-slate-400">
                   {totalItems} record{totalItems === 1 ? '' : 's'}
                 </div>
               </div>
               {loading && (
-                <div className="flex items-center gap-2 text-[8px] font-bold tracking-[0.12em] text-cyan-400 uppercase">
+                <div className="flex items-center gap-2 text-[10px] font-bold tracking-[0.12em] text-cyan-400 uppercase">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300" />
                   Syncing
                 </div>
@@ -681,11 +681,11 @@ export default function GroupManagement() {
                 </colgroup>
                 <thead>
                   <tr className="border-b border-sky-500/10 bg-[#061322]/45 text-left">
-                    <th className="px-4 py-2 text-[8px] font-black tracking-[0.15em] text-slate-400 uppercase">Group</th>
-                    <th className="px-4 py-2 text-[8px] font-black tracking-[0.15em] text-slate-400 uppercase">Description</th>
-                    <th className="px-4 py-2 text-[8px] font-black tracking-[0.15em] text-slate-400 uppercase">Status</th>
-                    <th className="px-4 py-2 text-[8px] font-black tracking-[0.15em] text-slate-400 uppercase">Created</th>
-                    <th className="px-2 py-2 text-center text-[8px] font-black tracking-[0.15em] text-slate-400 uppercase">Action</th>
+                    <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Group</th>
+                    <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Description</th>
+                    <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Status</th>
+                    <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Created</th>
+                    <th className="px-2 py-2 text-center text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Action</th>
                   </tr>
                 </thead>
 
@@ -702,7 +702,7 @@ export default function GroupManagement() {
                           onClick={() => setSelectedGroup(group)}
                           className="flex w-full min-w-0 items-center gap-2.5 text-left"
                         >
-                          <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-[10px] font-black tracking-[0.05em] ${
+                          <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-[12px] font-black tracking-[0.05em] ${
                             group.is_active
                               ? 'border-cyan-400/25 bg-cyan-950/25 text-cyan-200'
                               : 'border-slate-600/20 bg-slate-900/35 text-slate-500'
@@ -710,10 +710,10 @@ export default function GroupManagement() {
                             {groupInitials(group.group_name)}
                           </div>
                           <div className="min-w-0">
-                            <div className="max-w-[300px] truncate text-[10px] font-bold text-slate-200 transition group-hover:text-cyan-100">
+                            <div className="max-w-[300px] truncate text-[12px] font-bold text-slate-200 transition group-hover:text-cyan-100">
                               {group.group_name}
                             </div>
-                            <div className="mt-0.5 max-w-[300px] truncate font-mono text-[7px] text-slate-400">
+                            <div className="mt-0.5 max-w-[300px] truncate font-mono text-[9px] text-slate-400">
                               {group.group_id}
                             </div>
                           </div>
@@ -721,7 +721,7 @@ export default function GroupManagement() {
                       </td>
 
                       <td className="h-[50px] px-4 py-0 align-middle">
-                        <div className="truncate text-[9px] text-slate-500">
+                        <div className="truncate text-[11px] text-slate-500">
                           {group.description || '—'}
                         </div>
                       </td>
@@ -730,7 +730,7 @@ export default function GroupManagement() {
                         <StatusBadge active={group.is_active} />
                       </td>
 
-                      <td className="h-[50px] px-4 py-0 align-middle text-[9px] text-slate-500">
+                      <td className="h-[50px] px-4 py-0 align-middle text-[11px] text-slate-500">
                         {formatDate(group.created_at)}
                       </td>
 
@@ -757,14 +757,14 @@ export default function GroupManagement() {
                                 setSelectedGroup(group);
                                 setActionMenuId(null);
                               }}
-                              className="w-full rounded-lg px-3 py-2 text-left text-[9px] font-bold text-slate-300 transition hover:bg-cyan-950/25 hover:text-cyan-100"
+                              className="w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-slate-300 transition hover:bg-cyan-950/25 hover:text-cyan-100"
                             >
                               View Group
                             </button>
                             <button
                               type="button"
                               onClick={() => openEdit(group)}
-                              className="mt-1 w-full rounded-lg px-3 py-2 text-left text-[9px] font-bold text-cyan-200 transition hover:bg-cyan-950/25"
+                              className="mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-cyan-200 transition hover:bg-cyan-950/25"
                             >
                               Edit Group
                             </button>
@@ -774,7 +774,7 @@ export default function GroupManagement() {
                                 setStatusTarget(group);
                                 setActionMenuId(null);
                               }}
-                              className={`mt-1 w-full rounded-lg px-3 py-2 text-left text-[9px] font-bold transition ${
+                              className={`mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold transition ${
                                 group.is_active
                                   ? 'text-rose-300 hover:bg-rose-950/25'
                                   : 'text-emerald-300 hover:bg-emerald-950/25'
@@ -796,7 +796,7 @@ export default function GroupManagement() {
               {!loading && items.map((group) => (
                 <div key={group.group_id} className="p-3">
                   <div className="flex items-start gap-3">
-                    <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border text-[10px] font-black ${
+                    <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border text-[12px] font-black ${
                       group.is_active
                         ? 'border-cyan-400/25 bg-cyan-950/25 text-cyan-200'
                         : 'border-slate-600/20 bg-slate-900/35 text-slate-500'
@@ -804,23 +804,23 @@ export default function GroupManagement() {
                       {groupInitials(group.group_name)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[11px] font-bold text-slate-200">{group.group_name}</div>
-                      <div className="mt-0.5 line-clamp-2 text-[9px] text-slate-400">{group.description || 'No description'}</div>
+                      <div className="truncate text-[13px] font-bold text-slate-200">{group.group_name}</div>
+                      <div className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">{group.description || 'No description'}</div>
                     </div>
                     <StatusBadge active={group.is_active} />
                   </div>
 
                   <div className="mt-3 flex gap-2">
-                    <button type="button" onClick={() => setSelectedGroup(group)} className="flex-1 rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-2 text-[8px] font-black tracking-[0.10em] text-cyan-200 uppercase">
+                    <button type="button" onClick={() => setSelectedGroup(group)} className="flex-1 rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-2 text-[10px] font-black tracking-[0.10em] text-cyan-200 uppercase">
                       View
                     </button>
-                    <button type="button" onClick={() => openEdit(group)} className="flex-1 rounded-lg border border-sky-400/20 bg-sky-950/15 px-3 py-2 text-[8px] font-black tracking-[0.10em] text-sky-200 uppercase">
+                    <button type="button" onClick={() => openEdit(group)} className="flex-1 rounded-lg border border-sky-400/20 bg-sky-950/15 px-3 py-2 text-[10px] font-black tracking-[0.10em] text-sky-200 uppercase">
                       Edit
                     </button>
                     <button
                       type="button"
                       onClick={() => setStatusTarget(group)}
-                      className={`flex-1 rounded-lg border px-3 py-2 text-[8px] font-black tracking-[0.10em] uppercase ${
+                      className={`flex-1 rounded-lg border px-3 py-2 text-[10px] font-black tracking-[0.10em] uppercase ${
                         group.is_active
                           ? 'border-rose-400/20 bg-rose-950/15 text-rose-300'
                           : 'border-emerald-400/20 bg-emerald-950/15 text-emerald-300'
@@ -837,7 +837,7 @@ export default function GroupManagement() {
               <div className="grid min-h-[260px] place-items-center">
                 <div className="text-center">
                   <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-cyan-400/15 border-t-cyan-300" />
-                  <div className="mt-3 text-[8px] font-black tracking-[0.18em] text-cyan-300 uppercase">Loading Directory</div>
+                  <div className="mt-3 text-[10px] font-black tracking-[0.18em] text-cyan-300 uppercase">Loading Directory</div>
                 </div>
               </div>
             )}
@@ -848,15 +848,15 @@ export default function GroupManagement() {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-600/20 bg-slate-900/25 text-slate-400">
                     <GroupIcon />
                   </div>
-                  <div className="mt-3 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">No Groups Found</div>
-                  <div className="mt-1 text-[9px] text-slate-400">Try another search/status filter or register a group.</div>
+                  <div className="mt-3 text-[12px] font-black tracking-[0.15em] text-slate-400 uppercase">No Groups Found</div>
+                  <div className="mt-1 text-[11px] text-slate-400">Try another search/status filter or register a group.</div>
                 </div>
               </div>
             )}
 
             {/* PAGINATION */}
             <div className="flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 text-[8px] tracking-[0.08em] text-slate-400">
+              <div className="flex items-center gap-2 text-[10px] tracking-[0.08em] text-slate-400">
                 <span>
                   Page <strong className="text-slate-400">{totalPages === 0 ? 0 : page}</strong> of{' '}
                   <strong className="text-slate-400">{totalPages}</strong>
@@ -868,7 +868,7 @@ export default function GroupManagement() {
                     setPage(1);
                     setPageSize(Number(e.target.value));
                   }}
-                  className="rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[8px] text-slate-400 outline-none"
+                  className="rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[10px] text-slate-400 outline-none"
                 >
                   <option value={10}>10 / page</option>
                   <option value={20}>20 / page</option>
@@ -881,7 +881,7 @@ export default function GroupManagement() {
                   type="button"
                   disabled={loading || page <= 1}
                   onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                  className="rounded-lg border border-slate-600/20 bg-[#071523]/55 px-3 py-1.5 text-[8px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:border-cyan-400/25 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="rounded-lg border border-slate-600/20 bg-[#071523]/55 px-3 py-1.5 text-[10px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:border-cyan-400/25 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   Previous
                 </button>
@@ -889,7 +889,7 @@ export default function GroupManagement() {
                   type="button"
                   disabled={loading || totalPages === 0 || page >= totalPages}
                   onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                  className="rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-1.5 text-[8px] font-black tracking-[0.10em] text-cyan-200 uppercase transition hover:border-cyan-300/40 hover:bg-cyan-950/25 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-1.5 text-[10px] font-black tracking-[0.10em] text-cyan-200 uppercase transition hover:border-cyan-300/40 hover:bg-cyan-950/25 disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   Next
                 </button>
@@ -912,8 +912,8 @@ export default function GroupManagement() {
           <aside className="relative z-10 flex h-full w-full max-w-[420px] flex-col border-l border-cyan-400/20 bg-[#020b17]/96 shadow-[-20px_0_60px_rgba(0,0,0,.48)] backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-cyan-400/15 px-4 py-3">
               <div>
-                <div className="text-[8px] font-black tracking-[0.18em] text-cyan-400 uppercase">Group Profile</div>
-                <div className="mt-0.5 text-[8px] text-slate-400">Access group identity</div>
+                <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">Group Profile</div>
+                <div className="mt-0.5 text-[10px] text-slate-400">Access group identity</div>
               </div>
               <button type="button" onClick={() => setSelectedGroup(null)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-600/20 text-slate-500 transition hover:border-cyan-400/25 hover:text-cyan-200">
                 <CloseIcon />
@@ -936,24 +936,24 @@ export default function GroupManagement() {
               </div>
 
               <div className="mt-5 rounded-xl border border-sky-500/15 bg-[#061322]/45 p-3">
-                <div className="text-[8px] font-black tracking-[0.16em] text-slate-500 uppercase">Group Identity</div>
+                <div className="text-[10px] font-black tracking-[0.16em] text-slate-500 uppercase">Group Identity</div>
                 <dl className="mt-3 grid gap-3">
                   <div>
-                    <dt className="text-[7px] tracking-[0.12em] text-slate-400 uppercase">Group ID</dt>
-                    <dd className="mt-1 break-all font-mono text-[9px] text-slate-300">{selectedGroup.group_id}</dd>
+                    <dt className="text-[9px] tracking-[0.12em] text-slate-400 uppercase">Group ID</dt>
+                    <dd className="mt-1 break-all font-mono text-[11px] text-slate-300">{selectedGroup.group_id}</dd>
                   </div>
                   <div>
-                    <dt className="text-[7px] tracking-[0.12em] text-slate-400 uppercase">Description</dt>
-                    <dd className="mt-1 text-[9px] leading-relaxed text-slate-400">{selectedGroup.description || '—'}</dd>
+                    <dt className="text-[9px] tracking-[0.12em] text-slate-400 uppercase">Description</dt>
+                    <dd className="mt-1 text-[11px] leading-relaxed text-slate-400">{selectedGroup.description || '—'}</dd>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <dt className="text-[7px] tracking-[0.12em] text-slate-400 uppercase">Created</dt>
-                      <dd className="mt-1 text-[9px] text-slate-400">{formatDate(selectedGroup.created_at)}</dd>
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-400 uppercase">Created</dt>
+                      <dd className="mt-1 text-[11px] text-slate-400">{formatDate(selectedGroup.created_at)}</dd>
                     </div>
                     <div>
-                      <dt className="text-[7px] tracking-[0.12em] text-slate-400 uppercase">Last Update</dt>
-                      <dd className="mt-1 text-[9px] text-slate-400">{formatDate(selectedGroup.updated_at)}</dd>
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-400 uppercase">Last Update</dt>
+                      <dd className="mt-1 text-[11px] text-slate-400">{formatDate(selectedGroup.updated_at)}</dd>
                     </div>
                   </div>
                 </dl>
@@ -962,27 +962,27 @@ export default function GroupManagement() {
               <div className="mt-3 rounded-xl border border-cyan-400/15 bg-cyan-950/[0.08] p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[8px] font-black tracking-[0.16em] text-cyan-400 uppercase">Access Management</div>
-                    <div className="mt-1 text-[8px] text-slate-400">Application and dashboard permissions.</div>
+                    <div className="text-[10px] font-black tracking-[0.16em] text-cyan-400 uppercase">Access Management</div>
+                    <div className="mt-1 text-[10px] text-slate-400">Application and dashboard permissions.</div>
                   </div>
-                  {!menuLoading && <div className="font-mono text-[9px] font-bold text-cyan-300">{accessStats.granted}/{accessStats.total}</div>}
+                  {!menuLoading && <div className="font-mono text-[11px] font-bold text-cyan-300">{accessStats.granted}/{accessStats.total}</div>}
                 </div>
-                {menuError && <div className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2 text-[9px] text-rose-200">{menuError}</div>}
+                {menuError && <div className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2 text-[11px] text-rose-200">{menuError}</div>}
                 {menuLoading ? (
-                  <div className="py-7 text-center text-[8px] font-black tracking-[0.14em] text-cyan-400 uppercase">Loading Access...</div>
+                  <div className="py-7 text-center text-[10px] font-black tracking-[0.14em] text-cyan-400 uppercase">Loading Access...</div>
                 ) : (
                   <div className="mt-3 space-y-2">
                     {accessCategories.map(category => (
                       <div key={category.key} className="flex items-center justify-between rounded-lg border border-sky-500/10 bg-[#061322]/40 px-3 py-2.5">
-                        <span className="text-[9px] font-bold text-slate-300">{category.name}</span>
-                        <span className="font-mono text-[9px] text-cyan-300">{category.granted}/{category.total}</span>
+                        <span className="text-[11px] font-bold text-slate-300">{category.name}</span>
+                        <span className="font-mono text-[11px] text-cyan-300">{category.granted}/{category.total}</span>
                       </div>
                     ))}
                   </div>
                 )}
                 <button type="button" disabled={menuLoading || !selectedGroup.is_active}
                   onClick={() => { setAccessSearch(''); setAccessFilter('all'); setAccessCategory('all'); setAccessOpen(true); }}
-                  className="mt-3 w-full rounded-lg border border-cyan-300/30 bg-cyan-500/10 px-3 py-2.5 text-[8px] font-black tracking-[0.14em] text-cyan-100 uppercase transition hover:bg-cyan-500/15 disabled:opacity-35">
+                  className="mt-3 w-full rounded-lg border border-cyan-300/30 bg-cyan-500/10 px-3 py-2.5 text-[10px] font-black tracking-[0.14em] text-cyan-100 uppercase transition hover:bg-cyan-500/15 disabled:opacity-35">
                   Manage Access
                 </button>
               </div>
@@ -992,14 +992,14 @@ export default function GroupManagement() {
               <button
                 type="button"
                 onClick={() => openEdit(selectedGroup)}
-                className="rounded-xl border border-cyan-400/25 bg-cyan-950/15 px-4 py-3 text-[9px] font-black tracking-[0.14em] text-cyan-200 uppercase transition hover:bg-cyan-950/25"
+                className="rounded-xl border border-cyan-400/25 bg-cyan-950/15 px-4 py-3 text-[11px] font-black tracking-[0.14em] text-cyan-200 uppercase transition hover:bg-cyan-950/25"
               >
                 Edit Group
               </button>
               <button
                 type="button"
                 onClick={() => setStatusTarget(selectedGroup)}
-                className={`rounded-xl border px-4 py-3 text-[9px] font-black tracking-[0.14em] uppercase transition ${
+                className={`rounded-xl border px-4 py-3 text-[11px] font-black tracking-[0.14em] uppercase transition ${
                   selectedGroup.is_active
                     ? 'border-rose-400/25 bg-rose-950/15 text-rose-300 hover:bg-rose-950/25'
                     : 'border-emerald-400/25 bg-emerald-950/15 text-emerald-300 hover:bg-emerald-950/25'
@@ -1017,7 +1017,7 @@ export default function GroupManagement() {
           <div className="flex h-[90%] w-full max-w-[1100px] flex-col overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#020b17]/98 shadow-[0_24px_80px_rgba(0,0,0,.7)]">
             <div className="flex items-center justify-between border-b border-cyan-400/15 px-5 py-4">
               <div>
-                <div className="text-[8px] font-black tracking-[0.18em] text-cyan-400 uppercase">Access Management</div>
+                <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">Access Management</div>
                 <div className="mt-1 text-base font-black text-cyan-50">{selectedGroup.group_name}</div>
               </div>
               <button type="button" onClick={() => setAccessOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600/20 text-slate-500 hover:text-cyan-100"><CloseIcon /></button>
@@ -1028,30 +1028,30 @@ export default function GroupManagement() {
                 <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400"><SearchIcon /></div>
                 <input value={accessSearch} onChange={e => setAccessSearch(e.target.value)}
                   placeholder="Find menu by name, code or route..."
-                  className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 pl-10 pr-3 text-[10px] text-cyan-50 outline-none placeholder:text-slate-500 focus:border-cyan-300/45" />
+                  className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 pl-10 pr-3 text-[12px] text-cyan-50 outline-none placeholder:text-slate-500 focus:border-cyan-300/45" />
               </div>
               <div className="flex gap-1 rounded-lg border border-sky-500/12 bg-[#061322]/50 p-1">
                 {(['all','granted','not_granted'] as const).map(value => (
                   <button key={value} type="button" onClick={() => setAccessFilter(value)}
-                    className={`rounded-md px-3 py-2 text-[7px] font-black uppercase ${accessFilter === value ? 'bg-cyan-500/15 text-cyan-100' : 'text-slate-400'}`}>
+                    className={`rounded-md px-3 py-2 text-[9px] font-black uppercase ${accessFilter === value ? 'bg-cyan-500/15 text-cyan-100' : 'text-slate-400'}`}>
                     {value === 'all' ? 'All' : value === 'granted' ? 'Granted' : 'Not Granted'}
                   </button>
                 ))}
               </div>
-              <button type="button" onClick={() => setAllMenuAccess(true)} className="rounded-lg border border-emerald-400/20 px-3 py-2 text-[7px] font-black text-emerald-300 uppercase">Select All</button>
-              <button type="button" onClick={() => setAllMenuAccess(false)} className="rounded-lg border border-rose-400/20 px-3 py-2 text-[7px] font-black text-rose-300 uppercase">Clear All</button>
+              <button type="button" onClick={() => setAllMenuAccess(true)} className="rounded-lg border border-emerald-400/20 px-3 py-2 text-[9px] font-black text-emerald-300 uppercase">Select All</button>
+              <button type="button" onClick={() => setAllMenuAccess(false)} className="rounded-lg border border-rose-400/20 px-3 py-2 text-[9px] font-black text-rose-300 uppercase">Clear All</button>
             </div>
 
             <div className="grid min-h-0 flex-1 grid-cols-[210px_minmax(0,1fr)]">
               <aside className="overflow-y-auto border-r border-cyan-400/10 bg-[#020913]/70 p-3">
-                <div className="mb-2 px-2 text-[7px] font-black tracking-[0.16em] text-slate-400 uppercase">Application</div>
+                <div className="mb-2 px-2 text-[9px] font-black tracking-[0.16em] text-slate-400 uppercase">Application</div>
                 <button type="button" onClick={() => setAccessCategory('all')}
-                  className={`mb-1 flex w-full justify-between rounded-lg px-3 py-2.5 text-[9px] ${accessCategory === 'all' ? 'bg-cyan-500/10 text-cyan-100' : 'text-slate-500'}`}>
+                  className={`mb-1 flex w-full justify-between rounded-lg px-3 py-2.5 text-[11px] ${accessCategory === 'all' ? 'bg-cyan-500/10 text-cyan-100' : 'text-slate-500'}`}>
                   <span>All Applications</span><span>{accessStats.granted}/{accessStats.total}</span>
                 </button>
                 {accessCategories.map(category => (
                   <button key={category.key} type="button" onClick={() => setAccessCategory(category.key)}
-                    className={`mb-1 flex w-full justify-between rounded-lg px-3 py-2.5 text-[9px] ${accessCategory === category.key ? 'bg-cyan-500/10 text-cyan-100' : 'text-slate-500'}`}>
+                    className={`mb-1 flex w-full justify-between rounded-lg px-3 py-2.5 text-[11px] ${accessCategory === category.key ? 'bg-cyan-500/10 text-cyan-100' : 'text-slate-500'}`}>
                     <span className="truncate">{category.name}</span><span>{category.granted}/{category.total}</span>
                   </button>
                 ))}
@@ -1062,33 +1062,33 @@ export default function GroupManagement() {
                   {visibleAccessCategories.map(category => (
                     <section key={category.key} className="overflow-hidden rounded-xl border border-sky-500/12">
                       <div className="flex items-center justify-between border-b border-sky-500/10 bg-[#071727]/55 px-4 py-3">
-                        <div><div className="text-[9px] font-black text-cyan-200 uppercase">{category.name}</div><div className="mt-1 text-[7px] text-slate-400">{category.granted} of {category.total} granted</div></div>
+                        <div><div className="text-[11px] font-black text-cyan-200 uppercase">{category.name}</div><div className="mt-1 text-[9px] text-slate-400">{category.granted} of {category.total} granted</div></div>
                         <div className="flex gap-1">
-                          <button type="button" onClick={() => setCategoryMenuAccess(category.key,true)} className="rounded border border-emerald-400/15 px-2 py-1.5 text-[7px] text-emerald-300">Select All</button>
-                          <button type="button" onClick={() => setCategoryMenuAccess(category.key,false)} className="rounded border border-rose-400/15 px-2 py-1.5 text-[7px] text-rose-300">Clear</button>
+                          <button type="button" onClick={() => setCategoryMenuAccess(category.key,true)} className="rounded border border-emerald-400/15 px-2 py-1.5 text-[9px] text-emerald-300">Select All</button>
+                          <button type="button" onClick={() => setCategoryMenuAccess(category.key,false)} className="rounded border border-rose-400/15 px-2 py-1.5 text-[9px] text-rose-300">Clear</button>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-px bg-sky-500/[0.07]">
                         {category.menus.map(menu => (
                           <button key={menu.menu_id} type="button" onClick={() => toggleMenuAccess(menu.menu_id)}
                             className={`flex min-h-[72px] items-center gap-3 bg-[#04111e] px-4 py-3 text-left hover:bg-[#071a2a] ${menu.can_view ? 'shadow-[inset_3px_0_0_rgba(34,211,238,.75)]' : ''}`}>
-                            <span className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border text-[11px] ${menu.can_view ? 'border-cyan-300 bg-cyan-400 text-[#00101a]' : 'border-slate-600 text-transparent'}`}>✓</span>
-                            <span className="min-w-0 flex-1"><span className="block truncate text-[9px] font-bold text-slate-200">{menu.menu_name}</span><span className="mt-1 block truncate font-mono text-[7px] text-slate-400">{menu.menu_code}</span></span>
-                            <span className={`text-[6px] font-black uppercase ${menu.can_view ? 'text-emerald-300' : 'text-slate-400'}`}>{menu.can_view ? 'Granted' : 'No Access'}</span>
+                            <span className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border text-[13px] ${menu.can_view ? 'border-cyan-300 bg-cyan-400 text-[#00101a]' : 'border-slate-600 text-transparent'}`}>✓</span>
+                            <span className="min-w-0 flex-1"><span className="block truncate text-[11px] font-bold text-slate-200">{menu.menu_name}</span><span className="mt-1 block truncate font-mono text-[9px] text-slate-400">{menu.menu_code}</span></span>
+                            <span className={`text-[8px] font-black uppercase ${menu.can_view ? 'text-emerald-300' : 'text-slate-400'}`}>{menu.can_view ? 'Granted' : 'No Access'}</span>
                           </button>
                         ))}
                       </div>
                     </section>
                   ))}
-                </div> : <div className="grid h-full place-items-center text-[9px] text-slate-400">No menu found.</div>}
+                </div> : <div className="grid h-full place-items-center text-[11px] text-slate-400">No menu found.</div>}
               </main>
             </div>
 
             <div className="flex items-center justify-between border-t border-cyan-400/15 px-5 py-3">
-              <div><div className="text-[9px] text-slate-300">{accessStats.granted} of {accessStats.total} menus granted</div><div className={`mt-1 text-[7px] ${menuDirty ? 'text-amber-300' : 'text-slate-400'}`}>{menuDirty ? 'Unsaved access changes' : 'Access is synchronized'}</div></div>
+              <div><div className="text-[11px] text-slate-300">{accessStats.granted} of {accessStats.total} menus granted</div><div className={`mt-1 text-[9px] ${menuDirty ? 'text-amber-300' : 'text-slate-400'}`}>{menuDirty ? 'Unsaved access changes' : 'Access is synchronized'}</div></div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setAccessOpen(false)} className="rounded-lg border border-slate-600/20 px-4 py-2 text-[8px] font-black text-slate-400 uppercase">Close</button>
-                <button type="button" disabled={menuSaving || !menuDirty} onClick={saveMenuAccess} className="rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-5 py-2 text-[8px] font-black text-cyan-100 uppercase disabled:opacity-35">{menuSaving ? 'Saving...' : 'Save Access'}</button>
+                <button type="button" onClick={() => setAccessOpen(false)} className="rounded-lg border border-slate-600/20 px-4 py-2 text-[10px] font-black text-slate-400 uppercase">Close</button>
+                <button type="button" disabled={menuSaving || !menuDirty} onClick={saveMenuAccess} className="rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-5 py-2 text-[10px] font-black text-cyan-100 uppercase disabled:opacity-35">{menuSaving ? 'Saving...' : 'Save Access'}</button>
               </div>
             </div>
           </div>
@@ -1114,13 +1114,13 @@ export default function GroupManagement() {
         <div className="absolute inset-0 z-[110] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
           <div className="w-full max-w-[420px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
             <div className="border-b border-cyan-400/12 px-4 py-3">
-              <div className="text-[8px] font-black tracking-[0.18em] text-cyan-400 uppercase">Confirm Group Status</div>
+              <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">Confirm Group Status</div>
             </div>
             <div className="p-4">
               <div className="text-sm font-bold text-slate-100">
                 {statusTarget.is_active ? 'Deactivate' : 'Activate'} {statusTarget.group_name}?
               </div>
-              <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+              <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
                 {statusTarget.is_active
                   ? 'Group akan dinonaktifkan dan tidak dapat digunakan untuk assignment akses baru. Data group tetap disimpan.'
                   : 'Group akan kembali aktif dan dapat digunakan untuk assignment akses.'}
@@ -1130,7 +1130,7 @@ export default function GroupManagement() {
                   type="button"
                   disabled={statusBusy}
                   onClick={() => setStatusTarget(null)}
-                  className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2 text-[9px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40"
+                  className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2 text-[11px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40"
                 >
                   Cancel
                 </button>
@@ -1138,7 +1138,7 @@ export default function GroupManagement() {
                   type="button"
                   disabled={statusBusy}
                   onClick={changeStatus}
-                  className={`rounded-lg border px-4 py-2 text-[9px] font-black tracking-[0.10em] uppercase transition disabled:opacity-40 ${
+                  className={`rounded-lg border px-4 py-2 text-[11px] font-black tracking-[0.10em] uppercase transition disabled:opacity-40 ${
                     statusTarget.is_active
                       ? 'border-rose-400/25 bg-rose-950/25 text-rose-300 hover:bg-rose-950/40'
                       : 'border-emerald-400/25 bg-emerald-950/25 text-emerald-300 hover:bg-emerald-950/40'
@@ -1154,7 +1154,7 @@ export default function GroupManagement() {
 
       {toast && (
         <div className="pointer-events-none absolute bottom-4 left-1/2 z-[120] -translate-x-1/2">
-          <div className="rounded-xl border border-emerald-400/25 bg-[#031712]/95 px-4 py-2.5 text-[9px] font-bold text-emerald-200 shadow-[0_14px_45px_rgba(0,0,0,.48),0_0_18px_rgba(52,211,153,.06)] backdrop-blur-xl">
+          <div className="rounded-xl border border-emerald-400/25 bg-[#031712]/95 px-4 py-2.5 text-[11px] font-bold text-emerald-200 shadow-[0_14px_45px_rgba(0,0,0,.48),0_0_18px_rgba(52,211,153,.06)] backdrop-blur-xl">
             ✓ {toast}
           </div>
         </div>

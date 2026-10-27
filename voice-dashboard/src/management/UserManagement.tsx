@@ -32,7 +32,13 @@ interface ManagedUser {
   user_id: string;
   username: string;
   display_name: string;
+  email?: string | null;
   is_active: boolean;
+  is_locked: boolean;
+  failed_login_count: number;
+  locked_at?: string | null;
+  lock_reason?: string | null;
+  last_failed_login_at?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
 
@@ -53,6 +59,27 @@ interface UserListResponse {
   summary: UserSummary;
   items: ManagedUser[];
   message?: string;
+}
+
+interface UserGroupAccess {
+  group_id: string;
+  group_code?: string | null;
+  group_name: string;
+  description?: string | null;
+  is_active: boolean;
+  is_assigned: boolean;
+}
+
+interface EffectiveAccessMenu {
+  menu_id: string;
+  menu_code?: string | null;
+  menu_name: string;
+  parent_menu_id?: string | null;
+  parent_menu_code?: string | null;
+  parent_menu_name?: string | null;
+  route_key?: string | null;
+  icon_key?: string | null;
+  sort_order?: number | null;
 }
 
 interface UserManagementProps {
@@ -271,7 +298,7 @@ function MetricCard({
 
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-[8px] font-black tracking-[0.18em] text-slate-500 uppercase">
+          <div className="text-[10px] font-black tracking-[0.18em] text-slate-500 uppercase">
             {label}
           </div>
 
@@ -287,7 +314,7 @@ function MetricCard({
             {value}
           </div>
 
-          <div className="mt-1 text-[8px] tracking-[0.10em] text-slate-600 uppercase">
+          <div className="mt-1 text-[10px] tracking-[0.10em] text-slate-500 uppercase">
             {subtitle}
           </div>
         </div>
@@ -321,8 +348,8 @@ function StatusBadge({
         rounded-full
         border
         px-2.5
-        py-0.5
-        text-[8px]
+        py-1
+        text-[10px]
         font-black
         tracking-[0.14em]
         uppercase
@@ -353,6 +380,34 @@ function StatusBadge({
   );
 }
 
+function LockBadge({
+  locked,
+  attempts,
+}: {
+  locked: boolean;
+  attempts?: number;
+}) {
+  if (!locked && !attempts) {
+    return null;
+  }
+
+  return (
+    <span
+      className={`
+        inline-flex items-center gap-1.5 rounded-full border
+        px-2.5 py-1 text-[10px] font-black tracking-[0.12em] uppercase
+        ${locked
+          ? 'border-amber-400/30 bg-amber-950/25 text-amber-200'
+          : 'border-slate-600/20 bg-slate-900/25 text-slate-500'}
+      `}
+    >
+      {locked
+        ? `Locked · ${attempts ?? 3}/3`
+        : `Failed · ${attempts ?? 0}/3`}
+    </span>
+  );
+}
+
 function VoiceBadge({
   enrolled,
 }: {
@@ -367,8 +422,8 @@ function VoiceBadge({
         rounded-full
         border
         px-2.5
-        py-0.5
-        text-[8px]
+        py-1
+        text-[10px]
         font-black
         tracking-[0.12em]
         uppercase
@@ -469,6 +524,30 @@ export default function UserManagement(
     setStatusBusy,
   ] =
     useState(false);
+
+  const [
+    unlockBusy,
+    setUnlockBusy,
+  ] = useState(false);
+
+  const [
+    groupAccess,
+    setGroupAccess,
+  ] = useState<UserGroupAccess[]>([]);
+
+  const [
+    effectiveMenus,
+    setEffectiveMenus,
+  ] = useState<EffectiveAccessMenu[]>([]);
+
+  const [groupLoading, setGroupLoading] =
+    useState(false);
+  const [groupSaving, setGroupSaving] =
+    useState(false);
+  const [groupDirty, setGroupDirty] =
+    useState(false);
+  const [groupError, setGroupError] =
+    useState('');
 
   const [
     toast,
@@ -676,6 +755,152 @@ export default function UserManagement(
     };
   }, [actionMenuId]);
 
+  const loadUserAccess = useCallback(
+    async (userId: string) => {
+      setGroupLoading(true);
+      setGroupError('');
+      setGroupDirty(false);
+
+      try {
+        const [groupResponse, accessResponse] =
+          await Promise.all([
+            fetch(
+              `${API_BASE}/api/management/users/${userId}/groups`
+            ),
+            fetch(
+              `${API_BASE}/api/management/users/${userId}/access`
+            ),
+          ]);
+
+        const groupResult = await groupResponse.json();
+        const accessResult = await accessResponse.json();
+
+        if (!groupResponse.ok || !groupResult.success) {
+          throw new Error(
+            groupResult.message ||
+              'Gagal mengambil group access user.'
+          );
+        }
+
+        if (!accessResponse.ok || !accessResult.success) {
+          throw new Error(
+            accessResult.message ||
+              'Gagal mengambil effective menu access.'
+          );
+        }
+
+        setGroupAccess(
+          Array.isArray(groupResult.items)
+            ? groupResult.items
+            : []
+        );
+
+        setEffectiveMenus(
+          Array.isArray(accessResult.access?.menus)
+            ? accessResult.access.menus
+            : []
+        );
+      } catch (err) {
+        setGroupAccess([]);
+        setEffectiveMenus([]);
+        setGroupError(
+          err instanceof Error
+            ? err.message
+            : 'Gagal mengambil group access user.'
+        );
+      } finally {
+        setGroupLoading(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!selectedUser) {
+      setGroupAccess([]);
+      setEffectiveMenus([]);
+      setGroupError('');
+      setGroupDirty(false);
+      return;
+    }
+
+    loadUserAccess(selectedUser.user_id);
+  }, [selectedUser?.user_id, loadUserAccess]);
+
+  const toggleUserGroup = (groupId: string) => {
+    setGroupAccess((prev) =>
+      prev.map((group) => {
+        if (group.group_id !== groupId) {
+          return group;
+        }
+
+        if (!group.is_active && !group.is_assigned) {
+          return group;
+        }
+
+        return {
+          ...group,
+          is_assigned: !group.is_assigned,
+        };
+      })
+    );
+    setGroupDirty(true);
+  };
+
+  const saveUserGroupAccess = async () => {
+    if (!selectedUser || groupSaving) {
+      return;
+    }
+
+    setGroupSaving(true);
+    setGroupError('');
+
+    try {
+      const groupIds = groupAccess
+        .filter(
+          (group) => group.is_assigned && group.is_active
+        )
+        .map((group) => group.group_id);
+
+      const response = await fetch(
+        `${API_BASE}/api/management/users/${selectedUser.user_id}/groups`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            group_ids: groupIds,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message ||
+            'Gagal menyimpan group access user.'
+        );
+      }
+
+      setToast(
+        `Group access ${selectedUser.display_name} berhasil disimpan.`
+      );
+      setGroupDirty(false);
+      await loadUserAccess(selectedUser.user_id);
+      await loadUsers();
+    } catch (err) {
+      setGroupError(
+        err instanceof Error
+          ? err.message
+          : 'Gagal menyimpan group access user.'
+      );
+    } finally {
+      setGroupSaving(false);
+    }
+  };
+
   const statusLabel =
     useMemo(() => {
       if (
@@ -803,6 +1028,71 @@ export default function UserManagement(
       }
     };
 
+  const unlockUser =
+    async (target: ManagedUser) => {
+      if (!target.is_locked || unlockBusy) {
+        return;
+      }
+
+      const confirmed = window.confirm(
+        `Unlock account ${target.display_name}? Failed login counter akan di-reset ke 0.`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setUnlockBusy(true);
+      setError('');
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/api/management/users/${target.user_id}/unlock`,
+          { method: 'POST' }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(
+            result.message || 'Gagal unlock account.'
+          );
+        }
+
+        setToast(
+          `${target.display_name} berhasil di-unlock.`
+        );
+
+        if (
+          selectedUser?.user_id === target.user_id
+        ) {
+          setSelectedUser((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  is_locked: false,
+                  failed_login_count: 0,
+                  locked_at: null,
+                  lock_reason: null,
+                  last_failed_login_at: null,
+                }
+              : prev
+          );
+        }
+
+        setActionMenuId(null);
+        await loadUsers();
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Gagal unlock account.'
+        );
+      } finally {
+        setUnlockBusy(false);
+      }
+    };
+
   if (
     view ===
     'register'
@@ -815,16 +1105,16 @@ export default function UserManagement(
             onClick={
               returnDirectory
             }
-            className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/25 bg-cyan-950/15 px-3 py-2 text-[9px] font-black tracking-[0.14em] text-cyan-200 uppercase transition hover:border-cyan-300/45 hover:bg-cyan-950/30"
+            className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/25 bg-cyan-950/15 px-3 py-2 text-[11px] font-black tracking-[0.14em] text-cyan-200 uppercase transition hover:border-cyan-300/45 hover:bg-cyan-950/30"
           >
             ← User Directory
           </button>
 
           <div className="text-right">
-            <div className="text-[8px] font-black tracking-[0.18em] text-cyan-200 uppercase">
+            <div className="text-[10px] font-black tracking-[0.18em] text-cyan-200 uppercase">
               Registration Mode
             </div>
-            <div className="mt-0.5 text-[7px] tracking-[0.10em] text-slate-600 uppercase">
+            <div className="mt-0.5 text-[9px] tracking-[0.10em] text-slate-500 uppercase">
               Account + Voice Enrollment
             </div>
           </div>
@@ -850,19 +1140,21 @@ export default function UserManagement(
         {/* HEADER */}
         <div className="flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
-            <div className="text-[8px] font-black tracking-[0.22em] text-cyan-400 uppercase">
+            <div className="text-[10px] font-black tracking-[0.22em] text-cyan-400 uppercase">
               CoreAnalytics · Management Center
-                          <div className="mt-1 flex items-center gap-2">
-              <h2 className="truncate text-lg font-black tracking-tight text-cyan-50 sm:text-xl">
+            </div>
+
+            <div className="mt-1 flex items-center gap-2">
+              <h1 className="truncate text-lg font-black tracking-tight text-cyan-50 sm:text-xl">
                 User Directory
-              </h2>
+              </h1>
 
+              <span className="hidden rounded border border-cyan-400/20 bg-cyan-950/20 px-2 py-0.5 text-[9px] font-black tracking-[0.16em] text-cyan-300 uppercase sm:inline-flex">
+                Identity Control
+              </span>
             </div>
 
-            </div>
-
-
-            <p className="mt-1 text-[9px] tracking-[0.07em] text-slate-500">
+            <p className="mt-1 text-[11px] tracking-[0.07em] text-slate-500">
               Manage account lifecycle and biometric voice identity.
             </p>
           </div>
@@ -893,7 +1185,7 @@ export default function UserManagement(
               onClick={
                 openRegistration
               }
-              className="inline-flex h-9 items-center gap-2 rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-3.5 text-[9px] font-black tracking-[0.14em] text-cyan-100 uppercase shadow-[0_0_20px_rgba(34,211,238,.07)] transition hover:border-cyan-200/60 hover:bg-cyan-500/15"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-3.5 text-[11px] font-black tracking-[0.14em] text-cyan-100 uppercase shadow-[0_0_20px_rgba(34,211,238,.07)] transition hover:border-cyan-200/60 hover:bg-cyan-500/15"
             >
               <span className="text-base leading-none">
                 +
@@ -947,7 +1239,7 @@ export default function UserManagement(
           {/* TOOLBAR */}
           <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-sky-500/15 bg-[#04101f]/48 p-2.5 backdrop-blur-md lg:flex-row lg:items-center">
             <div className="relative min-w-0 flex-1">
-              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-600">
+              <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-500">
                 <SearchIcon />
               </div>
 
@@ -961,12 +1253,12 @@ export default function UserManagement(
                   )
                 }
                 placeholder="Search display name or username..."
-                className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[11px] text-cyan-50 outline-none transition placeholder:text-slate-700 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
+                className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
               />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <div className="text-[8px] font-black tracking-[0.14em] text-slate-600 uppercase">
+              <div className="text-[10px] font-black tracking-[0.14em] text-slate-500 uppercase">
                 Status
               </div>
 
@@ -992,7 +1284,7 @@ export default function UserManagement(
                       border
                       px-3
                       py-2
-                      text-[8px]
+                      text-[10px]
                       font-black
                       tracking-[0.12em]
                       uppercase
@@ -1014,7 +1306,7 @@ export default function UserManagement(
 
           {/* INFO / ERROR */}
           {error && (
-            <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-rose-400/25 bg-rose-950/15 px-3 py-2.5 text-[10px] text-rose-200">
+            <div className="mt-3 flex items-start justify-between gap-3 rounded-xl border border-rose-400/25 bg-rose-950/15 px-3 py-2.5 text-[12px] text-rose-200">
               <span>
                 {error}
               </span>
@@ -1033,13 +1325,13 @@ export default function UserManagement(
 
           {/* TABLE PANEL */}
           <div className="mt-3 overflow-hidden rounded-xl border border-sky-500/15 bg-[#020b17]/52 shadow-[0_12px_40px_rgba(0,0,0,.16)] backdrop-blur-md">
-            <div className="flex items-center justify-between border-b border-sky-500/12 px-3 py-2">
+            <div className="flex items-center justify-between border-b border-sky-500/12 px-3 py-2.5">
               <div>
-                <div className="text-[9px] font-black tracking-[0.16em] text-cyan-100 uppercase">
+                <div className="text-[11px] font-black tracking-[0.16em] text-cyan-100 uppercase">
                   {statusLabel}
                 </div>
 
-                <div className="mt-0.5 text-[8px] tracking-[0.08em] text-slate-600">
+                <div className="mt-0.5 text-[10px] tracking-[0.08em] text-slate-500">
                   {totalItems}{' '}
                   record
                   {totalItems === 1
@@ -1049,7 +1341,7 @@ export default function UserManagement(
               </div>
 
               {loading && (
-                <div className="flex items-center gap-2 text-[8px] font-bold tracking-[0.12em] text-cyan-400 uppercase">
+                <div className="flex items-center gap-2 text-[10px] font-bold tracking-[0.12em] text-cyan-400 uppercase">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300" />
                   Syncing
                 </div>
@@ -1058,33 +1350,25 @@ export default function UserManagement(
 
             {/* DESKTOP TABLE */}
             <div className="hidden overflow-x-auto md:block">
-              <table className="w-full min-w-[980px] table-fixed border-collapse" style={{ tableLayout: 'fixed' }}>
-                <colgroup>
-                  <col style={{ width: '35%' }} />
-                  <col style={{ width: '14%' }} />
-                  <col style={{ width: '17%' }} />
-                  <col style={{ width: '14%' }} />
-                  <col style={{ width: '16%' }} />
-                  <col style={{ width: '4%' }} />
-                </colgroup>
+              <table className="w-full min-w-[840px] border-collapse">
                 <thead>
                   <tr className="border-b border-sky-500/10 bg-[#061322]/45 text-left">
-                    <th className="px-4 py-2 text-left text-[8px] font-black tracking-[0.15em] text-slate-600 uppercase">
+                    <th className="px-4 py-3 text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       User
                     </th>
-                    <th className="px-4 py-2 text-left text-[8px] font-black tracking-[0.15em] text-slate-600 uppercase">
+                    <th className="px-3 py-3 text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       Username
                     </th>
-                    <th className="px-4 py-2 text-left text-[8px] font-black tracking-[0.15em] text-slate-600 uppercase">
+                    <th className="px-3 py-3 text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       Voice Identity
                     </th>
-                    <th className="px-4 py-2 text-left text-[8px] font-black tracking-[0.15em] text-slate-600 uppercase">
+                    <th className="px-3 py-3 text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       Status
                     </th>
-                    <th className="px-4 py-2 text-left text-[8px] font-black tracking-[0.15em] text-slate-600 uppercase">
+                    <th className="px-3 py-3 text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       Created
                     </th>
-                    <th className="px-2 py-2 text-center text-[8px] font-black tracking-[0.15em] text-slate-600 uppercase">
+                    <th className="w-14 px-3 py-3 text-center text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       Action
                     </th>
                   </tr>
@@ -1103,9 +1387,9 @@ export default function UserManagement(
                               user
                             )
                           }
-                          className="group h-[50px] border-b border-sky-500/[0.07] transition hover:bg-cyan-500/[0.035]"
+                          className="group border-b border-sky-500/[0.07] transition hover:bg-cyan-500/[0.035]"
                         >
-                          <td className="h-[50px] px-4 py-0 align-middle">
+                          <td className="px-4 py-3">
                             <button
                               type="button"
                               onClick={() =>
@@ -1113,19 +1397,19 @@ export default function UserManagement(
                                   user
                                 )
                               }
-                              className="flex w-full min-w-0 items-center gap-2.5 text-left"
+                              className="flex items-center gap-3 text-left"
                             >
                               <div
                                 className={`
                                   flex
-                                  h-8
-                                  w-8
+                                  h-9
+                                  w-9
                                   flex-shrink-0
                                   items-center
                                   justify-center
-                                  rounded-lg
+                                  rounded-xl
                                   border
-                                  text-[10px]
+                                  text-[12px]
                                   font-black
                                   tracking-[0.05em]
                                   ${
@@ -1142,13 +1426,13 @@ export default function UserManagement(
                               </div>
 
                               <div className="min-w-0">
-                                <div className="max-w-[320px] truncate text-[10px] font-bold text-slate-200 transition group-hover:text-cyan-100">
+                                <div className="max-w-[230px] truncate text-[13px] font-bold text-slate-200 transition group-hover:text-cyan-100">
                                   {
                                     user.display_name
                                   }
                                 </div>
 
-                                <div className="mt-0.5 max-w-[320px] truncate text-[7px] text-slate-600">
+                                <div className="mt-0.5 max-w-[230px] truncate text-[10px] text-slate-500">
                                   {
                                     user.user_id
                                   }
@@ -1157,8 +1441,8 @@ export default function UserManagement(
                             </button>
                           </td>
 
-                          <td className="h-[50px] px-4 py-0 text-left align-middle">
-                            <span className="rounded-md border border-slate-600/15 bg-[#081523]/45 px-2 py-0.5 font-mono text-[8px] text-slate-400">
+                          <td className="px-3 py-3">
+                            <span className="rounded-md border border-slate-600/15 bg-[#081523]/45 px-2 py-1 font-mono text-[11px] text-slate-400">
                               @
                               {
                                 user.username
@@ -1166,7 +1450,7 @@ export default function UserManagement(
                             </span>
                           </td>
 
-                          <td className="h-[50px] px-4 py-0 text-left align-middle">
+                          <td className="px-3 py-3">
                             <VoiceBadge
                               enrolled={
                                 user.voice_enrolled
@@ -1176,7 +1460,7 @@ export default function UserManagement(
                             {user.voice_enrolled &&
                               user.voice_sample_count !=
                                 null && (
-                                <div className="mt-0.5 pl-0.5 text-left text-[6px] tracking-[0.08em] text-slate-650">
+                                <div className="mt-1 text-[9px] tracking-[0.08em] text-slate-500">
                                   {
                                     user.voice_sample_count
                                   }{' '}
@@ -1185,21 +1469,27 @@ export default function UserManagement(
                               )}
                           </td>
 
-                          <td className="h-[50px] px-4 py-0 text-left align-middle">
-                            <StatusBadge
-                              active={
-                                user.is_active
-                              }
-                            />
+                          <td className="px-3 py-3">
+                            <div className="flex flex-wrap gap-1.5">
+                              <StatusBadge
+                                active={
+                                  user.is_active
+                                }
+                              />
+                              <LockBadge
+                                locked={user.is_locked}
+                                attempts={user.failed_login_count}
+                              />
+                            </div>
                           </td>
 
-                          <td className="h-[50px] px-4 py-0 text-left align-middle text-[9px] text-slate-500">
+                          <td className="px-3 py-3 text-[11px] text-slate-500">
                             {formatDate(
                               user.created_at
                             )}
                           </td>
 
-                          <td className="relative h-[50px] px-2 py-0 text-center align-middle">
+                          <td className="relative px-3 py-3 text-center">
                             <button
                               type="button"
                               onClick={(
@@ -1214,7 +1504,7 @@ export default function UserManagement(
                                       : user.user_id
                                 );
                               }}
-                              className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-transparent text-slate-500 transition hover:border-cyan-400/20 hover:bg-cyan-950/20 hover:text-cyan-200"
+                              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-slate-500 transition hover:border-cyan-400/20 hover:bg-cyan-950/20 hover:text-cyan-200"
                             >
                               <MoreIcon />
                             </button>
@@ -1239,7 +1529,7 @@ export default function UserManagement(
                                       null
                                     );
                                   }}
-                                  className="w-full rounded-lg px-3 py-2 text-left text-[9px] font-bold text-slate-300 transition hover:bg-cyan-950/25 hover:text-cyan-100"
+                                  className="w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-slate-300 transition hover:bg-cyan-950/25 hover:text-cyan-100"
                                 >
                                   View Profile
                                 </button>
@@ -1261,7 +1551,7 @@ export default function UserManagement(
                                     px-3
                                     py-2
                                     text-left
-                                    text-[9px]
+                                    text-[11px]
                                     font-bold
                                     transition
                                     ${
@@ -1275,6 +1565,19 @@ export default function UserManagement(
                                     ? 'Deactivate User'
                                     : 'Activate User'}
                                 </button>
+
+                                {user.is_locked && (
+                                  <button
+                                    type="button"
+                                    disabled={unlockBusy}
+                                    onClick={() =>
+                                      unlockUser(user)
+                                    }
+                                    className="mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-amber-200 transition hover:bg-amber-950/25 disabled:opacity-40"
+                                  >
+                                    Unlock Account
+                                  </button>
+                                )}
                               </div>
                             )}
                           </td>
@@ -1307,7 +1610,7 @@ export default function UserManagement(
                             justify-center
                             rounded-xl
                             border
-                            text-[10px]
+                            text-[12px]
                             font-black
                             ${
                               user.is_active
@@ -1323,13 +1626,13 @@ export default function UserManagement(
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-[11px] font-bold text-slate-200">
+                          <div className="truncate text-[13px] font-bold text-slate-200">
                             {
                               user.display_name
                             }
                           </div>
 
-                          <div className="mt-0.5 truncate text-[9px] text-slate-600">
+                          <div className="mt-0.5 truncate text-[11px] text-slate-500">
                             @
                             {
                               user.username
@@ -1337,11 +1640,17 @@ export default function UserManagement(
                           </div>
                         </div>
 
-                        <StatusBadge
-                          active={
-                            user.is_active
-                          }
-                        />
+                        <div className="flex flex-col items-end gap-1">
+                          <StatusBadge
+                            active={
+                              user.is_active
+                            }
+                          />
+                          <LockBadge
+                            locked={user.is_locked}
+                            attempts={user.failed_login_count}
+                          />
+                        </div>
                       </div>
 
                       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -1354,7 +1663,7 @@ export default function UserManagement(
                         {user.voice_sample_count !=
                           null &&
                           user.voice_enrolled && (
-                            <span className="text-[8px] text-slate-600">
+                            <span className="text-[10px] text-slate-500">
                               {
                                 user.voice_sample_count
                               }{' '}
@@ -1371,7 +1680,7 @@ export default function UserManagement(
                               user
                             )
                           }
-                          className="flex-1 rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-2 text-[8px] font-black tracking-[0.10em] text-cyan-200 uppercase"
+                          className="flex-1 rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-2 text-[10px] font-black tracking-[0.10em] text-cyan-200 uppercase"
                         >
                           View
                         </button>
@@ -1389,7 +1698,7 @@ export default function UserManagement(
                             border
                             px-3
                             py-2
-                            text-[8px]
+                            text-[10px]
                             font-black
                             tracking-[0.10em]
                             uppercase
@@ -1415,7 +1724,7 @@ export default function UserManagement(
               <div className="grid min-h-[260px] place-items-center">
                 <div className="text-center">
                   <div className="mx-auto h-9 w-9 animate-spin rounded-full border-2 border-cyan-400/15 border-t-cyan-300" />
-                  <div className="mt-3 text-[8px] font-black tracking-[0.18em] text-cyan-300 uppercase">
+                  <div className="mt-3 text-[10px] font-black tracking-[0.18em] text-cyan-300 uppercase">
                     Loading Directory
                   </div>
                 </div>
@@ -1427,15 +1736,15 @@ export default function UserManagement(
               items.length === 0 && (
                 <div className="grid min-h-[260px] place-items-center p-6 text-center">
                   <div>
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-600/20 bg-slate-900/25 text-slate-600">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-600/20 bg-slate-900/25 text-slate-500">
                       <UserIcon />
                     </div>
 
-                    <div className="mt-3 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
+                    <div className="mt-3 text-[12px] font-black tracking-[0.15em] text-slate-400 uppercase">
                       No Users Found
                     </div>
 
-                    <div className="mt-1 text-[9px] text-slate-600">
+                    <div className="mt-1 text-[11px] text-slate-500">
                       Try another search or status filter.
                     </div>
                   </div>
@@ -1443,8 +1752,8 @@ export default function UserManagement(
               )}
 
             {/* PAGINATION */}
-            <div className="flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 text-[8px] tracking-[0.08em] text-slate-600">
+            <div className="flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-[10px] tracking-[0.08em] text-slate-500">
                 <span>
                   Page{' '}
                   <strong className="text-slate-400">
@@ -1474,7 +1783,7 @@ export default function UserManagement(
                       )
                     );
                   }}
-                  className="rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[8px] text-slate-400 outline-none"
+                  className="rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[10px] text-slate-400 outline-none"
                 >
                   <option value={10}>
                     10 / page
@@ -1504,7 +1813,7 @@ export default function UserManagement(
                         )
                     )
                   }
-                  className="rounded-lg border border-slate-600/20 bg-[#071523]/55 px-3 py-1.5 text-[8px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:border-cyan-400/25 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="rounded-lg border border-slate-600/20 bg-[#071523]/55 px-3 py-1.5 text-[10px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:border-cyan-400/25 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   Previous
                 </button>
@@ -1526,7 +1835,7 @@ export default function UserManagement(
                         )
                     )
                   }
-                  className="rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-1.5 text-[8px] font-black tracking-[0.10em] text-cyan-200 uppercase transition hover:border-cyan-300/40 hover:bg-cyan-950/25 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="rounded-lg border border-cyan-400/20 bg-cyan-950/15 px-3 py-1.5 text-[10px] font-black tracking-[0.10em] text-cyan-200 uppercase transition hover:border-cyan-300/40 hover:bg-cyan-950/25 disabled:cursor-not-allowed disabled:opacity-30"
                 >
                   Next
                 </button>
@@ -1553,10 +1862,10 @@ export default function UserManagement(
           <aside className="relative z-10 flex h-full w-full max-w-[420px] flex-col border-l border-cyan-400/20 bg-[#020b17]/96 shadow-[-20px_0_60px_rgba(0,0,0,.48)] backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-cyan-400/15 px-4 py-3">
               <div>
-                <div className="text-[8px] font-black tracking-[0.18em] text-cyan-400 uppercase">
+                <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">
                   User Profile
                 </div>
-                <div className="mt-0.5 text-[8px] text-slate-600">
+                <div className="mt-0.5 text-[10px] text-slate-500">
                   Identity & authentication
                 </div>
               </div>
@@ -1607,46 +1916,78 @@ export default function UserManagement(
                     }
                   </div>
 
-                  <div className="mt-0.5 truncate text-[10px] text-slate-500">
+                  <div className="mt-0.5 truncate text-[12px] text-slate-500">
                     @
                     {
                       selectedUser.username
                     }
                   </div>
 
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-wrap gap-1.5">
                     <StatusBadge
                       active={
                         selectedUser.is_active
                       }
+                    />
+                    <LockBadge
+                      locked={selectedUser.is_locked}
+                      attempts={selectedUser.failed_login_count}
                     />
                   </div>
                 </div>
               </div>
 
               <div className="mt-5 rounded-xl border border-sky-500/15 bg-[#061322]/45 p-3">
-                <div className="text-[8px] font-black tracking-[0.16em] text-slate-500 uppercase">
+                <div className="text-[10px] font-black tracking-[0.16em] text-slate-500 uppercase">
                   Account Identity
                 </div>
 
                 <dl className="mt-3 grid gap-3">
                   <div>
-                    <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                    <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                       User ID
                     </dt>
-                    <dd className="mt-1 break-all font-mono text-[9px] text-slate-300">
+                    <dd className="mt-1 break-all font-mono text-[11px] text-slate-300">
                       {
                         selectedUser.user_id
                       }
                     </dd>
                   </div>
 
+                  <div>
+                    <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
+                      Email
+                    </dt>
+                    <dd className="mt-1 break-all text-[11px] text-slate-400">
+                      {selectedUser.email || '—'}
+                    </dd>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
+                        Failed Login
+                      </dt>
+                      <dd className="mt-1 text-[11px] text-slate-400">
+                        {selectedUser.failed_login_count || 0} / 3
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
+                        Locked At
+                      </dt>
+                      <dd className="mt-1 text-[11px] text-slate-400">
+                        {formatDate(selectedUser.locked_at)}
+                      </dd>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                         Created
                       </dt>
-                      <dd className="mt-1 text-[9px] text-slate-400">
+                      <dd className="mt-1 text-[11px] text-slate-400">
                         {formatDate(
                           selectedUser.created_at
                         )}
@@ -1654,10 +1995,10 @@ export default function UserManagement(
                     </div>
 
                     <div>
-                      <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                         Last Update
                       </dt>
-                      <dd className="mt-1 text-[9px] text-slate-400">
+                      <dd className="mt-1 text-[11px] text-slate-400">
                         {formatDate(
                           selectedUser.updated_at
                         )}
@@ -1667,9 +2008,138 @@ export default function UserManagement(
                 </dl>
               </div>
 
+              <div className="mt-3 rounded-xl border border-violet-400/15 bg-violet-950/[0.08] p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-black tracking-[0.16em] text-violet-300 uppercase">
+                      Group Access
+                    </div>
+                    <div className="mt-1 text-[10px] leading-relaxed text-slate-500">
+                      Menu access mengikuti gabungan seluruh active group.
+                    </div>
+                  </div>
+
+                  <span className="rounded-full border border-violet-400/20 bg-violet-950/20 px-2 py-1 text-[9px] font-black tracking-[0.10em] text-violet-200 uppercase">
+                    {groupAccess.filter((g) => g.is_assigned).length} Groups
+                  </span>
+                </div>
+
+                {groupLoading ? (
+                  <div className="mt-3 rounded-lg border border-slate-700/20 bg-slate-950/20 px-3 py-3 text-[11px] text-slate-500">
+                    Loading group access...
+                  </div>
+                ) : (
+                  <>
+                    {groupError && (
+                      <div className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2.5 text-[11px] leading-relaxed text-rose-300">
+                        {groupError}
+                      </div>
+                    )}
+
+                    <div className="mt-3 grid gap-2">
+                      {groupAccess.length === 0 ? (
+                        <div className="rounded-lg border border-slate-700/20 bg-slate-950/20 px-3 py-3 text-[11px] text-slate-500">
+                          Belum ada group yang tersedia.
+                        </div>
+                      ) : (
+                        groupAccess.map((group) => (
+                          <label
+                            key={group.group_id}
+                            className={`flex items-start gap-3 rounded-lg border px-3 py-2.5 transition ${
+                              group.is_assigned
+                                ? 'border-violet-400/30 bg-violet-950/20'
+                                : 'border-slate-700/20 bg-slate-950/15'
+                            } ${
+                              !group.is_active && !group.is_assigned
+                                ? 'cursor-not-allowed opacity-45'
+                                : 'cursor-pointer hover:border-violet-400/25'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={group.is_assigned}
+                              disabled={
+                                !group.is_active &&
+                                !group.is_assigned
+                              }
+                              onChange={() =>
+                                toggleUserGroup(group.group_id)
+                              }
+                              className="mt-0.5 h-4 w-4 accent-violet-400"
+                            />
+
+                            <span className="min-w-0 flex-1">
+                              <span className="flex items-center justify-between gap-2">
+                                <span className="truncate text-[11px] font-bold text-slate-200">
+                                  {group.group_name}
+                                </span>
+                                <span
+                                  className={`shrink-0 text-[8px] font-black tracking-[0.10em] uppercase ${
+                                    group.is_active
+                                      ? 'text-emerald-300'
+                                      : 'text-slate-600'
+                                  }`}
+                                >
+                                  {group.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                              </span>
+                              <span className="mt-0.5 block font-mono text-[9px] text-slate-600">
+                                {group.group_code || group.group_id}
+                              </span>
+                            </span>
+                          </label>
+                        ))
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={!groupDirty || groupSaving}
+                      onClick={saveUserGroupAccess}
+                      className="mt-3 w-full rounded-lg border border-violet-400/25 bg-violet-950/20 px-3 py-2.5 text-[10px] font-black tracking-[0.12em] text-violet-200 uppercase transition hover:bg-violet-950/35 disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      {groupSaving
+                        ? 'Saving Group Access...'
+                        : groupDirty
+                          ? 'Save Group Access'
+                          : 'Group Access Saved'}
+                    </button>
+
+                    <div className="mt-4 border-t border-violet-400/10 pt-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-[9px] font-black tracking-[0.14em] text-slate-500 uppercase">
+                          Effective Menu Access
+                        </div>
+                        <div className="text-[9px] font-bold text-cyan-300">
+                          {effectiveMenus.length} menus
+                        </div>
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {effectiveMenus.length === 0 ? (
+                          <span className="text-[10px] text-slate-600">
+                            User belum memiliki menu access dari active group.
+                          </span>
+                        ) : (
+                          effectiveMenus.map((menu) => (
+                            <span
+                              key={menu.menu_id}
+                              title={menu.route_key || menu.menu_code || ''}
+                              className="rounded-md border border-cyan-400/15 bg-cyan-950/15 px-2 py-1 text-[9px] font-bold text-cyan-100/80"
+                            >
+                              {menu.menu_name}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
               <div className="mt-3 rounded-xl border border-cyan-400/15 bg-cyan-950/[0.08] p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-[8px] font-black tracking-[0.16em] text-cyan-400 uppercase">
+                  <div className="text-[10px] font-black tracking-[0.16em] text-cyan-400 uppercase">
                     Voice Identity
                   </div>
 
@@ -1684,10 +2154,10 @@ export default function UserManagement(
                   <dl className="mt-3 grid gap-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                        <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                           Samples
                         </dt>
-                        <dd className="mt-1 text-[11px] font-bold text-cyan-100">
+                        <dd className="mt-1 text-[13px] font-bold text-cyan-100">
                           {
                             selectedUser.voice_sample_count ??
                             '—'
@@ -1696,10 +2166,10 @@ export default function UserManagement(
                       </div>
 
                       <div>
-                        <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                        <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                           Threshold
                         </dt>
-                        <dd className="mt-1 text-[11px] font-bold text-cyan-100">
+                        <dd className="mt-1 text-[13px] font-bold text-cyan-100">
                           {
                             selectedUser.voice_threshold ??
                             '—'
@@ -1709,10 +2179,10 @@ export default function UserManagement(
                     </div>
 
                     <div>
-                      <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                         Model
                       </dt>
-                      <dd className="mt-1 text-[9px] text-slate-400">
+                      <dd className="mt-1 text-[11px] text-slate-400">
                         {
                           selectedUser.voice_model_name ||
                           '—'
@@ -1724,10 +2194,10 @@ export default function UserManagement(
                     </div>
 
                     <div>
-                      <dt className="text-[7px] tracking-[0.12em] text-slate-650 uppercase">
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                         Voice Profile ID
                       </dt>
-                      <dd className="mt-1 break-all font-mono text-[8px] text-slate-500">
+                      <dd className="mt-1 break-all font-mono text-[10px] text-slate-500">
                         {
                           selectedUser.voice_profile_id ||
                           '—'
@@ -1736,7 +2206,7 @@ export default function UserManagement(
                     </div>
                   </dl>
                 ) : (
-                  <div className="mt-3 rounded-lg border border-amber-400/15 bg-amber-950/10 px-3 py-2.5 text-[9px] leading-relaxed text-amber-200/70">
+                  <div className="mt-3 rounded-lg border border-amber-400/15 bg-amber-950/10 px-3 py-2.5 text-[11px] leading-relaxed text-amber-200/70">
                     User belum memiliki active biometric voice profile.
                   </div>
                 )}
@@ -1744,6 +2214,17 @@ export default function UserManagement(
             </div>
 
             <div className="border-t border-cyan-400/15 p-4">
+              {selectedUser.is_locked && (
+                <button
+                  type="button"
+                  disabled={unlockBusy}
+                  onClick={() => unlockUser(selectedUser)}
+                  className="mb-2 w-full rounded-xl border border-amber-400/30 bg-amber-950/20 px-4 py-3 text-[11px] font-black tracking-[0.14em] text-amber-200 uppercase transition hover:bg-amber-950/35 disabled:opacity-40"
+                >
+                  {unlockBusy ? 'Unlocking...' : 'Unlock Account'}
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() =>
@@ -1757,7 +2238,7 @@ export default function UserManagement(
                   border
                   px-4
                   py-3
-                  text-[9px]
+                  text-[11px]
                   font-black
                   tracking-[0.14em]
                   uppercase
@@ -1783,7 +2264,7 @@ export default function UserManagement(
         <div className="absolute inset-0 z-[100] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
           <div className="w-full max-w-[420px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
             <div className="border-b border-cyan-400/12 px-4 py-3">
-              <div className="text-[8px] font-black tracking-[0.18em] text-cyan-400 uppercase">
+              <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">
                 Confirm Account Status
               </div>
             </div>
@@ -1797,7 +2278,7 @@ export default function UserManagement(
                 ?
               </div>
 
-              <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+              <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
                 {statusTarget.is_active
                   ? 'User akan kehilangan akses login. Voice profile dan history tetap disimpan.'
                   : 'User akan kembali diizinkan login. Active voice profile yang valid akan dapat dipakai lagi.'}
@@ -1814,7 +2295,7 @@ export default function UserManagement(
                       null
                     )
                   }
-                  className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2 text-[9px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40"
+                  className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2 text-[11px] font-black tracking-[0.10em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40"
                 >
                   Cancel
                 </button>
@@ -1832,7 +2313,7 @@ export default function UserManagement(
                     border
                     px-4
                     py-2
-                    text-[9px]
+                    text-[11px]
                     font-black
                     tracking-[0.10em]
                     uppercase
@@ -1860,7 +2341,7 @@ export default function UserManagement(
       {/* TOAST */}
       {toast && (
         <div className="pointer-events-none absolute bottom-4 left-1/2 z-[120] -translate-x-1/2">
-          <div className="rounded-xl border border-emerald-400/25 bg-[#031712]/95 px-4 py-2.5 text-[9px] font-bold text-emerald-200 shadow-[0_14px_45px_rgba(0,0,0,.48),0_0_18px_rgba(52,211,153,.06)] backdrop-blur-xl">
+          <div className="rounded-xl border border-emerald-400/25 bg-[#031712]/95 px-4 py-2.5 text-[11px] font-bold text-emerald-200 shadow-[0_14px_45px_rgba(0,0,0,.48),0_0_18px_rgba(52,211,153,.06)] backdrop-blur-xl">
             ✓ {toast}
           </div>
         </div>

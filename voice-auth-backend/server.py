@@ -11,6 +11,7 @@ from flask_cors import CORS
 from speechbrain.inference.speaker import SpeakerRecognition
 from app.routes.management_api import management_bp
 from app.routes.voice_auth_api import voice_auth_bp
+from app.services.auth_api import auth_bp
 
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ CORS(app)  # Mengizinkan akses dari front-end React/Vite
 
 app.register_blueprint(management_bp)
 app.register_blueprint(voice_auth_bp)
+app.register_blueprint(auth_bp)
 
 # Pastikan folder penyimpanan profil suara tersedia
 os.makedirs("voice-profiles", exist_ok=True)

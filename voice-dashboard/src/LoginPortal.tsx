@@ -60,6 +60,29 @@ interface VoiceIdentityUser {
   voice_profile_id?: string;
 }
 
+interface CoreAccessGroup {
+  group_id: string;
+  group_code?: string | null;
+  group_name: string;
+}
+
+interface CoreAccessMenu {
+  menu_id: string;
+  menu_code?: string | null;
+  menu_name: string;
+  parent_menu_id?: string | null;
+  parent_menu_code?: string | null;
+  parent_menu_name?: string | null;
+  route_key?: string | null;
+  icon_key?: string | null;
+  sort_order?: number | null;
+}
+
+interface CoreAccessProfile {
+  groups: CoreAccessGroup[];
+  menus: CoreAccessMenu[];
+}
+
 interface VoiceIdentifyResponse {
   success: boolean;
   decision:
@@ -74,7 +97,22 @@ interface VoiceIdentifyResponse {
   score_margin?: number | null;
   threshold_used?: number | null;
   user?: VoiceIdentityUser | null;
+  access?: CoreAccessProfile | null;
 }
+
+type LoginMode = 'voice' | 'manual';
+
+interface PasswordLoginResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  user?: VoiceIdentityUser | null;
+  access?: CoreAccessProfile | null;
+  failed_login_count?: number;
+  is_locked?: boolean;
+}
+
+const MAX_LOGIN_ATTEMPTS = 3;
 
 /* =========================================================
    COLORS
@@ -2350,12 +2388,33 @@ export default function LoginPortal({
     setIsAuthenticating,
   ] = useState(false);
 
+  const [loginMode, setLoginMode] =
+    useState<LoginMode>('voice');
+
+  const [manualUsername, setManualUsername] =
+    useState('');
+
+  const [manualPassword, setManualPassword] =
+    useState('');
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [isManualSubmitting, setIsManualSubmitting] =
+    useState(false);
+
+  const [loginAttemptCount, setLoginAttemptCount] =
+    useState(0);
+
+  const [accountLocked, setAccountLocked] =
+    useState(false);
+
 
   const [
     statusMessage,
     setStatusMessage,
   ] = useState(
-    'Neural gateway online. Voice authentication ready.'
+    'Neural gateway online. Choose voice or manual authentication.'
   );
 
   const [
@@ -2973,6 +3032,12 @@ export default function LoginPortal({
                           display_name:
                             identity.display_name,
 
+                          groups:
+                            data.access?.groups || [],
+
+                          menus:
+                            data.access?.menus || [],
+
                           auth_method:
                             'voice',
 
@@ -3073,7 +3138,7 @@ export default function LoginPortal({
                 );
 
                 setStatusMessage(
-                  'Voice service offline. Start backend on port 5001 or use DEV bypass.'
+                  'Voice service is unavailable. You can use manual authentication.'
                 );
 
                 SciFiAudio.failure();
@@ -3366,25 +3431,179 @@ export default function LoginPortal({
   ]);
 
   /* =======================================================
-     DEV BYPASS
+     MANUAL USERNAME / PASSWORD AUTHENTICATION
   ======================================================= */
 
-  const handleDevBypass =
-    () => {
-      /*
-        Dev bypass tidak menggunakan TTS
-        supaya cepat untuk development.
-        Tetapi portal animation tetap sama.
-      */
+  const handleManualLogin =
+    useCallback(
+      async (event?: React.FormEvent) => {
+        event?.preventDefault();
 
-      setAuthenticatedUser(
-        'Developer'
-      );
+        if (
+          isManualSubmitting ||
+          transitionStartedRef.current
+        ) {
+          return;
+        }
 
-      beginPortalTransition(
-        'Developer'
-      );
-    };
+        const username = manualUsername.trim();
+
+        if (!username) {
+          setStatusMessage('Username wajib diisi.');
+          return;
+        }
+
+        if (!manualPassword) {
+          setStatusMessage('Password wajib diisi.');
+          return;
+        }
+
+        try {
+          setIsManualSubmitting(true);
+          setIsAuthenticating(true);
+          setPhase('authenticating');
+          setStatusMessage('Validating secure credentials...');
+
+          const response = await fetch(
+            `${VOICE_API_BASE}/api/auth/login`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                username,
+                password: manualPassword,
+              }),
+            }
+          );
+
+          let data: PasswordLoginResponse;
+
+          try {
+            data = await response.json();
+          } catch {
+            throw new Error(
+              'Authentication service returned an invalid response.'
+            );
+          }
+
+          const failedCount = Math.max(
+            0,
+            Number(data.failed_login_count || 0)
+          );
+
+          setLoginAttemptCount(failedCount);
+          setAccountLocked(
+            Boolean(data.is_locked) ||
+            data.code === 'ACCOUNT_LOCKED' ||
+            response.status === 423
+          );
+
+          if (
+            response.ok &&
+            data.success &&
+            data.user
+          ) {
+            const identity = data.user;
+
+            setLoginAttemptCount(0);
+            setAccountLocked(false);
+            setManualPassword('');
+
+            try {
+              localStorage.setItem(
+                'core_authenticated_user',
+                JSON.stringify({
+                  user_id: identity.user_id,
+                  username: identity.username,
+                  display_name: identity.display_name,
+                  groups: data.access?.groups || [],
+                  menus: data.access?.menus || [],
+                  auth_method: 'password',
+                  authenticated_at: new Date().toISOString(),
+                })
+              );
+            } catch {}
+
+            /*
+              Login success/failure audit tetap dicatat backend.
+              Frontend hanya menyimpan identity non-secret untuk session UI.
+            */
+            handleAuthenticatedUser(
+              identity.display_name ||
+                identity.username ||
+                'User'
+            );
+
+            return;
+          }
+
+          setIsAuthenticating(false);
+          setPhase('idle');
+          SciFiAudio.failure();
+
+          if (
+            data.code === 'ACCOUNT_LOCKED' ||
+            response.status === 423 ||
+            data.is_locked
+          ) {
+            setAccountLocked(true);
+            setStatusMessage(
+              'Account locked after 3 failed login attempts. Please contact an administrator to unlock the account.'
+            );
+            return;
+          }
+
+          if (data.code === 'USER_INACTIVE') {
+            setStatusMessage(
+              data.message ||
+                'This account is inactive. Please contact an administrator.'
+            );
+            return;
+          }
+
+          if (data.code === 'INVALID_CREDENTIALS') {
+            const remaining = Math.max(
+              0,
+              MAX_LOGIN_ATTEMPTS - failedCount
+            );
+
+            setStatusMessage(
+              remaining > 0
+                ? `Username or password is incorrect. ${remaining} login attempt${remaining === 1 ? '' : 's'} remaining.`
+                : 'Username or password is incorrect.'
+            );
+            return;
+          }
+
+          setStatusMessage(
+            data.message ||
+              'Manual authentication failed.'
+          );
+        } catch (error) {
+          console.error(
+            'Manual authentication error:',
+            error
+          );
+
+          setIsAuthenticating(false);
+          setPhase('idle');
+          setStatusMessage(
+            'Authentication service is unavailable. Please try again.'
+          );
+          SciFiAudio.failure();
+        } finally {
+          setIsManualSubmitting(false);
+        }
+      },
+      [
+        handleAuthenticatedUser,
+        isManualSubmitting,
+        manualPassword,
+        manualUsername,
+      ]
+    );
 
   /* =======================================================
      DISPLAY STATE
@@ -3696,124 +3915,275 @@ export default function LoginPortal({
                 </div>
               </div>
 
-              {/* VOICE IDENTITY DIRECTORY - same compact HUD language */}
+              {/* AUTH MODE SELECTOR */}
               <div className="mt-3 px-2">
-                <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-[7px] font-bold tracking-[0.18em] text-sky-500/80">
-                    VOICE IDENTITY
-                  </span>
-
-                  <span className="text-[6px] tracking-[0.18em] text-emerald-500/65">
-                    CORE PROFILE
-                  </span>
-                </div>
-
-                <div className="login-profile-row relative flex min-h-10 items-center overflow-hidden rounded-md border border-sky-500/24 bg-[#00111f]/90 px-3 shadow-[inset_0_0_18px_rgba(0,183,255,.035)]">
-                  <span className="absolute inset-y-1 left-0 w-px bg-gradient-to-b from-transparent via-sky-300/60 to-transparent shadow-[0_0_8px_rgba(56,189,248,.38)]" />
-
-                  <div className="min-w-0 flex-1 py-2">
-                    <div className="truncate text-[7px] font-black tracking-[0.14em] text-sky-200">
-                      COREANALYTICS BIOMETRIC DIRECTORY
-                    </div>
-
-                    <div className="mt-0.5 truncate text-[6px] tracking-[0.13em] text-slate-600">
-                      ACTIVE PROFILES // CENTROID MATCHING
-                    </div>
-                  </div>
-
-                  <div
-                    className="
-                      ml-3
-                      flex
-                      h-7
-                      w-7
-                      flex-shrink-0
-                      items-center
-                      justify-center
-                      rounded-full
-                      border
-                      border-emerald-400/28
-                      bg-emerald-950/20
-                      text-[9px]
-                      text-emerald-300
-                      shadow-[0_0_10px_rgba(52,211,153,.07)]
-                    "
+                <div className="grid grid-cols-2 gap-1 rounded-lg border border-sky-500/15 bg-[#00101d]/80 p-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isAuthenticating || isVerified) return;
+                      setLoginMode('voice');
+                      setStatusMessage('Voice authentication ready.');
+                    }}
+                    disabled={isAuthenticating || isVerified}
+                    className={`h-8 rounded-md text-[7px] font-black tracking-[0.16em] transition-all ${
+                      loginMode === 'voice'
+                        ? 'border border-sky-300/35 bg-sky-400/10 text-sky-100 shadow-[inset_0_0_14px_rgba(0,183,255,.06)]'
+                        : 'border border-transparent text-slate-600 hover:text-sky-300'
+                    }`}
                   >
-                    ◈
-                  </div>
+                    ◉ VOICE ACCESS
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isAuthenticating || isVerified) return;
+                      setLoginMode('manual');
+                      setStatusMessage('Manual credential authentication ready.');
+                    }}
+                    disabled={isAuthenticating || isVerified}
+                    className={`h-8 rounded-md text-[7px] font-black tracking-[0.16em] transition-all ${
+                      loginMode === 'manual'
+                        ? 'border border-sky-300/35 bg-sky-400/10 text-sky-100 shadow-[inset_0_0_14px_rgba(0,183,255,.06)]'
+                        : 'border border-transparent text-slate-600 hover:text-sky-300'
+                    }`}
+                  >
+                    ⌨ MANUAL ACCESS
+                  </button>
                 </div>
               </div>
 
-              {/* ACTIONS - compact futuristic command rail */}
-              <div className="mt-3 grid grid-cols-[1fr_auto] gap-2 px-2">
-                <button
-                  type="button"
-                  onClick={startManualVoiceListener}
-                  disabled={isListening || isAuthenticating || isVerified}
-                  className={`login-auth-action group relative h-11 overflow-hidden rounded-md border px-3 backdrop-blur-sm transition-all ${
-                    isVerified
-                      ? 'border-emerald-400/35 bg-emerald-950/28'
-                      : isAuthenticating
-                      ? 'border-amber-400/35 bg-amber-950/28'
-                      : 'border-sky-400/28 bg-[#031421]/78 hover:border-sky-300/55 hover:bg-[#062034]/90'
-                  }`}
-                >
-                  {(isListening || isAuthenticating) && (
-                    <div className="login-auth-scan absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent" />
-                  )}
+              {loginMode === 'voice' ? (
+                <>
+                  {/* VOICE IDENTITY DIRECTORY - original HUD preserved */}
+                  <div className="mt-3 px-2">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-[7px] font-bold tracking-[0.18em] text-sky-500/80">
+                        VOICE IDENTITY
+                      </span>
 
-                  <div className="relative flex h-full items-center gap-3 text-left">
-                    <span
-                      className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border text-[9px] ${
+                      <span className="text-[6px] tracking-[0.18em] text-emerald-500/65">
+                        CORE PROFILE
+                      </span>
+                    </div>
+
+                    <div className="login-profile-row relative flex min-h-10 items-center overflow-hidden rounded-md border border-sky-500/24 bg-[#00111f]/90 px-3 shadow-[inset_0_0_18px_rgba(0,183,255,.035)]">
+                      <span className="absolute inset-y-1 left-0 w-px bg-gradient-to-b from-transparent via-sky-300/60 to-transparent shadow-[0_0_8px_rgba(56,189,248,.38)]" />
+
+                      <div className="min-w-0 flex-1 py-2">
+                        <div className="truncate text-[7px] font-black tracking-[0.14em] text-sky-200">
+                          COREANALYTICS BIOMETRIC DIRECTORY
+                        </div>
+
+                        <div className="mt-0.5 truncate text-[6px] tracking-[0.13em] text-slate-600">
+                          ACTIVE PROFILES // CENTROID MATCHING
+                        </div>
+                      </div>
+
+                      <div
+                        className="
+                          ml-3
+                          flex
+                          h-7
+                          w-7
+                          flex-shrink-0
+                          items-center
+                          justify-center
+                          rounded-full
+                          border
+                          border-emerald-400/28
+                          bg-emerald-950/20
+                          text-[9px]
+                          text-emerald-300
+                          shadow-[0_0_10px_rgba(52,211,153,.07)]
+                        "
+                      >
+                        ◈
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Voice action - DEV bypass intentionally removed */}
+                  <div className="mt-3 px-2">
+                    <button
+                      type="button"
+                      onClick={startManualVoiceListener}
+                      disabled={isListening || isAuthenticating || isVerified}
+                      className={`login-auth-action group relative h-11 w-full overflow-hidden rounded-md border px-3 backdrop-blur-sm transition-all ${
                         isVerified
-                          ? 'border-emerald-300/45 text-emerald-300'
+                          ? 'border-emerald-400/35 bg-emerald-950/28'
                           : isAuthenticating
-                          ? 'border-amber-300/45 text-amber-300'
-                          : 'border-sky-300/35 text-sky-300'
+                          ? 'border-amber-400/35 bg-amber-950/28'
+                          : 'border-sky-400/28 bg-[#031421]/78 hover:border-sky-300/55 hover:bg-[#062034]/90'
                       }`}
                     >
-                      {isVerified ? '✓' : isAuthenticating ? '⌁' : isListening ? ')))' : '◉'}
+                      {(isListening || isAuthenticating) && (
+                        <div className="login-auth-scan absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent" />
+                      )}
+
+                      <div className="relative flex h-full items-center gap-3 text-left">
+                        <span
+                          className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border text-[9px] ${
+                            isVerified
+                              ? 'border-emerald-300/45 text-emerald-300'
+                              : isAuthenticating
+                              ? 'border-amber-300/45 text-amber-300'
+                              : 'border-sky-300/35 text-sky-300'
+                          }`}
+                        >
+                          {isVerified ? '✓' : isAuthenticating ? '⌁' : isListening ? ')))' : '◉'}
+                        </span>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[8px] font-black tracking-[0.17em] text-sky-100">
+                            {isVerified
+                              ? 'ACCESS VERIFIED'
+                              : isAuthenticating
+                              ? 'ANALYZING SIGNATURE'
+                              : isListening
+                              ? 'LISTENING FOR FRIDAY'
+                              : 'VOICE AUTHENTICATION'}
+                          </div>
+                          <div className="mt-0.5 truncate text-[6px] tracking-[0.14em] text-slate-600">
+                            {isListening
+                              ? 'SAY "HEY FRIDAY"'
+                              : isAuthenticating
+                              ? 'NEURAL BIOMETRIC MATCH'
+                              : 'ACTIVATE SECURE GATEWAY'}
+                          </div>
+                        </div>
+
+                        <span className="text-[11px] text-sky-400/45 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-sky-200">
+                          ›
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <form
+                  className="mt-3 px-2"
+                  onSubmit={handleManualLogin}
+                >
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-[7px] font-bold tracking-[0.18em] text-sky-500/80">
+                      SECURE CREDENTIALS
                     </span>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-[8px] font-black tracking-[0.17em] text-sky-100">
-                        {isVerified
-                          ? 'ACCESS VERIFIED'
-                          : isAuthenticating
-                          ? 'ANALYZING SIGNATURE'
-                          : isListening
-                          ? 'LISTENING FOR FRIDAY'
-                          : 'VOICE AUTHENTICATION'}
-                      </div>
-                      <div className="mt-0.5 truncate text-[6px] tracking-[0.14em] text-slate-600">
-                        {isListening
-                          ? 'SAY "HEY FRIDAY"'
-                          : isAuthenticating
-                          ? 'NEURAL BIOMETRIC MATCH'
-                          : 'ACTIVATE SECURE GATEWAY'}
-                      </div>
-                    </div>
-
-                    <span className="text-[11px] text-sky-400/45 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-sky-200">
-                      ›
+                    <span className={`text-[6px] font-black tracking-[0.16em] ${
+                      accountLocked ? 'text-rose-400' : 'text-slate-600'
+                    }`}>
+                      {accountLocked ? 'ACCOUNT LOCKED' : 'ARGON2 VERIFIED'}
                     </span>
                   </div>
-                </button>
 
-                <button
-                  type="button"
-                  onClick={handleDevBypass}
-                  disabled={isVerified}
-                  title="Development only - bypass voice authentication"
-                  className="login-dev-bypass group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-sky-400/38 bg-[#031522]/92 text-sky-300 shadow-[0_0_16px_rgba(0,183,255,.14)] backdrop-blur-md transition-all hover:scale-[1.03] hover:border-sky-300/70 hover:bg-sky-950/95 hover:text-white disabled:opacity-30"
-                >
-                  <span className="absolute left-0 top-1/2 h-5 w-px -translate-y-1/2 bg-sky-300/45 shadow-[0_0_8px_rgba(56,189,248,.4)]" />
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h8m0 0-3-3m3 3-3 3M5 5v14" />
-                  </svg>
-                  <span className="pointer-events-none absolute -bottom-0.5 text-[4px] font-black tracking-[0.14em] text-sky-400/55">DEV</span>
-                </button>
-              </div>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <input
+                        value={manualUsername}
+                        onChange={(event) => {
+                          setManualUsername(event.target.value);
+                          if (accountLocked) {
+                            setAccountLocked(false);
+                            setLoginAttemptCount(0);
+                          }
+                        }}
+                        disabled={isManualSubmitting || isVerified}
+                        autoComplete="username"
+                        placeholder="USERNAME"
+                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 text-[9px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
+                      />
+                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[6px] tracking-[0.12em] text-slate-700">
+                        ID
+                      </span>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={manualPassword}
+                        onChange={(event) => setManualPassword(event.target.value)}
+                        disabled={isManualSubmitting || isVerified || accountLocked}
+                        autoComplete="current-password"
+                        placeholder="PASSWORD"
+                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 pr-14 text-[9px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((value) => !value)}
+                        disabled={isManualSubmitting}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[6px] font-black tracking-[0.10em] text-slate-500 transition hover:text-sky-300 disabled:opacity-40"
+                      >
+                        {showPassword ? 'HIDE' : 'SHOW'}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[6px] tracking-[0.12em] text-slate-600">
+                        LOGIN ATTEMPTS
+                      </span>
+                      {[0, 1, 2].map((index) => (
+                        <span
+                          key={index}
+                          className={`h-1.5 w-4 rounded-full ${
+                            index < loginAttemptCount
+                              ? loginAttemptCount >= MAX_LOGIN_ATTEMPTS
+                                ? 'bg-rose-400 shadow-[0_0_6px_rgba(251,113,133,.65)]'
+                                : 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,.45)]'
+                              : 'bg-slate-800'
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    <span className={`text-right text-[6px] font-black tracking-[0.12em] ${
+                      accountLocked
+                        ? 'text-rose-400'
+                        : loginAttemptCount > 0
+                        ? 'text-amber-400'
+                        : 'text-emerald-500/70'
+                    }`}>
+                      {accountLocked
+                        ? 'ADMIN UNLOCK REQUIRED'
+                        : `${Math.max(0, MAX_LOGIN_ATTEMPTS - loginAttemptCount)} REMAINING`}
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={
+                      isManualSubmitting ||
+                      isVerified ||
+                      accountLocked
+                    }
+                    className={`login-auth-action group relative mt-3 h-11 w-full overflow-hidden rounded-md border px-3 backdrop-blur-sm transition-all ${
+                      accountLocked
+                        ? 'cursor-not-allowed border-rose-400/25 bg-rose-950/15 text-rose-300/60'
+                        : isManualSubmitting
+                        ? 'border-amber-400/35 bg-amber-950/28'
+                        : 'border-sky-400/28 bg-[#031421]/78 hover:border-sky-300/55 hover:bg-[#062034]/90'
+                    }`}
+                  >
+                    {isManualSubmitting && (
+                      <div className="login-auth-scan absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent" />
+                    )}
+                    <div className="relative flex h-full items-center justify-center gap-3">
+                      <span className="text-[9px]">
+                        {accountLocked ? '⊘' : isManualSubmitting ? '⌁' : '→'}
+                      </span>
+                      <span className="text-[8px] font-black tracking-[0.17em]">
+                        {accountLocked
+                          ? 'ACCOUNT LOCKED'
+                          : isManualSubmitting
+                          ? 'VERIFYING CREDENTIALS'
+                          : 'SECURE LOGIN'}
+                      </span>
+                    </div>
+                  </button>
+                </form>
+              )}
 
               {/* STATUS - one compact HUD line, no extra box */}
               <div className="mt-3 flex items-start gap-2 border-t border-sky-500/12 px-2 pt-2.5">

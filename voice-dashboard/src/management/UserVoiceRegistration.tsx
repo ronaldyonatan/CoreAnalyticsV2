@@ -76,6 +76,9 @@ export default function UserVoiceRegistration() {
   const [completed, setCompleted] =
     useState(false);
 
+  const [voiceSkipped, setVoiceSkipped] =
+    useState(false);
+
   const recorderRef =
     useRef<MediaRecorder | null>(null);
 
@@ -101,6 +104,24 @@ export default function UserVoiceRegistration() {
     }, [samples.length]);
 
 
+  const passwordPolicy =
+    useMemo(() => ({
+      length:
+        password.length >= 8
+        && password.length <= 128,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special:
+        /[^A-Za-z0-9\s]/.test(password),
+    }), [password]);
+
+
+  const passwordIsValid =
+    Object.values(passwordPolicy)
+      .every(Boolean);
+
+
   async function registerUser() {
     setMessage("");
 
@@ -115,11 +136,12 @@ export default function UserVoiceRegistration() {
       !username.trim()
       || !displayName.trim()
       || !normalizedEmail
-      || password.length < 8
+      || !passwordIsValid
     ) {
       setMessage(
-        "Isi username, display name, email, "
-        + "dan password minimal 8 karakter."
+        "Lengkapi data dan gunakan password 8-128 karakter "
+        + "yang memiliki huruf besar, huruf kecil, angka, "
+        + "dan karakter khusus."
       );
 
       return;
@@ -375,6 +397,36 @@ export default function UserVoiceRegistration() {
   }
 
 
+  function skipVoiceEnrollment() {
+    if (busy || recording || !user) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Lewati voice enrollment? User tetap dapat menggunakan "
+      + "account dan login dengan username/password, tetapi "
+      + "voice authentication belum tersedia sampai voice profile "
+      + "didaftarkan kemudian."
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    samples.forEach(sample => {
+      URL.revokeObjectURL(sample.url);
+    });
+
+    setSamples([]);
+    setVoiceSkipped(true);
+    setCompleted(true);
+    setMessage(
+      "Account berhasil dibuat. Voice enrollment dilewati "
+      + "dan dapat dilakukan kemudian."
+    );
+  }
+
+
   async function enrollVoice() {
     if (!user) {
       setMessage(
@@ -477,7 +529,7 @@ export default function UserVoiceRegistration() {
           COREANALYTICS · MANAGEMENT CENTER
         </div>
 
-        <h1>
+        <h1 className="uvr-title">
           User & Voice Registration
         </h1>
 
@@ -509,14 +561,16 @@ export default function UserVoiceRegistration() {
               `uvr-step ${
                 user && !completed
                   ? "active"
-                  : completed
-                    ? "done"
-                    : ""
+                  : voiceSkipped
+                    ? "skipped"
+                    : completed
+                      ? "done"
+                      : ""
               }`
             }
           >
             <span>2</span>
-            Voice
+            {voiceSkipped ? "Voice Skipped" : "Voice"}
           </div>
 
 
@@ -602,9 +656,28 @@ export default function UserVoiceRegistration() {
                       event.target.value
                     )
                 }
-                placeholder="Minimal 8 karakter"
+                placeholder="8-128 karakter"
                 autoComplete="new-password"
+                maxLength={128}
               />
+
+              <div className="uvr-policy">
+                <span className={passwordPolicy.length ? "ok" : ""}>
+                  {passwordPolicy.length ? "✓" : "○"} 8-128 karakter
+                </span>
+                <span className={passwordPolicy.uppercase ? "ok" : ""}>
+                  {passwordPolicy.uppercase ? "✓" : "○"} Huruf besar
+                </span>
+                <span className={passwordPolicy.lowercase ? "ok" : ""}>
+                  {passwordPolicy.lowercase ? "✓" : "○"} Huruf kecil
+                </span>
+                <span className={passwordPolicy.number ? "ok" : ""}>
+                  {passwordPolicy.number ? "✓" : "○"} Angka
+                </span>
+                <span className={passwordPolicy.special ? "ok" : ""}>
+                  {passwordPolicy.special ? "✓" : "○"} Karakter khusus
+                </span>
+              </div>
             </label>
 
 
@@ -622,6 +695,7 @@ export default function UserVoiceRegistration() {
                 }
                 placeholder="Ulangi password"
                 autoComplete="new-password"
+                maxLength={128}
               />
             </label>
 
@@ -759,21 +833,31 @@ export default function UserVoiceRegistration() {
             </div>
 
 
-            <button
-              className="uvr-primary"
-              onClick={enrollVoice}
-              disabled={
-                busy
-                || samples.length !== 5
-                || recording
-              }
-            >
-              {
-                busy
-                  ? "Processing Voice..."
-                  : "Enroll Voice Profile"
-              }
-            </button>
+            <div className="uvr-actions">
+              <button
+                className="uvr-primary"
+                onClick={enrollVoice}
+                disabled={
+                  busy
+                  || samples.length !== 5
+                  || recording
+                }
+              >
+                {
+                  busy
+                    ? "Processing Voice..."
+                    : "Enroll Voice Profile"
+                }
+              </button>
+
+              <button
+                className="uvr-secondary"
+                onClick={skipVoiceEnrollment}
+                disabled={busy || recording}
+              >
+                Skip Voice Enrollment
+              </button>
+            </div>
 
           </section>
         )}
@@ -786,15 +870,17 @@ export default function UserVoiceRegistration() {
               ✓
             </div>
 
-            <h2>
+            <h2 className="uvr-success-title">
               Registration Complete
             </h2>
 
             <p>
-              {user.display_name}
-              {" "}
-              sudah memiliki account
-              dan active voice profile.
+              {voiceSkipped
+                ? `${user.display_name} sudah memiliki account. `
+                  + "Voice profile belum didaftarkan dan dapat "
+                  + "dienroll kemudian."
+                : `${user.display_name} sudah memiliki account `
+                  + "dan active voice profile."}
             </p>
 
             <code>
