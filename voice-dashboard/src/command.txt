@@ -1,0 +1,7 @@
+1. Tutup Perbandingan
+2. Tutup Sidebar
+3. Bandingkan grafik 1 untuk x dan y
+4. Hey Friday
+5. Tampilkan grafik x
+6. Tampilkan grafix x dan y
+7. Munculkan semua grafik

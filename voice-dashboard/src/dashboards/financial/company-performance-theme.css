@@ -1,0 +1,344 @@
+
+/* =========================================================
+   COMPANY PERFORMANCE THEME EXTENSION
+   Cosmic Black stays visually compatible with the current UI.
+   Aurora overrides only when [data-theme="aurora"] is active.
+   ========================================================= */
+
+.company-theme-root,
+.company-panel,
+.company-pnl-card,
+.company-panel-frame,
+.company-view-shell,
+.company-node-view {
+  --company-primary: var(--core-primary, #00f2fe);
+  --company-primary-soft: var(--core-primary-soft, #67e8f9);
+  --company-text: var(--core-text, #e6fbff);
+  --company-muted: var(--core-text-secondary, #94a3b8);
+  --company-border: var(--core-border, rgba(0,242,254,.30));
+  --company-border-strong: var(--core-border-strong, rgba(0,242,254,.60));
+  --company-control: var(--core-control, rgba(0,20,40,.44));
+  --company-control-hover: var(--core-control-hover, rgba(0,242,254,.14));
+  --company-panel-bg: rgba(0,8,20,.90);
+  --company-panel-soft: rgba(0,20,40,.60);
+  --company-table-head: #001020;
+  --company-target: #f59e0b;
+
+  --company-chart-1: #00f2fe;
+  --company-chart-2: #00d4ff;
+  --company-chart-3: #00b7ff;
+  --company-chart-4: #0099ff;
+  --company-chart-5: #007aff;
+  --company-chart-6: #4d8aff;
+  --company-chart-7: #759dff;
+  --company-chart-8: #9fb0ff;
+  --company-chart-9: #c5c4ff;
+  --company-chart-10: #e0d8ff;
+}
+
+/* Shared semantic classes */
+.company-title { color: var(--company-primary-soft) !important; }
+.company-accent { color: var(--company-primary) !important; }
+.company-text { color: var(--company-text) !important; }
+.company-muted { color: var(--company-muted) !important; }
+
+.company-status-dot {
+  background: var(--company-primary) !important;
+  box-shadow: 0 0 9px color-mix(in srgb, var(--company-primary) 80%, transparent) !important;
+}
+
+.company-panel,
+.company-pnl-card {
+  background: var(--company-panel-bg) !important;
+  border-color: var(--company-border) !important;
+  color: var(--company-text);
+}
+
+.company-panel-header,
+.company-panel-footer,
+.company-node-header {
+  border-color: var(--company-border) !important;
+}
+
+.company-control-surface,
+.company-tabs,
+.company-select,
+.company-control-pill,
+.company-icon-button {
+  background: var(--company-control) !important;
+  border-color: var(--company-border) !important;
+  color: var(--company-primary-soft) !important;
+}
+
+.company-icon-button:hover,
+.company-control-pill:hover {
+  background: var(--company-control-hover) !important;
+  color: var(--company-text) !important;
+}
+
+.company-tab-active {
+  background: var(--company-primary) !important;
+  color: #031018 !important;
+  box-shadow: 0 0 9px color-mix(in srgb, var(--company-primary) 65%, transparent) !important;
+}
+
+.company-tab-idle {
+  color: var(--company-muted) !important;
+}
+
+.company-tab-idle:hover {
+  background: var(--company-control-hover) !important;
+  color: var(--company-text) !important;
+}
+
+.company-tooltip {
+  background: color-mix(in srgb, var(--company-panel-bg) 94%, #000 6%) !important;
+  border-color: var(--company-border-strong) !important;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--company-primary) 24%, transparent) !important;
+  color: var(--company-text) !important;
+}
+
+.company-table-head,
+.company-table-head th {
+  background: var(--company-table-head) !important;
+  color: var(--company-primary-soft) !important;
+  border-color: var(--company-border) !important;
+}
+
+.company-table-body {
+  color: var(--company-text) !important;
+}
+
+.company-table-row:hover,
+.company-pnl-row:hover {
+  background: var(--company-control-hover) !important;
+}
+
+.company-legend-row {
+  background: var(--company-panel-soft) !important;
+  border-color: var(--company-border) !important;
+}
+
+.company-chart-stage {
+  background: rgba(0,0,0,.60) !important;
+  border-color: var(--company-border) !important;
+}
+
+.company-axis {
+  background: color-mix(in srgb, var(--company-primary) 55%, transparent) !important;
+}
+
+.company-ring-track {
+  color: color-mix(in srgb, var(--company-primary) 18%, #00111d) !important;
+}
+
+.company-ring-previous {
+  color: var(--company-chart-3) !important;
+}
+
+.company-ring-current {
+  color: var(--company-primary) !important;
+}
+
+.company-quarter-label {
+  color: var(--company-primary-soft) !important;
+}
+
+.company-bar-previous {
+  background: linear-gradient(to top, color-mix(in srgb, var(--company-chart-4) 30%, #00111d), var(--company-chart-4)) !important;
+}
+
+.company-bar-current {
+  background: linear-gradient(to top, color-mix(in srgb, var(--company-primary) 28%, #00111d), var(--company-primary)) !important;
+}
+
+/* =========================================================
+   AURORA
+   ========================================================= */
+
+[data-theme="aurora"] .company-theme-root,
+[data-theme="aurora"] .company-panel,
+[data-theme="aurora"] .company-pnl-card,
+[data-theme="aurora"] .company-panel-frame,
+[data-theme="aurora"] .company-view-shell {
+  --company-panel-bg:
+    radial-gradient(ellipse at 12% 0%, rgba(45,212,191,.10), transparent 34%),
+    radial-gradient(ellipse at 94% 10%, rgba(139,92,246,.08), transparent 34%),
+    linear-gradient(145deg, rgba(12,43,55,.88), rgba(21,62,75,.82));
+  --company-panel-soft: rgba(24,67,81,.72);
+  --company-table-head: rgba(17,52,66,.98);
+
+  --company-chart-1: #59e8f5;
+  --company-chart-2: #2dd4bf;
+  --company-chart-3: #7deeff;
+  --company-chart-4: #60a5fa;
+  --company-chart-5: #818cf8;
+  --company-chart-6: #a78bfa;
+  --company-chart-7: #c084fc;
+  --company-chart-8: #f0abfc;
+  --company-chart-9: #5eead4;
+  --company-chart-10: #bae6fd;
+}
+
+[data-theme="aurora"] .company-performance-shell {
+  background:
+    radial-gradient(ellipse at 12% -8%, rgba(45,212,191,.10), transparent 36%),
+    radial-gradient(ellipse at 88% 2%, rgba(139,92,246,.08), transparent 38%),
+    linear-gradient(145deg, rgba(11,39,51,.76), rgba(18,57,70,.67)) !important;
+  border: 1px solid rgba(89,232,245,.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 16px 44px rgba(0,0,0,.13);
+}
+
+[data-theme="aurora"] .company-control-bar {
+  background:
+    linear-gradient(90deg, rgba(20,61,75,.82), rgba(25,69,82,.72), rgba(53,42,82,.56)) !important;
+  border-color: rgba(89,232,245,.27) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 6px 22px rgba(0,0,0,.12);
+}
+
+[data-theme="aurora"] .company-view-shell {
+  background:
+    linear-gradient(rgba(125,238,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125,238,255,.018) 1px, transparent 1px),
+    linear-gradient(150deg, rgba(11,42,54,.68), rgba(20,59,72,.58)) !important;
+  background-size: 42px 42px, 42px 42px, auto !important;
+  border-color: rgba(89,232,245,.22) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.03),
+    inset 0 0 36px rgba(45,212,191,.025) !important;
+}
+
+[data-theme="aurora"] .company-view-shell--compare {
+  background:
+    radial-gradient(ellipse at 95% 0%, rgba(167,139,250,.11), transparent 34%),
+    linear-gradient(150deg, rgba(29,43,64,.70), rgba(46,43,72,.62)) !important;
+  border-color: rgba(167,139,250,.30) !important;
+}
+
+[data-theme="aurora"] .company-node-header {
+  background:
+    linear-gradient(90deg, rgba(34,211,238,.12), rgba(45,212,191,.07), rgba(139,92,246,.08)) !important;
+  border-color: rgba(89,232,245,.24) !important;
+}
+
+[data-theme="aurora"] .company-panel-frame {
+  background: rgba(13,43,55,.32) !important;
+  border-color: rgba(89,232,245,.13) !important;
+}
+
+[data-theme="aurora"] .company-panel,
+[data-theme="aurora"] .company-pnl-card {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(45,212,191,.08), transparent 28%),
+    radial-gradient(circle at 96% 8%, rgba(139,92,246,.07), transparent 31%),
+    linear-gradient(150deg, rgba(14,48,61,.88), rgba(21,62,76,.82)) !important;
+  border-color: rgba(89,232,245,.25) !important;
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.16),
+    0 0 24px rgba(45,212,191,.035),
+    inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+[data-theme="aurora"] .company-panel--radiant {
+  border-color: rgba(89,232,245,.32) !important;
+}
+
+[data-theme="aurora"] .company-control-surface,
+[data-theme="aurora"] .company-tabs,
+[data-theme="aurora"] .company-select,
+[data-theme="aurora"] .company-control-pill,
+[data-theme="aurora"] .company-icon-button {
+  background: rgba(24,72,87,.78) !important;
+  border-color: rgba(89,232,245,.24) !important;
+  color: #bceff5 !important;
+}
+
+[data-theme="aurora"] .company-tab-active {
+  background: linear-gradient(135deg, #59e8f5, #2dd4bf) !important;
+  color: #06232b !important;
+}
+
+[data-theme="aurora"] .company-tooltip {
+  background:
+    linear-gradient(145deg, rgba(12,39,51,.97), rgba(27,58,75,.96)) !important;
+  border-color: rgba(89,232,245,.40) !important;
+}
+
+[data-theme="aurora"] .company-table-head,
+[data-theme="aurora"] .company-table-head th {
+  background:
+    linear-gradient(90deg, rgba(20,61,75,.98), rgba(33,62,83,.98)) !important;
+  color: #aef4fa !important;
+}
+
+[data-theme="aurora"] .company-legend-row {
+  background: rgba(27,75,89,.56) !important;
+  border-color: rgba(89,232,245,.17) !important;
+}
+
+[data-theme="aurora"] .company-legend-row:hover {
+  background: rgba(38,89,103,.70) !important;
+}
+
+[data-theme="aurora"] .company-chart-stage {
+  background:
+    linear-gradient(rgba(125,238,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125,238,255,.018) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 100%, rgba(45,212,191,.07), transparent 54%),
+    rgba(6,31,42,.56) !important;
+  background-size: 34px 34px, 34px 34px, auto, auto !important;
+  border-color: rgba(89,232,245,.20) !important;
+}
+
+[data-theme="aurora"] .company-pnl-scroll {
+  background: rgba(8,35,47,.65) !important;
+  border-color: rgba(89,232,245,.18) !important;
+}
+
+[data-theme="aurora"] .company-pnl-group {
+  background: linear-gradient(90deg, rgba(19,77,89,.88), rgba(38,61,91,.82)) !important;
+  border-color: rgba(89,232,245,.26) !important;
+  color: #8ff4f3 !important;
+}
+
+[data-theme="aurora"] .company-pnl-group td {
+  background: transparent !important;
+  color: #8ff4f3 !important;
+}
+
+[data-theme="aurora"] .company-pnl-section {
+  background: linear-gradient(90deg, rgba(24,71,85,.90), rgba(52,53,91,.80)) !important;
+  border-color: rgba(125,238,255,.27) !important;
+  color: #bdf7fb !important;
+}
+
+[data-theme="aurora"] .company-pnl-major {
+  background:
+    linear-gradient(90deg, rgba(20,92,103,.94), rgba(52,69,110,.92), rgba(72,57,111,.88)) !important;
+  border-color: rgba(125,238,255,.42) !important;
+}
+
+[data-theme="aurora"] .company-pnl-total {
+  background:
+    linear-gradient(90deg, rgba(21,67,82,.90), rgba(54,54,88,.78)) !important;
+  border-color: rgba(89,232,245,.32) !important;
+}
+
+[data-theme="aurora"] .company-pnl-row:nth-child(even) {
+  background: rgba(16,52,65,.32) !important;
+}
+
+[data-theme="aurora"] .company-pnl-row:hover {
+  background: rgba(45,212,191,.08) !important;
+}
+
+[data-theme="aurora"] .company-panel-footer {
+  color: #8bbdc7 !important;
+  border-color: rgba(89,232,245,.13) !important;
+}
+
+/* Existing semantic alert/success/amber states intentionally stay unchanged. */

@@ -1,0 +1,65 @@
+services:
+
+  # ==========================================
+  # Voice Authentication Backend
+  # ==========================================
+  voice-auth:
+    build:
+      context: ./voice-auth-backend
+      dockerfile: Dockerfile
+
+    container_name: coreanalytics-voice-auth
+
+    restart: unless-stopped
+
+    env_file:
+      - ./voice-auth-backend/.env
+
+    environment:
+      VOICE_STORAGE_ROOT: /app/voice-profiles
+
+    volumes:
+      - voice_profiles:/app/voice-profiles
+
+    expose:
+      - "5001"
+
+    networks:
+      - coreanalytics
+
+
+  # ==========================================
+  # CoreAnalytics Dashboard
+  # ==========================================
+  voice-dashboard:
+    build:
+      context: ./voice-dashboard
+      dockerfile: Dockerfile
+
+    container_name: coreanalytics-dashboard
+
+    restart: unless-stopped
+
+    depends_on:
+      - voice-auth
+
+    ports:
+      - "8080:80"
+
+    networks:
+      - coreanalytics
+
+
+# ============================================
+# Persistent Storage
+# ============================================
+volumes:
+  voice_profiles:
+
+
+# ============================================
+# Docker Network
+# ============================================
+networks:
+  coreanalytics:
+    driver: bridge

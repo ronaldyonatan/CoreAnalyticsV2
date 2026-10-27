@@ -1,0 +1,12 @@
+flask
+flask-cors
+torch
+torchaudio
+speechbrain
+requests>=2.32
+python-dotenv>=1.0
+numpy>=1.26
+argon2-cffi
+soundfile
+edge-tts
+sounddevice

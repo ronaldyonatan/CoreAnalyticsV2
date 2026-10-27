@@ -1,0 +1,593 @@
+:root,
+[data-theme="cosmic-black"] {
+  --core-bg: #000205;
+  --core-bg-secondary: #000511;
+  --core-surface: rgba(0, 8, 20, 0.24);
+  --core-surface-strong: rgba(0, 12, 27, 0.78);
+  --core-panel: rgba(0, 8, 20, 0.34);
+  --core-panel-hover: rgba(0, 36, 71, 0.48);
+
+  --core-text: #e6fbff;
+  --core-text-secondary: #94a3b8;
+  --core-text-muted: #64748b;
+
+  --core-primary: #00f2fe;
+  --core-primary-soft: #67e8f9;
+  --core-primary-strong: #00bfff;
+  --core-primary-rgb: 0, 242, 254;
+
+  --core-border: rgba(0, 242, 254, 0.30);
+  --core-border-strong: rgba(0, 242, 254, 0.60);
+  --core-glow: rgba(0, 242, 254, 0.22);
+  --core-frame-shadow: 0 0 30px rgba(0, 242, 254, 0.12);
+
+  --core-sidebar: rgba(0, 8, 20, 0.20);
+  --core-control: rgba(0, 20, 40, 0.44);
+  --core-control-hover: rgba(0, 242, 254, 0.14);
+
+  --core-purple-surface: rgba(59, 7, 100, 0.30);
+  --core-purple-border: rgba(192, 132, 252, 0.50);
+  --core-purple-text: #d8b4fe;
+
+  --core-danger-surface: rgba(69, 10, 10, 0.28);
+  --core-danger-border: rgba(248, 113, 113, 0.50);
+  --core-danger-text: #fb7185;
+
+  --core-success-surface: rgba(2, 44, 34, 0.34);
+  --core-success-border: rgba(52, 211, 153, 0.55);
+  --core-success-text: #6ee7b7;
+}
+
+[data-theme="aurora"] {
+  /* =======================================================
+     AURORA THEME
+     Medium-dark luminous environment:
+     brighter than Cosmic Black, never pale or white.
+     ======================================================= */
+
+  --core-bg: #102f3d;
+  --core-bg-secondary: #153946;
+
+  --core-surface: rgba(17, 55, 68, 0.66);
+  --core-surface-strong: rgba(17, 52, 66, 0.92);
+
+  --core-panel: rgba(20, 61, 75, 0.82);
+  --core-panel-hover: rgba(25, 73, 88, 0.90);
+
+  --core-text: #eefcff;
+  --core-text-secondary: #b3d7df;
+  --core-text-muted: #7baab5;
+
+  --core-primary: #59e8f5;
+  --core-primary-soft: #7deeff;
+  --core-primary-strong: #23d4e9;
+  --core-primary-rgb: 89, 232, 245;
+
+  --core-border: rgba(89, 232, 245, 0.27);
+  --core-border-strong: rgba(89, 232, 245, 0.54);
+
+  --core-glow: rgba(45, 212, 191, 0.20);
+  --core-frame-shadow:
+    0 22px 60px rgba(1, 15, 22, 0.28),
+    0 0 36px rgba(45, 212, 191, 0.07),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  --core-sidebar: rgba(12, 41, 53, 0.92);
+  --core-control: rgba(28, 76, 91, 0.82);
+  --core-control-hover: rgba(35, 92, 107, 0.92);
+
+  --core-purple-surface: rgba(57, 42, 89, 0.70);
+  --core-purple-border: rgba(167, 139, 250, 0.48);
+  --core-purple-text: #d8ccff;
+
+  --core-danger-surface: rgba(89, 31, 52, 0.62);
+  --core-danger-border: rgba(251, 113, 133, 0.48);
+  --core-danger-text: #ff9ab0;
+
+  --core-success-surface: rgba(20, 78, 64, 0.62);
+  --core-success-border: rgba(52, 211, 153, 0.50);
+  --core-success-text: #78f2c3;
+}
+
+/* =========================================================
+   GLOBAL BASE
+   ========================================================= */
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--core-bg);
+  color: var(--core-text);
+}
+
+body {
+  transition:
+    background-color 420ms ease,
+    color 320ms ease;
+}
+
+.core-app-shell {
+  background: var(--core-bg);
+  color: var(--core-primary);
+}
+
+.core-main-frame,
+.core-dashboard-frame {
+  background: var(--core-surface);
+  border-color: var(--core-border);
+  box-shadow: var(--core-frame-shadow);
+}
+
+.core-sidebar {
+  background: var(--core-sidebar);
+  border-color: var(--core-border);
+}
+
+.core-control {
+  background: var(--core-control);
+  border-color: var(--core-border);
+  color: var(--core-primary);
+  box-shadow: 0 0 12px var(--core-glow);
+}
+
+.core-control:hover {
+  background: var(--core-control-hover);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.core-nav-group {
+  background: var(--core-panel);
+  border-color: var(--core-border);
+  color: var(--core-primary-soft);
+}
+
+.core-nav-group:hover {
+  background: var(--core-panel-hover);
+}
+
+.core-menu-active {
+  background: color-mix(in srgb, var(--core-primary) 16%, transparent);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+  box-shadow: 0 0 16px var(--core-glow);
+}
+
+.core-menu-idle {
+  color: var(--core-text-secondary);
+}
+
+.core-menu-idle:hover {
+  background: var(--core-panel-hover);
+  color: var(--core-primary-soft);
+}
+
+.core-divider {
+  border-color: var(--core-border);
+}
+
+.core-empty-text {
+  color: var(--core-text-secondary);
+}
+
+.core-designer-control {
+  background: var(--core-purple-surface);
+  border-color: var(--core-purple-border);
+  color: var(--core-purple-text);
+}
+
+.core-danger-control {
+  background: var(--core-danger-surface);
+  border-color: var(--core-danger-border);
+  color: var(--core-danger-text);
+}
+
+.core-success-control {
+  background: var(--core-success-surface);
+  border-color: var(--core-success-border);
+  color: var(--core-success-text);
+}
+
+/* =========================================================
+   MOVING AURORA BACKGROUND
+   Rendered by App.tsx only while Aurora is active.
+   ========================================================= */
+
+.core-aurora-field {
+  position: absolute;
+  inset: -18%;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+
+[data-theme="aurora"] .core-aurora-field {
+  opacity: 1;
+}
+
+.core-aurora-ribbon {
+  position: absolute;
+  width: 75%;
+  height: 28%;
+  border-radius: 50%;
+  filter: blur(58px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+.core-aurora-ribbon--cyan {
+  left: -8%;
+  top: 5%;
+  background:
+    linear-gradient(
+      95deg,
+      transparent 0%,
+      rgba(34, 211, 238, .04) 14%,
+      rgba(45, 212, 191, .34) 42%,
+      rgba(125, 238, 255, .22) 65%,
+      transparent 100%
+    );
+  transform: rotate(-9deg);
+  animation: coreAuroraCyan 18s ease-in-out infinite alternate;
+}
+
+.core-aurora-ribbon--violet {
+  right: -14%;
+  top: 18%;
+  background:
+    linear-gradient(
+      92deg,
+      transparent 0%,
+      rgba(139, 92, 246, .08) 18%,
+      rgba(129, 92, 246, .31) 48%,
+      rgba(236, 72, 153, .13) 72%,
+      transparent 100%
+    );
+  transform: rotate(7deg);
+  animation: coreAuroraViolet 24s ease-in-out infinite alternate;
+}
+
+.core-aurora-ribbon--teal {
+  left: 15%;
+  bottom: 2%;
+  width: 82%;
+  background:
+    linear-gradient(
+      96deg,
+      transparent,
+      rgba(16, 185, 129, .10),
+      rgba(45, 212, 191, .25),
+      rgba(34, 211, 238, .10),
+      transparent
+    );
+  transform: rotate(-3deg);
+  animation: coreAuroraTeal 21s ease-in-out infinite alternate;
+}
+
+.core-aurora-stars {
+  position: absolute;
+  inset: 12%;
+  opacity: .22;
+  background-image:
+    radial-gradient(circle at 12px 18px, rgba(211,251,255,.75) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 73px 54px, rgba(125,238,255,.68) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 31px 82px, rgba(216,204,255,.62) 0 1px, transparent 1.5px);
+  background-size: 111px 111px, 157px 157px, 199px 199px;
+  animation: coreAuroraStars 34s linear infinite;
+}
+
+@keyframes coreAuroraCyan {
+  0% {
+    transform: translate3d(-8%, 0, 0) rotate(-10deg) scaleX(.94);
+    opacity: .62;
+  }
+  48% {
+    transform: translate3d(20%, -10%, 0) rotate(-5deg) scaleX(1.12);
+    opacity: .92;
+  }
+  100% {
+    transform: translate3d(42%, 4%, 0) rotate(-12deg) scaleX(.98);
+    opacity: .67;
+  }
+}
+
+@keyframes coreAuroraViolet {
+  0% {
+    transform: translate3d(8%, -4%, 0) rotate(8deg) scale(1);
+    opacity: .48;
+  }
+  50% {
+    transform: translate3d(-24%, 8%, 0) rotate(3deg) scale(1.12);
+    opacity: .78;
+  }
+  100% {
+    transform: translate3d(-42%, -3%, 0) rotate(10deg) scale(.96);
+    opacity: .56;
+  }
+}
+
+@keyframes coreAuroraTeal {
+  0% {
+    transform: translate3d(-16%, 8%, 0) rotate(-4deg) scaleX(.94);
+    opacity: .43;
+  }
+  55% {
+    transform: translate3d(8%, -12%, 0) rotate(2deg) scaleX(1.10);
+    opacity: .74;
+  }
+  100% {
+    transform: translate3d(23%, 3%, 0) rotate(-1deg) scaleX(1.02);
+    opacity: .49;
+  }
+}
+
+@keyframes coreAuroraStars {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-32px, 18px, 0); }
+}
+
+/* Respect reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  .core-aurora-ribbon,
+  .core-aurora-stars {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   AURORA ENVIRONMENT
+   ========================================================= */
+
+[data-theme="aurora"] body,
+[data-theme="aurora"] #root {
+  background:
+    radial-gradient(ellipse at 18% 6%, rgba(45,212,191,.12), transparent 35%),
+    radial-gradient(ellipse at 78% 9%, rgba(139,92,246,.10), transparent 37%),
+    linear-gradient(145deg, #0e2936 0%, #153c49 48%, #173f4e 100%);
+}
+
+[data-theme="aurora"] .core-dashboard-frame,
+[data-theme="aurora"] .core-main-frame {
+  background:
+    linear-gradient(rgba(125,238,255,.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125,238,255,.026) 1px, transparent 1px),
+    radial-gradient(ellipse at 16% -4%, rgba(45,212,191,.11), transparent 34%),
+    radial-gradient(ellipse at 85% 2%, rgba(139,92,246,.08), transparent 34%),
+    linear-gradient(150deg, rgba(14,43,55,.82), rgba(22,64,77,.74));
+  background-size: 44px 44px, 44px 44px, auto, auto, auto;
+  border-color: rgba(89,232,245,.30);
+  box-shadow:
+    0 22px 58px rgba(0,0,0,.26),
+    0 0 38px rgba(45,212,191,.07),
+    inset 0 1px 0 rgba(255,255,255,.045);
+}
+
+[data-theme="aurora"] .core-global-header {
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(45,212,191,.12), transparent 28%),
+    radial-gradient(ellipse at 78% 0%, rgba(139,92,246,.10), transparent 31%),
+    linear-gradient(105deg, rgba(14,43,55,.94), rgba(24,70,83,.90), rgba(25,56,76,.92)) !important;
+  border-color: rgba(89,232,245,.30) !important;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+
+[data-theme="aurora"] .core-sidebar {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(45,212,191,.10), transparent 36%),
+    radial-gradient(circle at 100% 42%, rgba(139,92,246,.08), transparent 40%),
+    linear-gradient(180deg, rgba(10,35,47,.97), rgba(16,48,61,.95)) !important;
+  border-color: rgba(89,232,245,.27) !important;
+  box-shadow:
+    10px 0 34px rgba(0,0,0,.18),
+    inset -1px 0 0 rgba(255,255,255,.035) !important;
+}
+
+[data-theme="aurora"] .core-nav-group {
+  background: rgba(24,67,81,.66) !important;
+  border-color: rgba(89,232,245,.17) !important;
+  color: #bcebf2 !important;
+}
+
+[data-theme="aurora"] .core-menu-idle {
+  color: #9fd6df !important;
+}
+
+[data-theme="aurora"] .core-menu-active {
+  background:
+    linear-gradient(90deg, rgba(34,211,238,.18), rgba(139,92,246,.12)) !important;
+  border-color: rgba(89,232,245,.44) !important;
+  color: #f2fdff !important;
+  box-shadow:
+    inset 3px 0 0 rgba(89,232,245,.76),
+    0 0 18px rgba(45,212,191,.10) !important;
+}
+
+/* =========================================================
+   DAILY TRACKING SHARED SURFACES
+   ========================================================= */
+
+.daily-themed-card {
+  background: var(--core-panel);
+  border-color: var(--core-border);
+  color: var(--core-text);
+}
+
+.daily-themed-fullscreen {
+  background: var(--core-bg-secondary);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.daily-themed-fullscreen-header {
+  border-color: var(--core-border);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--core-primary) 10%, var(--core-surface-strong)),
+      var(--core-surface-strong),
+      color-mix(in srgb, #8b5cf6 9%, var(--core-surface-strong))
+    );
+}
+
+.daily-themed-title {
+  color: var(--core-primary-soft) !important;
+}
+
+.daily-themed-text {
+  color: var(--core-text) !important;
+}
+
+.daily-themed-muted {
+  color: var(--core-text-secondary) !important;
+}
+
+.daily-themed-accent {
+  color: var(--core-primary) !important;
+}
+
+.daily-themed-border {
+  border-color: var(--core-border) !important;
+}
+
+.daily-themed-inset {
+  background: var(--core-control) !important;
+  border-color: var(--core-border) !important;
+  color: var(--core-text);
+}
+
+.daily-themed-control {
+  background: var(--core-control);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.daily-themed-popover {
+  background: var(--core-surface-strong);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.daily-themed-input {
+  background: rgba(16,47,61,.92);
+  border-color: var(--core-border);
+  color: var(--core-text);
+}
+
+.daily-themed-input::placeholder {
+  color: var(--core-text-muted);
+}
+
+.daily-themed-icon-button {
+  color: var(--core-primary);
+}
+
+.daily-themed-icon-button:hover {
+  background: var(--core-control-hover);
+  color: var(--core-text);
+}
+
+[data-theme="aurora"] .daily-themed-card {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 10% -5%, rgba(45,212,191,.10), transparent 34%),
+    radial-gradient(ellipse at 94% 2%, rgba(139,92,246,.07), transparent 32%),
+    linear-gradient(145deg, rgba(18,56,69,.92), rgba(25,72,85,.85)) !important;
+  border-color: rgba(89,232,245,.24) !important;
+  box-shadow:
+    0 13px 30px rgba(0,0,0,.18),
+    0 0 20px rgba(45,212,191,.045),
+    inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+[data-theme="aurora"] .daily-themed-card::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  left: 7%;
+  right: 34%;
+  top: 0;
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(89,232,245,.76),
+      rgba(139,92,246,.34),
+      transparent
+    );
+  box-shadow: 0 0 12px rgba(45,212,191,.14);
+}
+
+/* Do not force positioning/z-index on every direct child here.
+   Several widgets intentionally use absolute overlays (Coming Soon ribbons,
+   expand buttons, loading layers, HUD badges). The card pseudo-element is
+   already z-index:0 and normal content naturally paints above it. */
+
+[data-theme="aurora"] .daily-themed-inset {
+  background:
+    linear-gradient(180deg, rgba(17,50,64,.80), rgba(22,63,77,.76)) !important;
+  color: #e9fbff !important;
+}
+
+[data-theme="aurora"] .daily-themed-popover {
+  background:
+    radial-gradient(circle at 92% 5%, rgba(139,92,246,.11), transparent 34%),
+    linear-gradient(160deg, rgba(13,42,55,.98), rgba(20,58,71,.97)) !important;
+  box-shadow:
+    0 24px 58px rgba(0,0,0,.34),
+    0 0 28px rgba(45,212,191,.07) !important;
+}
+
+[data-theme="aurora"] .daily-themed-fullscreen,
+[data-theme="aurora"] .daily-tracking-fullscreen {
+  background:
+    linear-gradient(rgba(125,238,255,.030) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125,238,255,.030) 1px, transparent 1px),
+    radial-gradient(ellipse at 15% 10%, rgba(45,212,191,.12), transparent 32%),
+    radial-gradient(ellipse at 84% 5%, rgba(139,92,246,.10), transparent 34%),
+    linear-gradient(145deg, #102f3d, #183f4d) !important;
+  background-size: 48px 48px, 48px 48px, auto, auto, auto !important;
+}
+
+[data-theme="aurora"] .daily-themed-fullscreen-header,
+[data-theme="aurora"] .daily-tracking-fullscreen-header {
+  background:
+    linear-gradient(100deg, rgba(15,48,62,.95), rgba(24,69,82,.95), rgba(37,48,79,.92)) !important;
+}
+
+/* Existing generic grid wrapper should never become pale in Aurora. */
+[data-theme="aurora"] .grid-panel-container > div > div {
+  background:
+    linear-gradient(145deg, rgba(18,56,69,.90), rgba(23,67,80,.84)) !important;
+  border-color: rgba(89,232,245,.22) !important;
+  color: var(--core-text) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 10px 28px rgba(0,0,0,.15) !important;
+}
+
+/* Strong readable typography. */
+[data-theme="aurora"] .text-hud-glow {
+  color: #effdff !important;
+  text-shadow:
+    0 0 8px rgba(89,232,245,.20),
+    0 0 18px rgba(45,212,191,.08) !important;
+}
+
+[data-theme="aurora"] .daily-tracking-summary-chip {
+  background: rgba(22,64,78,.80);
+  border-color: rgba(89,232,245,.22);
+  color: #b8dae1;
+}
+
+[data-theme="aurora"] select,
+[data-theme="aurora"] input,
+[data-theme="aurora"] button {
+  color-scheme: dark;
+}
