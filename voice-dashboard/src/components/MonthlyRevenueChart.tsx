@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, Line as DreiLine, OrbitControls, Text } from '@react-three/drei';
+import { useTheme } from '../theme/ThemeContext';
 import { 
   ComposedChart, 
   Bar, 
@@ -12,7 +13,6 @@ import {
   CartesianGrid 
 } from 'recharts';
 
-import { useTheme } from '../theme/ThemeContext';
 interface MonthlyRevenueChartProps {
   isLoaded: boolean;
   monthlyData: any[];
@@ -27,13 +27,13 @@ function Monthly3DScene({
   onHover,
   autoRotate,
   onInteractionStart,
-  isLight,
+  isSolaris,
 }: {
   data: any[];
   onHover: (v: Hover3D | null) => void;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isLight: boolean;
+  isSolaris: boolean;
 }) {
   const maxQty = Math.max(...data.map(d => d.adm + d.sur), 1);
   const maxRev = Math.max(...data.map(d => d.rev), 1);
@@ -172,11 +172,11 @@ function Monthly3DScene({
   });
 
   return <>
-    <color attach="background" args={[isLight ? "#d7e8f0" : "#020916"]} /><fog attach="fog" args={[isLight ? "#d7e8f0" : "#020916",25,50]} />
-    <ambientLight intensity={1.15}/><directionalLight position={[3,9,8]} intensity={2.4} color="#d9fbff"/>
+    <color attach="background" args={[isSolaris ? "#5f97cb" : "#020916"]} /><fog attach="fog" args={[isSolaris ? "#91c8e8" : "#020916",25,50]} />
+    <ambientLight intensity={isSolaris ? 1.45 : 1.15}/><directionalLight position={[3,9,8]} intensity={2.4} color="#d9fbff"/>
     <pointLight position={[-5,4,4]} intensity={28} color="#00bfff" distance={16}/><pointLight position={[5,4,3]} intensity={24} color="#fb923c" distance={16}/>
-    <mesh position={[0,2.5,-3.15]}><planeGeometry args={[14.5,6]}/><meshPhysicalMaterial color={isLight ? '#c6dce6' : '#031321'} transparent opacity={.82} metalness={.4} roughness={.32}/></mesh>
-    <gridHelper args={[16,32,"#087da5","#07304a"]} position={[0,-.04,0]}/><mesh rotation={[-Math.PI/2,0,0]} position={[0,-.08,.4]}><planeGeometry args={[16,9]}/><meshStandardMaterial color="#031523" metalness={.6} roughness={.3} transparent opacity={.92}/></mesh>
+    <mesh position={[0,2.5,-3.15]}><planeGeometry args={[14.5,6]}/><meshPhysicalMaterial color={isSolaris ? "#78afd7" : "#031321"} transparent opacity={isSolaris ? .56 : .82} metalness={isSolaris ? .18 : .4} roughness={isSolaris ? .46 : .32}/></mesh>
+    <gridHelper args={[16,32,isSolaris ? "#a8e2ff" : "#087da5",isSolaris ? "#4f7fb0" : "#07304a"]} position={[0,-.04,0]}/><mesh rotation={[-Math.PI/2,0,0]} position={[0,-.08,.4]}><planeGeometry args={[16,9]}/><meshStandardMaterial color={isSolaris ? "#24527f" : "#031523"} metalness={isSolaris ? .32 : .6} roughness={isSolaris ? .46 : .3} transparent opacity={isSolaris ? .90 : .92}/></mesh>
     <Text position={[0,5.15,-.5]} fontSize={.26} color="#a5f3fc" anchorX="center">12-MONTH REVENUE</Text>
     {data.map((d,i)=>{ const x=startX+i*step, ah=d.adm*qtyScale, sh=d.sur*qtyScale; return <group key={d.m}>
       <mesh position={[x,ah/2,0]} onPointerOver={e=>{e.stopPropagation();onHover(d)}} onPointerOut={()=>onHover(null)}><boxGeometry args={[.48,Math.max(ah,.02),.58]}/><meshPhysicalMaterial color="#00bfff" emissive="#0077aa" emissiveIntensity={.55} metalness={.3} roughness={.2}/></mesh>
@@ -262,7 +262,7 @@ function Monthly3DScene({
 }
 
 export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpand, isFullscreen = false }: MonthlyRevenueChartProps) {
-  const { isLight } = useTheme();
+  const { isSolaris } = useTheme();
   const [hover3D,setHover3D]=useState<Hover3D|null>(null);
   const [tip,setTip]=useState({x:20,y:20});
   const [autoRotate, setAutoRotate] = useState(true);
@@ -299,8 +299,8 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
 
   if (isFullscreen) {
     return (
-      <div className="daily-themed-fullscreen w-full h-full min-h-0 flex flex-col border rounded-xl overflow-hidden relative">
-        <div className="daily-themed-fullscreen-header flex items-center justify-between px-4 py-3 border-b shrink-0">
+      <div className={`daily-3d-shell w-full h-full min-h-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-cyan-500/30 shrink-0 bg-gradient-to-r from-cyan-950/30 via-[#020916]/90 to-orange-950/25">
           <div><div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-cyan-300 animate-pulse shadow-[0_0_12px_#22d3ee]"/>
             <span className="text-sm font-bold tracking-[0.22em] text-cyan-100 uppercase">Monthly Revenue</span>
@@ -331,7 +331,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
               onHover={setHover3D}
               autoRotate={autoRotate}
               onInteractionStart={() => setAutoRotate(false)}
-            isLight={isLight}
+              isSolaris={isSolaris}
             />
           </Canvas>
           {hover3D && <div className="absolute z-20 w-[224px] pointer-events-none rounded-xl border border-cyan-300/55 p-4 backdrop-blur-xl" style={{left:tip.x,top:tip.y,transform:'perspective(900px) rotateX(2deg) rotateY(-4deg)',background:'linear-gradient(145deg, rgba(7,32,54,.78), rgba(2,12,27,.68))',boxShadow:'0 16px 36px rgba(0,0,0,.35), 0 0 26px rgba(0,191,255,.18)'}}>
@@ -343,7 +343,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
   }
 
   return (
-    <div className="daily-themed-card border rounded-xl p-3 flex flex-col justify-between backdrop-blur-sm relative group h-full">
+    <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3 flex flex-col justify-between backdrop-blur-sm relative group h-full">
       
       <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
         <button 
@@ -371,10 +371,10 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
       <div className="h-40 w-full pt-2 pb-0">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={processedData} margin={{ top: 10, right: 2, bottom: -5, left: -2 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={isLight ? '#789dad' : '#2587C8'} opacity={0.15} vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2587C8" opacity={0.15} vertical={false} />
             <XAxis 
               dataKey="m" 
-              stroke={isLight ? '#176b83' : '#00f2fe'} 
+              stroke="#00f2fe" 
               tick={{ fill: '#00f2fe', fontSize: 9 }} 
               tickLine={false}
               axisLine={{ stroke: '#2587C8', opacity: 0.3 }}
@@ -409,11 +409,11 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
                 return [Math.round(num).toLocaleString('id-ID'), name];
               }}
               contentStyle={{ 
-                backgroundColor: isLight ? '#e7f3f8' : '#000a17', 
-                borderColor: isLight ? '#4b8fa8' : '#2587C8', 
+                backgroundColor: '#000a17', 
+                borderColor: '#2587C8', 
                 borderRadius: '8px', 
                 fontSize: '10px',
-                color: isLight ? '#0a2635' : '#fff'
+                color: '#fff'
               }} 
             />
             <Bar yAxisId="left" dataKey="adm" name="adm" stackId="qty" fill="#00bfff" radius={[0, 0, 0, 0]} barSize={20} />

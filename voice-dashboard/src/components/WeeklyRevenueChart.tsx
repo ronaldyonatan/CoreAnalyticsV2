@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Line as DreiLine, Html } from '@react-three/drei';
+import { useTheme } from '../theme/ThemeContext';
 import {
   ComposedChart,
   Bar,
@@ -12,7 +13,6 @@ import {
   CartesianGrid,
 } from 'recharts';
 
-import { useTheme } from '../theme/ThemeContext';
 interface DailyDataModel {
   day: number;
   adm: number;
@@ -57,14 +57,14 @@ function Real3DRevenueScene({
   isMobile,
   autoRotate,
   onInteractionStart,
-  isLight,
+  isSolaris,
 }: {
   data: WeeklyDataModel[];
   onHover: (info: Revenue3DTooltip | null) => void;
   isMobile: boolean;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isLight: boolean;
+  isSolaris: boolean;
 }) {
   const maxQty = Math.max(100, ...data.map((d) => Number(d.adm) + Number(d.sur)));
   const maxRev = Math.max(100, ...data.map((d) => Number(d.rev)));
@@ -204,10 +204,10 @@ function Real3DRevenueScene({
 
   return (
     <>
-      <color attach="background" args={[isLight ? '#d7e8f0' : '#020916']} />
-      <fog attach="fog" args={[isLight ? '#d7e8f0' : '#020916', 24, 46]} />
-      <ambientLight intensity={isLight ? 1.7 : 1.15} />
-      <directionalLight position={[4, 9, 6]} intensity={2.4} color={isLight ? '#ffffff' : '#b9f7ff'} />
+      <color attach="background" args={[isSolaris ? '#5f97cb' : '#020916']} />
+      <fog attach="fog" args={[isSolaris ? '#91c8e8' : '#020916', 24, 46]} />
+      <ambientLight intensity={isSolaris ? 1.45 : 1.15} />
+      <directionalLight position={[4, 9, 6]} intensity={2.4} color="#b9f7ff" />
       <pointLight position={[-5, 4, 3]} intensity={38} color="#00cfff" distance={15} />
       <pointLight position={[5, 3, -2]} intensity={28} color="#00d084" distance={13} />
       <pointLight position={[0, 5, -4]} intensity={18} color="#ff8a1f" distance={12} />
@@ -215,32 +215,32 @@ function Real3DRevenueScene({
       {/* Back wall + angled wings create the curved command-center enclosure. */}
       <mesh position={[0, 2.45, -2.7]}>
         <planeGeometry args={[chartWidth + 2.6, 5.35]} />
-        <meshPhysicalMaterial color="#031321" transparent opacity={0.78} roughness={0.28} metalness={0.45} />
+        <meshPhysicalMaterial color={isSolaris ? '#78afd7' : '#031321'} transparent opacity={isSolaris ? 0.56 : 0.78} roughness={isSolaris ? 0.46 : 0.28} metalness={isSolaris ? 0.18 : 0.45} />
       </mesh>
       <mesh position={[-chartWidth / 2 - 1.18, 2.2, -1.55]} rotation={[0, Math.PI / 5.5, 0]}>
         <planeGeometry args={[2.7, 4.9]} />
-        <meshPhysicalMaterial color={isLight ? '#d3e5ec' : '#041727'} transparent opacity={0.72} roughness={0.3} metalness={0.5} />
+        <meshPhysicalMaterial color={isSolaris ? '#5875bd' : '#041727'} transparent opacity={isSolaris ? 0.38 : 0.72} roughness={isSolaris ? 0.5 : 0.3} metalness={isSolaris ? 0.16 : 0.5} />
       </mesh>
       <mesh position={[chartWidth / 2 + 1.18, 2.2, -1.55]} rotation={[0, -Math.PI / 5.5, 0]}>
         <planeGeometry args={[2.7, 4.9]} />
-        <meshPhysicalMaterial color={isLight ? '#d3e5ec' : '#041727'} transparent opacity={0.72} roughness={0.3} metalness={0.5} />
+        <meshPhysicalMaterial color={isSolaris ? '#5875bd' : '#041727'} transparent opacity={isSolaris ? 0.38 : 0.72} roughness={isSolaris ? 0.5 : 0.3} metalness={isSolaris ? 0.16 : 0.5} />
       </mesh>
 
       {/* Horizontal luminous guides on the rear wall. */}
       {qtyTicks.map((_, i) => {
         const y = (4.6 / 4) * i;
-        return <DreiLine key={`back-h-${i}`} points={[[-chartWidth / 2 - 0.5, y, -2.63], [chartWidth / 2 + 0.5, y, -2.63]]} color="#087da5" lineWidth={0.65} transparent opacity={0.42} />;
+        return <DreiLine key={`back-h-${i}`} points={[[-chartWidth / 2 - 0.5, y, -2.63], [chartWidth / 2 + 0.5, y, -2.63]]} color={isSolaris ? '#d7f3ff' : '#087da5'} lineWidth={0.65} transparent opacity={0.42} />;
       })}
       {Array.from({ length: 9 }, (_, i) => {
         const x = -chartWidth / 2 + (chartWidth / 8) * i;
-        return <DreiLine key={`back-v-${i}`} points={[[x, 0, -2.63], [x, 4.6, -2.63]]} color="#07506d" lineWidth={0.55} transparent opacity={0.3} />;
+        return <DreiLine key={`back-v-${i}`} points={[[x, 0, -2.63], [x, 4.6, -2.63]]} color={isSolaris ? '#7fb7df' : '#07506d'} lineWidth={0.55} transparent opacity={0.3} />;
       })}
 
       {/* Deeper floor: the chart sits toward the back instead of floating in the middle. */}
-      <gridHelper args={[chartWidth + 4, Math.min(48, data.length + 8), isLight ? '#4b8fa8' : '#087da5', isLight ? '#9bbdca' : '#07304a']} position={[0, 0, 0]} />
+      <gridHelper args={[chartWidth + 4, Math.min(48, data.length + 8), isSolaris ? '#a8e2ff' : '#087da5', isSolaris ? '#4f7fb0' : '#07304a']} position={[0, 0, 0]} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.045, 0.25]} receiveShadow>
         <planeGeometry args={[chartWidth + 4, 6.6]} />
-        <meshStandardMaterial color="#031523" metalness={0.62} roughness={0.3} transparent opacity={0.92} />
+        <meshStandardMaterial color={isSolaris ? '#24527f' : '#031523'} metalness={isSolaris ? 0.32 : 0.62} roughness={isSolaris ? 0.46 : 0.3} transparent opacity={isSolaris ? 0.90 : 0.92} />
       </mesh>
 
       {/* Visible quantity axis on the left. */}
@@ -348,7 +348,7 @@ export default function WeeklyRevenueChart({
   isPeriodLoading = false,
   onMonthChange,
 }: WeeklyRevenueChartProps) {
-  const { isLight } = useTheme();
+  const { isSolaris } = useTheme();
   const [hover3D, setHover3D] = useState<Revenue3DTooltip | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
@@ -397,8 +397,8 @@ export default function WeeklyRevenueChart({
 
   if (isFullscreen) {
     return (
-      <div className="daily-themed-fullscreen w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative">
-        <div className="daily-themed-fullscreen-header relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,191,255,0.06)]">
+      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
+        <div className={`relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl ${isSolaris ? 'border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]' : 'border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/80 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]'}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
@@ -558,7 +558,7 @@ export default function WeeklyRevenueChart({
                 isMobile={isMobile}
                 autoRotate={autoRotate}
                 onInteractionStart={() => setAutoRotate(false)}
-              isLight={isLight}
+                isSolaris={isSolaris}
               />
             </Canvas>
           </div>
@@ -636,7 +636,7 @@ export default function WeeklyRevenueChart({
   }
 
   return (
-    <div className="daily-themed-card border rounded-xl p-3 flex flex-col backdrop-blur-sm relative group h-full min-h-0 overflow-hidden">
+    <div className="daily-themed-card bg-[#000a17]/80 border border-[#00cfff]/40 rounded-xl p-3 flex flex-col backdrop-blur-sm relative group h-full min-h-0 overflow-hidden shadow-[inset_0_0_22px_rgba(0,191,255,0.045),0_0_14px_rgba(0,191,255,0.06)]">
       {/* Expand / restore button: preserves the existing onExpand contract */}
       <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity z-10">
         <button
@@ -679,10 +679,10 @@ export default function WeeklyRevenueChart({
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 12, right: 12, bottom: 0, left: -18 }} barCategoryGap="18%">
 
-            <CartesianGrid strokeDasharray="3 4" stroke={isLight ? '#789dad' : '#08749B'} opacity={0.26} vertical={false} />
+            <CartesianGrid strokeDasharray="3 4" stroke="#08749B" opacity={0.26} vertical={false} />
             <XAxis
               dataKey="week"
-              stroke={isLight ? '#176b83' : '#00eaff'}
+              stroke="#00eaff"
               tick={{ fill: '#00eaff', fontSize: 10 }}
               tickLine={false}
               axisLine={{ stroke: '#00cfff', opacity: 0.38 }}
@@ -722,11 +722,11 @@ export default function WeeklyRevenueChart({
               }}
               labelFormatter={(label) => `Tanggal ${label}`}
               contentStyle={{
-                backgroundColor: isLight ? 'rgba(231,243,248,.98)' : 'rgba(0, 10, 23, 0.96)',
-                border: isLight ? '1px solid rgba(4,101,132,.45)' : '1px solid rgba(0, 217, 255, 0.65)',
+                backgroundColor: 'rgba(0, 10, 23, 0.96)',
+                border: '1px solid rgba(0, 217, 255, 0.65)',
                 borderRadius: '8px',
                 fontSize: '11px',
-                color: isLight ? '#0a2635' : '#e6fbff',
+                color: '#e6fbff',
                 boxShadow: '0 0 16px rgba(0, 191, 255, 0.2)',
               }}
               itemStyle={{ paddingTop: 2, paddingBottom: 2 }}

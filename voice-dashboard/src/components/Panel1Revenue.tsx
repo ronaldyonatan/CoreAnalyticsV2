@@ -164,11 +164,13 @@ function Revenue3DScene({
   mode,
   onHover,
   isAurora,
+  isSolaris,
 }: {
   data: QuarterRevenue3D[];
   mode: RevenueMode;
   onHover: (value: RevenueHover3D | null) => void;
   isAurora: boolean;
+  isSolaris: boolean;
 }) {
   const scannerGroupRef = useRef<THREE.Group>(null);
   const barRefs = useRef<Array<{ mesh: THREE.Mesh; x: number; baseOpacity: number }>>([]);
@@ -180,7 +182,30 @@ function Revenue3DScene({
   const transitionStartRef = useRef<number | null>(null);
   const [displayedMode, setDisplayedMode] = useState<RevenueMode>(mode);
 
-  const palette = isAurora
+  const palette = isSolaris
+    ? {
+        // Solaris Daylight Ion: electric azure + cobalt + ice, deliberately not Aurora teal.
+        background: '#5f97cb',
+        fog: '#91c8e8',
+        floor: '#24527f',
+        grid1: '#a8e2ff',
+        grid2: '#4f7fb0',
+        previous: '#3b82f6',
+        previousEmissive: '#1d4ed8',
+        current: '#79cfff',
+        currentEmissive: '#287cc4',
+        radiantOuter: '#9bdcff',
+        radiantOuterEmissive: '#287cc4',
+        radiantInner: '#d7f3ff',
+        radiantInnerEmissive: '#4b9bdd',
+        target: '#5b6ee1',
+        scanner: '#c3ecff',
+        scannerSecondary: '#6f8cff',
+        wall: '#78afd7',
+        sideWall: '#5875bd',
+        text: '#f8fdff',
+      }
+    : isAurora
     ? {
         background: '#0a2935',
         fog: '#0b2f3b',
@@ -425,10 +450,10 @@ function Revenue3DScene({
       <color attach="background" args={[palette.background]} />
       <fog attach="fog" args={[palette.fog, 18, 34]} />
 
-      <ambientLight intensity={isAurora ? 1.05 : 0.9} />
+      <ambientLight intensity={isSolaris ? 1.18 : isAurora ? 1.05 : 0.9} />
       <directionalLight position={[5, 8, 7]} intensity={2.2} color="#d9ffff" />
       <pointLight position={[-5, 4.4, 4]} intensity={28} color={palette.current} distance={16} />
-      <pointLight position={[5, 4.0, 3]} intensity={22} color={isAurora ? '#a78bfa' : '#2563eb'} distance={15} />
+      <pointLight position={[5, 4.0, 3]} intensity={22} color={isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'} distance={15} />
       <pointLight position={[0, 2.3, -2]} intensity={16} color={palette.target} distance={11} />
 
       {/* command-center wall */}
@@ -457,7 +482,7 @@ function Revenue3DScene({
       <mesh position={[6.25, 2.40, -1.95]} rotation={[0, -Math.PI / 5.7, 0]}>
         <planeGeometry args={[3.1, 5.6]} />
         <meshPhysicalMaterial
-          color={isAurora ? '#382f57' : '#1a0a20'}
+          color={isSolaris ? '#73a5ce' : isAurora ? '#382f57' : '#1a0a20'}
           transparent
           opacity={0.50}
           roughness={0.34}
@@ -887,11 +912,11 @@ function Revenue3DFullscreen({
   mode: RevenueMode;
   onModeChange: (mode: RevenueMode) => void;
 }) {
-  const { isAurora } = useTheme();
+  const { isAurora, isSolaris } = useTheme();
   const [hover, setHover] = useState<RevenueHover3D | null>(null);
 
   return (
-    <div className="company-panel relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
+    <div className="company-panel company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between p-4 pr-14">
         <div>
           <div className="company-title text-[11px] font-black uppercase tracking-[0.26em]">
@@ -936,6 +961,7 @@ function Revenue3DFullscreen({
           mode={mode}
           onHover={setHover}
           isAurora={isAurora}
+          isSolaris={isSolaris}
         />
       </Canvas>
 

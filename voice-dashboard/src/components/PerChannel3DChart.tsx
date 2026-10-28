@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
-
 import { useTheme } from '../theme/ThemeContext';
+
 interface ChannelItem {
   Kriteria?: string;
   kriteria?: string;
@@ -1005,7 +1005,7 @@ function ChannelTowerScene({
   onHover,
   autoRotate,
   onInteractionStart,
-  isLight,
+  isSolaris,
 }: {
   metrics: MetricData[];
   onHover: (
@@ -1013,7 +1013,7 @@ function ChannelTowerScene({
   ) => void;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isLight: boolean;
+  isSolaris: boolean;
 }) {
   const { camera, size } = useThree();
   const [fitDistance, setFitDistance] = useState(16);
@@ -1142,14 +1142,14 @@ function ChannelTowerScene({
       <color
         attach="background"
         args={[
-          '#010812',
+          isSolaris ? '#5f97cb' : '#010812',
         ]}
       />
 
       <fog
         attach="fog"
         args={[
-          '#010812',
+          isSolaris ? '#91c8e8' : '#010812',
           28,
           58,
         ]}
@@ -1158,7 +1158,7 @@ function ChannelTowerScene({
       {/* LIGHT */}
 
       <ambientLight
-        intensity={0.95}
+        intensity={isSolaris ? 1.4 : 0.95}
       />
 
       <directionalLight
@@ -1223,9 +1223,9 @@ function ChannelTowerScene({
         />
 
         <meshStandardMaterial
-          color={isLight ? '#d3e5ec' : '#02101d'}
+          color={isSolaris ? "#78afd7" : "#02101d"}
           transparent
-          opacity={0.48}
+          opacity={isSolaris ? 0.55 : 0.48}
           roughness={0.9}
         />
       </mesh>
@@ -1268,8 +1268,8 @@ function ChannelTowerScene({
         args={[
           24,
           24,
-          '#07506d',
-          '#04283b',
+          isSolaris ? '#a8e2ff' : '#07506d',
+          isSolaris ? '#4f7fb0' : '#04283b',
         ]}
         position={[
           0,
@@ -1298,9 +1298,9 @@ function ChannelTowerScene({
         />
 
         <meshStandardMaterial
-          color="#010b14"
+          color={isSolaris ? "#24527f" : "#010b14"}
           transparent
-          opacity={0.92}
+          opacity={isSolaris ? 0.90 : 0.92}
           metalness={0.4}
           roughness={0.65}
         />
@@ -1394,7 +1394,7 @@ export default function PerChannel3DChart({
   onMonthChange,
   onYtdToggle,
 }: PerChannel3DChartProps) {
-  const { isLight } = useTheme();
+  const { isSolaris } = useTheme();
   const [
     hover,
     setHover,
@@ -1494,7 +1494,7 @@ export default function PerChannel3DChart({
     revenueData.length > 0;
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-cyan-500/30 daily-themed-fullscreen">
+    <div className={`daily-3d-shell relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border ${isSolaris ? 'border-blue-400/35 bg-[#dff2ff]' : 'border-cyan-500/30 bg-[#010812]'}`}>
       {/* ===================================================
           HEADER / PERIOD CONTROL
       =================================================== */}
@@ -1549,7 +1549,7 @@ export default function PerChannel3DChart({
                 className={`flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[8px] font-black uppercase tracking-[0.12em] transition-all ${
                   showPeriodFilter
                     ? 'border-cyan-300/60 bg-cyan-500/15 text-cyan-50 shadow-[0_0_12px_rgba(34,211,238,.15)]'
-                    : 'border-cyan-500/25 /55 text-cyan-300 hover:border-cyan-300/50'
+                    : 'border-cyan-500/25 bg-[#02101d]/55 text-cyan-300 hover:border-cyan-300/50'
                 }`}
                 title={showPeriodFilter ? 'Hide period filter' : 'Show period filter'}
                 aria-expanded={showPeriodFilter}
@@ -1564,7 +1564,7 @@ export default function PerChannel3DChart({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-400/40 /75 text-cyan-200 transition-all hover:bg-cyan-400/10 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-400/40 bg-[#03111f]/75 text-cyan-200 transition-all hover:bg-cyan-400/10 hover:text-white"
                 title="Close fullscreen"
                 aria-label="Close Per Channel fullscreen"
               >
@@ -1594,7 +1594,7 @@ export default function PerChannel3DChart({
         )}
 
         {showPeriodFilter && (
-          <div className="per-channel-filter-panel mt-2 rounded-lg border border-cyan-400/15 /45 px-2.5 py-2 backdrop-blur-md">
+          <div className="per-channel-filter-panel mt-2 rounded-lg border border-cyan-400/15 bg-[#03111f]/45 px-2.5 py-2 backdrop-blur-md">
             <div className="flex flex-wrap items-center justify-center gap-1 md:gap-1.5">
               <button
                 type="button"
@@ -1622,7 +1622,7 @@ export default function PerChannel3DChart({
                     className={`min-w-[34px] rounded-md border px-1.5 py-1 text-[8px] font-bold tracking-[0.08em] transition-all duration-300 md:min-w-[38px] md:px-2 md:text-[9px] ${
                       active
                         ? 'border-cyan-300/70 bg-cyan-400/15 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.25)]'
-                        : 'border-cyan-500/20 /40 text-cyan-600/70 hover:border-cyan-400/40 hover:text-cyan-300'
+                        : 'border-cyan-500/20 bg-[#02101d]/40 text-cyan-600/70 hover:border-cyan-400/40 hover:text-cyan-300'
                     }`}
                   >
                     {month}
@@ -1679,7 +1679,7 @@ export default function PerChannel3DChart({
         <div className="pointer-events-none absolute bottom-5 right-5 z-10 h-9 w-9 rounded-br-lg border-b-2 border-r-2 border-cyan-300/30" />
 
         {/* GLOBAL LEGEND */}
-        <div className="pointer-events-none absolute right-6 top-5 z-20 hidden items-center gap-4 rounded-lg border border-cyan-500/15 /65 px-3 py-2 backdrop-blur-md lg:flex">
+        <div className="pointer-events-none absolute right-6 top-5 z-20 hidden items-center gap-4 rounded-lg border border-cyan-500/15 bg-[#03111f]/65 px-3 py-2 backdrop-blur-md lg:flex">
           {ORDER.map((name) => (
             <div key={name} className="flex items-center gap-2 text-[8px] font-bold tracking-wider">
               <span
@@ -1709,8 +1709,8 @@ export default function PerChannel3DChart({
               onHover={setHover}
               autoRotate={autoRotate}
               onInteractionStart={() => setAutoRotate(false)}
-              isLight={isLight}
-/>
+              isSolaris={isSolaris}
+            />
           </Canvas>
         </div>
 
@@ -1719,7 +1719,7 @@ export default function PerChannel3DChart({
           <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden">
             <div className="absolute inset-0 bg-cyan-950/10 backdrop-blur-[0.5px]" />
             <div className="per-channel-period-scan absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent shadow-[0_0_18px_rgba(34,211,238,.8)]" />
-            <div className="absolute left-1/2 top-5 -translate-x-1/2 rounded-lg border border-cyan-300/30 /85 px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.20em] text-cyan-200 backdrop-blur-md md:text-[9px]">
+            <div className="absolute left-1/2 top-5 -translate-x-1/2 rounded-lg border border-cyan-300/30 bg-[#03111f]/85 px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.20em] text-cyan-200 backdrop-blur-md md:text-[9px]">
               Synchronizing Period · {previewLabel}
             </div>
           </div>
@@ -1728,7 +1728,7 @@ export default function PerChannel3DChart({
         {/* EMPTY */}
         {isLoaded && !isPeriodLoading && !hasAnyData && (
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-            <div className="rounded-xl border border-cyan-500/15 /65 px-5 py-3 text-center backdrop-blur-md">
+            <div className="rounded-xl border border-cyan-500/15 bg-[#03111f]/65 px-5 py-3 text-center backdrop-blur-md">
               <div className="text-[9px] font-black uppercase tracking-[0.24em] text-cyan-400/50">No Data</div>
               <div className="mt-1 text-[8px] text-slate-600">No channel data for {previewLabel}</div>
             </div>
@@ -1736,7 +1736,7 @@ export default function PerChannel3DChart({
         )}
 
         {/* BOTTOM SCALE */}
-        <div className="pointer-events-none absolute bottom-5 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-6 rounded-xl border border-cyan-500/15 /65 px-5 py-2.5 backdrop-blur-md xl:flex">
+        <div className="pointer-events-none absolute bottom-5 left-1/2 z-20 hidden -translate-x-1/2 items-center gap-6 rounded-xl border border-cyan-500/15 bg-[#03111f]/65 px-5 py-2.5 backdrop-blur-md xl:flex">
           <span className="text-[8px] uppercase tracking-[0.24em] text-slate-500">Tower Height</span>
           <span className="text-[9px] font-bold text-cyan-200">Channel Share %</span>
           <span className="h-4 w-px bg-cyan-500/20" />
@@ -1783,8 +1783,8 @@ export default function PerChannel3DChart({
         )}
 
         {!isLoaded && (
-          <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center daily-themed-fullscreen/40 backdrop-blur-[1px]">
-            <div className="rounded-xl border border-cyan-500/20 /80 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-cyan-400/70">
+          <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-[#010812]/40 backdrop-blur-[1px]">
+            <div className="rounded-xl border border-cyan-500/20 bg-[#03111f]/80 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-cyan-400/70">
               Select healthcare to load channel data
             </div>
           </div>

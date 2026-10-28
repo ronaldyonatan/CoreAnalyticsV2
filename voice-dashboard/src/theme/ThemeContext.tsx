@@ -17,6 +17,7 @@ interface ThemeContextValue {
   toggleTheme: () => void;
   isLight: boolean;
   isAurora: boolean;
+  isSolaris: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -26,8 +27,7 @@ const getInitialTheme = (): CoreThemeId => {
 
   const saved = window.localStorage.getItem(CORE_THEME_STORAGE_KEY);
 
-  // Backward compatibility: users who previously selected Cosmic Light
-  // are migrated automatically to the new Aurora theme.
+  // Backward compatibility: the retired Cosmic Light theme maps to Aurora.
   if (saved === 'cosmic-light') return 'aurora';
 
   if (isCoreThemeId(saved)) return saved;
@@ -40,9 +40,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = themeId;
-    // Aurora deliberately uses dark browser controls because its surfaces
-    // are medium-dark translucent glass, not a white/light UI.
-    document.documentElement.style.colorScheme = 'dark';
+
+    // Solaris is the only true light environment. Cosmic Black and Aurora
+    // deliberately keep dark browser-native controls.
+    document.documentElement.style.colorScheme =
+      themeId === 'solaris' ? 'light' : 'dark';
 
     window.localStorage.setItem(CORE_THEME_STORAGE_KEY, themeId);
   }, [themeId]);
@@ -54,17 +56,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       themeId,
       theme,
       setTheme: setThemeId,
+      // Kept for legacy callers. It now cycles through all available themes.
       toggleTheme: () =>
-        setThemeId((current) =>
-          current === 'cosmic-black' ? 'aurora' : 'cosmic-black'
-        ),
+        setThemeId((current) => {
+          if (current === 'cosmic-black') return 'aurora';
+          if (current === 'aurora') return 'solaris';
+          return 'cosmic-black';
+        }),
 
-      // Legacy compatibility flag.
-      // Aurora is intentionally NOT treated as a traditional light theme.
-      // Existing chart components that still branch on `isLight` will therefore
-      // keep their dark/cosmic 3D scene materials instead of switching to white.
-      isLight: false,
+      // Existing chart components can use this flag to switch to their
+      // established light materials only for Solaris.
+      isLight: themeId === 'solaris',
       isAurora: themeId === 'aurora',
+      isSolaris: themeId === 'solaris',
     };
   }, [themeId]);
 

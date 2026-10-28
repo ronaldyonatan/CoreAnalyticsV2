@@ -6,7 +6,7 @@ import PanelExsumRevenue from '../../components/PanelExsumRevenue';
 import PanelExsumDoctorFee from '../../components/PanelExsumDoctorFee';
 import PanelExsumMaterial from '../../components/PanelExsumMaterial';
 import PanelDetailPNL, { type PnLItem, type PnLClosingInfo } from '../../components/PanelDetailPNL';
-import SciFiDropdown from '../../components/SciFiDropdown';
+import DailyFilterHealthcare from '../../components/PanelFilterHealthcare';
 import { useVoiceCommandCompanyPerformance } from '../../voiceCommand/CompanyperformanceVC';
 import './company-performance-theme.css';
 
@@ -18,6 +18,10 @@ interface HealthcareItem { healthcareID: string; healthcareName: string; }
 interface CompanyPerformanceProps {
   selectedHealthcareId: string;
   healthcareList: HealthcareItem[];
+  onHealthcareChange?: (id: string) => void;
+  onHealthcareRefresh?: () => Promise<boolean>;
+  healthcareLoading?: boolean;
+  healthcareError?: string | null;
 }
 
 class SciFiAudio {
@@ -331,7 +335,11 @@ const HealthcareDashboardView = ({
 // =========================================================================
 export default function CompanyPerformance({ 
   selectedHealthcareId, 
-  healthcareList 
+  healthcareList,
+  onHealthcareChange,
+  onHealthcareRefresh,
+  healthcareLoading = false,
+  healthcareError = null,
 }: CompanyPerformanceProps) {
 
   const [activeGraphs, setActiveGraphs] = useState<number[]>([1, 2, 3, 4]);
@@ -348,9 +356,6 @@ export default function CompanyPerformance({
   // State Kiri & Kanan
   const [leftHealthcareId, setLeftHealthcareId] = useState<string>(selectedHealthcareId || '');
   const [rightHealthcareId, setRightHealthcareId] = useState<string>('');
-  
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isRightDropdownOpen, setIsRightDropdownOpen] = useState(false);
 
   // Ref untuk Synchronized Scrolling antara Kiri dan Kanan
   const leftScrollRef = useRef<HTMLDivElement>(null);
@@ -513,6 +518,11 @@ export default function CompanyPerformance({
     }
   }, [currentLeftId, currentRightId, isCompareMode, fetchPeerData]);
 
+  const handlePrimaryHealthcareSelect = useCallback((id: string) => {
+    setLeftHealthcareId(id);
+    onHealthcareChange?.(id);
+  }, [onHealthcareChange]);
+
   const handleToggleCompare = () => {
     const nextMode = !isCompareMode;
     SciFiAudio.playBeep(nextMode ? 600 : 400, 'square', 0.1, 0.05);
@@ -548,19 +558,6 @@ export default function CompanyPerformance({
     leftHealthcareId,
     SciFiAudio
   });  
-
-  const selectedHealthcareName = currentLeftId === '' 
-    ? '-- All Healthcare Nodes --' 
-    : (healthcareList.find(hc => hc.healthcareID === currentLeftId)?.healthcareName || currentLeftId);
-  const rightHealthcareName = rightHealthcareId === '' 
-    ? '-- All Healthcare Nodes --' 
-    : (healthcareList.find(hc => hc.healthcareID === rightHealthcareId)?.healthcareName || rightHealthcareId);
-
-  const formattedHealthcareList = healthcareList.map(hc => ({
-    id: hc.healthcareID,
-    name: hc.healthcareName
-  }));
-
   const getHealthcareName = (id: string) => {
     if (!id || id === '') return 'ALL HEALTHCARE NODES';
     return healthcareList.find(hc => hc.healthcareID === id)?.healthcareName || id;
@@ -570,13 +567,16 @@ export default function CompanyPerformance({
     <div className="company-theme-root company-performance-shell relative flex-1 min-w-0 min-h-0 flex flex-col h-full bg-[#000511]/40 rounded-xl p-2 overflow-hidden">
       
       {/* HEADER CONTROL BAR */}
-      <div className="company-control-bar flex items-center justify-between border-b border-[#00f2fe]/30 pb-2 px-2 mb-2 bg-[#000814]/15 rounded-lg backdrop-blur-[2px] pointer-events-auto z-50 flex-shrink-0">
-        <div className="flex items-center space-x-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-          <span className="company-title text-xs font-bold tracking-widest text-[#00f2fe] text-hud-glow uppercase">TEL-SYSTEMS DASHBOARD</span>
+      <div className="company-page-header company-control-bar relative z-[200] mb-2 flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border border-[#00f2fe]/40 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5">
+        <div className="company-page-title-row flex min-w-0 items-center space-x-3">
+          <div className="relative flex h-3 w-3 flex-shrink-0 items-center justify-center">
+            <span className="company-page-status-dot absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-60" />
+            <span className="company-page-status-dot relative inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400" />
+          </div>
+          <span className="company-page-title company-title min-w-0 text-lg font-extrabold uppercase tracking-[0.16em] sm:text-xl sm:tracking-widest">COMPANY PERFORMANCE</span>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="company-page-controls flex min-w-0 flex-wrap items-center justify-end gap-2 lg:gap-3">
           {isCompareMode && (
             <div className="company-control-surface flex items-center gap-1 bg-[#001428]/60 p-0.5 rounded border border-[#00f2fe]/20">
               <button
@@ -629,34 +629,55 @@ export default function CompanyPerformance({
           )}
 
           <div className="flex items-center gap-1.5">
-            {isCompareMode && <span className="text-[10px] text-cyan-400 font-bold uppercase">Kiri:</span>}
-            <SciFiDropdown 
-              isOpen={isDropdownOpen}
-              toggle={() => setIsDropdownOpen(!isDropdownOpen)}
-              selectedName={selectedHealthcareName}
-              list={formattedHealthcareList}
-              onSelect={(id) => {
-                setLeftHealthcareId(id);
-                setIsDropdownOpen(false);
-              }}
-              selectedId={currentLeftId}
-            />
+            {isCompareMode && <span className="company-compare-side-label text-[10px] font-bold uppercase">Kiri:</span>}
+
+            <div className="company-healthcare-filter-wrap relative z-[260] min-w-0">
+              <DailyFilterHealthcare
+                healthcareList={healthcareList}
+                selectedId={currentLeftId}
+                onSelect={handlePrimaryHealthcareSelect}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => { void onHealthcareRefresh?.(); }}
+              disabled={!onHealthcareRefresh || healthcareLoading}
+              className="company-healthcare-refresh company-icon-button flex h-[30px] w-[34px] shrink-0 items-center justify-center rounded-lg border border-[#00f2fe]/30 bg-[#001428]/60 text-cyan-300 transition-all hover:bg-cyan-500/15 disabled:cursor-not-allowed disabled:opacity-45"
+              title={healthcareError ? `Refresh healthcare — ${healthcareError}` : 'Refresh healthcare dari BEAM'}
+              aria-label="Refresh healthcare"
+            >
+              <svg
+                className={`h-3.5 w-3.5 ${healthcareLoading ? 'animate-spin' : ''}`}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20 6v5h-5M4 18v-5h5" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.1 9A7 7 0 0118 6.4L20 11M4 13l2 4.6A7 7 0 0017.9 15" />
+              </svg>
+            </button>
+
+            {healthcareError && !healthcareLoading && (
+              <span
+                className="company-healthcare-error flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[9px] font-black"
+                title={healthcareError}
+                aria-label="Healthcare load failed"
+              >
+                !
+              </span>
+            )}
           </div>
 
           {isCompareMode && (
             <div className="flex items-center gap-1.5 animate-glitch-in">
-              <span className="text-[10px] text-amber-400 font-bold uppercase">Kanan:</span>
-              <div className="relative">
-                <SciFiDropdown 
-                  isOpen={isRightDropdownOpen}
-                  toggle={() => setIsRightDropdownOpen(!isRightDropdownOpen)}
-                  selectedName={rightHealthcareName}
-                  list={formattedHealthcareList}
-                  onSelect={(id) => {
-                    setRightHealthcareId(id);
-                    setIsRightDropdownOpen(false);
-                  }}
+              <span className="company-compare-side-label text-[10px] font-bold uppercase">Kanan:</span>
+              <div className="company-healthcare-filter-wrap relative z-[260] min-w-0">
+                <DailyFilterHealthcare
+                  healthcareList={healthcareList}
                   selectedId={rightHealthcareId}
+                  onSelect={(id) => setRightHealthcareId(id)}
                 />
               </div>
             </div>
@@ -664,7 +685,7 @@ export default function CompanyPerformance({
 
           <button
             onClick={handleToggleCompare}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase rounded border transition-all cursor-pointer ${
+            className={`company-compare-toggle ${isCompareMode ? 'company-compare-toggle--active' : 'company-compare-toggle--idle'} flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase rounded border transition-all cursor-pointer ${
               isCompareMode 
                 ? 'bg-amber-950/40 border-amber-500 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.3)]' 
                 : 'bg-cyan-950/30 border-cyan-500 text-cyan-400 hover:bg-cyan-900/50'

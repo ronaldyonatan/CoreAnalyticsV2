@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 import LoginPortal from './LoginPortal';
+import type { AuthenticatedUser } from './LoginPortal';
 import DashboardManager from './components/DashboardManager';
 import { useVoiceCommand } from './hooks/useVoiceCommand';
 import { ThemeProvider, useTheme } from './theme/ThemeContext';
@@ -62,6 +63,10 @@ const DASHBOARD_COMPONENTS: Record<
   React.ComponentType<{
     selectedHealthcareId: string;
     healthcareList: HealthcareItem[];
+    onHealthcareChange?: (id: string) => void;
+    onHealthcareRefresh?: () => Promise<boolean>;
+    healthcareLoading?: boolean;
+    healthcareError?: string | null;
   }>
 > = {
   company_performance: CompanyPerformance,
@@ -102,6 +107,15 @@ const HARDCODED_MENU: MenuItem[] = [
     ],
   },
 ];
+
+const SCREEN_ORDER = [
+  ...HARDCODED_MENU.flatMap(category => category.children?.map(menu => menu.id) ?? [category.id]),
+  'user_management',
+  'group_management',
+  'dashboard_designer',
+  'widget_revenue',
+];
+const REGISTERED_ROUTES = new Set([...Object.keys(DASHBOARD_COMPONENTS), 'dashboard_designer']);
 
 function FuturisticMenuIcon({
   type,
@@ -298,12 +312,61 @@ function CyberTunnelBackground() {
 }
 
 // =========================================================
+// AUTH SESSION RESTORE
+// =========================================================
+
+function readStoredAuthenticatedUser(): AuthenticatedUser | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = window.localStorage.getItem('core_authenticated_user');
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as Partial<AuthenticatedUser> | null;
+    if (
+      !parsed ||
+      typeof parsed.user_id !== 'string' ||
+      !parsed.user_id.trim() ||
+      typeof parsed.username !== 'string' ||
+      !parsed.username.trim()
+    ) {
+      window.localStorage.removeItem('core_authenticated_user');
+      return null;
+    }
+
+    return {
+      ...parsed,
+      display_name:
+        typeof parsed.display_name === 'string' && parsed.display_name.trim()
+          ? parsed.display_name
+          : parsed.username,
+      groups: Array.isArray(parsed.groups) ? parsed.groups : [],
+      menus: Array.isArray(parsed.menus) ? parsed.menus : [],
+      auth_method: parsed.auth_method ?? 'manual',
+      authenticated_at:
+        typeof parsed.authenticated_at === 'string'
+          ? parsed.authenticated_at
+          : new Date().toISOString(),
+    } as AuthenticatedUser;
+  } catch {
+    try { window.localStorage.removeItem('core_authenticated_user'); } catch {}
+    return null;
+  }
+}
+
+// =========================================================
 // APP
 // =========================================================
 
 function AppContent() {
-  const { themeId, isLight, isAurora } = useTheme();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { themeId, isAurora, isSolaris } = useTheme();
+  const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(
+    () => readStoredAuthenticatedUser()
+  );
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+    () => authenticatedUser !== null
+  );
+  const [isWidgetMode, setIsWidgetMode] = useState(false);
   const [selectedHealthcareId, setSelectedHealthcareId] =
     useState<string>('');
 
@@ -311,6 +374,18 @@ function AppContent() {
   const [activeMenuId, setActiveMenuId] = useState<string>(
     'company_performance'
   );
+  const authorizedRouteKeys = useMemo(() => new Set(
+    (authenticatedUser?.menus ?? [])
+      .map(menu => menu?.route_key)
+      .filter((key): key is string => typeof key === 'string' && REGISTERED_ROUTES.has(key)),
+  ), [authenticatedUser]);
+  const canAccess = useCallback((routeKey: string) => (
+    isWidgetMode ? routeKey === 'widget_revenue' : authorizedRouteKeys.has(routeKey)
+  ), [isWidgetMode, authorizedRouteKeys]);
+  const authorizedMenus = HARDCODED_MENU
+    .map(category => ({ ...category, children: category.children?.filter(menu => canAccess(menu.id)) }))
+    .filter(category => category.children ? category.children.length > 0 : canAccess(category.id));
+  const firstAuthorizedRoute = SCREEN_ORDER.find(canAccess) ?? '';
   const [expandedGroups, setExpandedGroups] = useState<
     Record<string, boolean>
   >({ financial: true });
@@ -351,12 +426,27 @@ function AppContent() {
       hashParams.get('autologin') === 'true'
     ) {
       setIsLoggedIn(true);
+      setIsWidgetMode(true);
       setActiveMenuId('widget_revenue');
     }
   }, []);
 
   // Dashboard Manager
   const [showManager, setShowManager] = useState(false);
+  const requestedRoute = showManager ? 'dashboard_designer' : activeMenuId;
+  // Resolve before rendering so stale or unauthorized state never mounts a screen.
+  const effectiveRoute = canAccess(requestedRoute) ? requestedRoute : firstAuthorizedRoute;
+  const navigateTo = useCallback((routeKey: string) => {
+    if (!isLoggedIn || !canAccess(routeKey)) return;
+    setShowManager(routeKey === 'dashboard_designer');
+    if (routeKey !== 'dashboard_designer') setActiveMenuId(routeKey);
+  }, [isLoggedIn, canAccess]);
+  const firstDashboardRoute = SCREEN_ORDER.find(route => route !== 'dashboard_designer' && canAccess(route));
+  const closeDashboardDesigner = () => {
+    if (firstDashboardRoute) {
+      navigateTo(activeMenuId !== 'dashboard_designer' && canAccess(activeMenuId) ? activeMenuId : firstDashboardRoute);
+    }
+  };
 
   // Management / settings dropdown in the global header.
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -381,26 +471,27 @@ function AppContent() {
   }, [showSettingsMenu]);
 
   const openUserManagement = useCallback(() => {
+    if (!canAccess('user_management')) return;
     SciFiAudio.playBeep(760, 'sine', 0.06, 0.035);
-    setShowManager(false);
-    setActiveMenuId('user_management');
+    navigateTo('user_management');
     setShowSettingsMenu(false);
     if (!isSidebarPinned) setIsSidebarExpanded(false);
-  }, [isSidebarPinned]);
+  }, [isSidebarPinned, canAccess, navigateTo]);
 
   const openGroupManagement = useCallback(() => {
+    if (!canAccess('group_management')) return;
     SciFiAudio.playBeep(790, 'sine', 0.06, 0.035);
-    setShowManager(false);
-    setActiveMenuId('group_management');
+    navigateTo('group_management');
     setShowSettingsMenu(false);
     if (!isSidebarPinned) setIsSidebarExpanded(false);
-  }, [isSidebarPinned]);
+  }, [isSidebarPinned, canAccess, navigateTo]);
 
   const openDashboardDesigner = useCallback(() => {
+    if (!canAccess('dashboard_designer')) return;
     SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
     setShowSettingsMenu(false);
-    setShowManager(true);
-  }, []);
+    navigateTo('dashboard_designer');
+  }, [canAccess, navigateTo]);
 
   const [dashboardItems, setDashboardItems] = useState<any[]>(() => {
     const saved = localStorage.getItem('coa_dashboard_layout');
@@ -455,6 +546,8 @@ function AppContent() {
   }, [dashboardItems]);
 
   const [healthcareList, setHealthcareList] = useState<HealthcareItem[]>([]);
+  const [healthcareLoading, setHealthcareLoading] = useState(false);
+  const [healthcareError, setHealthcareError] = useState<string | null>(null);
 
   // Global Voice Command
   const { isListening, toggleListening } = useVoiceCommand({
@@ -510,45 +603,71 @@ function AppContent() {
   const handleResetToLogin = useCallback(() => {
     SciFiAudio.playBeep(400, 'sawtooth', 0.15, 0.05);
     setIsLoggedIn(false);
+    setAuthenticatedUser(null);
+    setIsWidgetMode(false);
+    setShowManager(false);
+    setShowSettingsMenu(false);
+    setActiveMenuId('company_performance');
+    try { localStorage.removeItem('core_authenticated_user'); } catch {
+      // Reactive identity and widget state are cleared even when storage is unavailable.
+    }
   }, []);
 
-  // Healthcare master
-  useEffect(() => {
-    const fetchHealthcareMaster = async () => {
-      try {
-        const res = await fetch('https://beam.jec.co.id/v1/alb/Dashboard', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-connection': 'domo',
-            'x-token': 'e2e6457d15727d578130f0fc7db54708',
-            'Cache-Control': 'no-cache',
-          },
-          body: JSON.stringify({ Mode: 'healthcare' }),
-        });
+  // Healthcare master. Kept as a reusable callback so the dashboard can retry
+  // manually when the initial BEAM request fails.
+  const fetchHealthcareMaster = useCallback(async (): Promise<boolean> => {
+    setHealthcareLoading(true);
+    setHealthcareError(null);
 
-        if (res.ok) {
-          const json = await res.json();
-          const rawData = json.data || [];
+    try {
+      const res = await fetch('https://beam.jec.co.id/v1/alb/Dashboard', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-connection': 'domo',
+          'x-token': 'e2e6457d15727d578130f0fc7db54708',
+          'Cache-Control': 'no-cache',
+        },
+        body: JSON.stringify({ Mode: 'healthcare' }),
+      });
 
-          if (Array.isArray(rawData)) {
-            const formattedData: HealthcareItem[] = rawData.map(
-              (item: any) => ({
-                healthcareID: item.healthcareID,
-                healthcareName: item.healthcareName,
-              })
-            );
-
-            setHealthcareList(formattedData);
-          }
-        }
-      } catch (error) {
-        console.error('Gagal mengambil data healthcare:', error);
+      if (!res.ok) {
+        throw new Error(`BEAM healthcare request failed (${res.status})`);
       }
-    };
 
-    fetchHealthcareMaster();
+      const json = await res.json();
+      const rawData = json?.data || [];
+
+      if (!Array.isArray(rawData)) {
+        throw new Error('BEAM healthcare response is not an array');
+      }
+
+      const formattedData: HealthcareItem[] = rawData
+        .map((item: any) => ({
+          healthcareID: String(item?.healthcareID ?? '').trim(),
+          healthcareName: String(item?.healthcareName ?? '').trim(),
+        }))
+        .filter((item: HealthcareItem) => item.healthcareID && item.healthcareName);
+
+      if (formattedData.length === 0) {
+        throw new Error('BEAM returned an empty healthcare list');
+      }
+
+      setHealthcareList(formattedData);
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Gagal mengambil data healthcare';
+      setHealthcareError(message);
+      console.error('Gagal mengambil data healthcare:', error);
+      return false;
+    } finally {
+      setHealthcareLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void fetchHealthcareMaster();
+  }, [fetchHealthcareMaster]);
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups((prev) => ({
@@ -564,9 +683,11 @@ function AppContent() {
   if (!isLoggedIn) {
     return (
       <LoginPortal
-        onLoginSuccess={(hcId) => {
+        onLoginSuccess={(hcId, session) => {
           setSelectedHealthcareId(hcId || '');
-          setActiveMenuId('company_performance');
+          setAuthenticatedUser(session ?? null);
+          setIsWidgetMode(false);
+          setShowManager(false);
           setIsLoggedIn(true);
         }}
       />
@@ -577,7 +698,7 @@ function AppContent() {
   // DASHBOARD MANAGER
   // =======================================================
 
-  if (showManager) {
+  if (effectiveRoute === 'dashboard_designer' && canAccess('dashboard_designer')) {
     return (
       <div
         data-active-theme={themeId}
@@ -591,30 +712,31 @@ function AppContent() {
             background: 'var(--core-panel)',
           }}
         >
-          <button
-            onClick={() => setShowManager(false)}
+          {firstDashboardRoute && <button
+            onClick={closeDashboardDesigner}
             className="cursor-pointer rounded-lg border border-indigo-400/40 bg-indigo-950/35 px-4 py-2 text-xs font-bold text-indigo-200 shadow-[0_0_14px_rgba(99,102,241,.12)] transition-all hover:bg-indigo-900/45"
           >
             ← Back to Main Dashboard
-          </button>
+          </button>}
 
           <span className="text-xs tracking-widest text-indigo-300 uppercase">
             🛠️ DESIGNER / DASHBOARD MANAGER MODE
           </span>
+          <button onClick={handleResetToLogin} className="rounded-lg border border-rose-400/30 px-3 py-2 text-xs text-rose-300">Logout</button>
         </div>
 
         <div className="w-full flex-1">
           <DashboardManager
             dashboardItems={dashboardItems}
             setDashboardItems={setDashboardItems}
-            onLaunchPresentation={() => setShowManager(false)}
+            onLaunchPresentation={closeDashboardDesigner}
           />
         </div>
       </div>
     );
   }
 
-  const ActiveDashboardComponent = DASHBOARD_COMPONENTS[activeMenuId];
+  const ActiveDashboardComponent = canAccess(effectiveRoute) ? DASHBOARD_COMPONENTS[effectiveRoute] : undefined;
 
   // =======================================================
   // MAIN DASHBOARD
@@ -738,6 +860,8 @@ function AppContent() {
           style={{
             background: isAurora
               ? 'radial-gradient(ellipse at 78% 19%, rgba(139,92,246,.10) 0%, transparent 43%), radial-gradient(ellipse at 20% 72%, rgba(45,212,191,.09) 0%, transparent 38%)'
+              : isSolaris
+              ? 'radial-gradient(ellipse at 84% 9%, rgba(86,220,255,.22) 0%, transparent 38%), radial-gradient(ellipse at 18% 78%, rgba(49,140,255,.09) 0%, transparent 36%)'
               : 'radial-gradient(ellipse at 80% 25%, rgba(0,140,255,.10) 0%, rgba(20,60,160,.035) 25%, transparent 48%), radial-gradient(ellipse at 20% 75%, rgba(0,115,255,.055) 0%, transparent 36%)',
           }}
         />
@@ -750,6 +874,18 @@ function AppContent() {
             <div className="core-aurora-ribbon core-aurora-ribbon--violet" />
             <div className="core-aurora-ribbon core-aurora-ribbon--teal" />
             <div className="core-aurora-stars" />
+          </div>
+        )}
+
+        {/* MOVING SOLARIS FIELD
+            Daylight solar environment. Cosmic Black and Aurora remain untouched. */}
+        {isSolaris && (
+          <div className="core-solaris-field" aria-hidden="true">
+            <div className="core-solaris-corona" />
+            <div className="core-solaris-sun" />
+            <div className="core-solaris-ring" />
+            <div className="core-solaris-ring core-solaris-ring--b" />
+            <div className="core-solaris-dust" />
           </div>
         )}
 
@@ -772,12 +908,14 @@ function AppContent() {
               borderColor: 'var(--core-border)',
               background: isAurora
                 ? 'linear-gradient(105deg, rgba(14,43,55,.94), rgba(24,70,83,.90), rgba(25,56,76,.92))'
+                : isSolaris
+                ? 'linear-gradient(105deg, rgba(248,253,255,.97), rgba(235,248,255,.95), rgba(222,243,255,.95))'
                 : 'var(--core-surface-strong)',
             }}
           >
             <div className="flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4">
               {/* Global navigation trigger: sits beside the logo and never consumes dashboard width. */}
-              <button
+              {firstAuthorizedRoute && <button
                 type="button"
                 onClick={() => {
                   SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
@@ -785,7 +923,7 @@ function AppContent() {
                 }}
                 title={isSidebarExpanded ? 'Close navigation' : 'Open navigation'}
                 aria-label={isSidebarExpanded ? 'Close navigation' : 'Open navigation'}
-                className={`group relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
+                className={`core-icon-button group relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
                   isSidebarExpanded
                     ? 'border-cyan-300/55 bg-cyan-500/12 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.15)]'
                     : 'border-sky-500/25 bg-[#04111f]/70 text-sky-300 hover:border-cyan-300/50 hover:text-cyan-100'
@@ -804,13 +942,13 @@ function AppContent() {
                   <path d="M4 17h16" strokeLinecap="round" />
                 </svg>
                 <span className="absolute -bottom-px left-1/2 h-px w-5 -translate-x-1/2 bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent" />
-              </button>
+              </button>}
 
               <img
                 src={dashboardLogo}
                 alt="Core Analytics"
                 draggable={false}
-                className="relative z-10 h-[42px] w-[175px] max-w-[58vw] object-contain object-left brightness-110 saturate-110 drop-shadow-[0_0_11px_rgba(56,189,248,.48)] sm:h-[48px] sm:w-[220px] md:h-[54px] md:w-[270px] lg:w-[300px]"
+                className="core-brand-logo relative z-10 h-[42px] w-[175px] max-w-[58vw] object-contain object-left brightness-110 saturate-110 drop-shadow-[0_0_11px_rgba(56,189,248,.48)] sm:h-[48px] sm:w-[220px] md:h-[54px] md:w-[270px] lg:w-[300px]"
               />
             </div>
 
@@ -831,8 +969,8 @@ function AppContent() {
                 title="Management Center"
                 aria-label="Open Management Center"
                 aria-expanded={showSettingsMenu}
-                className={`group relative flex h-10 w-10 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
-                  showSettingsMenu || activeMenuId === 'user_management' || activeMenuId === 'group_management'
+                className={`core-icon-button group relative flex h-10 w-10 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
+                  showSettingsMenu || effectiveRoute === 'user_management' || effectiveRoute === 'group_management'
                     ? 'border-cyan-300/55 bg-cyan-500/12 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.16)]'
                     : 'border-sky-500/25 bg-[#04111f]/70 text-sky-300 hover:border-cyan-300/50 hover:text-cyan-100'
                 }`}
@@ -854,16 +992,18 @@ function AppContent() {
 
               {showSettingsMenu && (
                 <div
-                  className="absolute right-0 top-[calc(100%+10px)] z-[9999] w-[270px] overflow-hidden rounded-xl border p-2 backdrop-blur-xl"
+                  className="core-settings-popover absolute right-0 top-[calc(100%+10px)] z-[9999] w-[270px] overflow-hidden rounded-xl border p-2 backdrop-blur-xl"
                   style={{
                     borderColor: 'var(--core-border)',
                     background: 'var(--core-surface-strong)',
                     boxShadow: isAurora
                       ? '0 20px 60px rgba(0,0,0,.36), 0 0 30px rgba(45,212,191,.10)'
+                      : isSolaris
+                      ? '0 20px 55px rgba(25,80,115,.15), 0 0 26px rgba(0,191,232,.08)'
                       : '0 18px 60px rgba(0,0,0,.72), 0 0 34px rgba(0,183,255,.18)',
                   }}
                 >
-                  <div className="mb-2 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3 py-2.5">
+                  <div className="core-settings-intro mb-2 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3 py-2.5">
                     <div className="text-[9px] font-black tracking-[0.20em] text-cyan-100 uppercase">
                       Management Center
                     </div>
@@ -888,11 +1028,11 @@ function AppContent() {
                     <ThemeSwitcher />
                   </div>
 
-                  <button
+                  {canAccess('user_management') && <button
                     type="button"
                     onClick={openUserManagement}
                     className={`group flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all ${
-                      activeMenuId === 'user_management'
+                      effectiveRoute === 'user_management'
                         ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50'
                         : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'
                     }`}
@@ -912,13 +1052,13 @@ function AppContent() {
                         Account & voice identity enrollment
                       </span>
                     </span>
-                  </button>
+                  </button>}
 
-                  <button
+                  {canAccess('group_management') && <button
                     type="button"
                     onClick={openGroupManagement}
                     className={`group mt-1 flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all ${
-                      activeMenuId === 'group_management'
+                      effectiveRoute === 'group_management'
                         ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50'
                         : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'
                     }`}
@@ -939,9 +1079,9 @@ function AppContent() {
                         Access groups & permission foundation
                       </span>
                     </span>
-                  </button>
+                  </button>}
 
-                  <button
+                  {canAccess('dashboard_designer') && <button
                     type="button"
                     onClick={openDashboardDesigner}
                     className="group mt-1 flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-left text-indigo-200/80 transition-all hover:border-indigo-400/20 hover:bg-indigo-950/30 hover:text-indigo-100"
@@ -960,7 +1100,7 @@ function AppContent() {
                         Layout & presentation tools
                       </span>
                     </span>
-                  </button>
+                  </button>}
 
                   <div className="mt-2 flex items-center justify-between border-t border-sky-500/10 px-2 pt-2">
                     <span className="text-[7px] tracking-[0.14em] text-slate-600 uppercase">
@@ -983,7 +1123,7 @@ function AppContent() {
                 - Unpinned: overlays dashboard; content width never changes.
                 - Pinned: participates in the flex layout and can be collapsed.
             ================================================= */}
-            {isSidebarExpanded && !isSidebarPinned && (
+            {firstAuthorizedRoute && isSidebarExpanded && !isSidebarPinned && (
               <button
                 type="button"
                 aria-label="Close navigation overlay"
@@ -992,12 +1132,14 @@ function AppContent() {
                 style={{
                   background: isAurora
                     ? 'rgba(5,24,33,.42)'
+                    : isSolaris
+                    ? 'rgba(35,103,145,.14)'
                     : 'rgba(1,6,17,.35)',
                 }}
               />
             )}
 
-            <aside
+            {firstAuthorizedRoute && <aside
               className={`z-40 flex flex-col justify-between overflow-hidden rounded-xl border p-2 backdrop-blur-xl transition-all duration-300 ease-out ${
                 isSidebarPinned
                   ? `relative flex-shrink-0 ${isSidebarExpanded ? 'w-56' : 'w-[58px]'}`
@@ -1015,7 +1157,7 @@ function AppContent() {
             >
               <div className="flex min-h-0 w-full flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto">
                 {/* Drawer HUD header */}
-                <div className={`flex items-center rounded-lg border border-sky-500/20 bg-[#061426]/55 p-1.5 ${
+                <div className={`core-nav-drawer-header flex items-center rounded-lg border border-sky-500/20 bg-[#061426]/55 p-1.5 ${
                   isSidebarExpanded ? 'justify-between' : 'justify-center'
                 }`}>
                   {isSidebarExpanded && (
@@ -1067,7 +1209,7 @@ function AppContent() {
 
                 {/* MENU LIST */}
                 <div className="mt-1 flex w-full flex-col gap-1">
-                  {HARDCODED_MENU.map((group) => {
+                  {authorizedMenus.map((group) => {
                     const isExpanded = expandedGroups[group.id];
 
                     return (
@@ -1075,7 +1217,7 @@ function AppContent() {
                         <button
                           onClick={() => toggleGroup(group.id)}
                           title={group.label}
-                          className="group flex w-full items-center justify-between rounded-lg border border-sky-500/15 bg-[#061426]/35 p-2 text-xs font-bold text-sky-300 transition-all hover:border-sky-400/30 hover:bg-[#08203b]/55"
+                          className="core-nav-group-button group flex w-full items-center justify-between rounded-lg border border-sky-500/15 bg-[#061426]/35 p-2 text-xs font-bold text-sky-300 transition-all hover:border-sky-400/30 hover:bg-[#08203b]/55"
                         >
                           <div className="flex min-w-0 items-center gap-2.5 overflow-hidden">
                             <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-sky-400/10 bg-sky-950/20">
@@ -1104,7 +1246,7 @@ function AppContent() {
                         {isExpanded && group.children && (
                           <div className={`mt-1 flex flex-col gap-1 ${isSidebarExpanded ? 'pl-2' : 'pl-0'}`}>
                             {group.children.map((child) => {
-                              const isActive = activeMenuId === child.id;
+                              const isActive = effectiveRoute === child.id;
 
                               return (
                                 <button
@@ -1112,12 +1254,12 @@ function AppContent() {
                                   title={child.label}
                                   onClick={() => {
                                     SciFiAudio.playBeep(800, 'sine', 0.05, 0.03);
-                                    setActiveMenuId(child.id);
+                                    navigateTo(child.id);
                                     if (!isSidebarPinned) setIsSidebarExpanded(false);
                                   }}
-                                  className={`group flex w-full items-center gap-2.5 rounded-lg border p-1.5 text-xs transition-all ${
+                                  className={`core-nav-child-button group flex w-full items-center gap-2.5 rounded-lg border p-1.5 text-xs transition-all ${
                                     isActive
-                                      ? 'border-cyan-300/40 bg-cyan-500/10 font-bold text-cyan-50 shadow-[0_0_12px_rgba(34,211,238,.10)]'
+                                      ? 'core-nav-child-active border-cyan-300/40 bg-cyan-500/10 font-bold text-cyan-50 shadow-[0_0_12px_rgba(34,211,238,.10)]'
                                       : 'border-transparent text-sky-400/70 hover:border-sky-500/15 hover:bg-[#071b31]/65 hover:text-sky-100'
                                   }`}
                                 >
@@ -1171,6 +1313,7 @@ function AppContent() {
                 <button
                   onClick={handleResetToLogin}
                   title="Logout"
+                  aria-label="Logout"
                   className="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-rose-500/30 bg-rose-950/14 p-2 font-bold whitespace-nowrap text-rose-400/80 shadow-[0_0_8px_rgba(244,63,94,.06)] transition-all hover:bg-rose-500/15 hover:text-rose-200"
                 >
                   <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -1181,7 +1324,7 @@ function AppContent() {
                   )}
                 </button>
               </div>
-            </aside>
+            </aside>}
 
             {/* DYNAMIC DASHBOARD */}
             <div className="relative z-10 min-h-0 min-w-0 flex-1 overflow-hidden transition-all duration-300">
@@ -1189,13 +1332,22 @@ function AppContent() {
                 <ActiveDashboardComponent
                   selectedHealthcareId={selectedHealthcareId}
                   healthcareList={healthcareList}
+                  onHealthcareChange={setSelectedHealthcareId}
+                  onHealthcareRefresh={fetchHealthcareMaster}
+                  healthcareLoading={healthcareLoading}
+                  healthcareError={healthcareError}
                 />
               ) : (
                 <div
                   className="flex h-full flex-1 items-center justify-center text-sm"
                   style={{ color: 'var(--core-text-secondary)' }}
                 >
-                  <span>Select a menu from the sidebar.</span>
+                  <div className="max-w-md px-5 text-center" role="status" style={{ letterSpacing: 0 }}>
+                    <h1 style={{ fontSize: 20, lineHeight: 1.4, fontWeight: 700, margin: 0, letterSpacing: 0, color: 'var(--core-primary)' }}>No Menu Access</h1>
+                    <p style={{ marginTop: 12, fontSize: 14, lineHeight: 1.6 }}>Your account is authenticated, but no application access has been assigned.</p>
+                    <p style={{ marginTop: 8, fontSize: 14, lineHeight: 1.6 }}>Contact your administrator if access is required.</p>
+                    <button onClick={handleResetToLogin} className="mt-5 rounded-lg border border-rose-400/30 bg-rose-950/20 px-4 py-2 text-sm text-rose-200">Logout</button>
+                  </div>
                 </div>
               )}
             </div>

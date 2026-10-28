@@ -22,6 +22,7 @@ import {
 import * as THREE from 'three';
 
 import { useTheme } from './theme/ThemeContext';
+import LoginSpotlightTour, { type LoginTourStepId } from './onboarding/LoginSpotlightTour';
 
 // Core Analytics brand assets (project-root /img folder)
 import coreAnalyticsLogo from '../img/logo.png';
@@ -33,7 +34,8 @@ import coreAnalyticsLogoWithName from '../img/logowithname.png';
 
 interface LoginPortalProps {
   onLoginSuccess?: (
-    selectedHealthcareId?: string
+    selectedHealthcareId?: string,
+    authenticatedUser?: AuthenticatedUser
   ) => void;
 }
 
@@ -83,6 +85,14 @@ interface CoreAccessProfile {
   menus: CoreAccessMenu[];
 }
 
+export interface AuthenticatedUser extends CoreAccessProfile {
+  user_id: string;
+  username: string;
+  display_name: string;
+  auth_method: 'voice' | 'password';
+  authenticated_at: string;
+}
+
 interface VoiceIdentifyResponse {
   success: boolean;
   decision:
@@ -101,6 +111,7 @@ interface VoiceIdentifyResponse {
 }
 
 type LoginMode = 'voice' | 'manual';
+type ManualPanel = 'login' | 'forgot-request' | 'forgot-verify' | 'forgot-reset';
 
 interface PasswordLoginResponse {
   success: boolean;
@@ -110,6 +121,13 @@ interface PasswordLoginResponse {
   access?: CoreAccessProfile | null;
   failed_login_count?: number;
   is_locked?: boolean;
+}
+
+interface PasswordResetResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  reset_token?: string | null;
 }
 
 const MAX_LOGIN_ATTEMPTS = 3;
@@ -2056,6 +2074,721 @@ function AuroraSkyCanvas({
 }
 
 /* =========================================================
+   SOLARIS / VENUS SUPERROTATION V7 — PROCEDURAL ATMOSPHERE
+   A continuous blue-white Venus-inspired cloud ocean. The motion
+   is intentionally fluid rather than object-based: layered cloud
+   decks deform every frame, superrotate at different velocities,
+   refract light, and bend around the Solaris Core as one atmosphere.
+========================================================= */
+
+function SolarisSkyCanvas({
+  phase,
+}: {
+  phase: PortalPhase;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    let raf = 0;
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+    };
+
+    resize();
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas);
+
+    // Smooth multi-octave wave field. It behaves like procedural noise but
+    // remains deterministic and inexpensive enough for the login screen.
+    const flowNoise = (
+      x: number,
+      time: number,
+      seed: number,
+      speed: number
+    ) => {
+      const a = Math.sin(x * 1.18 + time * speed + seed);
+      const b = Math.sin(x * 2.63 - time * speed * 0.61 + seed * 1.71);
+      const c = Math.sin(x * 5.37 + time * speed * 0.34 + seed * 2.43);
+      const d = Math.sin(x * 9.10 - time * speed * 0.17 + seed * 0.87);
+      return a * 0.50 + b * 0.27 + c * 0.15 + d * 0.08;
+    };
+
+    const vortexWarp = (
+      px: number,
+      baseY: number,
+      time: number,
+      seed: number,
+      strength: number
+    ) => {
+      const cx = width * 0.735;
+      const cy = height * 0.425;
+      const dx = (px - cx) / Math.max(1, width * 0.34);
+      const dy = (baseY - cy) / Math.max(1, height * 0.34);
+      const influence = Math.exp(-(dx * dx * 2.8 + dy * dy * 1.6));
+      const angle = Math.atan2(dy, dx);
+
+      return (
+        Math.sin(angle * 2.0 - time * 0.24 + seed) *
+        influence *
+        strength
+      );
+    };
+
+    const cloudY = (
+      px: number,
+      baseY: number,
+      amplitude: number,
+      time: number,
+      seed: number,
+      speed: number,
+      vortexStrength: number
+    ) => {
+      const nx = px / Math.max(1, width);
+      return (
+        baseY +
+        flowNoise(nx * Math.PI * 2, time, seed, speed) * amplitude +
+        vortexWarp(px, baseY, time, seed, vortexStrength)
+      );
+    };
+
+    const drawCloudDeck = (
+      time: number,
+      baseY: number,
+      amplitude: number,
+      thickness: number,
+      speed: number,
+      seed: number,
+      opacity: number,
+      activity: number,
+      palette: 'ice' | 'cyan' | 'azure' | 'indigo',
+      vortexStrength: number
+    ) => {
+      const colors = {
+        ice: ['rgba(255,255,255,0)', 'rgba(220,248,255,.78)', 'rgba(154,228,247,.42)', 'rgba(255,255,255,0)'],
+        cyan: ['rgba(255,255,255,0)', 'rgba(120,226,246,.66)', 'rgba(50,180,222,.38)', 'rgba(255,255,255,0)'],
+        azure: ['rgba(255,255,255,0)', 'rgba(111,190,255,.58)', 'rgba(50,128,232,.34)', 'rgba(255,255,255,0)'],
+        indigo: ['rgba(255,255,255,0)', 'rgba(139,173,255,.48)', 'rgba(91,112,225,.25)', 'rgba(255,255,255,0)'],
+      }[palette];
+
+      const gradient = ctx.createLinearGradient(
+        0,
+        baseY - thickness,
+        0,
+        baseY + thickness
+      );
+      gradient.addColorStop(0, colors[0]);
+      gradient.addColorStop(0.28, colors[1]);
+      gradient.addColorStop(0.62, colors[2]);
+      gradient.addColorStop(1, colors[3]);
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = Math.min(1, opacity * activity);
+      ctx.filter = `blur(${Math.max(7, thickness * 0.12)}px)`;
+
+      const step = Math.max(16, Math.floor(width / 90));
+      const topPoints: Array<[number, number]> = [];
+      const bottomPoints: Array<[number, number]> = [];
+
+      for (let x = -80; x <= width + 80; x += step) {
+        const center = cloudY(
+          x,
+          baseY,
+          amplitude,
+          time,
+          seed,
+          speed,
+          vortexStrength
+        );
+        const nx = x / Math.max(1, width);
+        const breathe =
+          0.86 +
+          flowNoise(nx * Math.PI * 2, time, seed + 4.2, speed * 0.72) * 0.13;
+        const half = thickness * Math.max(0.58, breathe);
+        const edgeRipple =
+          flowNoise(nx * Math.PI * 2, time, seed + 8.7, speed * 1.13) *
+          amplitude *
+          0.18;
+
+        topPoints.push([x, center - half + edgeRipple]);
+        bottomPoints.push([x, center + half - edgeRipple * 0.55]);
+      }
+
+      ctx.beginPath();
+      topPoints.forEach(([x, y], index) => {
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      for (let i = bottomPoints.length - 1; i >= 0; i--) {
+        ctx.lineTo(bottomPoints[i][0], bottomPoints[i][1]);
+      }
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // A second translucent inner body makes the deck feel volumetric rather
+      // than like a single painted ribbon.
+      ctx.globalAlpha = Math.min(1, opacity * activity * 0.46);
+      ctx.filter = `blur(${Math.max(12, thickness * 0.19)}px)`;
+      ctx.translate(0, thickness * 0.10);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    const drawRefraction = (
+      time: number,
+      baseY: number,
+      amplitude: number,
+      speed: number,
+      seed: number,
+      alpha: number,
+      activity: number,
+      vortexStrength: number
+    ) => {
+      const sweep = ((time * speed * 0.055 + seed * 0.13) % 1.65) - 0.32;
+      const centerX = sweep * width;
+      const beamWidth = Math.max(170, width * 0.17);
+      const lineGradient = ctx.createLinearGradient(
+        centerX - beamWidth,
+        0,
+        centerX + beamWidth,
+        0
+      );
+      lineGradient.addColorStop(0, 'rgba(255,255,255,0)');
+      lineGradient.addColorStop(0.34, `rgba(202,247,255,${alpha * 0.36})`);
+      lineGradient.addColorStop(0.50, `rgba(255,255,255,${alpha})`);
+      lineGradient.addColorStop(0.66, `rgba(87,211,246,${alpha * 0.34})`);
+      lineGradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = Math.min(1, activity);
+      ctx.strokeStyle = lineGradient;
+      ctx.lineWidth = 3.2;
+      ctx.lineCap = 'round';
+      ctx.filter = 'blur(4px)';
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = '#bdf7ff';
+      ctx.beginPath();
+
+      const step = Math.max(14, Math.floor(width / 110));
+      for (let x = -60; x <= width + 60; x += step) {
+        const y = cloudY(
+          x,
+          baseY,
+          amplitude,
+          time,
+          seed,
+          speed,
+          vortexStrength
+        );
+        if (x === -60) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const drawVortex = (
+      time: number,
+      activity: number
+    ) => {
+      const cx = width * 0.735;
+      const cy = height * 0.425;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(-0.08 + Math.sin(time * 0.09) * 0.025);
+      ctx.globalCompositeOperation = 'screen';
+
+      for (let i = 0; i < 5; i++) {
+        const rotation = time * (0.035 + i * 0.006) + i * 1.18;
+        const breathe = 1 + Math.sin(time * 0.28 + i * 1.4) * 0.045;
+        const rx = (150 + i * 68) * breathe;
+        const ry = (42 + i * 19) * breathe;
+        const start = rotation + Math.sin(time * 0.19 + i) * 0.16;
+        const length = Math.PI * (0.82 + i * 0.07);
+
+        const arcGradient = ctx.createLinearGradient(-rx, 0, rx, 0);
+        arcGradient.addColorStop(0, 'rgba(255,255,255,0)');
+        arcGradient.addColorStop(
+          0.32,
+          `rgba(174,239,255,${0.12 * activity})`
+        );
+        arcGradient.addColorStop(
+          0.56,
+          `rgba(68,181,239,${0.10 * activity})`
+        );
+        arcGradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, start, start + length);
+        ctx.strokeStyle = arcGradient;
+        ctx.lineWidth = 13 + i * 4;
+        ctx.lineCap = 'round';
+        ctx.filter = `blur(${8 + i * 1.5}px)`;
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    };
+
+    const draw = (now: number) => {
+      const time = now * 0.001;
+      const activity =
+        phase === 'portal'
+          ? 1.42
+          : phase === 'charging'
+          ? 1.30
+          : phase === 'authenticating' || phase === 'listening'
+          ? 1.14
+          : phase === 'verified'
+          ? 1.20
+          : 1;
+
+      const velocity =
+        phase === 'portal'
+          ? 1.72
+          : phase === 'charging'
+          ? 1.46
+          : phase === 'authenticating' || phase === 'listening'
+          ? 1.18
+          : 1;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      // The entire sky is treated as one atmosphere. Broad cloud decks overlap
+      // and continuously deform instead of moving as discrete fog objects.
+      drawCloudDeck(time, height * 0.16, 27, 82, 0.20 * velocity, 0.4, 0.48, activity, 'ice', 38);
+      drawCloudDeck(time, height * 0.28, 38, 112, -0.16 * velocity, 1.7, 0.42, activity, 'cyan', 54);
+      drawCloudDeck(time, height * 0.43, 31, 96, 0.13 * velocity, 3.2, 0.38, activity, 'ice', 66);
+      drawCloudDeck(time, height * 0.57, 43, 126, -0.11 * velocity, 4.8, 0.34, activity, 'azure', 72);
+      drawCloudDeck(time, height * 0.72, 34, 106, 0.095 * velocity, 6.1, 0.31, activity, 'cyan', 52);
+      drawCloudDeck(time, height * 0.86, 25, 86, -0.08 * velocity, 7.4, 0.25, activity, 'indigo', 34);
+
+      // Slowly moving refraction crests mimic sunlight travelling through the
+      // dense upper atmosphere. They follow the same flow field as the clouds.
+      drawRefraction(time, height * 0.23, 31, 0.54 * velocity, 0.8, 0.42, activity, 44);
+      drawRefraction(time, height * 0.47, 36, 0.41 * velocity, 3.6, 0.34, activity, 64);
+      drawRefraction(time, height * 0.69, 30, 0.47 * velocity, 5.7, 0.28, activity, 48);
+
+      // The Solaris Core bends the nearby atmosphere into a slow planetary
+      // vortex. This is intentionally soft and atmospheric, not a HUD ring.
+      drawVortex(time, activity);
+
+      // A gentle central bloom increases when authentication converges toward
+      // the core, tying the natural atmospheric motion to the login state.
+      if (
+        phase === 'authenticating' ||
+        phase === 'verified' ||
+        phase === 'charging' ||
+        phase === 'portal'
+      ) {
+        const cx = width * 0.735;
+        const cy = height * 0.425;
+        const radius = width * (phase === 'portal' ? 0.38 : 0.29);
+        const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        glow.addColorStop(0, `rgba(255,255,255,${phase === 'portal' ? 0.24 : 0.15})`);
+        glow.addColorStop(0.25, 'rgba(163,238,255,.10)');
+        glow.addColorStop(0.58, 'rgba(61,154,245,.04)');
+        glow.addColorStop(1, 'rgba(49,140,255,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
+    };
+  }, [phase]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="login-solaris-motion-canvas absolute inset-0 h-full w-full"
+      aria-hidden="true"
+    />
+  );
+}
+
+
+/* =========================================================
+   SOLARIS HORIZONTAL PLASMA RIBBONS — V18 FINAL
+   Three low-contrast atmospheric ribbons drift left-to-right behind
+   the Helios Crown. They remain intentionally subtle so the Stellar
+   Core stays the focal point rather than competing with the login UI.
+========================================================= */
+function SolarisHorizontalRibbonsSvg({ phase }: { phase: PortalPhase }) {
+  const phaseClass =
+    phase === 'portal' || phase === 'charging'
+      ? 'solaris-horizontal-ribbons--charged'
+      : phase === 'authenticating' || phase === 'listening' || phase === 'verified'
+      ? 'solaris-horizontal-ribbons--active'
+      : '';
+
+  const ribbons = [
+    { d: 'M 520 300 C 740 244, 878 344, 1045 302 C 1226 258, 1388 276, 1740 322', width: 62, duration: 14.8, delay: -4.2, drift: 82, opacity: 0.075 },
+    { d: 'M 470 448 C 700 382, 842 500, 1036 442 C 1218 388, 1430 414, 1770 462', width: 72, duration: 17.2, delay: -9.1, drift: 96, opacity: 0.065 },
+    { d: 'M 560 606 C 760 548, 928 646, 1094 588 C 1270 526, 1450 560, 1780 620', width: 54, duration: 19.6, delay: -12.4, drift: 74, opacity: 0.055 },
+  ];
+
+  return (
+    <svg
+      className={`solaris-horizontal-ribbons absolute inset-0 z-[7] h-full w-full pointer-events-none ${phaseClass}`}
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="solarisHorizontalRibbonGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0b4d78" stopOpacity="0" />
+          <stop offset="34%" stopColor="#075985" stopOpacity="0.18" />
+          <stop offset="52%" stopColor="#0b78aa" stopOpacity="0.32" />
+          <stop offset="72%" stopColor="#00bfe8" stopOpacity="0.12" />
+          <stop offset="100%" stopColor="#00bfe8" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="solarisHorizontalRibbonHighlight" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7eeeff" stopOpacity="0" />
+          <stop offset="38%" stopColor="#7eeeff" stopOpacity="0.06" />
+          <stop offset="55%" stopColor="#ffffff" stopOpacity="0.17" />
+          <stop offset="72%" stopColor="#318cff" stopOpacity="0.05" />
+          <stop offset="100%" stopColor="#318cff" stopOpacity="0" />
+        </linearGradient>
+        <filter id="solarisHorizontalRibbonWarp" x="-25%" y="-70%" width="150%" height="240%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.004 0.015" numOctaves="2" seed="61" result="horizontalRibbonNoise">
+            <animate attributeName="baseFrequency" values="0.0035 0.012;0.0055 0.019;0.004 0.014;0.0035 0.012" dur="13s" repeatCount="indefinite" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="horizontalRibbonNoise" scale="11" xChannelSelector="R" yChannelSelector="B">
+            <animate attributeName="scale" values="7;13;9;12;7" dur="11.5s" repeatCount="indefinite" />
+          </feDisplacementMap>
+        </filter>
+        <filter id="solarisHorizontalRibbonGlow" x="-40%" y="-80%" width="180%" height="260%">
+          <feGaussianBlur stdDeviation="9" result="softRibbonBlur" />
+          <feMerge><feMergeNode in="softRibbonBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        <radialGradient id="solarisHorizontalRibbonCoreHole" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="black" /><stop offset="62%" stopColor="black" /><stop offset="88%" stopColor="#777" /><stop offset="100%" stopColor="white" />
+        </radialGradient>
+        <mask id="solarisHorizontalRibbonCoreMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1600" height="900">
+          <rect x="0" y="0" width="1600" height="900" fill="white" />
+          <ellipse cx="1168" cy="450" rx="205" ry="182" fill="url(#solarisHorizontalRibbonCoreHole)" />
+        </mask>
+      </defs>
+      <g mask="url(#solarisHorizontalRibbonCoreMask)" filter="url(#solarisHorizontalRibbonWarp)">
+        {ribbons.map((ribbon, index) => (
+          <g key={`solaris-horizontal-ribbon-${index}`} opacity={ribbon.opacity}>
+            <animateTransform attributeName="transform" type="translate" values={`${-ribbon.drift} 0;${ribbon.drift} 0;${-ribbon.drift} 0`} keyTimes="0;0.68;1" dur={`${ribbon.duration}s`} begin={`${ribbon.delay}s`} repeatCount="indefinite" />
+            <path d={ribbon.d} fill="none" stroke="url(#solarisHorizontalRibbonGradient)" strokeWidth={ribbon.width} strokeLinecap="round" filter="url(#solarisHorizontalRibbonGlow)" />
+            <path d={ribbon.d} fill="none" stroke="url(#solarisHorizontalRibbonHighlight)" strokeWidth={Math.max(2.5, ribbon.width * 0.045)} strokeLinecap="round" opacity="0.46">
+              <animate attributeName="stroke-dasharray" values="32 180;66 146;32 180" dur={`${8.5 + index * 1.9}s`} repeatCount="indefinite" />
+              <animate attributeName="stroke-dashoffset" values="120;-210" dur={`${9.5 + index * 1.8}s`} repeatCount="indefinite" />
+            </path>
+          </g>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+/* =========================================================
+   SOLARIS HELIOS CROWN — FINAL POLISH V16
+   A radial, breathing corona surrounds the living Solaris Core.
+   Rays are intentionally slimmer and more blue than the validation
+   build so the crown stays energetic without overpowering the core.
+========================================================= */
+function SolarisHeliosCrownSvg({ phase }: { phase: PortalPhase }) {
+  const phaseClass =
+    phase === 'portal' || phase === 'charging'
+      ? 'solaris-helios-crown--charged'
+      : phase === 'authenticating' || phase === 'listening'
+      ? 'solaris-helios-crown--active'
+      : '';
+
+  const cx = 1168;
+  const cy = 450;
+  const innerRadius = 132;
+
+  const rays = Array.from({ length: 24 }, (_, index) => {
+    const angle = (360 / 24) * index - 90;
+    const baseLength = 48 + ((index * 31) % 66);
+    const peakLength = baseLength + 18 + ((index * 17) % 28);
+    const width = 0.62 + ((index * 11) % 4) * 0.16;
+    const duration = 2.25 + (index % 7) * 0.31;
+    const begin = -(index * 0.21);
+    const color =
+      index % 6 === 0
+        ? '#24c7ed'
+        : index % 3 === 0
+        ? '#3a9ccc'
+        : '#4d8fb7';
+
+    return { angle, baseLength, peakLength, width, duration, begin, color };
+  });
+
+  const windPaths = [
+    'M 1288 360 C 1380 318, 1480 302, 1608 318',
+    'M 1300 398 C 1400 370, 1496 372, 1610 392',
+    'M 1308 438 C 1410 425, 1504 432, 1614 454',
+    'M 1308 478 C 1410 486, 1502 508, 1612 536',
+    'M 1298 518 C 1390 548, 1490 584, 1604 602',
+    'M 1266 330 C 1340 270, 1446 236, 1572 230',
+    'M 1264 570 C 1346 632, 1454 670, 1580 676',
+    'M 1316 418 C 1428 396, 1510 402, 1608 426',
+    'M 1312 496 C 1420 516, 1512 548, 1608 576',
+  ];
+
+  return (
+    <svg
+      className={`solaris-helios-crown absolute inset-0 z-[8] h-full w-full pointer-events-none ${phaseClass}`}
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="solarisCrownHalo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#075985" stopOpacity="0.18" />
+          <stop offset="52%" stopColor="#0369a1" stopOpacity="0.09" />
+          <stop offset="100%" stopColor="#0369a1" stopOpacity="0" />
+        </radialGradient>
+
+        <linearGradient id="solarisRayFade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#082b4c" stopOpacity="0.82" />
+          <stop offset="65%" stopColor="#075985" stopOpacity="0.52" />
+          <stop offset="100%" stopColor="#00a9d6" stopOpacity="0.06" />
+        </linearGradient>
+
+        <filter id="solarisCoronaWarp" x="-70%" y="-70%" width="240%" height="240%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.012 0.020"
+            numOctaves="2"
+            seed="29"
+            result="coronaNoise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              values="0.010 0.016;0.017 0.026;0.012 0.021;0.010 0.016"
+              dur="4.6s"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="coronaNoise"
+            scale="7"
+            xChannelSelector="R"
+            yChannelSelector="B"
+          >
+            <animate
+              attributeName="scale"
+              values="4;10;6;12;4"
+              dur="5.2s"
+              repeatCount="indefinite"
+            />
+          </feDisplacementMap>
+        </filter>
+
+        <filter id="solarisCoronaSoftBlur" x="-90%" y="-90%" width="280%" height="280%">
+          <feGaussianBlur stdDeviation="4.4" />
+        </filter>
+
+        <filter id="solarisCrownGlow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="3.2" result="crownBlur" />
+          <feMerge>
+            <feMergeNode in="crownBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <ellipse
+        className="solaris-crown-halo"
+        cx={cx}
+        cy={cy}
+        rx="248"
+        ry="210"
+        fill="url(#solarisCrownHalo)"
+      />
+
+      {/* Broken rotating corona bands create a continuous solar crown rather
+          than a few countable tentacles. */}
+      <g className="solaris-crown-bands" filter="url(#solarisCrownGlow)">
+        <circle
+          className="solaris-crown-band solaris-crown-band--outer"
+          cx={cx}
+          cy={cy}
+          r="178"
+          pathLength="100"
+        />
+        <circle
+          className="solaris-crown-band solaris-crown-band--middle"
+          cx={cx}
+          cy={cy}
+          r="156"
+          pathLength="100"
+        />
+        <circle
+          className="solaris-crown-band solaris-crown-band--inner"
+          cx={cx}
+          cy={cy}
+          r="142"
+          pathLength="100"
+        />
+      </g>
+
+      {/* Soft radial corona: a blurred veil plus an ultra-thin core line.
+          This keeps the motion readable without looking like physical rods. */}
+      <g className="solaris-crown-rays solaris-crown-rays--mist" filter="url(#solarisCoronaSoftBlur)">
+        {rays.map((ray, index) => (
+          <line
+            key={`solaris-corona-mist-${index}`}
+            x1={cx + innerRadius + 7}
+            y1={cy}
+            x2={cx + innerRadius + ray.baseLength}
+            y2={cy}
+            transform={`rotate(${ray.angle} ${cx} ${cy})`}
+            stroke={ray.color}
+            strokeWidth={ray.width * 5.4}
+            strokeLinecap="round"
+            opacity={index % 4 === 0 ? 0.12 : 0.075}
+          >
+            <animate
+              attributeName="x2"
+              values={`${cx + innerRadius + ray.baseLength};${cx + innerRadius + ray.peakLength};${cx + innerRadius + ray.baseLength * 0.92};${cx + innerRadius + ray.baseLength}`}
+              keyTimes="0;0.46;0.78;1"
+              dur={`${ray.duration}s`}
+              begin={`${ray.begin}s`}
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.045;0.15;0.07;0.045"
+              dur={`${ray.duration}s`}
+              begin={`${ray.begin}s`}
+              repeatCount="indefinite"
+            />
+          </line>
+        ))}
+      </g>
+
+      <g className="solaris-crown-rays solaris-crown-rays--filaments" filter="url(#solarisCoronaWarp)">
+        {rays.map((ray, index) => (
+          <line
+            key={`solaris-corona-ray-${index}`}
+            x1={cx + innerRadius + 10}
+            y1={cy}
+            x2={cx + innerRadius + ray.baseLength}
+            y2={cy}
+            transform={`rotate(${ray.angle} ${cx} ${cy})`}
+            stroke={ray.color}
+            strokeWidth={ray.width}
+            strokeLinecap="round"
+            opacity={index % 4 === 0 ? 0.27 : 0.16}
+          >
+            <animate
+              attributeName="x2"
+              values={`${cx + innerRadius + ray.baseLength};${cx + innerRadius + ray.peakLength};${cx + innerRadius + ray.baseLength * 0.92};${cx + innerRadius + ray.baseLength}`}
+              keyTimes="0;0.46;0.78;1"
+              dur={`${ray.duration}s`}
+              begin={`${ray.begin}s`}
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.08;0.31;0.16;0.08"
+              dur={`${ray.duration}s`}
+              begin={`${ray.begin}s`}
+              repeatCount="indefinite"
+            />
+          </line>
+        ))}
+      </g>
+
+      {/* Two irregular pressure waves escape from the corona and dissolve. */}
+      <g className="solaris-crown-pressure-waves">
+        <ellipse className="solaris-crown-pressure solaris-crown-pressure--a" cx={cx} cy={cy} rx="155" ry="136" />
+        <ellipse className="solaris-crown-pressure solaris-crown-pressure--b" cx={cx} cy={cy} rx="162" ry="142" />
+      </g>
+
+      {/* Occasional asymmetric flare. It is intentionally a single event, not
+          a permanent geometric loop. */}
+      <g className="solaris-crown-flare" filter="url(#solarisCrownGlow)">
+        <path
+          className="solaris-crown-flare__body"
+          d="M 1280 402 C 1344 338 1412 322 1476 350 C 1530 374 1560 350 1608 318"
+          pathLength="100"
+        />
+        <path
+          className="solaris-crown-flare__spark"
+          d="M 1280 402 C 1344 338 1412 322 1476 350 C 1530 374 1560 350 1608 318"
+          pathLength="100"
+        />
+      </g>
+
+      {/* Directional solar wind keeps the right side alive while preserving the
+          login panel on the left. */}
+      {windPaths.map((path, index) => {
+        const duration = 1.75 + (index % 5) * 0.27;
+        return (
+          <g key={`solaris-crown-wind-${index}`}>
+            {index % 2 === 0 && (
+              <path
+                d={path}
+                className="solaris-crown-wind-trace"
+                pathLength="100"
+              />
+            )}
+            <circle
+              className="solaris-crown-wind-dot"
+              r={index % 3 === 0 ? 2.45 : 1.65}
+              fill={index % 3 === 0 ? '#18bce3' : '#3c86ae'}
+            >
+              <animateMotion
+                dur={`${duration}s`}
+                begin={`${-(index * 0.31)}s`}
+                repeatCount="indefinite"
+                path={path}
+              />
+              <animate
+                attributeName="opacity"
+                values="0;1;0.88;0"
+                keyTimes="0;0.15;0.72;1"
+                dur={`${duration}s`}
+                begin={`${-(index * 0.31)}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+
+/* =========================================================
    AURORA ORB — IDLE/AUTH VISUAL
    Deliberately DOM/CSS based for a smooth, predictable sphere.
    Portal/charging still hands off to the original Three.js scene.
@@ -2371,7 +3104,29 @@ function AuroraOrbVisual({
 export default function LoginPortal({
   onLoginSuccess,
 }: LoginPortalProps) {
-  const { isAurora } = useTheme();
+  const { isAurora, isSolaris } = useTheme();
+  const authenticatedSessionRef = useRef<AuthenticatedUser | null>(null);
+  const rememberAuthenticatedUser = useCallback((
+    identity: VoiceIdentityUser,
+    access: CoreAccessProfile | null | undefined,
+    method: AuthenticatedUser['auth_method'],
+  ) => {
+    const session: AuthenticatedUser = {
+      user_id: identity.user_id,
+      username: identity.username,
+      display_name: identity.display_name,
+      groups: Array.isArray(access?.groups) ? access.groups : [],
+      menus: Array.isArray(access?.menus) ? access.menus : [],
+      auth_method: method,
+      authenticated_at: new Date().toISOString(),
+    };
+    authenticatedSessionRef.current = session;
+    try {
+      localStorage.setItem('core_authenticated_user', JSON.stringify(session));
+    } catch {
+      // The login callback still receives the fresh session if persistence fails.
+    }
+  }, []);
   const [
     isListening,
     setIsListening,
@@ -2408,6 +3163,33 @@ export default function LoginPortal({
 
   const [accountLocked, setAccountLocked] =
     useState(false);
+
+  const [manualPanel, setManualPanel] =
+    useState<ManualPanel>('login');
+
+  const [resetIdentifier, setResetIdentifier] =
+    useState('');
+
+  const [resetCode, setResetCode] =
+    useState('');
+
+  const [resetToken, setResetToken] =
+    useState('');
+
+  const [resetNewPassword, setResetNewPassword] =
+    useState('');
+
+  const [resetConfirmPassword, setResetConfirmPassword] =
+    useState('');
+
+  const [showResetPassword, setShowResetPassword] =
+    useState(false);
+
+  const [isResetSubmitting, setIsResetSubmitting] =
+    useState(false);
+
+  const [resendSeconds, setResendSeconds] =
+    useState(0);
 
 
   const [
@@ -2447,6 +3229,38 @@ export default function LoginPortal({
     >([]);
 
   /* =======================================================
+     LOGIN SPOTLIGHT GUIDE
+     Presentation-only onboarding. Authentication logic remains unchanged.
+  ======================================================= */
+
+  const prepareLoginTourStep = useCallback((stepId: LoginTourStepId) => {
+    if (
+      isAuthenticating ||
+      isManualSubmitting ||
+      isResetSubmitting ||
+      transitionStartedRef.current
+    ) {
+      return;
+    }
+
+    if (stepId === 'manual-login' || stepId === 'forgot-password') {
+      setLoginMode('manual');
+      setManualPanel('login');
+      return;
+    }
+
+    if (
+      stepId === 'welcome' ||
+      stepId === 'auth-modes' ||
+      stepId === 'voice-login' ||
+      stepId === 'finish'
+    ) {
+      setLoginMode('voice');
+      setManualPanel('login');
+    }
+  }, [isAuthenticating, isManualSubmitting, isResetSubmitting]);
+
+  /* =======================================================
      CLEANUP
   ======================================================= */
 
@@ -2460,6 +3274,16 @@ export default function LoginPortal({
       );
     };
   }, []);
+
+  useEffect(() => {
+    if (resendSeconds <= 0) return;
+
+    const timer = window.setInterval(() => {
+      setResendSeconds((value) => Math.max(0, value - 1));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendSeconds]);
 
   /* =======================================================
      TTS - FRIDAY SERVER + BROWSER FALLBACK
@@ -2706,7 +3530,8 @@ export default function LoginPortal({
           setTimeout(
             () => {
               onLoginSuccess?.(
-                ''
+                '',
+                authenticatedSessionRef.current ?? undefined
               );
             },
             2700
@@ -2729,7 +3554,8 @@ export default function LoginPortal({
   const handleAuthenticatedUser =
     useCallback(
       (
-        userName: string
+        userName: string,
+        waitForGreeting = true
       ) => {
         setAuthenticatedUser(
           userName
@@ -2748,16 +3574,30 @@ export default function LoginPortal({
             userName
           );
 
-        /*
-          INI BAGIAN PENTING.
-
-          Transition TIDAK dimulai
-          sampai audio greeting selesai.
-        */
-
         setStatusMessage(
           greeting
         );
+
+        /*
+          Voice biometric login keeps the cinematic behavior:
+          wait until Friday finishes the greeting before opening the portal.
+
+          Manual username/password login can pass waitForGreeting = false.
+          In that mode the greeting still plays, but it no longer blocks
+          the portal transition.
+        */
+
+        if (!waitForGreeting) {
+          void speakText(
+            greeting
+          );
+
+          beginPortalTransition(
+            userName
+          );
+
+          return;
+        }
 
         speakText(
           greeting,
@@ -3018,35 +3858,7 @@ export default function LoginPortal({
                     Keep only non-secret identity metadata in
                     the browser. Voice embeddings stay backend-only.
                   */
-                  try {
-                    localStorage.setItem(
-                      'core_authenticated_user',
-                      JSON.stringify(
-                        {
-                          user_id:
-                            identity.user_id,
-
-                          username:
-                            identity.username,
-
-                          display_name:
-                            identity.display_name,
-
-                          groups:
-                            data.access?.groups || [],
-
-                          menus:
-                            data.access?.menus || [],
-
-                          auth_method:
-                            'voice',
-
-                          authenticated_at:
-                            new Date().toISOString(),
-                        }
-                      )
-                    );
-                  } catch {}
+                  rememberAuthenticatedUser(identity, data.access, 'voice');
 
                   handleAuthenticatedUser(
                     identity.display_name ||
@@ -3211,6 +4023,7 @@ export default function LoginPortal({
       [
         handleAuthenticatedUser,
         speakText,
+        rememberAuthenticatedUser,
       ]
     );
 
@@ -3511,20 +4324,7 @@ export default function LoginPortal({
             setAccountLocked(false);
             setManualPassword('');
 
-            try {
-              localStorage.setItem(
-                'core_authenticated_user',
-                JSON.stringify({
-                  user_id: identity.user_id,
-                  username: identity.username,
-                  display_name: identity.display_name,
-                  groups: data.access?.groups || [],
-                  menus: data.access?.menus || [],
-                  auth_method: 'password',
-                  authenticated_at: new Date().toISOString(),
-                })
-              );
-            } catch {}
+            rememberAuthenticatedUser(identity, data.access, 'password');
 
             /*
               Login success/failure audit tetap dicatat backend.
@@ -3533,7 +4333,8 @@ export default function LoginPortal({
             handleAuthenticatedUser(
               identity.display_name ||
                 identity.username ||
-                'User'
+                'User',
+              false
             );
 
             return;
@@ -3602,8 +4403,228 @@ export default function LoginPortal({
         isManualSubmitting,
         manualPassword,
         manualUsername,
+        rememberAuthenticatedUser,
       ]
     );
+
+  /* =======================================================
+     PASSWORD RECOVERY / EMAIL OTP
+  ======================================================= */
+
+  const openPasswordRecovery = useCallback(() => {
+    if (isAuthenticating || isManualSubmitting || isResetSubmitting) return;
+
+    setResetIdentifier(manualUsername.trim());
+    setResetCode('');
+    setResetToken('');
+    setResetNewPassword('');
+    setResetConfirmPassword('');
+    setShowResetPassword(false);
+    setManualPanel('forgot-request');
+    setStatusMessage('Password recovery ready. Enter your username or registered email.');
+  }, [isAuthenticating, isManualSubmitting, isResetSubmitting, manualUsername]);
+
+  const backToManualLogin = useCallback(() => {
+    setManualPanel('login');
+    setResetCode('');
+    setResetToken('');
+    setResetNewPassword('');
+    setResetConfirmPassword('');
+    setShowResetPassword(false);
+    setResendSeconds(0);
+    setStatusMessage('Manual credential authentication ready.');
+  }, []);
+
+  const handlePasswordResetRequest = useCallback(
+    async (event?: React.FormEvent) => {
+      event?.preventDefault();
+      if (isResetSubmitting) return;
+
+      const identifier = resetIdentifier.trim();
+      if (!identifier) {
+        setStatusMessage('Username atau email wajib diisi.');
+        return;
+      }
+
+      try {
+        setIsResetSubmitting(true);
+        setStatusMessage('Requesting secure verification code...');
+
+        const response = await fetch(
+          `${VOICE_API_BASE}/api/auth/forgot-password/request`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier }),
+          }
+        );
+
+        const data = (await response.json()) as PasswordResetResponse;
+        if (!response.ok || !data.success) {
+          setStatusMessage(data.message || 'Verification code could not be sent.');
+          SciFiAudio.failure();
+          return;
+        }
+
+        setResetCode('');
+        setManualPanel('forgot-verify');
+        setResendSeconds(45);
+        setStatusMessage(
+          'If the account is registered and eligible, a 6-digit verification code has been sent.'
+        );
+        SciFiAudio.playBeep(860, 'sine', 0.08, 0.025);
+      } catch (error) {
+        console.error('Password reset request error:', error);
+        setStatusMessage('Password recovery service is unavailable. Please try again.');
+        SciFiAudio.failure();
+      } finally {
+        setIsResetSubmitting(false);
+      }
+    },
+    [isResetSubmitting, resetIdentifier]
+  );
+
+  const handlePasswordResetVerify = useCallback(
+    async (event?: React.FormEvent) => {
+      event?.preventDefault();
+      if (isResetSubmitting) return;
+
+      const code = resetCode.replace(/\D/g, '').slice(0, 6);
+      if (code.length !== 6) {
+        setStatusMessage('Masukkan 6 digit verification code.');
+        return;
+      }
+
+      try {
+        setIsResetSubmitting(true);
+        setStatusMessage('Verifying recovery code...');
+
+        const response = await fetch(
+          `${VOICE_API_BASE}/api/auth/forgot-password/verify`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              identifier: resetIdentifier.trim(),
+              code,
+            }),
+          }
+        );
+
+        const data = (await response.json()) as PasswordResetResponse;
+        if (!response.ok || !data.success || !data.reset_token) {
+          setStatusMessage(data.message || 'Verification code is invalid or expired.');
+          SciFiAudio.failure();
+          return;
+        }
+
+        setResetToken(data.reset_token);
+        setResetNewPassword('');
+        setResetConfirmPassword('');
+        setManualPanel('forgot-reset');
+        setStatusMessage('Identity verified. Create a new secure password.');
+        SciFiAudio.success();
+      } catch (error) {
+        console.error('Password reset verification error:', error);
+        setStatusMessage('Verification service is unavailable. Please try again.');
+        SciFiAudio.failure();
+      } finally {
+        setIsResetSubmitting(false);
+      }
+    },
+    [isResetSubmitting, resetCode, resetIdentifier]
+  );
+
+  const handlePasswordResetApply = useCallback(
+    async (event?: React.FormEvent) => {
+      event?.preventDefault();
+      if (isResetSubmitting) return;
+
+      if (!resetToken) {
+        setManualPanel('forgot-request');
+        setStatusMessage('Recovery session expired. Request a new verification code.');
+        return;
+      }
+
+      if (resetNewPassword !== resetConfirmPassword) {
+        setStatusMessage('Konfirmasi password baru tidak sama.');
+        return;
+      }
+
+      try {
+        setIsResetSubmitting(true);
+        setStatusMessage('Updating secure credential...');
+
+        const response = await fetch(
+          `${VOICE_API_BASE}/api/auth/forgot-password/reset`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reset_token: resetToken,
+              new_password: resetNewPassword,
+            }),
+          }
+        );
+
+        const data = (await response.json()) as PasswordResetResponse;
+        if (!response.ok || !data.success) {
+          setStatusMessage(data.message || 'Password could not be reset.');
+          SciFiAudio.failure();
+          return;
+        }
+
+        if (!resetIdentifier.includes('@')) {
+          setManualUsername(resetIdentifier.trim());
+        }
+        setManualPassword('');
+        setResetCode('');
+        setResetToken('');
+        setResetNewPassword('');
+        setResetConfirmPassword('');
+        setShowResetPassword(false);
+        setResendSeconds(0);
+        setManualPanel('login');
+        setAccountLocked(false);
+        setLoginAttemptCount(0);
+        setStatusMessage('Password updated. Please sign in with your new password.');
+        SciFiAudio.success();
+      } catch (error) {
+        console.error('Password reset apply error:', error);
+        setStatusMessage('Password recovery service is unavailable. Please try again.');
+        SciFiAudio.failure();
+      } finally {
+        setIsResetSubmitting(false);
+      }
+    },
+    [
+      isResetSubmitting,
+      resetConfirmPassword,
+      resetIdentifier,
+      resetNewPassword,
+      resetToken,
+    ]
+  );
+
+  const resetPasswordChecks = useMemo(
+    () => ({
+      length: resetNewPassword.length >= 8 && resetNewPassword.length <= 128,
+      upperLower: /[A-Z]/.test(resetNewPassword) && /[a-z]/.test(resetNewPassword),
+      number: /\d/.test(resetNewPassword),
+      special: /[^A-Za-z0-9\s]/.test(resetNewPassword),
+      match:
+        resetConfirmPassword.length > 0 &&
+        resetNewPassword === resetConfirmPassword,
+    }),
+    [resetConfirmPassword, resetNewPassword]
+  );
+
+  const resetPasswordReady =
+    resetPasswordChecks.length &&
+    resetPasswordChecks.upperLower &&
+    resetPasswordChecks.number &&
+    resetPasswordChecks.special &&
+    resetPasswordChecks.match;
 
   /* =======================================================
      DISPLAY STATE
@@ -3640,13 +4661,36 @@ export default function LoginPortal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 h-screen w-screen overflow-hidden font-mono text-sky-100 select-none ${
-        isAurora ? 'login-aurora-mode bg-[#071b25]' : 'bg-[#010611]'
+      className={`login-portal-root fixed inset-0 z-50 h-[100dvh] w-screen overflow-hidden font-mono text-sky-100 select-none ${
+        isAurora
+          ? 'login-aurora-mode bg-[#071b25]'
+          : isSolaris
+          ? 'login-solaris-mode bg-[#eaf8ff]'
+          : 'bg-[#010611]'
       }`}
     >
       {/* ===================================================
+          SOLARIS SKY
+          Bright solar atmosphere. V18 keeps the polished Helios Crown and Stellar Core, with only three subtle left-to-right plasma ribbons adding gentle depth behind the core.
+      =================================================== */}
+
+      {isSolaris && (
+        <div
+          className="login-solaris-sky absolute inset-0 z-0 pointer-events-none"
+          aria-hidden="true"
+        >
+          <div className="login-solaris-haze" />
+          <div className="login-solaris-sun-disc" />
+          <SolarisSkyCanvas phase={phase} />
+          <div className="login-solaris-orbit login-solaris-orbit--a" />
+          <div className="login-solaris-orbit login-solaris-orbit--b" />
+          <div className="login-solaris-horizon" />
+        </div>
+      )}
+
+      {/* ===================================================
           AURORA SKY
-          Real-time CSS ribbons are used instead of a static space image.
+          Subtle horizontal plasma ribbons add depth without competing with the Stellar Core.
           The mountains/horizon are decorative and never block interaction.
       =================================================== */}
 
@@ -3668,7 +4712,7 @@ export default function LoginPortal({
           3D SPACE BACKGROUND
       =================================================== */}
 
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-700 ${isSolaris ? 'opacity-0' : 'opacity-100'}`}>
 
         <Canvas
           style={{ pointerEvents: 'none' }}
@@ -3701,7 +4745,7 @@ export default function LoginPortal({
           CSS NEBULA
       =================================================== */}
 
-      {!isAurora && (
+      {!isAurora && !isSolaris && (
         <div
           className="
             absolute
@@ -3719,6 +4763,8 @@ export default function LoginPortal({
         className={`absolute inset-0 z-[2] pointer-events-none ${
           isAurora
             ? 'bg-gradient-to-r from-[#06131d]/82 via-[#071923]/32 to-transparent'
+            : isSolaris
+            ? 'login-solaris-sidewash'
             : 'bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08'
         }`}
       />
@@ -3727,6 +4773,7 @@ export default function LoginPortal({
 
       <div
         className="
+          login-portal-vignette
           absolute
           inset-0
           z-[2]
@@ -3738,6 +4785,16 @@ export default function LoginPortal({
       {/* SCANLINES */}
 
       <div className="login-scanlines absolute inset-0 z-[3] pointer-events-none opacity-[0.12]" />
+
+      {/* SOLARIS HORIZONTAL PLASMA RIBBONS — V18 FINAL
+          Aurora-inspired up/down curtains add slow atmospheric motion behind
+          the Helios Crown without covering the Stellar Core. */}
+      {isSolaris && <SolarisHorizontalRibbonsSvg phase={phase} />}
+
+      {/* SOLARIS HELIOS CROWN — FINAL V16
+          A breathing radial corona surrounds a living stellar plasma core while
+          pressure waves, solar wind, and an occasional flare radiate out. */}
+      {isSolaris && <SolarisHeliosCrownSvg phase={phase} />}
 
       {/* ===================================================
           TOP HUD
@@ -3782,11 +4839,11 @@ export default function LoginPortal({
 
           <div>
 
-            <div className="text-[10px] font-black tracking-[0.30em] text-sky-100 md:text-[11px]">
+            <div className="text-[12px] font-black tracking-[0.30em] text-sky-100 md:text-[13px]">
               JEC // CORE ANALYTICS
             </div>
 
-            <div className="mt-0.5 text-[7px] tracking-[0.24em] text-sky-500/60">
+            <div className="mt-0.5 text-[9px] tracking-[0.24em] text-sky-500/60">
               EXECUTIVE INTELLIGENCE NETWORK
             </div>
 
@@ -3796,11 +4853,11 @@ export default function LoginPortal({
 
         <div className="hidden items-center gap-3 rounded-lg border border-sky-500/15 bg-[#03111f]/55 px-3 py-2 backdrop-blur-lg sm:flex">
 
-          <span className="text-[7px] tracking-[0.20em] text-slate-500">
+          <span className="text-[9px] tracking-[0.20em] text-slate-500">
             SECURE NODE
           </span>
 
-          <span className="text-[8px] font-black text-emerald-400">
+          <span className="text-[10px] font-black text-emerald-400">
             ONLINE
           </span>
 
@@ -3815,7 +4872,7 @@ export default function LoginPortal({
           MAIN
       =================================================== */}
 
-      <main className="relative z-10 grid h-full grid-cols-1 overflow-y-auto overflow-x-hidden lg:grid-cols-[44%_56%] lg:overflow-hidden">
+      <main className="login-main-layout relative z-10 grid h-full grid-cols-1 overflow-y-auto overflow-x-hidden lg:grid-cols-[44%_56%] lg:overflow-hidden">
 
         {/* =================================================
             LEFT
@@ -3823,6 +4880,7 @@ export default function LoginPortal({
 
         <section
           className={`
+            login-left-panel
             relative
             z-20
             flex
@@ -3847,13 +4905,13 @@ export default function LoginPortal({
             }
           `}
         >
-          <div className="mx-auto w-full max-w-[460px] lg:translate-x-0">
+          <div className="login-left-content mx-auto w-full max-w-[500px] lg:translate-x-0">
 
             <div className="mb-3 flex items-center justify-center gap-2">
 
               <span className="h-px w-7 bg-sky-400/70" />
 
-              <span className="text-[8px] font-bold tracking-[0.30em] text-sky-400/70">
+              <span className="text-[12px] font-bold tracking-[0.30em] text-sky-400/70">
                 EXECUTIVE ACCESS
               </span>
 
@@ -3865,12 +4923,12 @@ export default function LoginPortal({
               <img
                 src={coreAnalyticsLogoWithName}
                 alt="Core Analytics"
-                className="relative z-10 h-auto w-[235px] max-w-[82vw] object-contain object-center drop-shadow-[0_0_20px_rgba(0,153,255,.26)] sm:w-[270px] lg:w-[300px]"
+                className="login-brand-logo relative z-10 h-auto w-[235px] max-w-[82vw] object-contain object-center drop-shadow-[0_0_20px_rgba(0,153,255,.26)] sm:w-[270px] lg:w-[300px]"
                 draggable={false}
               />
             </div>
 
-            <p className="mt-1.5 text-center text-[7px] leading-relaxed tracking-[0.14em] text-slate-500 sm:mt-2 sm:text-[8px]">
+            <p className="login-brand-subtitle mt-1.5 text-center text-[11px] leading-relaxed tracking-[0.14em] text-slate-500 sm:mt-2 sm:text-[12px]">
               INTELLIGENCE COMMAND GATEWAY
               <br />
               VOICE BIOMETRIC AUTHORIZATION NODE
@@ -3878,7 +4936,10 @@ export default function LoginPortal({
 
             {/* COMPACT FRAMELESS HUD LOGIN */}
 
-            <div className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}>
+            <div
+              data-tour="login-hud"
+              className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} ${isSolaris ? 'login-hud-surface--solaris' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
+            >
               {/* Holographic rails instead of a large boxed frame */}
               <div className="pointer-events-none absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/65 to-transparent" />
               <div className="pointer-events-none absolute left-0 top-0 h-8 w-px bg-gradient-to-b from-sky-300/70 to-transparent" />
@@ -3893,17 +4954,17 @@ export default function LoginPortal({
                     <div className="absolute inset-[6px] rounded-full bg-sky-300/70 shadow-[0_0_10px_rgba(125,211,252,.75)]" />
                   </div>
                   <div>
-                    <div className="text-[9px] font-black tracking-[0.22em] text-sky-100">
-                      {isAurora ? 'AURORA COMMAND LOGIN' : 'IDENTITY GATEWAY'}
+                    <div className="text-[13px] font-black tracking-[0.22em] text-sky-100">
+                      {isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : 'IDENTITY GATEWAY'}
                     </div>
-                    <div className="mt-0.5 text-[6px] tracking-[0.22em] text-slate-600">
-                      {isAurora ? 'EXECUTIVE NODE // AURORA' : 'BIOMETRIC NODE // 01'}
+                    <div className="mt-0.5 text-[10px] tracking-[0.22em] text-slate-600">
+                      {isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : 'BIOMETRIC NODE // 01'}
                     </div>
                   </div>
                 </div>
 
                 <div
-                  className={`border-l pl-3 text-[7px] font-black tracking-[0.16em] ${
+                  className={`border-l pl-3 text-[11px] font-black tracking-[0.16em] ${
                     isVerified
                       ? 'border-emerald-400/35 text-emerald-300'
                       : isAuthenticating
@@ -3917,7 +4978,10 @@ export default function LoginPortal({
 
               {/* AUTH MODE SELECTOR */}
               <div className="mt-3 px-2">
-                <div className="grid grid-cols-2 gap-1 rounded-lg border border-sky-500/15 bg-[#00101d]/80 p-1">
+                <div
+                  data-tour="login-auth-modes"
+                  className="grid grid-cols-2 gap-1 rounded-lg border border-sky-500/15 bg-[#00101d]/80 p-1"
+                >
                   <button
                     type="button"
                     onClick={() => {
@@ -3926,7 +4990,7 @@ export default function LoginPortal({
                       setStatusMessage('Voice authentication ready.');
                     }}
                     disabled={isAuthenticating || isVerified}
-                    className={`h-8 rounded-md text-[7px] font-black tracking-[0.16em] transition-all ${
+                    className={`h-8 rounded-md text-[11px] font-black tracking-[0.16em] transition-all ${
                       loginMode === 'voice'
                         ? 'border border-sky-300/35 bg-sky-400/10 text-sky-100 shadow-[inset_0_0_14px_rgba(0,183,255,.06)]'
                         : 'border border-transparent text-slate-600 hover:text-sky-300'
@@ -3940,10 +5004,11 @@ export default function LoginPortal({
                     onClick={() => {
                       if (isAuthenticating || isVerified) return;
                       setLoginMode('manual');
+                      setManualPanel('login');
                       setStatusMessage('Manual credential authentication ready.');
                     }}
                     disabled={isAuthenticating || isVerified}
-                    className={`h-8 rounded-md text-[7px] font-black tracking-[0.16em] transition-all ${
+                    className={`h-8 rounded-md text-[11px] font-black tracking-[0.16em] transition-all ${
                       loginMode === 'manual'
                         ? 'border border-sky-300/35 bg-sky-400/10 text-sky-100 shadow-[inset_0_0_14px_rgba(0,183,255,.06)]'
                         : 'border border-transparent text-slate-600 hover:text-sky-300'
@@ -3959,11 +5024,11 @@ export default function LoginPortal({
                   {/* VOICE IDENTITY DIRECTORY - original HUD preserved */}
                   <div className="mt-3 px-2">
                     <div className="mb-1.5 flex items-center justify-between">
-                      <span className="text-[7px] font-bold tracking-[0.18em] text-sky-500/80">
+                      <span className="text-[11px] font-bold tracking-[0.18em] text-sky-500/80">
                         VOICE IDENTITY
                       </span>
 
-                      <span className="text-[6px] tracking-[0.18em] text-emerald-500/65">
+                      <span className="text-[10px] tracking-[0.18em] text-emerald-500/65">
                         CORE PROFILE
                       </span>
                     </div>
@@ -3972,11 +5037,11 @@ export default function LoginPortal({
                       <span className="absolute inset-y-1 left-0 w-px bg-gradient-to-b from-transparent via-sky-300/60 to-transparent shadow-[0_0_8px_rgba(56,189,248,.38)]" />
 
                       <div className="min-w-0 flex-1 py-2">
-                        <div className="truncate text-[7px] font-black tracking-[0.14em] text-sky-200">
+                        <div className="truncate text-[11px] font-black tracking-[0.14em] text-sky-200">
                           COREANALYTICS BIOMETRIC DIRECTORY
                         </div>
 
-                        <div className="mt-0.5 truncate text-[6px] tracking-[0.13em] text-slate-600">
+                        <div className="mt-0.5 truncate text-[10px] tracking-[0.13em] text-slate-600">
                           ACTIVE PROFILES // CENTROID MATCHING
                         </div>
                       </div>
@@ -3994,7 +5059,7 @@ export default function LoginPortal({
                           border
                           border-emerald-400/28
                           bg-emerald-950/20
-                          text-[9px]
+                          text-[13px]
                           text-emerald-300
                           shadow-[0_0_10px_rgba(52,211,153,.07)]
                         "
@@ -4007,6 +5072,7 @@ export default function LoginPortal({
                   {/* Voice action - DEV bypass intentionally removed */}
                   <div className="mt-3 px-2">
                     <button
+                      data-tour="login-voice-auth"
                       type="button"
                       onClick={startManualVoiceListener}
                       disabled={isListening || isAuthenticating || isVerified}
@@ -4024,7 +5090,7 @@ export default function LoginPortal({
 
                       <div className="relative flex h-full items-center gap-3 text-left">
                         <span
-                          className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border text-[9px] ${
+                          className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border text-[13px] ${
                             isVerified
                               ? 'border-emerald-300/45 text-emerald-300'
                               : isAuthenticating
@@ -4036,7 +5102,7 @@ export default function LoginPortal({
                         </span>
 
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-[8px] font-black tracking-[0.17em] text-sky-100">
+                          <div className="truncate text-[12px] font-black tracking-[0.17em] text-sky-100">
                             {isVerified
                               ? 'ACCESS VERIFIED'
                               : isAuthenticating
@@ -4045,7 +5111,7 @@ export default function LoginPortal({
                               ? 'LISTENING FOR FRIDAY'
                               : 'VOICE AUTHENTICATION'}
                           </div>
-                          <div className="mt-0.5 truncate text-[6px] tracking-[0.14em] text-slate-600">
+                          <div className="mt-0.5 truncate text-[10px] tracking-[0.14em] text-slate-600">
                             {isListening
                               ? 'SAY "HEY FRIDAY"'
                               : isAuthenticating
@@ -4054,23 +5120,24 @@ export default function LoginPortal({
                           </div>
                         </div>
 
-                        <span className="text-[11px] text-sky-400/45 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-sky-200">
+                        <span className="text-[14px] text-sky-400/45 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-sky-200">
                           ›
                         </span>
                       </div>
                     </button>
                   </div>
                 </>
-              ) : (
+              ) : manualPanel === 'login' ? (
                 <form
+                  data-tour="login-manual-form"
                   className="mt-3 px-2"
                   onSubmit={handleManualLogin}
                 >
                   <div className="mb-1.5 flex items-center justify-between">
-                    <span className="text-[7px] font-bold tracking-[0.18em] text-sky-500/80">
+                    <span className="text-[11px] font-bold tracking-[0.18em] text-sky-500/80">
                       SECURE CREDENTIALS
                     </span>
-                    <span className={`text-[6px] font-black tracking-[0.16em] ${
+                    <span className={`text-[10px] font-black tracking-[0.16em] ${
                       accountLocked ? 'text-rose-400' : 'text-slate-600'
                     }`}>
                       {accountLocked ? 'ACCOUNT LOCKED' : 'ARGON2 VERIFIED'}
@@ -4091,9 +5158,9 @@ export default function LoginPortal({
                         disabled={isManualSubmitting || isVerified}
                         autoComplete="username"
                         placeholder="USERNAME"
-                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 text-[9px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
+                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 text-[13px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
                       />
-                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[6px] tracking-[0.12em] text-slate-700">
+                      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] tracking-[0.12em] text-slate-700">
                         ID
                       </span>
                     </div>
@@ -4106,22 +5173,34 @@ export default function LoginPortal({
                         disabled={isManualSubmitting || isVerified || accountLocked}
                         autoComplete="current-password"
                         placeholder="PASSWORD"
-                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 pr-14 text-[9px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
+                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 pr-14 text-[13px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((value) => !value)}
                         disabled={isManualSubmitting}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[6px] font-black tracking-[0.10em] text-slate-500 transition hover:text-sky-300 disabled:opacity-40"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[10px] font-black tracking-[0.10em] text-slate-500 transition hover:text-sky-300 disabled:opacity-40"
                       >
                         {showPassword ? 'HIDE' : 'SHOW'}
                       </button>
                     </div>
                   </div>
 
+                  <div className="mt-1.5 flex justify-end">
+                    <button
+                      data-tour="login-forgot-password"
+                      type="button"
+                      onClick={openPasswordRecovery}
+                      disabled={isManualSubmitting || isVerified}
+                      className="text-[10px] font-black tracking-[0.13em] text-sky-500/70 transition hover:text-sky-200 disabled:opacity-40"
+                    >
+                      FORGOT PASSWORD?
+                    </button>
+                  </div>
+
                   <div className="mt-2 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[6px] tracking-[0.12em] text-slate-600">
+                      <span className="text-[10px] tracking-[0.12em] text-slate-600">
                         LOGIN ATTEMPTS
                       </span>
                       {[0, 1, 2].map((index) => (
@@ -4138,7 +5217,7 @@ export default function LoginPortal({
                       ))}
                     </div>
 
-                    <span className={`text-right text-[6px] font-black tracking-[0.12em] ${
+                    <span className={`text-right text-[10px] font-black tracking-[0.12em] ${
                       accountLocked
                         ? 'text-rose-400'
                         : loginAttemptCount > 0
@@ -4170,10 +5249,10 @@ export default function LoginPortal({
                       <div className="login-auth-scan absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent" />
                     )}
                     <div className="relative flex h-full items-center justify-center gap-3">
-                      <span className="text-[9px]">
+                      <span className="text-[13px]">
                         {accountLocked ? '⊘' : isManualSubmitting ? '⌁' : '→'}
                       </span>
-                      <span className="text-[8px] font-black tracking-[0.17em]">
+                      <span className="text-[12px] font-black tracking-[0.17em]">
                         {accountLocked
                           ? 'ACCOUNT LOCKED'
                           : isManualSubmitting
@@ -4181,6 +5260,214 @@ export default function LoginPortal({
                           : 'SECURE LOGIN'}
                       </span>
                     </div>
+                  </button>
+                </form>
+              ) : manualPanel === 'forgot-request' ? (
+                <form
+                  className="mt-3 px-2"
+                  onSubmit={handlePasswordResetRequest}
+                >
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-[11px] font-bold tracking-[0.18em] text-sky-500/80">
+                      PASSWORD RECOVERY
+                    </span>
+                    <span className="text-[10px] font-black tracking-[0.16em] text-amber-400/80">
+                      EMAIL OTP
+                    </span>
+                  </div>
+
+                  <div className="rounded-md border border-sky-500/14 bg-[#00111f]/55 px-3 py-2 text-[10px] leading-relaxed tracking-[0.08em] text-slate-500">
+                    Enter your username or registered email. For security, the response is the same whether an account exists or not.
+                  </div>
+
+                  <div className="relative mt-2">
+                    <input
+                      value={resetIdentifier}
+                      onChange={(event) => setResetIdentifier(event.target.value)}
+                      disabled={isResetSubmitting}
+                      autoComplete="username"
+                      placeholder="USERNAME / EMAIL"
+                      className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 pr-16 text-[13px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 focus:shadow-[0_0_14px_rgba(0,183,255,.06)] disabled:opacity-50"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px] tracking-[0.12em] text-slate-700">
+                      ID / MAIL
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isResetSubmitting}
+                    className="login-auth-action group relative mt-3 h-11 w-full overflow-hidden rounded-md border border-sky-400/28 bg-[#031421]/78 px-3 backdrop-blur-sm transition-all hover:border-sky-300/55 hover:bg-[#062034]/90 disabled:opacity-50"
+                  >
+                    {isResetSubmitting && (
+                      <div className="login-auth-scan absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent" />
+                    )}
+                    <div className="relative flex h-full items-center justify-center gap-3">
+                      <span className="text-[13px]">{isResetSubmitting ? '⌁' : '✉'}</span>
+                      <span className="text-[12px] font-black tracking-[0.17em]">
+                        {isResetSubmitting ? 'SENDING CODE' : 'SEND VERIFICATION CODE'}
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={backToManualLogin}
+                    disabled={isResetSubmitting}
+                    className="mt-2 w-full text-center text-[10px] font-black tracking-[0.14em] text-slate-600 transition hover:text-sky-300 disabled:opacity-40"
+                  >
+                    ← BACK TO LOGIN
+                  </button>
+                </form>
+              ) : manualPanel === 'forgot-verify' ? (
+                <form
+                  className="mt-3 px-2"
+                  onSubmit={handlePasswordResetVerify}
+                >
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-[11px] font-bold tracking-[0.18em] text-sky-500/80">
+                      VERIFY IDENTITY
+                    </span>
+                    <span className="text-[10px] font-black tracking-[0.16em] text-emerald-400/75">
+                      OTP CHALLENGE
+                    </span>
+                  </div>
+
+                  <div className="rounded-md border border-sky-500/14 bg-[#00111f]/55 px-3 py-2 text-[10px] leading-relaxed tracking-[0.08em] text-slate-500">
+                    If the account is eligible, a 6-digit code was sent to its registered email. The code expires automatically.
+                  </div>
+
+                  <input
+                    value={resetCode}
+                    onChange={(event) =>
+                      setResetCode(event.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
+                    disabled={isResetSubmitting}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    placeholder="• • • • • •"
+                    className="mt-2 h-12 w-full rounded-md border border-sky-500/25 bg-[#00111f]/90 px-3 text-center text-[20px] font-black tracking-[0.55em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/55 focus:shadow-[0_0_16px_rgba(0,183,255,.08)] disabled:opacity-50"
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={isResetSubmitting || resetCode.length !== 6}
+                    className="login-auth-action group relative mt-3 h-11 w-full overflow-hidden rounded-md border border-sky-400/28 bg-[#031421]/78 px-3 backdrop-blur-sm transition-all hover:border-sky-300/55 hover:bg-[#062034]/90 disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    <div className="relative flex h-full items-center justify-center gap-3">
+                      <span className="text-[13px]">{isResetSubmitting ? '⌁' : '✓'}</span>
+                      <span className="text-[12px] font-black tracking-[0.17em]">
+                        {isResetSubmitting ? 'VERIFYING CODE' : 'VERIFY CODE'}
+                      </span>
+                    </div>
+                  </button>
+
+                  <div className="mt-2 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={backToManualLogin}
+                      disabled={isResetSubmitting}
+                      className="text-[10px] font-black tracking-[0.12em] text-slate-600 transition hover:text-sky-300 disabled:opacity-40"
+                    >
+                      ← BACK TO LOGIN
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handlePasswordResetRequest()}
+                      disabled={isResetSubmitting || resendSeconds > 0}
+                      className="text-[10px] font-black tracking-[0.12em] text-sky-500/75 transition hover:text-sky-200 disabled:text-slate-700"
+                    >
+                      {resendSeconds > 0
+                        ? `RESEND CODE 00:${String(resendSeconds).padStart(2, '0')}`
+                        : 'RESEND CODE'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form
+                  className="mt-3 px-2"
+                  onSubmit={handlePasswordResetApply}
+                >
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-[11px] font-bold tracking-[0.18em] text-sky-500/80">
+                      RESET CREDENTIAL
+                    </span>
+                    <span className="text-[10px] font-black tracking-[0.16em] text-emerald-400/75">
+                      IDENTITY VERIFIED
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <input
+                        type={showResetPassword ? 'text' : 'password'}
+                        value={resetNewPassword}
+                        onChange={(event) => setResetNewPassword(event.target.value)}
+                        disabled={isResetSubmitting}
+                        autoComplete="new-password"
+                        placeholder="NEW PASSWORD"
+                        className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 pr-14 text-[13px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 disabled:opacity-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowResetPassword((value) => !value)}
+                        disabled={isResetSubmitting}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-[10px] font-black tracking-[0.10em] text-slate-500 transition hover:text-sky-300 disabled:opacity-40"
+                      >
+                        {showResetPassword ? 'HIDE' : 'SHOW'}
+                      </button>
+                    </div>
+
+                    <input
+                      type={showResetPassword ? 'text' : 'password'}
+                      value={resetConfirmPassword}
+                      onChange={(event) => setResetConfirmPassword(event.target.value)}
+                      disabled={isResetSubmitting}
+                      autoComplete="new-password"
+                      placeholder="CONFIRM NEW PASSWORD"
+                      className="h-10 w-full rounded-md border border-sky-500/22 bg-[#00111f]/90 px-3 text-[13px] tracking-[0.10em] text-sky-100 outline-none transition placeholder:text-slate-700 focus:border-sky-300/50 disabled:opacity-50"
+                    />
+                  </div>
+
+                  <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[9px] tracking-[0.08em]">
+                    <span className={resetPasswordChecks.length ? 'text-emerald-400' : 'text-slate-700'}>
+                      {resetPasswordChecks.length ? '✓' : '○'} 8-128 CHARACTERS
+                    </span>
+                    <span className={resetPasswordChecks.upperLower ? 'text-emerald-400' : 'text-slate-700'}>
+                      {resetPasswordChecks.upperLower ? '✓' : '○'} UPPER + LOWER
+                    </span>
+                    <span className={resetPasswordChecks.number ? 'text-emerald-400' : 'text-slate-700'}>
+                      {resetPasswordChecks.number ? '✓' : '○'} NUMBER
+                    </span>
+                    <span className={resetPasswordChecks.special ? 'text-emerald-400' : 'text-slate-700'}>
+                      {resetPasswordChecks.special ? '✓' : '○'} SPECIAL CHAR
+                    </span>
+                    <span className={`col-span-2 ${resetPasswordChecks.match ? 'text-emerald-400' : 'text-slate-700'}`}>
+                      {resetPasswordChecks.match ? '✓' : '○'} PASSWORDS MATCH
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isResetSubmitting || !resetPasswordReady}
+                    className="login-auth-action group relative mt-3 h-11 w-full overflow-hidden rounded-md border border-emerald-400/25 bg-emerald-950/15 px-3 backdrop-blur-sm transition-all hover:border-emerald-300/45 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <div className="relative flex h-full items-center justify-center gap-3">
+                      <span className="text-[13px]">{isResetSubmitting ? '⌁' : '↻'}</span>
+                      <span className="text-[12px] font-black tracking-[0.17em]">
+                        {isResetSubmitting ? 'UPDATING PASSWORD' : 'RESET PASSWORD'}
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={backToManualLogin}
+                    disabled={isResetSubmitting}
+                    className="mt-2 w-full text-center text-[10px] font-black tracking-[0.14em] text-slate-600 transition hover:text-sky-300 disabled:opacity-40"
+                  >
+                    ← CANCEL RECOVERY
                   </button>
                 </form>
               )}
@@ -4197,10 +5484,10 @@ export default function LoginPortal({
                   }`}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="text-[6px] font-bold tracking-[0.19em] text-slate-600">
+                  <div className="text-[10px] font-bold tracking-[0.19em] text-slate-600">
                     FRIDAY // SYSTEM STATUS
                   </div>
-                  <div className="mt-1 line-clamp-2 text-[8px] leading-relaxed text-sky-100/85">
+                  <div className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-sky-100/85">
                     {statusMessage}
                   </div>
                 </div>
@@ -4209,7 +5496,7 @@ export default function LoginPortal({
               {/* bottom rail */}
               <div className="mt-3 flex items-center gap-3 px-2">
                 <span className="h-px flex-1 bg-gradient-to-r from-transparent to-sky-500/20" />
-                <span className="text-[6px] tracking-[0.18em] text-slate-700">
+                <span className="text-[10px] tracking-[0.18em] text-slate-700">
                   JEC SECURE NETWORK // AES
                 </span>
                 <span className="h-px flex-1 bg-gradient-to-l from-transparent to-sky-500/20" />
@@ -4241,13 +5528,15 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/90' : 'bg-[#010611]'
+                isAurora ? 'bg-[#020b10]/90' : isSolaris ? 'login-solaris-portal-base' : 'bg-[#010611]'
               }`}
             />
             <div
               className={`absolute inset-0 ${
                 isAurora
                   ? 'bg-[radial-gradient(circle_at_center,rgba(78,255,207,.16)_0%,rgba(54,207,231,.08)_30%,rgba(62,39,95,.10)_52%,rgba(2,11,16,.88)_82%,#020b10_100%)]'
+                  : isSolaris
+                  ? 'login-solaris-portal-radial'
                   : 'bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]'
               }`}
             />
@@ -4259,7 +5548,7 @@ export default function LoginPortal({
           <div
             className={`
               absolute inset-0 transition-opacity duration-500
-              ${isAurora ? 'aurora-portal-stage' : ''}
+              ${isAurora ? 'aurora-portal-stage' : ''} ${isSolaris ? 'solaris-portal-stage' : ''}
               ${
                 phase === 'charging' || phase === 'portal' || phase === 'flash'
                   ? 'opacity-100'
@@ -4269,13 +5558,15 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/88' : 'bg-[#010611]'
+                isAurora ? 'bg-[#020b10]/88' : isSolaris ? 'login-solaris-portal-base' : 'bg-[#010611]'
               }`}
             />
             <div
               className={`absolute inset-0 ${
                 isAurora
                   ? 'bg-[radial-gradient(circle_at_center,rgba(95,255,214,.18)_0%,rgba(66,221,239,.09)_26%,rgba(116,83,197,.10)_50%,rgba(3,15,21,.86)_75%,#020b10_100%)]'
+                  : isSolaris
+                  ? 'login-solaris-portal-radial login-solaris-portal-radial--active'
                   : 'bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]'
               }`}
             />
@@ -4292,8 +5583,8 @@ export default function LoginPortal({
               w-[190px]
               sm:h-[230px]
               sm:w-[230px]
-              ${isAurora ? 'lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]' : 'lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]'}
-              ${isAurora ? 'rounded-full blur-[78px] opacity-50' : 'rounded-full blur-[120px]'}
+              ${isAurora || isSolaris ? 'lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]' : 'lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]'}
+              ${isAurora || isSolaris ? 'rounded-full blur-[78px] opacity-50' : 'rounded-full blur-[120px]'}
               transition-colors
               duration-700
 
@@ -4314,12 +5605,51 @@ export default function LoginPortal({
             `}
           />
 
+          {/* SOLARIS CORE
+              Solaris uses a bright CSS solar core so the light environment never
+              flashes the Cosmic Black Three.js scene during authentication. */}
+          {isSolaris && (
+            <div
+              className={`login-solaris-core-stage absolute inset-0 z-[3] flex items-center justify-center transition-all ${
+                phase === 'portal'
+                  ? 'duration-1000 scale-[3.10] opacity-100 translate-x-0'
+                  : phase === 'charging'
+                  ? 'duration-1000 scale-[1.40] opacity-100 translate-x-0'
+                  : phase === 'flash'
+                  ? 'duration-200 scale-[3.60] opacity-0 translate-x-0'
+                  : 'duration-700 scale-100 opacity-100 lg:translate-x-[23vw]'
+              }`}
+            >
+              <div className="login-solaris-core">
+                <div className="login-solaris-core-rayfield" />
+                <div className="login-solaris-core-aura" />
+                <div className="login-solaris-core-orbit login-solaris-core-orbit--a" />
+                <div className="login-solaris-core-orbit login-solaris-core-orbit--b" />
+                <div className="login-solaris-core-orbit login-solaris-core-orbit--c" />
+                <div className="login-solaris-core-shell">
+                  <div className="login-solaris-core-limb" />
+                  <div className="login-solaris-core-surface">
+                    <div className="login-solaris-core-granulation" />
+                    <div className="login-solaris-core-stream login-solaris-core-stream--a" />
+                    <div className="login-solaris-core-stream login-solaris-core-stream--b" />
+                    <div className="login-solaris-core-stream login-solaris-core-stream--c" />
+                    <div className="login-solaris-core-hotspot login-solaris-core-hotspot--a" />
+                    <div className="login-solaris-core-hotspot login-solaris-core-hotspot--b" />
+                    <div className="login-solaris-core-hotspot login-solaris-core-hotspot--c" />
+                    <div className="login-solaris-core-inner" />
+                  </div>
+                </div>
+                <div className="login-solaris-core-caption">SOLARIS CORE</div>
+              </div>
+            </div>
+          )}
+
           {/* AURORA ORB
               Aurora-only idle/auth visual. Cosmic Black never renders it.
               During charging/portal/flash the original Three.js scene takes over. */}
           {isAurora && (
             <div
-              className={`absolute inset-0 z-[3] flex items-center justify-center transition-all ${
+              className={`login-aurora-orb-stage absolute inset-0 z-[3] flex items-center justify-center transition-all ${
                 phase === 'portal'
                   ? 'duration-1000 scale-[3.15] opacity-100 translate-x-0'
                   : phase === 'charging'
@@ -4341,7 +5671,7 @@ export default function LoginPortal({
 
           <div
             className={`pointer-events-none relative h-screen w-screen transition-opacity duration-700 ${
-              isAurora ? 'opacity-0' : 'opacity-100'
+              isAurora || isSolaris ? 'opacity-0' : 'opacity-100'
             }`}
           >
 
@@ -4388,6 +5718,7 @@ export default function LoginPortal({
 
                 ${
                   isAurora ||
+                  isSolaris ||
                   phase === 'charging' ||
                   phase === 'portal' ||
                   phase === 'flash'
@@ -4398,12 +5729,12 @@ export default function LoginPortal({
             >
               <div className="text-center">
 
-                <div className="text-[7px] tracking-[0.30em] text-slate-600">
+                <div className="text-[9px] tracking-[0.30em] text-slate-600">
                   JEC
                 </div>
 
-                <div className="mt-1 text-[10px] font-black tracking-[0.22em] text-sky-50">
-                  {isAurora ? 'AURORA NEXUS' : 'AI CORE'}
+                <div className="mt-1 text-[12px] font-black tracking-[0.22em] text-sky-50">
+                  {isAurora ? 'AURORA NEXUS' : isSolaris ? 'SOLARIS CORE' : 'AI CORE'}
                 </div>
 
               </div>
@@ -4434,7 +5765,7 @@ export default function LoginPortal({
           >
             <div
               className={`
-                text-[9px]
+                text-[11px]
                 font-black
                 tracking-[0.28em]
 
@@ -4450,7 +5781,7 @@ export default function LoginPortal({
               {coreStatus}
             </div>
 
-            <div className="mt-1.5 text-[7px] tracking-[0.20em] text-slate-600">
+            <div className="mt-1.5 text-[9px] tracking-[0.20em] text-slate-600">
               AUTONOMOUS NEURAL VOICE GATEWAY
             </div>
 
@@ -4484,12 +5815,12 @@ export default function LoginPortal({
       >
         <div className="translate-y-[32vh] text-center lg:translate-y-[25vh]">
 
-          <div className="text-[9px] font-black tracking-[0.35em] text-emerald-400">
+          <div className="text-[11px] font-black tracking-[0.35em] text-emerald-400">
             ACCESS GRANTED
           </div>
 
           {authenticatedUser && (
-            <div className="mt-2 text-[8px] tracking-[0.24em] text-emerald-200/60">
+            <div className="mt-2 text-[10px] tracking-[0.24em] text-emerald-200/60">
               WELCOME //{' '}
               {authenticatedUser.toUpperCase()}
             </div>
@@ -4569,6 +5900,12 @@ export default function LoginPortal({
           }
         `}
       />
+
+      {/* ===================================================
+          FIRST-ACCESS LOGIN GUIDE
+      =================================================== */}
+
+      <LoginSpotlightTour onPrepareStep={prepareLoginTourStep} />
 
       {/* ===================================================
           LOCAL CSS
@@ -5062,6 +6399,121 @@ export default function LoginPortal({
           }
         }
 
+
+        /* =================================================
+           RESPONSIVE HEIGHT SAFETY
+           Keep the larger readable typography, but compact decorative
+           spacing on shorter laptop screens. If the viewport is still
+           too short, only the left authentication column becomes scrollable.
+           ================================================= */
+        @media (min-width: 1024px) and (max-height: 860px) {
+          .login-main-layout {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+          }
+
+          .login-left-panel {
+            padding-top: 76px !important;
+            padding-bottom: 14px !important;
+          }
+
+          .login-left-content {
+            max-width: 470px !important;
+          }
+
+          .login-brand-logo {
+            width: 230px !important;
+          }
+
+          .login-brand-subtitle {
+            margin-top: 2px !important;
+            line-height: 1.35 !important;
+          }
+
+          .login-hud-surface {
+            margin-top: 10px !important;
+          }
+
+          .login-aurora-orb-stage {
+            transform: scale(.88);
+            transform-origin: center center;
+          }
+        }
+
+        @media (min-width: 1024px) and (max-height: 760px) {
+          .login-left-panel {
+            padding-top: 68px !important;
+            padding-bottom: 10px !important;
+          }
+
+          .login-left-content {
+            max-width: 450px !important;
+          }
+
+          .login-brand-logo {
+            width: 190px !important;
+          }
+
+          .login-brand-subtitle {
+            font-size: 10px !important;
+            line-height: 1.25 !important;
+          }
+
+          .login-hud-surface {
+            margin-top: 7px !important;
+          }
+
+          .login-aurora-orb-stage {
+            transform: scale(.76);
+          }
+        }
+
+        @media (max-width: 1023px) {
+          .login-portal-root,
+          .login-main-layout {
+            min-height: 100dvh;
+          }
+
+          .login-main-layout {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+          }
+
+          .login-left-panel {
+            min-height: 100dvh;
+          }
+
+          .login-left-content {
+            padding-bottom: max(18px, env(safe-area-inset-bottom));
+          }
+
+          .login-aurora-orb-stage {
+            opacity: .22;
+            transform: scale(.72) translateY(9vh);
+          }
+        }
+
+        @media (max-width: 640px) {
+          .login-left-panel {
+            padding-top: 78px !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+          }
+
+          .login-left-content {
+            max-width: 100% !important;
+          }
+
+          .login-brand-logo {
+            width: min(220px, 72vw) !important;
+          }
+
+          .login-brand-subtitle {
+            font-size: 10px !important;
+            letter-spacing: .10em !important;
+          }
+        }
+
         /* Mobile composition: branding and form remain a single clean column. */
         @media (max-width: 1023px) {
           .login-scanlines { opacity: 0.08; }
@@ -5381,6 +6833,7 @@ export default function LoginPortal({
         }
 
         @media (prefers-reduced-motion: reduce) {
+          .login-solaris-motion-canvas { opacity: .72; }
           .login-aurora-curtain,
           .login-aurora-pillars,
           .login-aurora-wave,
@@ -5596,7 +7049,7 @@ export default function LoginPortal({
 
         .aurora-orb-copy span {
           color: rgba(227,255,255,.62);
-          font-size: 7px;
+          font-size: 9px;
           letter-spacing: .40em;
           margin-left: .40em;
         }
@@ -5604,7 +7057,7 @@ export default function LoginPortal({
         .aurora-orb-copy strong {
           margin-top: 6px;
           color: rgba(248,255,255,.96);
-          font-size: 11px;
+          font-size: 13px;
           letter-spacing: .30em;
           margin-left: .30em;
           font-weight: 900;
@@ -6250,6 +7703,932 @@ export default function LoginPortal({
           }
         }
 
+
+
+        /* =================================================
+           SOLARIS AZURE LOGIN
+           Bright Venus blue-white atmosphere. Unlike Aurora's
+           luminous curtains, Solaris uses continuous superrotating
+           cloud decks, refraction and a slow atmospheric vortex.
+           ================================================= */
+
+        .login-solaris-mode {
+          color: #0b2740 !important;
+          background:
+            radial-gradient(ellipse at 82% 5%, rgba(86,220,255,.26), transparent 31%),
+            radial-gradient(ellipse at 14% 82%, rgba(49,140,255,.10), transparent 36%),
+            linear-gradient(145deg, #f5fcff, #eaf8ff 48%, #d8f1ff) !important;
+        }
+
+        .login-solaris-sky {
+          overflow: hidden;
+          background:
+            linear-gradient(180deg, #f7fdff 0%, #e9f8ff 52%, #d5efff 100%);
+        }
+
+        .login-solaris-motion-canvas {
+          z-index: 3;
+          opacity: .92;
+          mix-blend-mode: normal;
+          filter: saturate(1.10) contrast(1.03);
+        }
+
+
+        /* =====================================================
+           SOLARIS HORIZONTAL PLASMA RIBBONS — V18 FINAL
+           Only three low-opacity flows move left-to-right as atmospheric depth.
+           They stay softer than both the Helios Crown and Stellar Core.
+           ===================================================== */
+        .solaris-horizontal-ribbons {
+          opacity: .70;
+          overflow: visible;
+          mix-blend-mode: multiply;
+          filter: saturate(.90) contrast(.94);
+          transform-origin: 73% 50%;
+          transition: transform .9s cubic-bezier(.22,.78,.25,1), opacity .45s ease, filter .45s ease;
+        }
+
+        .solaris-horizontal-ribbons--active {
+          opacity: .78;
+          filter: saturate(.96) contrast(.96);
+        }
+
+        .solaris-horizontal-ribbons--charged {
+          transform: translateX(-23vw) scale(1.018);
+          opacity: .82;
+          filter: saturate(1) contrast(.98);
+        }
+
+        @media (max-width: 1023px) {
+          .solaris-horizontal-ribbons {
+            transform: translateX(-18vw) scale(.94);
+            opacity: .52;
+          }
+          .solaris-horizontal-ribbons--charged { transform: translateX(0) scale(1.01); }
+        }
+
+        /* =====================================================
+           SOLARIS HELIOS CROWN — V19 SOFT CORONA
+           Final soft-corona polish. Motion stays radial and alive, while individual
+           rays dissolve into a thin plasma field instead of concrete rods.
+           ===================================================== */
+        .solaris-helios-crown {
+          opacity: .90;
+          overflow: visible;
+          mix-blend-mode: normal;
+          filter: saturate(.94) contrast(.985);
+        }
+
+        .solaris-crown-halo {
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: solarisCrownHalo 3.2s ease-in-out infinite alternate;
+        }
+
+        .solaris-crown-bands {
+          transform-box: view-box;
+          transform-origin: 73% 50%;
+        }
+
+        .solaris-crown-band {
+          fill: none;
+          stroke-linecap: round;
+          transform-box: fill-box;
+          transform-origin: center;
+        }
+
+        .solaris-crown-band--outer {
+          stroke: #4a92b8;
+          stroke-width: 2.4;
+          stroke-dasharray: 10 8 3 13 18 10;
+          opacity: .13;
+          filter: blur(.35px);
+          animation: solarisCrownBandSpin 16s linear infinite;
+        }
+
+        .solaris-crown-band--middle {
+          stroke: #268ebd;
+          stroke-width: 1.8;
+          stroke-dasharray: 14 10 4 13 7 11;
+          opacity: .18;
+          filter: blur(.2px);
+          animation: solarisCrownBandSpinReverse 12s linear infinite;
+        }
+
+        .solaris-crown-band--inner {
+          stroke: #19add3;
+          stroke-width: 1.25;
+          stroke-dasharray: 7 11 16 9 5 13;
+          opacity: .24;
+          animation: solarisCrownBandSpin 9.5s linear infinite;
+        }
+
+        .solaris-crown-rays {
+          transform-box: view-box;
+          transform-origin: 73% 50%;
+          animation: solarisCrownRayDrift 12s ease-in-out infinite alternate;
+        }
+
+        .solaris-crown-rays--mist { opacity: .82; }
+        .solaris-crown-rays--filaments { opacity: .78; }
+
+        .solaris-crown-pressure {
+          fill: none;
+          stroke: #48a6c9;
+          stroke-width: .85;
+          stroke-dasharray: 16 12 4 15;
+          opacity: 0;
+          filter: blur(.25px);
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: solarisCrownPressure 4.1s ease-out infinite;
+        }
+
+        .solaris-crown-pressure--b {
+          stroke: #23add2;
+          stroke-width: .7;
+          animation-delay: -2.05s;
+        }
+
+        .solaris-crown-flare__body,
+        .solaris-crown-flare__spark {
+          fill: none;
+          stroke-linecap: round;
+        }
+
+        .solaris-crown-flare__body {
+          stroke: #2a8fb9;
+          stroke-width: 3.2;
+          stroke-dasharray: 2 98;
+          opacity: 0;
+          filter: blur(.35px);
+          animation: solarisCrownFlareBody 6.8s ease-in-out infinite;
+        }
+
+        .solaris-crown-flare__spark {
+          stroke: #42c8e8;
+          stroke-width: 1.15;
+          stroke-dasharray: 9 91;
+          opacity: 0;
+          animation: solarisCrownFlareSpark 6.8s linear infinite;
+        }
+
+        .solaris-crown-wind-trace {
+          fill: none;
+          stroke: #4997bb;
+          stroke-width: .62;
+          stroke-linecap: round;
+          stroke-dasharray: 2 17;
+          opacity: .09;
+          filter: blur(.15px);
+          animation: solarisCrownWindTrace 3.1s linear infinite;
+        }
+
+        .solaris-crown-wind-dot { opacity: .46; filter: blur(.18px); }
+
+        .solaris-helios-crown--active .solaris-crown-rays {
+          animation-duration: 8.2s;
+        }
+
+        .solaris-helios-crown--active .solaris-crown-band--outer { animation-duration: 8s; }
+        .solaris-helios-crown--active .solaris-crown-band--middle { animation-duration: 6.2s; }
+        .solaris-helios-crown--active .solaris-crown-pressure { animation-duration: 2s; }
+
+        .solaris-helios-crown--charged .solaris-crown-rays {
+          animation-duration: 6.2s;
+          filter: saturate(1.06);
+        }
+
+        .solaris-helios-crown--charged .solaris-crown-band--outer { animation-duration: 5.4s; }
+        .solaris-helios-crown--charged .solaris-crown-band--middle { animation-duration: 4.1s; }
+        .solaris-helios-crown--charged .solaris-crown-band--inner { animation-duration: 3.2s; }
+        .solaris-helios-crown--charged .solaris-crown-pressure { animation-duration: 1.3s; }
+        .solaris-helios-crown--charged .solaris-crown-flare__body,
+        .solaris-helios-crown--charged .solaris-crown-flare__spark { animation-duration: 2.8s; }
+
+        /* Keep the SVG crown locked to the CSS core when the core moves to
+           screen center for charging/portal. Idle desktop stays at +23vw. */
+        .solaris-helios-crown {
+          transition: transform .8s cubic-bezier(.22,.78,.25,1);
+        }
+
+        .solaris-helios-crown--charged {
+          transform: translateX(-23vw);
+        }
+
+        @media (max-width: 1023px) {
+          .solaris-helios-crown {
+            transform: translateX(-23vw);
+          }
+        }
+
+        @keyframes solarisCrownHalo {
+          0% { transform: scale(.95); opacity: .24; }
+          45% { transform: scale(1.055, 1.02); opacity: .40; }
+          100% { transform: scale(.99, 1.07); opacity: .29; }
+        }
+
+        @keyframes solarisCrownBandSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes solarisCrownBandSpinReverse {
+          to { transform: rotate(-360deg); }
+        }
+
+        @keyframes solarisCrownRayDrift {
+          0% { transform: rotate(-1.2deg) scale(.992); }
+          46% { transform: rotate(1.5deg) scale(1.018); }
+          100% { transform: rotate(-.6deg) scale(1.006); }
+        }
+
+        @keyframes solarisCrownPressure {
+          0% { transform: scale(.94, .91) rotate(-.5deg); opacity: .24; }
+          44% { opacity: .11; }
+          100% { transform: scale(1.62, 1.48) rotate(1deg); opacity: 0; }
+        }
+
+        @keyframes solarisCrownFlareBody {
+          0%, 57% { stroke-dasharray: 2 98; stroke-dashoffset: 0; opacity: 0; }
+          63% { stroke-dasharray: 16 84; opacity: .88; }
+          76% { stroke-dasharray: 54 46; stroke-dashoffset: -22; opacity: .96; }
+          90% { stroke-dasharray: 24 76; stroke-dashoffset: -72; opacity: .46; }
+          100% { stroke-dasharray: 2 98; stroke-dashoffset: -100; opacity: 0; }
+        }
+
+        @keyframes solarisCrownFlareSpark {
+          0%, 57% { stroke-dashoffset: 0; opacity: 0; }
+          63% { opacity: 1; }
+          92% { opacity: .9; }
+          100% { stroke-dashoffset: -100; opacity: 0; }
+        }
+
+        @keyframes solarisCrownWindTrace {
+          to { stroke-dashoffset: -32; }
+        }
+
+
+        .login-solaris-haze {
+          position: absolute;
+          z-index: 0;
+          inset: -10%;
+          background:
+            radial-gradient(ellipse at 80% 8%, rgba(255,255,255,.98) 0 7%, rgba(86,220,255,.27) 24%, transparent 49%),
+            radial-gradient(ellipse at 18% 70%, rgba(49,140,255,.10), transparent 40%),
+            linear-gradient(115deg, rgba(255,255,255,.48), transparent 42%);
+          filter: blur(3px);
+          animation: loginSolarisHaze 24s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-sun-disc {
+          z-index: 2;
+          position: absolute;
+          right: 8%;
+          top: 7%;
+          width: min(33vw, 460px);
+          aspect-ratio: 1;
+          border-radius: 999px;
+          opacity: .72;
+          background:
+            radial-gradient(circle,
+              rgba(255,255,255,.76) 0 7%,
+              rgba(232,251,255,.58) 13% 21%,
+              rgba(86,220,255,.34) 34%,
+              rgba(49,140,255,.12) 52%,
+              transparent 72%);
+          box-shadow:
+            0 0 72px rgba(0,191,232,.16),
+            0 0 155px rgba(49,140,255,.09);
+          filter: blur(5px);
+          animation: loginSolarisSun 7.4s ease-in-out infinite alternate;
+        }
+
+
+        .login-solaris-orbit {
+          z-index: 2;
+          position: absolute;
+          right: 10%;
+          top: 12%;
+          width: min(34vw, 460px);
+          aspect-ratio: 1;
+          border: 1px solid rgba(0,143,196,.15);
+          border-radius: 999px;
+          transform: rotateX(66deg) rotateZ(-13deg);
+          box-shadow:
+            0 0 0 22px rgba(0,191,232,.028),
+            0 0 0 58px rgba(49,140,255,.022),
+            0 0 28px rgba(0,191,232,.08);
+          animation: loginSolarisOrbit 14s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-orbit--b {
+          right: 3%;
+          top: 5%;
+          width: min(47vw, 640px);
+          border-color: rgba(109,125,255,.09);
+          transform: rotateX(72deg) rotateZ(11deg);
+          animation-duration: 21s;
+        }
+
+
+
+
+
+        .login-solaris-horizon {
+          z-index: 2;
+          position: absolute;
+          left: -8%;
+          right: -8%;
+          bottom: -12%;
+          height: 38%;
+          border-radius: 50% 50% 0 0;
+          background:
+            radial-gradient(ellipse at 50% 0%, rgba(0,191,232,.10), transparent 50%),
+            linear-gradient(180deg, rgba(204,237,255,.34), rgba(169,219,247,.48));
+          filter: blur(1px);
+        }
+
+        .login-solaris-sidewash {
+          background:
+            linear-gradient(
+              90deg,
+              rgba(234,248,255,.97) 0%,
+              rgba(234,248,255,.80) 34%,
+              rgba(234,248,255,.22) 66%,
+              transparent 100%
+            ) !important;
+        }
+
+        .login-solaris-mode .login-portal-vignette {
+          background:
+            radial-gradient(circle at 62% 43%, transparent 28%, rgba(22,91,135,.11) 100%) !important;
+        }
+
+        .login-solaris-mode .login-scanlines {
+          opacity: .045 !important;
+          mix-blend-mode: multiply;
+        }
+
+        .login-solaris-mode header > div:last-child {
+          background: rgba(242,251,255,.82) !important;
+          border-color: rgba(0,143,196,.20) !important;
+          box-shadow: 0 8px 20px rgba(25,92,132,.08);
+        }
+
+        .login-solaris-mode [class*="text-sky-"] { color: #13789d !important; }
+        .login-solaris-mode [class*="text-slate-"] { color: #62849a !important; }
+        .login-solaris-mode .login-brand-subtitle { color: #5d7e94 !important; }
+
+        .login-solaris-mode .login-brand-logo {
+          filter:
+            saturate(1.08)
+            contrast(1.04)
+            drop-shadow(0 7px 18px rgba(0,143,196,.18)) !important;
+        }
+
+        .login-hud-surface--solaris {
+          background:
+            radial-gradient(ellipse at 92% -8%, rgba(86,220,255,.17), transparent 34%),
+            linear-gradient(145deg, rgba(247,253,255,.94), rgba(226,245,255,.88)) !important;
+          border-color: rgba(0,143,196,.24) !important;
+          color: #0b2740 !important;
+          box-shadow:
+            0 20px 50px rgba(25,92,132,.12),
+            0 0 30px rgba(0,191,232,.08),
+            inset 0 1px 0 rgba(255,255,255,.97) !important;
+        }
+
+        .login-solaris-mode .login-hud-surface [class*="bg-[#"] {
+          background-color: rgba(239,250,255,.82) !important;
+        }
+
+        .login-solaris-mode .login-hud-surface input {
+          background: rgba(247,253,255,.97) !important;
+          border-color: rgba(0,143,196,.24) !important;
+          color: #0b2740 !important;
+          box-shadow: inset 0 1px 2px rgba(25,92,132,.05) !important;
+          color-scheme: light;
+        }
+
+        .login-solaris-mode .login-hud-surface input::placeholder { color: #86a3b5 !important; }
+        .login-solaris-mode .login-hud-surface button { color-scheme: light; }
+        .login-solaris-mode .login-hud-surface button:hover { filter: saturate(1.04) brightness(.99); }
+
+        .login-solaris-portal-base {
+          background:
+            linear-gradient(145deg, rgba(247,253,255,.98), rgba(214,240,255,.97)) !important;
+        }
+
+        .login-solaris-portal-radial {
+          background:
+            radial-gradient(
+              circle at center,
+              rgba(255,255,255,.99) 0%,
+              rgba(86,220,255,.34) 20%,
+              rgba(0,191,232,.18) 38%,
+              rgba(49,140,255,.10) 55%,
+              rgba(234,248,255,.94) 78%,
+              #eaf8ff 100%
+            ) !important;
+        }
+
+        .login-solaris-portal-radial--active { filter: saturate(1.10); }
+
+        .solaris-portal-stage .frameless-portal-grid {
+          opacity: .10 !important;
+          filter: hue-rotate(164deg) saturate(1.12);
+        }
+
+        .solaris-portal-stage .frameless-portal-sweep {
+          opacity: .22;
+          filter: hue-rotate(164deg) saturate(1.18);
+        }
+
+        .login-solaris-core {
+          position: relative;
+          width: min(34vw, 410px);
+          aspect-ratio: 1;
+          display: grid;
+          place-items: center;
+          filter: drop-shadow(0 20px 40px rgba(22,91,135,.16));
+        }
+
+        .login-solaris-core-rayfield {
+          position: absolute;
+          inset: -35%;
+          border-radius: 999px;
+          background:
+            repeating-conic-gradient(
+              from 0deg,
+              transparent 0 11deg,
+              rgba(0,191,232,.11) 12deg 13deg,
+              transparent 14deg 25deg,
+              rgba(49,140,255,.07) 26deg 27deg,
+              transparent 28deg 40deg
+            );
+          filter: blur(12px);
+          opacity: .68;
+          animation: loginSolarisCoreRaySpin 24s linear infinite;
+        }
+
+        .login-solaris-core-aura {
+          position: absolute;
+          inset: -28%;
+          border-radius: 999px;
+          background:
+            radial-gradient(circle,
+              rgba(255,255,255,.98) 0 7%,
+              rgba(86,220,255,.30) 24%,
+              rgba(49,140,255,.11) 44%,
+              transparent 69%);
+          animation: loginSolarisCoreAura 4.8s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-shell {
+          position: absolute;
+          width: 47%;
+          aspect-ratio: 1;
+          display: grid;
+          place-items: center;
+          isolation: isolate;
+          animation: loginSolarisCoreBody 5.8s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-limb {
+          position: absolute;
+          inset: -9%;
+          z-index: 0;
+          border-radius: 46% 54% 49% 51% / 52% 46% 54% 48%;
+          background:
+            conic-gradient(
+              from 18deg,
+              rgba(0,191,232,0) 0 7%,
+              rgba(0,191,232,.92) 8% 10%,
+              rgba(49,140,255,.12) 11% 18%,
+              rgba(49,140,255,.78) 19% 22%,
+              rgba(0,191,232,.08) 23% 36%,
+              rgba(27,99,217,.72) 37% 40%,
+              rgba(0,191,232,.06) 41% 55%,
+              rgba(0,191,232,.86) 56% 59%,
+              rgba(49,140,255,.08) 60% 75%,
+              rgba(49,140,255,.82) 76% 80%,
+              rgba(0,191,232,.10) 81% 92%,
+              rgba(0,191,232,.70) 93% 96%,
+              rgba(0,191,232,0) 97% 100%
+            );
+          -webkit-mask:
+            radial-gradient(circle at center, transparent 0 51%, #000 54% 65%, transparent 68%);
+          mask:
+            radial-gradient(circle at center, transparent 0 51%, #000 54% 65%, transparent 68%);
+          filter:
+            drop-shadow(0 0 11px rgba(0,191,232,.32))
+            drop-shadow(0 0 24px rgba(49,140,255,.13));
+          opacity: .56;
+          animation:
+            loginSolarisCoreLimbSpin 11s linear infinite,
+            loginSolarisCoreLimbMorph 4.8s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-surface {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          overflow: hidden;
+          border: 1px solid rgba(0,143,196,.22);
+          border-radius: 48% 52% 46% 54% / 54% 45% 55% 46%;
+          background:
+            radial-gradient(circle at 32% 25%, rgba(255,255,255,.40) 0 5%, rgba(255,255,255,.13) 10% 17%, transparent 28%),
+            radial-gradient(circle at 65% 63%, rgba(101,225,255,.34) 0 12%, transparent 34%),
+            radial-gradient(circle at 24% 72%, rgba(109,125,255,.22) 0 14%, transparent 36%),
+            radial-gradient(circle at 72% 26%, rgba(0,191,232,.26) 0 13%, transparent 35%),
+            conic-gradient(
+              from 214deg at 51% 48%,
+              #dffaff 0deg,
+              #7fe6ff 42deg,
+              #2dbbe9 91deg,
+              #318cff 143deg,
+              #1b63d9 194deg,
+              #44c6ef 246deg,
+              #8cecff 302deg,
+              #e7fbff 360deg
+            );
+          box-shadow:
+            inset -18px -22px 34px rgba(14,61,146,.16),
+            inset 11px 9px 28px rgba(255,255,255,.22),
+            inset 0 0 28px rgba(0,191,232,.18),
+            0 0 32px rgba(0,191,232,.28),
+            0 0 72px rgba(49,140,255,.14);
+          animation:
+            loginSolarisCoreSurfaceMorph 6.4s ease-in-out infinite alternate,
+            loginSolarisCorePulse 4.1s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-surface::after {
+          content: "";
+          position: absolute;
+          inset: -18%;
+          pointer-events: none;
+          background:
+            conic-gradient(
+              from 0deg,
+              transparent 0 7%,
+              rgba(255,255,255,.15) 8% 11%,
+              transparent 12% 24%,
+              rgba(0,191,232,.11) 25% 29%,
+              transparent 30% 45%,
+              rgba(255,255,255,.11) 46% 50%,
+              transparent 51% 71%,
+              rgba(49,140,255,.10) 72% 77%,
+              transparent 78% 100%
+            );
+          mix-blend-mode: screen;
+          filter: blur(7px);
+          opacity: .68;
+          animation: loginSolarisCoreSurfaceFlow 8.5s linear infinite;
+        }
+
+        .login-solaris-core-granulation {
+          position: absolute;
+          inset: -22%;
+          z-index: 1;
+          opacity: .44;
+          background:
+            radial-gradient(circle at 12% 18%, rgba(255,255,255,.62) 0 1.8%, transparent 2.4%),
+            radial-gradient(circle at 27% 42%, rgba(10,111,190,.38) 0 2.2%, transparent 3%),
+            radial-gradient(circle at 44% 15%, rgba(255,255,255,.52) 0 1.5%, transparent 2.2%),
+            radial-gradient(circle at 61% 36%, rgba(0,191,232,.42) 0 2.5%, transparent 3.3%),
+            radial-gradient(circle at 78% 18%, rgba(255,255,255,.55) 0 1.7%, transparent 2.4%),
+            radial-gradient(circle at 87% 51%, rgba(20,86,180,.34) 0 2.6%, transparent 3.4%),
+            radial-gradient(circle at 69% 76%, rgba(255,255,255,.44) 0 2.1%, transparent 2.9%),
+            radial-gradient(circle at 45% 84%, rgba(0,191,232,.40) 0 2.2%, transparent 3.1%),
+            radial-gradient(circle at 20% 72%, rgba(255,255,255,.42) 0 2.3%, transparent 3.2%),
+            repeating-radial-gradient(circle at 50% 48%, rgba(255,255,255,.08) 0 2px, transparent 3px 9px);
+          filter: blur(1.25px) contrast(1.01);
+          mix-blend-mode: overlay;
+          animation: loginSolarisGranulationDrift 6.8s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-stream {
+          position: absolute;
+          z-index: 2;
+          left: -24%;
+          width: 150%;
+          height: 22%;
+          border-radius: 50%;
+          border-top: 1px solid rgba(232,252,255,.26);
+          border-bottom: 1px solid rgba(0,191,232,.11);
+          filter: blur(.35px) drop-shadow(0 0 5px rgba(255,255,255,.34));
+          opacity: .30;
+          transform-origin: 50% 50%;
+          mix-blend-mode: screen;
+        }
+
+        .login-solaris-core-stream--a {
+          top: 26%;
+          transform: rotate(-18deg) scaleX(.94);
+          animation: loginSolarisStreamA 5.2s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-stream--b {
+          top: 49%;
+          border-top-color: rgba(30,136,255,.22);
+          transform: rotate(14deg) scaleX(1.08);
+          animation: loginSolarisStreamB 6.3s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-stream--c {
+          top: 65%;
+          height: 16%;
+          border-top-color: rgba(255,255,255,.18);
+          transform: rotate(-8deg) scaleX(.88);
+          animation: loginSolarisStreamC 4.6s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-hotspot {
+          position: absolute;
+          z-index: 4;
+          width: 5.8%;
+          aspect-ratio: 1;
+          border-radius: 48% 52% 54% 46% / 45% 55% 46% 54%;
+          background: rgba(237,253,255,.42);
+          box-shadow:
+            0 0 7px rgba(255,255,255,.32),
+            0 0 17px rgba(0,191,232,.28),
+            0 0 26px rgba(49,140,255,.12);
+          filter: blur(.2px);
+          mix-blend-mode: screen;
+          opacity: .52;
+        }
+
+        .login-solaris-core-hotspot--a {
+          left: 27%;
+          top: 23%;
+          animation: loginSolarisHotspotA 3.8s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-hotspot--b {
+          right: 20%;
+          top: 47%;
+          width: 4.6%;
+          opacity: .42;
+          animation: loginSolarisHotspotB 4.9s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-hotspot--c {
+          left: 38%;
+          bottom: 18%;
+          width: 3.8%;
+          opacity: .32;
+          animation: loginSolarisHotspotC 3.3s ease-in-out infinite alternate;
+        }
+
+        .login-solaris-core-inner {
+          position: absolute;
+          z-index: 3;
+          left: 37%;
+          top: 31%;
+          width: 27%;
+          aspect-ratio: 1;
+          border-radius: 44% 56% 48% 52% / 58% 43% 57% 42%;
+          border: 1px solid rgba(255,255,255,.22);
+          background:
+            radial-gradient(circle at 38% 33%,
+              rgba(255,255,255,.86) 0 12%,
+              rgba(233,252,255,.78) 24%,
+              rgba(109,230,255,.70) 48%,
+              rgba(0,191,232,.46) 74%,
+              rgba(49,140,255,.16) 100%);
+          box-shadow:
+            0 0 18px rgba(255,255,255,.34),
+            0 0 32px rgba(0,191,232,.22),
+            inset -6px -7px 16px rgba(27,99,217,.09),
+            inset 6px 5px 16px rgba(255,255,255,.24);
+          animation: loginSolarisInnerMorph 4.4s ease-in-out infinite alternate;
+          mix-blend-mode: screen;
+          opacity: .68;
+          filter: blur(.3px);
+        }
+
+        .login-solaris-core-orbit {
+          position: absolute;
+          width: 66%;
+          aspect-ratio: 1;
+          border-radius: 999px;
+          border: 1px solid rgba(0,143,196,.22);
+          transform: rotateX(68deg) rotateZ(-14deg);
+          animation: loginSolarisCoreOrbit 9s linear infinite;
+        }
+
+        .login-solaris-core-orbit::after {
+          content: "";
+          position: absolute;
+          left: 8%;
+          top: 46%;
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: #00bfe8;
+          box-shadow: 0 0 14px rgba(0,191,232,.42);
+        }
+
+        .login-solaris-core-orbit--b {
+          width: 82%;
+          border-color: rgba(49,140,255,.20);
+          transform: rotateX(72deg) rotateZ(18deg);
+          animation-duration: 13s;
+          animation-direction: reverse;
+        }
+
+        .login-solaris-core-orbit--b::after {
+          left: 76%;
+          top: 51%;
+          background: #318cff;
+          box-shadow: 0 0 14px rgba(49,140,255,.38);
+        }
+
+        .login-solaris-core-orbit--c {
+          width: 98%;
+          border-color: rgba(109,125,255,.13);
+          transform: rotateX(76deg) rotateZ(-32deg);
+          animation-duration: 18s;
+        }
+
+        .login-solaris-core-caption {
+          position: absolute;
+          bottom: 9%;
+          left: 50%;
+          transform: translateX(-50%);
+          white-space: nowrap;
+          color: #176f9b;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: .28em;
+          text-shadow: 0 2px 12px rgba(0,191,232,.20);
+        }
+
+        @keyframes loginSolarisHaze {
+          from { transform: translate3d(-1.5%, 0, 0) scale(1); }
+          to   { transform: translate3d(1.5%, -1%, 0) scale(1.025); }
+        }
+
+        @keyframes loginSolarisSun {
+          from { transform: scale(.95); opacity: .80; }
+          to   { transform: scale(1.065); opacity: 1; }
+        }
+
+
+        @keyframes loginSolarisOrbit {
+          from { translate: -7px 2px; opacity: .44; }
+          to   { translate: 13px -8px; opacity: .90; }
+        }
+
+
+
+
+        @keyframes loginSolarisCoreAura {
+          from { transform: scale(.92); opacity: .62; }
+          to   { transform: scale(1.09); opacity: .98; }
+        }
+
+        @keyframes loginSolarisCoreRaySpin {
+          from { transform: rotate(0deg) scale(.98); opacity: .58; }
+          50%  { opacity: .88; }
+          to   { transform: rotate(360deg) scale(1.02); opacity: .58; }
+        }
+
+        @keyframes loginSolarisCorePulse {
+          from { transform: scale(.96); filter: saturate(.96) brightness(1); }
+          to   { transform: scale(1.045); filter: saturate(1.10) brightness(1.06); }
+        }
+
+        @keyframes loginSolarisCoreBody {
+          0%   { transform: rotate(-1.3deg) scale(.985); }
+          48%  { transform: rotate(.7deg) scale(1.015); }
+          100% { transform: rotate(1.6deg) scale(.995); }
+        }
+
+        @keyframes loginSolarisCoreLimbSpin {
+          from { transform: rotate(0deg) scale(.99); }
+          to   { transform: rotate(360deg) scale(1.015); }
+        }
+
+        @keyframes loginSolarisCoreLimbMorph {
+          0% {
+            border-radius: 46% 54% 49% 51% / 52% 46% 54% 48%;
+            opacity: .76;
+          }
+          48% {
+            border-radius: 54% 46% 43% 57% / 44% 58% 42% 56%;
+            opacity: 1;
+          }
+          100% {
+            border-radius: 49% 51% 56% 44% / 57% 43% 53% 47%;
+            opacity: .84;
+          }
+        }
+
+        @keyframes loginSolarisCoreSurfaceMorph {
+          0% {
+            border-radius: 48% 52% 46% 54% / 54% 45% 55% 46%;
+          }
+          35% {
+            border-radius: 54% 46% 53% 47% / 47% 57% 43% 53%;
+          }
+          68% {
+            border-radius: 45% 55% 51% 49% / 56% 44% 58% 42%;
+          }
+          100% {
+            border-radius: 52% 48% 44% 56% / 46% 54% 48% 52%;
+          }
+        }
+
+        @keyframes loginSolarisCoreSurfaceFlow {
+          from { transform: rotate(0deg) scale(1.03); }
+          to   { transform: rotate(360deg) scale(1.08); }
+        }
+
+        @keyframes loginSolarisGranulationDrift {
+          0%   { transform: translate3d(-4%, -2%, 0) rotate(-3deg) scale(1.02); opacity: .62; }
+          50%  { transform: translate3d(3%, 2%, 0) rotate(2deg) scale(1.08); opacity: .86; }
+          100% { transform: translate3d(-1%, 5%, 0) rotate(5deg) scale(1.04); opacity: .72; }
+        }
+
+        @keyframes loginSolarisStreamA {
+          from { transform: translate3d(-5%, -4%, 0) rotate(-22deg) scaleX(.90) scaleY(.86); opacity: .40; }
+          to   { transform: translate3d(7%, 5%, 0) rotate(-12deg) scaleX(1.07) scaleY(1.08); opacity: .84; }
+        }
+
+        @keyframes loginSolarisStreamB {
+          from { transform: translate3d(6%, -2%, 0) rotate(19deg) scaleX(1.02) scaleY(.82); opacity: .34; }
+          to   { transform: translate3d(-7%, 5%, 0) rotate(8deg) scaleX(1.12) scaleY(1.12); opacity: .76; }
+        }
+
+        @keyframes loginSolarisStreamC {
+          from { transform: translate3d(-4%, 4%, 0) rotate(-13deg) scaleX(.82); opacity: .30; }
+          to   { transform: translate3d(8%, -3%, 0) rotate(-4deg) scaleX(1.04); opacity: .68; }
+        }
+
+        @keyframes loginSolarisHotspotA {
+          from { transform: translate3d(-8%, 3%, 0) scale(.68) rotate(-8deg); opacity: .50; }
+          to   { transform: translate3d(18%, -10%, 0) scale(1.20) rotate(12deg); opacity: 1; }
+        }
+
+        @keyframes loginSolarisHotspotB {
+          from { transform: translate3d(10%, -12%, 0) scale(.72); opacity: .36; }
+          to   { transform: translate3d(-18%, 17%, 0) scale(1.16); opacity: .88; }
+        }
+
+        @keyframes loginSolarisHotspotC {
+          from { transform: translate3d(-12%, 8%, 0) scale(.74); opacity: .28; }
+          to   { transform: translate3d(15%, -14%, 0) scale(1.12); opacity: .72; }
+        }
+
+        @keyframes loginSolarisInnerMorph {
+          0% {
+            transform: translate3d(-3%, 0, 0) rotate(-6deg) scale(.92);
+            border-radius: 44% 56% 48% 52% / 58% 43% 57% 42%;
+          }
+          50% {
+            transform: translate3d(5%, -4%, 0) rotate(5deg) scale(1.08);
+            border-radius: 55% 45% 56% 44% / 44% 58% 42% 56%;
+          }
+          100% {
+            transform: translate3d(0, 5%, 0) rotate(-1deg) scale(.98);
+            border-radius: 48% 52% 42% 58% / 55% 45% 52% 48%;
+          }
+        }
+
+        @keyframes loginSolarisCoreOrbit {
+          from { rotate: 0deg; }
+          to   { rotate: 360deg; }
+        }
+
+
+        @media (max-width: 1023px) {
+          .login-solaris-sun-disc {
+            right: -6%;
+            top: 12%;
+            width: 58vw;
+            opacity: .62;
+          }
+
+          .login-solaris-core {
+            width: min(68vw, 350px);
+            opacity: .28;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .login-solaris-haze,
+          .login-solaris-sun-disc,
+          .login-solaris-orbit,
+          .login-solaris-core-rayfield,
+          .login-solaris-core-aura,
+          .login-solaris-core-shell,
+          .login-solaris-core-orbit {
+            animation: none !important;
+          }
+        }
 
       `}</style>
     </div>

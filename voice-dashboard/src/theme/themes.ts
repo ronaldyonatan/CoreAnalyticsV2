@@ -1,4 +1,4 @@
-export type CoreThemeId = 'cosmic-black' | 'aurora';
+export type CoreThemeId = 'cosmic-black' | 'aurora' | 'solaris';
 
 export interface CoreThemeDefinition {
   id: CoreThemeId;
@@ -58,8 +58,27 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
       wallSecondary: '#194455',
       wallAccent: '#362b57',
     },
-  }
+  },
+
+  'solaris': {
+    id: 'solaris',
+    name: 'Solaris',
+    description: 'Bright azure command center with white-blue solar plasma and Core cyan.',
+    icon: '☼',
+    three: {
+      background: '#eaf8ff',
+      fog: '#d8f1ff',
+      star: '#00bfe8',
+      ambientIntensity: 1.38,
+      floor: '#dff3fc',
+      gridPrimary: '#00a8d4',
+      gridSecondary: '#8fcbe8',
+      wall: '#f4fbff',
+      wallSecondary: '#e4f5ff',
+      wallAccent: '#4b8cff',
+    },
+  },
 };
 
 export const isCoreThemeId = (value: string | null): value is CoreThemeId =>
-  value === 'cosmic-black' || value === 'aurora';
+  value === 'cosmic-black' || value === 'aurora' || value === 'solaris';

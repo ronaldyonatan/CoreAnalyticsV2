@@ -10,3 +10,4 @@ argon2-cffi
 soundfile
 edge-tts
 sounddevice
+certifi>=2026.7.22

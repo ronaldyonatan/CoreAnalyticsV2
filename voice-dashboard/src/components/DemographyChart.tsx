@@ -38,9 +38,37 @@ const MONTHS = [
   'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
 ];
 
-type AgeGroup = { label: string; count: number; percentage: number; color: string };
+type AgeGroup = {
+  label: string;
+  count: number;
+  percentage: number;
+  color: string;
+  male: number;
+  female: number;
+  newPatient: number;
+  returningPatient: number;
+};
 type DemographyDonutMode = 'gender' | 'patient_type';
 type Hover3D = { title: string; value: number; percentage: number; color: string; type: 'gender' | 'patient_type' | 'age' };
+
+function getAgeBreakdown(group: AgeGroup, mode: DemographyDonutMode) {
+  const gender = mode === 'gender';
+  const firstValue = gender ? group.male : group.newPatient;
+  const secondValue = gender ? group.female : group.returningPatient;
+  const total = firstValue + secondValue;
+
+  return {
+    firstValue,
+    secondValue,
+    total,
+    firstLabel: gender ? 'Male' : 'New Patient',
+    secondLabel: gender ? 'Female' : 'Returning Patient',
+    firstShortLabel: gender ? 'M' : 'NEW',
+    secondShortLabel: gender ? 'F' : 'RETURN',
+    firstColor: gender ? '#818cf8' : '#22d3ee',
+    secondColor: gender ? '#ec4899' : '#34d399',
+  };
+}
 
 function Demography3DScene({
   male,
@@ -91,8 +119,6 @@ function Demography3DScene({
     };
   };
 
-  const maxAge = Math.max(1, ...ageGroups.map(x => x.count));
-
   // Responsive 3D fit:
   // keep portrait mobile as portrait and solve visibility only with camera distance.
   const { camera, size } = useThree();
@@ -105,18 +131,37 @@ function Demography3DScene({
   // then expands with the new emissive colors.
   const ringGroupRef = useRef<any>(null);
   const scannerGroupRef = useRef<any>(null);
+  const ageScannerGroupRef = useRef<any>(null);
   const ringSegmentRefs = useRef<any[]>([]);
+  const ageSegmentRefs = useRef<any[][]>([]);
 
   // The donut is intentionally split into small physical 3D segments.
   // This lets the hologram sweep transform only the portion it has actually passed.
   const RING_SEGMENTS = 72;
   const RING_RADIUS = 1.42;
   const RING_TUBE = 0.38;
+
+  // Age bars use the same physical-segment reconstruction principle as the donut.
+  // Each tiny segment can independently keep the old perspective or switch to
+  // the incoming perspective only after the holographic scanner reaches it.
+  const AGE_SEGMENTS = 48;
+  const AGE_BAR_WIDTH = 4.25;
+  const AGE_GROUP_X = 1.25;
   const previousModeRef = useRef<DemographyDonutMode>(donutMode);
   const displayedModeRef = useRef<DemographyDonutMode>(donutMode);
   const transitionStartRef = useRef<number | null>(null);
   const [displayedMode, setDisplayedMode] = useState<DemographyDonutMode>(donutMode);
   const [transitionPulse, setTransitionPulse] = useState(0);
+
+  const activeAgeBars = ageGroups.map((group) => ({
+    group,
+    breakdown: getAgeBreakdown(group, displayedMode),
+  }));
+  const maxAge = Math.max(1, ...activeAgeBars.map(({ breakdown }) => breakdown.total));
+  const activeAgeTotal = activeAgeBars.reduce((sum, { breakdown }) => sum + breakdown.total, 0);
+  const ageModePalette = displayedMode === 'gender'
+    ? { firstColor: '#818cf8', secondColor: '#ec4899', firstLabel: 'MALE', secondLabel: 'FEMALE' }
+    : { firstColor: '#22d3ee', secondColor: '#34d399', firstLabel: 'NEW PATIENT', secondLabel: 'RETURNING' };
 
   // IMPORTANT: keep the currently displayed donut and the incoming target donut
   // as two different datasets during the holographic wipe.
@@ -235,6 +280,115 @@ function Demography3DScene({
       mesh.material.needsUpdate = true;
     };
 
+
+    const currentAgeBreakdowns = ageGroups.map((group) => ({
+      group,
+      breakdown: getAgeBreakdown(group, currentDisplayed),
+    }));
+    const targetAgeBreakdowns = ageGroups.map((group) => ({
+      group,
+      breakdown: getAgeBreakdown(group, targetMode),
+    }));
+    const currentAgeMax = Math.max(
+      1,
+      ...currentAgeBreakdowns.map(({ breakdown }) => breakdown.total)
+    );
+    const targetAgeMax = Math.max(
+      1,
+      ...targetAgeBreakdowns.map(({ breakdown }) => breakdown.total)
+    );
+
+    const getAgeSegmentState = (
+      breakdown: ReturnType<typeof getAgeBreakdown>,
+      maxValue: number,
+      segmentIndex: number
+    ) => {
+      const localX = ((segmentIndex + 0.5) / AGE_SEGMENTS) * AGE_BAR_WIDTH;
+      const totalWidth =
+        breakdown.total > 0
+          ? Math.max(0.08, (breakdown.total / maxValue) * AGE_BAR_WIDTH)
+          : 0;
+      const firstWidth =
+        breakdown.total > 0
+          ? totalWidth * (breakdown.firstValue / breakdown.total)
+          : 0;
+
+      const visible = localX <= totalWidth;
+      const first = localX <= firstWidth;
+
+      return {
+        localX,
+        visible,
+        color: first ? breakdown.firstColor : breakdown.secondColor,
+        emissive: first ? breakdown.firstColor : breakdown.secondColor,
+      };
+    };
+
+    const updateAgeSegments = (ageScanX: number, spatialWipe: boolean) => {
+      const transitionBand = 0.18;
+
+      ageGroups.forEach((groupItem, rowIndex) => {
+        const oldBreakdown = currentAgeBreakdowns[rowIndex]?.breakdown;
+        const newBreakdown = targetAgeBreakdowns[rowIndex]?.breakdown;
+        if (!oldBreakdown || !newBreakdown) return;
+
+        for (let segmentIndex = 0; segmentIndex < AGE_SEGMENTS; segmentIndex += 1) {
+          const mesh = ageSegmentRefs.current[rowIndex]?.[segmentIndex];
+          if (!mesh?.material) continue;
+
+          const oldState = getAgeSegmentState(
+            oldBreakdown,
+            currentAgeMax,
+            segmentIndex
+          );
+          const newState = getAgeSegmentState(
+            newBreakdown,
+            targetAgeMax,
+            segmentIndex
+          );
+
+          const globalX = AGE_GROUP_X + oldState.localX;
+          let blend = currentDisplayed === targetMode ? 0 : 1;
+
+          if (spatialWipe && currentDisplayed !== targetMode) {
+            if (globalX <= ageScanX - transitionBand) {
+              blend = 1;
+            } else if (globalX < ageScanX + transitionBand) {
+              const t =
+                (ageScanX + transitionBand - globalX) /
+                (transitionBand * 2);
+              blend = smooth(Math.max(0, Math.min(1, t)));
+            } else {
+              blend = 0;
+            }
+          }
+
+          const oldOpacity = oldState.visible ? 1 : 0;
+          const newOpacity = newState.visible ? 1 : 0;
+          const opacity =
+            oldOpacity * (1 - blend) + newOpacity * blend;
+
+          const oldColor = new THREE.Color(oldState.color);
+          const newColor = new THREE.Color(newState.color);
+          mesh.material.color.copy(oldColor).lerp(newColor, blend);
+          mesh.material.emissive.copy(oldColor).lerp(newColor, blend);
+
+          const edgeDistance = Math.abs(globalX - ageScanX);
+          const edgeGlow =
+            spatialWipe && currentDisplayed !== targetMode
+              ? Math.max(0, 1 - edgeDistance / 0.24)
+              : 0;
+
+          mesh.material.opacity = Math.max(0, Math.min(1, opacity));
+          mesh.material.emissiveIntensity = 0.48 + edgeGlow * 1.05;
+          mesh.material.transparent = true;
+          mesh.material.depthWrite = opacity > 0.35;
+          mesh.visible = opacity > 0.015;
+          mesh.material.needsUpdate = true;
+        }
+      });
+    };
+
     // Stable state: ensure every segment matches the currently displayed mode.
     if (currentDisplayed === targetMode && transitionStartRef.current === null) {
       group.scale.setScalar(1);
@@ -245,10 +399,12 @@ function Demography3DScene({
       group.position.z = baseZ;
 
       if (scannerGroupRef.current) scannerGroupRef.current.visible = false;
+      if (ageScannerGroupRef.current) ageScannerGroupRef.current.visible = false;
 
       ringSegmentRefs.current.forEach((mesh, index) => {
         setSegmentMaterial(mesh, index, 0, RING_RADIUS + RING_TUBE + 1);
       });
+      updateAgeSegments(AGE_GROUP_X + AGE_BAR_WIDTH + 1, false);
       return;
     }
 
@@ -259,6 +415,11 @@ function Demography3DScene({
       if (scannerGroupRef.current) {
         scannerGroupRef.current.visible = true;
         scannerGroupRef.current.position.x = -(RING_RADIUS + RING_TUBE + 0.28);
+      }
+
+      if (ageScannerGroupRef.current) {
+        ageScannerGroupRef.current.visible = true;
+        ageScannerGroupRef.current.position.x = -0.30;
       }
     }
 
@@ -299,6 +460,23 @@ function Demography3DScene({
       scannerGroupRef.current.visible = p < 1;
     }
 
+    // Age Distribution uses the same reconstruction timeline as the donut.
+    // Its beam travels across the stacked bars from left to right so the two
+    // demographic views read as one synchronized holographic transition.
+    const ageScanStart = AGE_GROUP_X - 0.10;
+    const ageScanEnd = AGE_GROUP_X + AGE_BAR_WIDTH + 0.10;
+    const ageScanX =
+      ageScanStart + (ageScanEnd - ageScanStart) * easedProgress;
+
+    if (ageScannerGroupRef.current) {
+      ageScannerGroupRef.current.position.x = ageScanX;
+      ageScannerGroupRef.current.visible = p < 1;
+    }
+
+    // Exactly like the donut: only the physical age-bar segments that are
+    // already behind the scanner are reconstructed into the incoming mode.
+    updateAgeSegments(ageScanX, true);
+
     // Keep the movement subtle; the spatial color wipe is now the hero effect.
     const lift = Math.sin(p * Math.PI) * 0.10;
     const tilt = Math.sin(p * Math.PI);
@@ -315,6 +493,7 @@ function Demography3DScene({
       ringSegmentRefs.current.forEach((mesh, index) => {
         setSegmentMaterial(mesh, index, 1, scanEnd);
       });
+      updateAgeSegments(ageScanEnd + 1, true);
 
       displayedModeRef.current = targetMode;
       setDisplayedMode(targetMode);
@@ -329,6 +508,7 @@ function Demography3DScene({
       transitionStartRef.current = null;
 
       if (scannerGroupRef.current) scannerGroupRef.current.visible = false;
+      if (ageScannerGroupRef.current) ageScannerGroupRef.current.visible = false;
     }
   });
 
@@ -672,39 +852,189 @@ function Demography3DScene({
         {isGender ? 'GENDER DISTRIBUTION' : 'PATIENT TYPE DISTRIBUTION'}
       </Text>
 
-      {/* holographic 3D age bars */}
-      <group position={[1.25, 0.55, 0]}>
-        {ageGroups.map((group, index) => {
+      {/* holographic 3D age bars — physically segmented so the incoming
+          perspective is reconstructed only behind the scanner, just like donut. */}
+      <group position={[AGE_GROUP_X, 0.55, 0]}>
+        {activeAgeBars.map(({ group, breakdown }, index) => {
           const y = 3.25 - index * 1.08;
-          const width = group.count > 0 ? Math.max(0.08, (group.count / maxAge) * 4.25) : 0;
+          const width = breakdown.total > 0
+            ? Math.max(0.08, (breakdown.total / maxAge) * AGE_BAR_WIDTH)
+            : 0;
+          const firstWidth = breakdown.total > 0
+            ? width * (breakdown.firstValue / breakdown.total)
+            : 0;
+          const groupPct = activeAgeTotal > 0
+            ? (breakdown.total / activeAgeTotal) * 100
+            : 0;
+          const firstPct = breakdown.total > 0
+            ? (breakdown.firstValue / breakdown.total) * 100
+            : 0;
+          const secondPct = breakdown.total > 0
+            ? (breakdown.secondValue / breakdown.total) * 100
+            : 0;
+
           return (
-            <group key={group.label}>
+            <group key={`age-row-${group.label}`}>
               <mesh position={[2.15, y, -0.28]}>
                 <boxGeometry args={[4.4, 0.42, 0.18]} />
-                <meshStandardMaterial color="#06233a" transparent opacity={0.55} metalness={0.5} roughness={0.35} />
+                <meshStandardMaterial
+                  color="#06233a"
+                  transparent
+                  opacity={0.55}
+                  metalness={0.5}
+                  roughness={0.35}
+                />
               </mesh>
-              {width > 0 && (
-                <mesh
-                  position={[width / 2, y, 0]}
-                  onPointerOver={(e) => { e.stopPropagation(); onHover({ title: group.label, value: group.count, percentage: group.percentage, color: group.color, type: 'age' }); cursor(true); }}
-                  onPointerOut={() => { onHover(null); cursor(false); }}
+
+              {Array.from({ length: AGE_SEGMENTS }, (_, segmentIndex) => {
+                const localX =
+                  ((segmentIndex + 0.5) / AGE_SEGMENTS) * AGE_BAR_WIDTH;
+                const segmentWidth = (AGE_BAR_WIDTH / AGE_SEGMENTS) * 1.04;
+                const visible = localX <= width;
+                const first = localX <= firstWidth;
+                const segmentColor = first
+                  ? breakdown.firstColor
+                  : breakdown.secondColor;
+
+                return (
+                  <mesh
+                    key={`age-segment-${group.label}-${segmentIndex}`}
+                    ref={(mesh) => {
+                      if (!ageSegmentRefs.current[index]) {
+                        ageSegmentRefs.current[index] = [];
+                      }
+                      ageSegmentRefs.current[index][segmentIndex] = mesh;
+                    }}
+                    position={[localX, y, 0]}
+                    visible={visible}
+                    onPointerOver={(e) => {
+                      e.stopPropagation();
+                      const firstSegment = localX <= firstWidth;
+                      onHover({
+                        title: `${group.label} · ${
+                          firstSegment
+                            ? breakdown.firstLabel
+                            : breakdown.secondLabel
+                        }`,
+                        value: firstSegment
+                          ? breakdown.firstValue
+                          : breakdown.secondValue,
+                        percentage: firstSegment ? firstPct : secondPct,
+                        color: firstSegment
+                          ? breakdown.firstColor
+                          : breakdown.secondColor,
+                        type: 'age',
+                      });
+                      cursor(true);
+                    }}
+                    onPointerOut={() => {
+                      onHover(null);
+                      cursor(false);
+                    }}
+                  >
+                    <boxGeometry args={[segmentWidth, 0.5, 0.55]} />
+                    <meshPhysicalMaterial
+                      color={segmentColor}
+                      emissive={segmentColor}
+                      emissiveIntensity={0.52}
+                      metalness={0.3}
+                      roughness={0.2}
+                      transparent
+                      opacity={visible ? 1 : 0}
+                    />
+                  </mesh>
+                );
+              })}
+
+              <Html
+                position={[-0.28, y, 0.28]}
+                center
+                style={{ pointerEvents: 'none' }}
+              >
+                <div
+                  style={{
+                    width: 58,
+                    color: '#a5f3fc',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    textAlign: 'right',
+                    transform: 'translateX(-30px)',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
-                  <boxGeometry args={[width, 0.5, 0.55]} />
-                  <meshPhysicalMaterial color={group.color} emissive={group.color} emissiveIntensity={0.52} metalness={0.3} roughness={0.2} />
-                </mesh>
-              )}
-              <Html position={[-0.28, y, 0.28]} center style={{ pointerEvents: 'none' }}>
-                <div style={{ width: 58, color: '#a5f3fc', fontSize: 10, fontWeight: 800, textAlign: 'right', transform: 'translateX(-30px)', whiteSpace: 'nowrap' }}>{group.label}</div>
+                  {group.label}
+                </div>
               </Html>
-              <Html position={[4.75, y, 0.2]} center style={{ pointerEvents: 'none' }}>
-                <div style={{ minWidth: 92, color: '#e6fbff', fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap' }}>
-                  {group.count.toLocaleString('id-ID')} <span style={{ color: '#67e8f9' }}>{group.percentage.toFixed(1)}%</span>
+
+              <Html
+                position={[4.75, y, 0.2]}
+                center
+                style={{ pointerEvents: 'none' }}
+              >
+                <div
+                  style={{
+                    minWidth: 118,
+                    color: '#e6fbff',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {breakdown.total.toLocaleString('id-ID')}{' '}
+                  <span style={{ color: '#67e8f9' }}>
+                    {groupPct.toFixed(1)}%
+                  </span>
                 </div>
               </Html>
             </group>
           );
         })}
       </group>
+
+      {/* Synchronized holographic scanner for Age Distribution.
+          It shares the donut reconstruction timeline and sweeps the stacked
+          age bars from left to right whenever the perspective changes. */}
+      <group ref={ageScannerGroupRef} visible={false} position={[AGE_GROUP_X - 0.10, 0, 0.72]}>
+        <mesh position={[0, 2.28, 0]}>
+          <planeGeometry args={[0.035, 4.25]} />
+          <meshBasicMaterial
+            color="#d8f5ff"
+            transparent
+            opacity={0.92}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        <mesh position={[0, 2.28, -0.035]}>
+          <planeGeometry args={[0.24, 4.50]} />
+          <meshBasicMaterial
+            color="#58c8ff"
+            transparent
+            opacity={0.16}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        <pointLight
+          position={[0, 2.30, 0.45]}
+          color="#8fddff"
+          intensity={5.2}
+          distance={2.1}
+        />
+      </group>
+
+      <Html position={[3.25, 4.34, 0.02]} center style={{ pointerEvents: 'none' }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', whiteSpace: 'nowrap', fontSize: 9, fontWeight: 800 }}>
+          <span style={{ color: ageModePalette.firstColor }}>
+            ● {ageModePalette.firstLabel}
+          </span>
+          <span style={{ color: ageModePalette.secondColor }}>
+            ● {ageModePalette.secondLabel}
+          </span>
+        </div>
+      </Html>
 
       <Text position={[3.25, 4.72, -0.15]} fontSize={0.25} color="#a5f3fc" anchorX="center">AGE DISTRIBUTION</Text>
       <mesh position={[0, 2.45, -0.15]}>
@@ -746,12 +1076,35 @@ export default function DemographyChart({
   donutMode: controlledDonutMode,
   onDonutModeChange,
 }: DemographyChartProps) {
-  const { theme, isLight } = useTheme();
+  const { theme, isLight, isSolaris } = useTheme();
   const [hover3D, setHover3D] = useState<Hover3D | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [autoRotate, setAutoRotate] = useState(true);
   const [showPeriodFilter, setShowPeriodFilter] = useState(false);
   const [internalDonutMode, setInternalDonutMode] = useState<DemographyDonutMode>('gender');
+  const [ageTransitionToken, setAgeTransitionToken] = useState(0);
+  const [ageTransitionActive, setAgeTransitionActive] = useState(false);
+  const [compactPreviousMode, setCompactPreviousMode] = useState<DemographyDonutMode>(
+    controlledDonutMode ?? 'gender'
+  );
+  const ageTransitionTimerRef = useRef<number | null>(null);
+  const previousCompactModeRef = useRef<DemographyDonutMode>(
+    controlledDonutMode ?? 'gender'
+  );
+  const sceneTheme = isSolaris
+    ? {
+        ...theme.three,
+        background: '#5f97cb',
+        fog: '#91c8e8',
+        floor: '#24527f',
+        gridPrimary: '#a8e2ff',
+        gridSecondary: '#4f7fb0',
+        wall: '#78afd7',
+        wallSecondary: '#6f96c9',
+        wallAccent: '#5875bd',
+        ambientIntensity: 1.45,
+      }
+    : theme.three;
 
   const donutMode = controlledDonutMode ?? internalDonutMode;
   const setDonutMode = (mode: DemographyDonutMode) => {
@@ -760,6 +1113,36 @@ export default function DemographyChart({
     else setInternalDonutMode(mode);
   };
 
+  // Compact Age Distribution uses the same visual language as the 3D donut:
+  // a short holographic beam sweeps across the stacked bars on every mode change.
+  useEffect(() => {
+    if (previousCompactModeRef.current === donutMode) return;
+
+    const outgoingMode = previousCompactModeRef.current;
+    setCompactPreviousMode(outgoingMode);
+    previousCompactModeRef.current = donutMode;
+
+    setAgeTransitionToken((value) => value + 1);
+    setAgeTransitionActive(true);
+
+    if (ageTransitionTimerRef.current !== null) {
+      window.clearTimeout(ageTransitionTimerRef.current);
+    }
+
+    ageTransitionTimerRef.current = window.setTimeout(() => {
+      setAgeTransitionActive(false);
+      setCompactPreviousMode(donutMode);
+      ageTransitionTimerRef.current = null;
+    }, 1150);
+
+    return () => {
+      if (ageTransitionTimerRef.current !== null) {
+        window.clearTimeout(ageTransitionTimerRef.current);
+        ageTransitionTimerRef.current = null;
+      }
+    };
+  }, [donutMode]);
+
   const { genderData, patientTypeData, ageGroups } = useMemo(() => {
     const raw = demographicData || [];
     let maleCount = 0;
@@ -767,6 +1150,12 @@ export default function DemographyChart({
     let newPatientCount = 0;
     let returningPatientCount = 0;
     const ageCounts = { '> 65': 0, '45 - 65': 0, '25 - 44': 0, '< 25': 0 };
+    const ageSplitCounts = {
+      '> 65': { male: 0, female: 0, newPatient: 0, returningPatient: 0 },
+      '45 - 65': { male: 0, female: 0, newPatient: 0, returningPatient: 0 },
+      '25 - 44': { male: 0, female: 0, newPatient: 0, returningPatient: 0 },
+      '< 25': { male: 0, female: 0, newPatient: 0, returningPatient: 0 },
+    };
 
     raw.forEach(item => {
       const sex = (item.Sex || '').trim().toUpperCase();
@@ -784,10 +1173,15 @@ export default function DemographyChart({
       else returningPatientCount++;
 
       const age = Number(item.AgeInYear) || 0;
-      if (age > 65) ageCounts['> 65']++;
-      else if (age >= 45) ageCounts['45 - 65']++;
-      else if (age >= 25) ageCounts['25 - 44']++;
-      else ageCounts['< 25']++;
+      const ageKey: keyof typeof ageCounts =
+        age > 65 ? '> 65' : age >= 45 ? '45 - 65' : age >= 25 ? '25 - 44' : '< 25';
+
+      ageCounts[ageKey]++;
+      if (sex === 'M' || sex === 'L') ageSplitCounts[ageKey].male++;
+      else if (sex === 'F' || sex === 'P') ageSplitCounts[ageKey].female++;
+
+      if (isNewPatient) ageSplitCounts[ageKey].newPatient++;
+      else ageSplitCounts[ageKey].returningPatient++;
     });
 
     // Tidak ada lagi fallback/dummy data.
@@ -812,10 +1206,10 @@ export default function DemographyChart({
         { name: 'Returning', value: hasData ? returningPatientCount : 0, color: '#34d399' },
       ],
       ageGroups: [
-        { label: '> 65', count: count65, percentage: totalAge > 0 ? (count65 / totalAge) * 100 : 0, color: '#22d3ee' },
-        { label: '45 - 65', count: count45, percentage: totalAge > 0 ? (count45 / totalAge) * 100 : 0, color: '#38bdf8' },
-        { label: '25 - 44', count: count25, percentage: totalAge > 0 ? (count25 / totalAge) * 100 : 0, color: '#818cf8' },
-        { label: '< 25', count: countUnder25, percentage: totalAge > 0 ? (countUnder25 / totalAge) * 100 : 0, color: '#ec4899' },
+        { label: '> 65', count: count65, percentage: totalAge > 0 ? (count65 / totalAge) * 100 : 0, color: '#22d3ee', ...(hasData ? ageSplitCounts['> 65'] : { male: 0, female: 0, newPatient: 0, returningPatient: 0 }) },
+        { label: '45 - 65', count: count45, percentage: totalAge > 0 ? (count45 / totalAge) * 100 : 0, color: '#38bdf8', ...(hasData ? ageSplitCounts['45 - 65'] : { male: 0, female: 0, newPatient: 0, returningPatient: 0 }) },
+        { label: '25 - 44', count: count25, percentage: totalAge > 0 ? (count25 / totalAge) * 100 : 0, color: '#818cf8', ...(hasData ? ageSplitCounts['25 - 44'] : { male: 0, female: 0, newPatient: 0, returningPatient: 0 }) },
+        { label: '< 25', count: countUnder25, percentage: totalAge > 0 ? (countUnder25 / totalAge) * 100 : 0, color: '#ec4899', ...(hasData ? ageSplitCounts['< 25'] : { male: 0, female: 0, newPatient: 0, returningPatient: 0 }) },
       ] as AgeGroup[],
     };
   }, [demographicData, isLoaded]);
@@ -831,6 +1225,24 @@ export default function DemographyChart({
   const totalPatientType = totalNewPatient + totalReturningPatient;
   const newPatientPct = totalPatientType > 0 ? (totalNewPatient / totalPatientType) * 100 : 0;
   const returningPatientPct = totalPatientType > 0 ? (totalReturningPatient / totalPatientType) * 100 : 0;
+
+  const activeAgeBreakdowns = ageGroups.map((group) => ({
+    group,
+    breakdown: getAgeBreakdown(group, donutMode),
+  }));
+  const activeAgeTotal = activeAgeBreakdowns.reduce(
+    (sum, { breakdown }) => sum + breakdown.total,
+    0
+  );
+
+  const previousAgeBreakdowns = ageGroups.map((group) => ({
+    group,
+    breakdown: getAgeBreakdown(group, compactPreviousMode),
+  }));
+  const previousAgeTotal = previousAgeBreakdowns.reduce(
+    (sum, { breakdown }) => sum + breakdown.total,
+    0
+  );
 
   const activeDonutData = donutMode === 'gender' ? genderData : patientTypeData;
   const activeDonutTotal = activeDonutData.reduce((sum, item) => sum + item.value, 0);
@@ -851,7 +1263,7 @@ export default function DemographyChart({
   if (isFullscreen) {
     return (
       <div
-        className="w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative"
+        className="daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative"
         style={{
           background: 'var(--core-bg-secondary)',
           borderColor: 'var(--core-border)',
@@ -1103,7 +1515,7 @@ export default function DemographyChart({
                   onHover={setHover3D}
                   autoRotate={autoRotate}
                   onInteractionStart={() => setAutoRotate(false)}
-                  sceneTheme={theme.three}
+                  sceneTheme={sceneTheme}
                   isLight={isLight}
                 />
               </Canvas>
@@ -1134,7 +1546,13 @@ export default function DemographyChart({
             >
               <div className="flex items-center justify-between border-b border-cyan-300/20 pb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-cyan-200">
-                  {hover3D.type === 'gender' ? 'Gender' : hover3D.type === 'patient_type' ? 'Patient Type' : 'Age Group'}
+                  {hover3D.type === 'gender'
+                    ? 'Gender'
+                    : hover3D.type === 'patient_type'
+                    ? 'Patient Type'
+                    : donutMode === 'gender'
+                    ? 'Age / Gender'
+                    : 'Age / Patient Type'}
                 </span>
                 <span
                   className="h-2.5 w-2.5 rounded-full"
@@ -1238,7 +1656,7 @@ export default function DemographyChart({
 
   return (
     <div
-      className="border rounded-xl p-3 flex flex-col justify-between backdrop-blur-sm relative group h-full min-h-0 overflow-hidden"
+      className="daily-themed-card border rounded-xl p-3 flex flex-col justify-between backdrop-blur-sm relative group h-full min-h-0 overflow-hidden"
       style={{
         background: 'var(--core-panel)',
         borderColor: 'var(--core-border)',
@@ -1324,17 +1742,160 @@ export default function DemographyChart({
           )}
         </div>
 
-        <div className="space-y-2.5 pr-1 min-w-0">
-          <div className="flex items-center justify-between pb-1"><span className="text-[9px] font-bold uppercase tracking-[0.14em] text-cyan-400">Dist by age</span><span className="text-[8px] text-slate-500">COUNT / SHARE</span></div>
-          {ageGroups.map(group => (
-            <div key={group.label} className="space-y-1">
-              <div className="flex justify-between gap-3 text-[9px]"><span className="text-cyan-100 font-semibold">{group.label}</span><span className="text-white font-bold whitespace-nowrap">{group.count.toLocaleString('id-ID')} <span className="text-cyan-400 font-normal">{group.percentage.toFixed(1)}%</span></span></div>
-              <div className="relative w-full h-2.5 bg-[#001428] rounded-sm overflow-hidden border border-[#2587C8]/25">
-                <div className="absolute inset-y-0 left-0 rounded-sm transition-all duration-700" style={{ width: `${Math.max(group.count > 0 ? 2 : 0, group.percentage)}%`, background: `linear-gradient(90deg, ${group.color}88, ${group.color})`, boxShadow: `0 0 10px ${group.color}66` }} />
-                <div className="absolute inset-y-0 left-1/4 w-px bg-white/5" /><div className="absolute inset-y-0 left-1/2 w-px bg-white/5" /><div className="absolute inset-y-0 left-3/4 w-px bg-white/5" />
+        <div className="relative space-y-2.5 pr-1 min-w-0 overflow-hidden">
+          {ageTransitionActive && (
+            <div
+              key={`age-scan-${ageTransitionToken}`}
+              className="demography-age-mode-scan pointer-events-none absolute inset-y-0 z-30 w-[3px] bg-gradient-to-b from-transparent via-sky-200 to-transparent shadow-[0_0_10px_rgba(56,189,248,.95),0_0_22px_rgba(99,102,241,.32)]"
+              aria-hidden="true"
+            >
+              <div className="absolute left-1/2 top-1/2 h-[88%] w-12 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent blur-md" />
+            </div>
+          )}
+          <style>{`
+            @keyframes demographyAgeModeScan {
+              0% { left: -5%; opacity: 0; transform: scaleY(.78); }
+              7% { opacity: 1; }
+              90% { opacity: .96; }
+              100% { left: 101%; opacity: 0; transform: scaleY(1); }
+            }
+            @keyframes demographyAgeModeReveal {
+              0% { clip-path: inset(0 100% 0 0); }
+              100% { clip-path: inset(0 0 0 0); }
+            }
+            .demography-age-mode-scan {
+              animation: demographyAgeModeScan 1.08s cubic-bezier(.22,.61,.36,1) both;
+            }
+            .demography-age-mode-new-layer {
+              animation: demographyAgeModeReveal 1.08s cubic-bezier(.22,.61,.36,1) both;
+              will-change: clip-path;
+            }
+          `}</style>
+          <div className="flex items-start justify-between gap-3 pb-1">
+            <div>
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-cyan-400">Dist by age</span>
+              <div className="mt-1 flex items-center gap-3 text-[7px] font-bold uppercase tracking-[0.10em]">
+                <span style={{ color: donutMode === 'gender' ? '#818cf8' : '#22d3ee' }}>
+                  ● {donutMode === 'gender' ? 'Male' : 'New'}
+                </span>
+                <span style={{ color: donutMode === 'gender' ? '#ec4899' : '#34d399' }}>
+                  ● {donutMode === 'gender' ? 'Female' : 'Returning'}
+                </span>
               </div>
             </div>
-          ))}
+            <span className="text-[8px] text-slate-500">COUNT / SHARE</span>
+          </div>
+
+          {activeAgeBreakdowns.map(({ group, breakdown }, rowIndex) => {
+            const groupShare =
+              activeAgeTotal > 0
+                ? (breakdown.total / activeAgeTotal) * 100
+                : 0;
+            const firstWidth =
+              activeAgeTotal > 0
+                ? (breakdown.firstValue / activeAgeTotal) * 100
+                : 0;
+            const secondWidth =
+              activeAgeTotal > 0
+                ? (breakdown.secondValue / activeAgeTotal) * 100
+                : 0;
+
+            const previousBreakdown =
+              previousAgeBreakdowns[rowIndex]?.breakdown ?? breakdown;
+            const previousFirstWidth =
+              previousAgeTotal > 0
+                ? (previousBreakdown.firstValue / previousAgeTotal) * 100
+                : 0;
+            const previousSecondWidth =
+              previousAgeTotal > 0
+                ? (previousBreakdown.secondValue / previousAgeTotal) * 100
+                : 0;
+
+            const renderBarLayers = (
+              item: ReturnType<typeof getAgeBreakdown>,
+              first: number,
+              second: number
+            ) => (
+              <>
+                {first > 0 && (
+                  <div
+                    className="absolute inset-y-0 left-0"
+                    title={`${item.firstLabel}: ${item.firstValue.toLocaleString('id-ID')}`}
+                    style={{
+                      width: `${first}%`,
+                      background: `linear-gradient(90deg, ${item.firstColor}aa, ${item.firstColor})`,
+                      boxShadow: `0 0 9px ${item.firstColor}55`,
+                    }}
+                  />
+                )}
+                {second > 0 && (
+                  <div
+                    className="absolute inset-y-0"
+                    title={`${item.secondLabel}: ${item.secondValue.toLocaleString('id-ID')}`}
+                    style={{
+                      left: `${first}%`,
+                      width: `${second}%`,
+                      background: `linear-gradient(90deg, ${item.secondColor}aa, ${item.secondColor})`,
+                      boxShadow: `0 0 9px ${item.secondColor}55`,
+                    }}
+                  />
+                )}
+              </>
+            );
+
+            return (
+              <div key={`age-compact-${group.label}`} className="space-y-1">
+                <div className="flex justify-between gap-3 text-[9px]">
+                  <span className="text-cyan-100 font-semibold">
+                    {group.label}
+                  </span>
+                  <span className="text-white font-bold whitespace-nowrap">
+                    {breakdown.total.toLocaleString('id-ID')}
+                    <span className="ml-1 text-cyan-400 font-normal">
+                      {groupShare.toFixed(1)}%
+                    </span>
+                  </span>
+                </div>
+
+                <div className="relative w-full h-2.5 bg-[#001428] rounded-sm overflow-hidden border border-[#2587C8]/25">
+                  {ageTransitionActive ? (
+                    <>
+                      {/* Outgoing mode remains visible ahead of the scanner. */}
+                      <div className="absolute inset-0">
+                        {renderBarLayers(
+                          previousBreakdown,
+                          previousFirstWidth,
+                          previousSecondWidth
+                        )}
+                      </div>
+
+                      {/* Incoming mode is revealed only behind the scanner. */}
+                      <div
+                        key={`age-reveal-${ageTransitionToken}-${group.label}`}
+                        className="demography-age-mode-new-layer absolute inset-0 overflow-hidden"
+                      >
+                        {renderBarLayers(
+                          breakdown,
+                          firstWidth,
+                          secondWidth
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    renderBarLayers(
+                      breakdown,
+                      firstWidth,
+                      secondWidth
+                    )
+                  )}
+
+                  <div className="absolute inset-y-0 left-1/4 w-px bg-white/5" />
+                  <div className="absolute inset-y-0 left-1/2 w-px bg-white/5" />
+                  <div className="absolute inset-y-0 left-3/4 w-px bg-white/5" />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
       ) : (

@@ -282,6 +282,7 @@ function MetricCard({
   return (
     <div
       className={`
+        management-metric-card
         relative
         overflow-hidden
         rounded-xl
@@ -549,6 +550,17 @@ export default function UserManagement(
   const [groupError, setGroupError] =
     useState('');
 
+  const [profileEditing, setProfileEditing] =
+    useState(false);
+  const [profileDisplayName, setProfileDisplayName] =
+    useState('');
+  const [profileEmail, setProfileEmail] =
+    useState('');
+  const [profileSaving, setProfileSaving] =
+    useState(false);
+  const [profileError, setProfileError] =
+    useState('');
+
   const [
     toast,
     setToast,
@@ -754,6 +766,143 @@ export default function UserManagement(
       );
     };
   }, [actionMenuId]);
+
+  useEffect(() => {
+    if (!selectedUser) {
+      setProfileEditing(false);
+      setProfileDisplayName('');
+      setProfileEmail('');
+      setProfileError('');
+      return;
+    }
+
+    setProfileEditing(false);
+    setProfileDisplayName(selectedUser.display_name || '');
+    setProfileEmail(selectedUser.email || '');
+    setProfileError('');
+  }, [selectedUser?.user_id]);
+
+  const saveUserProfile = async () => {
+    if (!selectedUser || profileSaving) {
+      return;
+    }
+
+    const displayName = profileDisplayName.trim();
+    const email = profileEmail.trim();
+
+    if (!displayName) {
+      setProfileError('Display name wajib diisi.');
+      return;
+    }
+
+    if (displayName.length > 200) {
+      setProfileError('Display name maksimal 200 karakter.');
+      return;
+    }
+
+    if (!email) {
+      setProfileError('Email wajib diisi agar password recovery dapat digunakan.');
+      return;
+    }
+
+    if (
+      email.length > 320 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      setProfileError('Format email tidak valid.');
+      return;
+    }
+
+    setProfileSaving(true);
+    setProfileError('');
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/management/users/${selectedUser.user_id}/profile`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            display_name: displayName,
+            email,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success || !result.user) {
+        throw new Error(
+          result.message || 'Gagal memperbarui profil user.'
+        );
+      }
+
+      const updatedUser: ManagedUser = {
+        ...selectedUser,
+        ...result.user,
+        voice_enrolled: selectedUser.voice_enrolled,
+        voice_profile_id: selectedUser.voice_profile_id,
+        voice_sample_count: selectedUser.voice_sample_count,
+        voice_threshold: selectedUser.voice_threshold,
+        voice_model_name: selectedUser.voice_model_name,
+        voice_model_version: selectedUser.voice_model_version,
+      };
+
+      setSelectedUser(updatedUser);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.user_id === updatedUser.user_id
+            ? { ...item, ...updatedUser }
+            : item
+        )
+      );
+      setProfileDisplayName(updatedUser.display_name || '');
+      setProfileEmail(updatedUser.email || '');
+      setProfileEditing(false);
+      setToast(`${updatedUser.display_name} berhasil diperbarui.`);
+
+      // Keep the current browser identity label in sync when an admin edits
+      // their own account. Password/access data are not changed here.
+      try {
+        const raw = localStorage.getItem('core_authenticated_user');
+        if (raw) {
+          const session = JSON.parse(raw);
+          if (session?.user_id === updatedUser.user_id) {
+            localStorage.setItem(
+              'core_authenticated_user',
+              JSON.stringify({
+                ...session,
+                display_name: updatedUser.display_name,
+                email: updatedUser.email,
+              })
+            );
+          }
+        }
+      } catch {
+        // Profile update remains successful even if local UI persistence fails.
+      }
+
+      await loadUsers();
+    } catch (err) {
+      setProfileError(
+        err instanceof Error
+          ? err.message
+          : 'Gagal memperbarui profil user.'
+      );
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const cancelProfileEdit = () => {
+    if (!selectedUser || profileSaving) return;
+    setProfileDisplayName(selectedUser.display_name || '');
+    setProfileEmail(selectedUser.email || '');
+    setProfileError('');
+    setProfileEditing(false);
+  };
 
   const loadUserAccess = useCallback(
     async (userId: string) => {
@@ -1098,8 +1247,8 @@ export default function UserManagement(
     'register'
   ) {
     return (
-      <div className="h-full min-h-0 w-full overflow-y-auto">
-        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-cyan-400/15 bg-[#010817]/88 px-3 py-2 backdrop-blur-xl sm:px-4">
+      <div className="management-themed-root user-management-root h-full min-h-0 w-full overflow-y-auto">
+        <div className="management-page-header sticky top-0 z-20 flex items-center justify-between border-b border-cyan-400/15 bg-[#010817]/88 px-3 py-2 backdrop-blur-xl sm:px-4">
           <button
             type="button"
             onClick={
@@ -1126,7 +1275,7 @@ export default function UserManagement(
   }
 
   return (
-    <div className="relative h-full min-h-0 w-full overflow-hidden text-slate-200">
+    <div className="management-themed-root user-management-root relative h-full min-h-0 w-full overflow-hidden text-slate-200">
       <div
         className="
           absolute
@@ -1138,7 +1287,7 @@ export default function UserManagement(
 
       <div className="relative flex h-full min-h-0 flex-col">
         {/* HEADER */}
-        <div className="flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="management-page-header flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="text-[10px] font-black tracking-[0.22em] text-cyan-400 uppercase">
               CoreAnalytics · Management Center
@@ -1237,7 +1386,7 @@ export default function UserManagement(
           </div>
 
           {/* TOOLBAR */}
-          <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-sky-500/15 bg-[#04101f]/48 p-2.5 backdrop-blur-md lg:flex-row lg:items-center">
+          <div className="management-toolbar mt-3 flex flex-col gap-2.5 rounded-xl border border-sky-500/15 bg-[#04101f]/48 p-2.5 backdrop-blur-md lg:flex-row lg:items-center">
             <div className="relative min-w-0 flex-1">
               <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-500">
                 <SearchIcon />
@@ -1252,8 +1401,8 @@ export default function UserManagement(
                     e.target.value
                   )
                 }
-                placeholder="Search display name or username..."
-                className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
+                placeholder="Search display name, username, or email..."
+                className="management-input h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
               />
             </div>
 
@@ -1324,7 +1473,7 @@ export default function UserManagement(
           )}
 
           {/* TABLE PANEL */}
-          <div className="mt-3 overflow-hidden rounded-xl border border-sky-500/15 bg-[#020b17]/52 shadow-[0_12px_40px_rgba(0,0,0,.16)] backdrop-blur-md">
+          <div className="management-table-shell mt-3 overflow-hidden rounded-xl border border-sky-500/15 bg-[#020b17]/52 shadow-[0_12px_40px_rgba(0,0,0,.16)] backdrop-blur-md">
             <div className="flex items-center justify-between border-b border-sky-500/12 px-3 py-2.5">
               <div>
                 <div className="text-[11px] font-black tracking-[0.16em] text-cyan-100 uppercase">
@@ -1352,7 +1501,7 @@ export default function UserManagement(
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full min-w-[840px] border-collapse">
                 <thead>
-                  <tr className="border-b border-sky-500/10 bg-[#061322]/45 text-left">
+                  <tr className="management-table-head border-b border-sky-500/10 bg-[#061322]/45 text-left">
                     <th className="px-4 py-3 text-[10px] font-black tracking-[0.15em] text-slate-500 uppercase">
                       User
                     </th>
@@ -1517,7 +1666,7 @@ export default function UserManagement(
                                 ) =>
                                   event.stopPropagation()
                                 }
-                                className="absolute right-8 top-9 z-30 w-44 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#020b17]/98 p-1.5 text-left shadow-[0_16px_45px_rgba(0,0,0,.62)] backdrop-blur-xl"
+                                className="management-floating-surface absolute right-8 top-9 z-30 w-44 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#020b17]/98 p-1.5 text-left shadow-[0_16px_45px_rgba(0,0,0,.62)] backdrop-blur-xl"
                               >
                                 <button
                                   type="button"
@@ -1752,7 +1901,7 @@ export default function UserManagement(
               )}
 
             {/* PAGINATION */}
-            <div className="flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="management-table-footer flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-[10px] tracking-[0.08em] text-slate-500">
                 <span>
                   Page{' '}
@@ -1783,7 +1932,7 @@ export default function UserManagement(
                       )
                     );
                   }}
-                  className="rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[10px] text-slate-400 outline-none"
+                  className="management-input rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[10px] text-slate-400 outline-none"
                 >
                   <option value={10}>
                     10 / page
@@ -1851,7 +2000,7 @@ export default function UserManagement(
           <button
             type="button"
             aria-label="Close user detail"
-            className="absolute inset-0 bg-[#00050a]/55 backdrop-blur-[2px]"
+            className="management-overlay absolute inset-0 bg-[#00050a]/55 backdrop-blur-[2px]"
             onClick={() =>
               setSelectedUser(
                 null
@@ -1859,7 +2008,7 @@ export default function UserManagement(
             }
           />
 
-          <aside className="relative z-10 flex h-full w-full max-w-[420px] flex-col border-l border-cyan-400/20 bg-[#020b17]/96 shadow-[-20px_0_60px_rgba(0,0,0,.48)] backdrop-blur-xl">
+          <aside className="management-drawer relative z-10 flex h-full w-full max-w-[740px] flex-col border-l border-cyan-400/20 bg-[#020b17]/96 shadow-[-20px_0_60px_rgba(0,0,0,.48)] backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-cyan-400/15 px-4 py-3">
               <div>
                 <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">
@@ -1938,32 +2087,154 @@ export default function UserManagement(
               </div>
 
               <div className="mt-5 rounded-xl border border-sky-500/15 bg-[#061322]/45 p-3">
-                <div className="text-[10px] font-black tracking-[0.16em] text-slate-500 uppercase">
-                  Account Identity
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-black tracking-[0.16em] text-slate-500 uppercase">
+                      Account Identity
+                    </div>
+                    <div className="mt-1 text-[10px] text-slate-600">
+                      Username tetap read-only. Display name dan email dapat diperbarui.
+                    </div>
+                  </div>
+
+                  {!profileEditing ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileDisplayName(selectedUser.display_name || '');
+                        setProfileEmail(selectedUser.email || '');
+                        setProfileError('');
+                        setProfileEditing(true);
+                      }}
+                      className="shrink-0 rounded-lg border border-cyan-400/25 bg-cyan-950/20 px-3 py-2 text-[10px] font-black tracking-[0.12em] text-cyan-200 uppercase transition hover:border-cyan-300/45 hover:bg-cyan-950/35"
+                    >
+                      Edit Profile
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={profileSaving}
+                      onClick={cancelProfileEdit}
+                      className="shrink-0 rounded-lg border border-slate-600/20 bg-slate-900/20 px-3 py-2 text-[10px] font-black tracking-[0.12em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40"
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
 
-                <dl className="mt-3 grid gap-3">
-                  <div>
-                    <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
-                      User ID
-                    </dt>
-                    <dd className="mt-1 break-all font-mono text-[11px] text-slate-300">
-                      {
-                        selectedUser.user_id
-                      }
-                    </dd>
-                  </div>
+                {profileEditing ? (
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-[9px] font-black tracking-[0.12em] text-slate-500 uppercase">
+                        Username
+                      </span>
+                      <input
+                        value={selectedUser.username}
+                        readOnly
+                        className="mt-1.5 h-10 w-full cursor-not-allowed rounded-lg border border-slate-700/25 bg-slate-950/30 px-3 font-mono text-[11px] text-slate-500 outline-none"
+                      />
+                    </label>
 
-                  <div>
-                    <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
-                      Email
-                    </dt>
-                    <dd className="mt-1 break-all text-[11px] text-slate-400">
-                      {selectedUser.email || '—'}
-                    </dd>
-                  </div>
+                    <label className="block">
+                      <span className="text-[9px] font-black tracking-[0.12em] text-slate-500 uppercase">
+                        Display Name
+                      </span>
+                      <input
+                        value={profileDisplayName}
+                        onChange={(event) =>
+                          setProfileDisplayName(event.target.value)
+                        }
+                        disabled={profileSaving}
+                        maxLength={200}
+                        autoComplete="name"
+                        className="management-input mt-1.5 h-10 w-full rounded-lg border border-cyan-400/20 bg-[#020b17]/80 px-3 text-[12px] text-cyan-50 outline-none transition focus:border-cyan-300/50 focus:shadow-[0_0_14px_rgba(34,211,238,.06)] disabled:opacity-50"
+                      />
+                    </label>
 
-                  <div className="grid grid-cols-2 gap-3">
+                    <label className="block sm:col-span-2">
+                      <span className="text-[9px] font-black tracking-[0.12em] text-slate-500 uppercase">
+                        Email
+                      </span>
+                      <input
+                        type="email"
+                        value={profileEmail}
+                        onChange={(event) =>
+                          setProfileEmail(event.target.value)
+                        }
+                        disabled={profileSaving}
+                        maxLength={320}
+                        autoComplete="email"
+                        placeholder="name@company.com"
+                        className="management-input mt-1.5 h-10 w-full rounded-lg border border-cyan-400/20 bg-[#020b17]/80 px-3 text-[12px] text-cyan-50 outline-none transition placeholder:text-slate-700 focus:border-cyan-300/50 focus:shadow-[0_0_14px_rgba(34,211,238,.06)] disabled:opacity-50"
+                      />
+                      <span className="mt-1.5 block text-[9px] leading-relaxed text-slate-600">
+                        Email ini digunakan untuk password recovery / OTP.
+                      </span>
+                    </label>
+
+                    <div className="sm:col-span-2">
+                      <div className="text-[9px] font-black tracking-[0.12em] text-slate-500 uppercase">
+                        User ID
+                      </div>
+                      <div className="mt-1.5 break-all rounded-lg border border-slate-700/20 bg-slate-950/20 px-3 py-2.5 font-mono text-[10px] text-slate-500">
+                        {selectedUser.user_id}
+                      </div>
+                    </div>
+
+                    {profileError && (
+                      <div className="sm:col-span-2 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2.5 text-[11px] leading-relaxed text-rose-300">
+                        {profileError}
+                      </div>
+                    )}
+
+                    <div className="flex justify-end gap-2 sm:col-span-2">
+                      <button
+                        type="button"
+                        disabled={profileSaving}
+                        onClick={cancelProfileEdit}
+                        className="rounded-lg border border-slate-600/20 bg-slate-900/20 px-4 py-2.5 text-[10px] font-black tracking-[0.12em] text-slate-400 uppercase transition hover:text-slate-200 disabled:opacity-40"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        disabled={profileSaving}
+                        onClick={saveUserProfile}
+                        className="rounded-lg border border-cyan-300/35 bg-cyan-500/10 px-4 py-2.5 text-[10px] font-black tracking-[0.12em] text-cyan-100 uppercase transition hover:border-cyan-200/55 hover:bg-cyan-500/15 disabled:opacity-40"
+                      >
+                        {profileSaving ? 'Saving Profile...' : 'Save Profile'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
+                        Username
+                      </dt>
+                      <dd className="mt-1 font-mono text-[11px] text-slate-300">
+                        @{selectedUser.username}
+                      </dd>
+                    </div>
+
+                    <div>
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
+                        Email
+                      </dt>
+                      <dd className="mt-1 break-all text-[11px] text-slate-400">
+                        {selectedUser.email || '—'}
+                      </dd>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
+                        User ID
+                      </dt>
+                      <dd className="mt-1 break-all font-mono text-[10px] text-slate-500">
+                        {selectedUser.user_id}
+                      </dd>
+                    </div>
+
                     <div>
                       <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                         Failed Login
@@ -1980,17 +2251,13 @@ export default function UserManagement(
                         {formatDate(selectedUser.locked_at)}
                       </dd>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <dt className="text-[9px] tracking-[0.12em] text-slate-500 uppercase">
                         Created
                       </dt>
                       <dd className="mt-1 text-[11px] text-slate-400">
-                        {formatDate(
-                          selectedUser.created_at
-                        )}
+                        {formatDate(selectedUser.created_at)}
                       </dd>
                     </div>
 
@@ -1999,13 +2266,11 @@ export default function UserManagement(
                         Last Update
                       </dt>
                       <dd className="mt-1 text-[11px] text-slate-400">
-                        {formatDate(
-                          selectedUser.updated_at
-                        )}
+                        {formatDate(selectedUser.updated_at)}
                       </dd>
                     </div>
-                  </div>
-                </dl>
+                  </dl>
+                )}
               </div>
 
               <div className="mt-3 rounded-xl border border-violet-400/15 bg-violet-950/[0.08] p-3">
@@ -2261,8 +2526,8 @@ export default function UserManagement(
 
       {/* CONFIRM STATUS MODAL */}
       {statusTarget && (
-        <div className="absolute inset-0 z-[100] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-[420px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
+        <div className="management-overlay absolute inset-0 z-[100] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
+          <div className="management-modal w-full max-w-[420px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
             <div className="border-b border-cyan-400/12 px-4 py-3">
               <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">
                 Confirm Account Status

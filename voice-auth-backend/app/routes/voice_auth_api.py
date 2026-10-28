@@ -10,6 +10,7 @@ from flask import (
     request,
 )
 
+from app.services.auth_service import get_user_access_profile
 from app.services.identification_service import (
     identification_service,
 )
@@ -89,6 +90,31 @@ def identify_voice():
         )
 
         if decision == "VERIFIED":
+            try:
+                user = result.get("user")
+                user_id = (
+                    user.get("user_id")
+                    if isinstance(user, dict)
+                    else None
+                )
+                if (
+                    result.get("success") is not True
+                    or not isinstance(user_id, str)
+                    or not user_id.strip()
+                ):
+                    raise ValueError("Verified voice identity is invalid.")
+
+                result["access"] = get_user_access_profile(user_id.strip())
+            except Exception:
+                return jsonify({
+                    "success": False,
+                    "decision": "ERROR",
+                    "code": "AUTH_ACCESS_ERROR",
+                    "message": "User authorization profile could not be loaded.",
+                    "user": None,
+                    "access": None,
+                }), 502
+
             status_code = 200
 
         elif decision in {

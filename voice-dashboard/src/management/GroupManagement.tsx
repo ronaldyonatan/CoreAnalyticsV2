@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const API_BASE =
   import.meta.env.VITE_VOICE_API_URL ||
@@ -120,6 +121,15 @@ function groupInitials(name?: string) {
   return (parts[0]?.slice(0, 2) || '?').toUpperCase();
 }
 
+function generatedGroupCode(name: string) {
+  return name.toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_+|_+$/g, '')
+    .slice(0, 50).replace(/_+$/g, '') || 'GROUP';
+}
+
+function duplicateGroupCodeMessage(code: string) {
+  return `Group code '${code}' already exists. Please use a different group code.`;
+}
+
 function MetricCard({
   label,
   value,
@@ -155,7 +165,7 @@ function MetricCard({
   const style = accents[accent];
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border bg-[#04101f]/55 px-4 py-3.5 backdrop-blur-md ${style.ring} ${style.glow}`}>
+    <div className={`management-metric-card relative overflow-hidden rounded-xl border bg-[#04101f]/55 px-4 py-3.5 backdrop-blur-md ${style.ring} ${style.glow}`}>
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -188,23 +198,30 @@ function GroupFormModal({
   mode,
   group,
   busy,
+  error,
+  knownGroups,
   onClose,
   onSave,
 }: {
   mode: 'create' | 'edit';
   group: ManagedGroup | null;
   busy: boolean;
+  error: string;
+  knownGroups: ManagedGroup[];
   onClose: () => void;
-  onSave: (groupName: string, description: string) => Promise<void>;
+  onSave: (groupName: string, description: string, groupCode?: string) => Promise<void>;
 }) {
   const [groupName, setGroupName] = useState(group?.group_name || '');
   const [description, setDescription] = useState(group?.description || '');
   const [localError, setLocalError] = useState('');
+  const [groupCode, setGroupCode] = useState<string | null>(null);
+  const effectiveCode = mode === 'edit' ? group?.group_code || '' : groupCode ?? generatedGroupCode(groupName);
 
   useEffect(() => {
     setGroupName(group?.group_name || '');
     setDescription(group?.description || '');
     setLocalError('');
+    setGroupCode(null);
   }, [group, mode]);
 
   const submit = async (event: React.FormEvent) => {
@@ -214,13 +231,23 @@ function GroupFormModal({
       setLocalError('Group name wajib diisi.');
       return;
     }
+    if (mode === 'create') {
+      if (!/^[A-Z0-9]+(?:_[A-Z0-9]+)*$/.test(effectiveCode) || effectiveCode.length > 50) {
+        setLocalError('Group code must contain 1-50 uppercase letters, numbers or single underscores between words.');
+        return;
+      }
+      if (knownGroups.some(item => item.group_code?.toUpperCase() === effectiveCode)) {
+        setLocalError(duplicateGroupCodeMessage(effectiveCode));
+        return;
+      }
+    }
     setLocalError('');
-    await onSave(name, description.trim());
+    await onSave(name, description.trim(), mode === 'create' ? effectiveCode : undefined);
   };
 
   return (
-    <div className="absolute inset-0 z-[100] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
-      <form onSubmit={submit} className="w-full max-w-[500px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
+    <div className="management-overlay absolute inset-0 z-[100] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
+      <form onSubmit={submit} role="dialog" aria-modal="true" aria-label={mode === 'create' ? 'Register Group' : 'Edit Group'} className="management-modal max-h-full w-full max-w-[500px] overflow-y-auto rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
         <div className="flex items-center justify-between border-b border-cyan-400/12 px-4 py-3">
           <div>
             <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">
@@ -240,27 +267,37 @@ function GroupFormModal({
             <span className="text-[10px] font-black tracking-[0.14em] text-slate-500 uppercase">Group Name</span>
             <input
               autoFocus
+              disabled={busy}
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               placeholder="Example: Executive Management"
-              className="mt-2 h-11 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
+              className="management-input mt-2 h-11 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
             />
+          </label>
+
+          <label className="mt-4 block">
+            <span className="text-[10px] font-black tracking-[0.14em] text-slate-500 uppercase">Group Code</span>
+            <input value={effectiveCode} readOnly={mode === 'edit'} disabled={busy}
+              maxLength={50}
+              onChange={event => { setGroupCode(event.target.value.toUpperCase()); setLocalError(''); }}
+              className="management-input mt-2 h-11 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 font-mono text-[13px] text-cyan-50 outline-none focus:border-cyan-300/45 read-only:text-slate-400" />
           </label>
 
           <label className="mt-4 block">
             <span className="text-[10px] font-black tracking-[0.14em] text-slate-500 uppercase">Description</span>
             <textarea
+              disabled={busy}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe this group's purpose..."
               rows={4}
-              className="mt-2 w-full resize-none rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 py-3 text-[13px] leading-relaxed text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
+              className="management-input mt-2 w-full resize-none rounded-lg border border-sky-500/18 bg-[#061322]/65 px-3 py-3 text-[13px] leading-relaxed text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45"
             />
           </label>
 
-          {localError && (
-            <div className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2 text-[11px] text-rose-200">
-              {localError}
+          {(localError || error) && (
+            <div role="alert" className="mt-3 rounded-lg border border-rose-400/20 bg-rose-950/15 px-3 py-2 text-[12px] text-rose-200">
+              {localError || error}
             </div>
           )}
 
@@ -298,6 +335,11 @@ export default function GroupManagement() {
   const [formMode, setFormMode] = useState<'create' | 'edit' | null>(null);
   const [formTarget, setFormTarget] = useState<ManagedGroup | null>(null);
   const [formBusy, setFormBusy] = useState(false);
+  const [formError, setFormError] = useState('');
+  const actionAnchorRef = useRef<HTMLButtonElement | null>(null);
+  const actionPopupRef = useRef<HTMLDivElement | null>(null);
+  const [actionPosition, setActionPosition] = useState<{ top: number; left: number } | null>(null);
+  const actionGroup = items.find(group => group.group_id === actionMenuId);
   const [menuAccess, setMenuAccess] = useState<GroupMenuAccess[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
   const [menuSaving, setMenuSaving] = useState(false);
@@ -312,6 +354,7 @@ export default function GroupManagement() {
   const loadGroups = useCallback(async (options?: { forcePage?: number }) => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
+    setActionMenuId(null);
     setError('');
 
     try {
@@ -361,11 +404,54 @@ export default function GroupManagement() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
+  const positionActionMenu = useCallback(() => {
+    if (!actionAnchorRef.current || !actionPopupRef.current) return;
+    const anchor = actionAnchorRef.current.getBoundingClientRect();
+    if (!actionAnchorRef.current.offsetParent || anchor.bottom < 0 || anchor.top > window.innerHeight
+      || anchor.right < 0 || anchor.left > window.innerWidth) {
+      setActionMenuId(null);
+      return;
+    }
+    const popup = actionPopupRef.current.getBoundingClientRect();
+    const margin = 8;
+    const below = window.innerHeight - anchor.bottom - margin;
+    const above = anchor.top - margin;
+    const top = below < popup.height + 6 && above > below
+      ? anchor.top - popup.height - 6 : anchor.bottom + 6;
+    setActionPosition({
+      top: Math.max(margin, Math.min(top, window.innerHeight - popup.height - margin)),
+      left: Math.max(margin, Math.min(anchor.right - popup.width, window.innerWidth - popup.width - margin)),
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (actionMenuId) positionActionMenu();
+  }, [actionMenuId, positionActionMenu]);
+
   useEffect(() => {
+    if (!actionMenuId) return;
     const close = () => setActionMenuId(null);
-    if (actionMenuId) window.addEventListener('click', close);
-    return () => window.removeEventListener('click', close);
-  }, [actionMenuId]);
+    const keyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        close();
+        actionAnchorRef.current?.focus();
+      }
+    };
+    const scroll = (event: Event) => {
+      if (event.target instanceof Node && actionPopupRef.current?.contains(event.target)) return;
+      positionActionMenu();
+    };
+    window.addEventListener('click', close);
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('resize', positionActionMenu);
+    window.addEventListener('scroll', scroll, true);
+    return () => {
+      window.removeEventListener('click', close);
+      window.removeEventListener('keydown', keyDown);
+      window.removeEventListener('resize', positionActionMenu);
+      window.removeEventListener('scroll', scroll, true);
+    };
+  }, [actionMenuId, positionActionMenu]);
 
   const statusLabel = useMemo(() => {
     if (statusFilter === 'active') return 'Active groups';
@@ -376,18 +462,20 @@ export default function GroupManagement() {
   const openCreate = () => {
     setActionMenuId(null);
     setFormTarget(null);
+    setFormError('');
     setFormMode('create');
   };
 
   const openEdit = (group: ManagedGroup) => {
     setActionMenuId(null);
     setFormTarget(group);
+    setFormError('');
     setFormMode('edit');
   };
 
-  const saveGroup = async (groupName: string, description: string) => {
+  const saveGroup = async (groupName: string, description: string, groupCode?: string) => {
     setFormBusy(true);
-    setError('');
+    setFormError('');
 
     try {
       const editing = formMode === 'edit' && formTarget;
@@ -401,12 +489,18 @@ export default function GroupManagement() {
           body: JSON.stringify({
             group_name: groupName,
             description,
+            ...(!editing && { group_code: groupCode }),
           }),
         }
       );
 
       const result = await response.json();
       if (!response.ok || !result.success) {
+        const duplicateCode = /GROUP_CODE.*(EXIST|DUPLICATE|TAKEN)|(EXIST|DUPLICATE).*GROUP_CODE/i.test(String(result.code || ''))
+          || /(?:group.?code|kode|code).*(?:exist|duplicate|sudah|terdaftar)/i.test(String(result.message || ''));
+        if (!editing && duplicateCode) {
+          throw new Error(duplicateGroupCodeMessage(groupCode || generatedGroupCode(groupName)));
+        }
         throw new Error(result.message || 'Gagal menyimpan group.');
       }
 
@@ -416,7 +510,7 @@ export default function GroupManagement() {
       setPage(1);
       await loadGroups({ forcePage: 1 });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Gagal menyimpan group.');
+      setFormError(err instanceof Error ? err.message : 'Gagal menyimpan group.');
     } finally {
       setFormBusy(false);
     }
@@ -557,12 +651,12 @@ export default function GroupManagement() {
   };
 
   return (
-    <div className="relative h-full min-h-0 w-full overflow-hidden text-slate-200">
+    <div className="management-themed-root group-management-root relative h-full min-h-0 w-full overflow-hidden text-slate-200">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(0,207,255,.07),transparent_30%),radial-gradient(circle_at_90%_20%,rgba(52,211,153,.035),transparent_26%)]" />
 
       <div className="relative flex h-full min-h-0 flex-col">
         {/* HEADER */}
-        <div className="flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="management-page-header flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="text-[10px] font-black tracking-[0.22em] text-cyan-400 uppercase">
               CoreAnalytics · Management Center
@@ -608,7 +702,7 @@ export default function GroupManagement() {
           </div>
 
           {/* TOOLBAR */}
-          <div className="mt-3 flex flex-col gap-2.5 rounded-xl border border-sky-500/15 bg-[#04101f]/48 p-2.5 backdrop-blur-md lg:flex-row lg:items-center">
+          <div className="management-toolbar mt-3 flex flex-col gap-2.5 rounded-xl border border-sky-500/15 bg-[#04101f]/48 p-2.5 backdrop-blur-md lg:flex-row lg:items-center">
             <div className="relative min-w-0 flex-1">
               <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
                 <SearchIcon />
@@ -617,7 +711,7 @@ export default function GroupManagement() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search group name or description..."
-                className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
+                className="management-input h-10 w-full rounded-lg border border-sky-500/18 bg-[#020b17]/75 pl-10 pr-3 text-[13px] text-cyan-50 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/45 focus:shadow-[0_0_16px_rgba(34,211,238,.06)]"
               />
             </div>
 
@@ -653,7 +747,7 @@ export default function GroupManagement() {
           )}
 
           {/* TABLE PANEL */}
-          <div className="mt-3 overflow-hidden rounded-xl border border-sky-500/15 bg-[#020b17]/52 shadow-[0_12px_40px_rgba(0,0,0,.16)] backdrop-blur-md">
+          <div className="management-table-shell mt-3 overflow-hidden rounded-xl border border-sky-500/15 bg-[#020b17]/52 shadow-[0_12px_40px_rgba(0,0,0,.16)] backdrop-blur-md">
             <div className="flex items-center justify-between border-b border-sky-500/12 px-3 py-2">
               <div>
                 <div className="text-[11px] font-black tracking-[0.16em] text-cyan-100 uppercase">{statusLabel}</div>
@@ -680,7 +774,7 @@ export default function GroupManagement() {
                   <col style={{ width: '4%' }} />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-sky-500/10 bg-[#061322]/45 text-left">
+                  <tr className="management-table-head border-b border-sky-500/10 bg-[#061322]/45 text-left">
                     <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Group</th>
                     <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Description</th>
                     <th className="px-4 py-2 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">Status</th>
@@ -737,8 +831,13 @@ export default function GroupManagement() {
                       <td className="relative h-[50px] px-2 py-0 text-center align-middle">
                         <button
                           type="button"
+                          aria-label={`Actions for ${group.group_name}`}
+                          aria-expanded={actionMenuId === group.group_id}
+                          aria-haspopup="menu"
                           onClick={(event) => {
                             event.stopPropagation();
+                            actionAnchorRef.current = event.currentTarget;
+                            setActionPosition(null);
                             setActionMenuId((prev) => prev === group.group_id ? null : group.group_id);
                           }}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-transparent text-slate-500 transition hover:border-cyan-400/20 hover:bg-cyan-950/20 hover:text-cyan-200"
@@ -746,44 +845,6 @@ export default function GroupManagement() {
                           <MoreIcon />
                         </button>
 
-                        {actionMenuId === group.group_id && (
-                          <div
-                            onClick={(event) => event.stopPropagation()}
-                            className="absolute right-8 top-9 z-30 w-44 overflow-hidden rounded-xl border border-cyan-400/20 bg-[#020b17]/98 p-1.5 text-left shadow-[0_16px_45px_rgba(0,0,0,.62)] backdrop-blur-xl"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedGroup(group);
-                                setActionMenuId(null);
-                              }}
-                              className="w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-slate-300 transition hover:bg-cyan-950/25 hover:text-cyan-100"
-                            >
-                              View Group
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => openEdit(group)}
-                              className="mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-cyan-200 transition hover:bg-cyan-950/25"
-                            >
-                              Edit Group
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setStatusTarget(group);
-                                setActionMenuId(null);
-                              }}
-                              className={`mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold transition ${
-                                group.is_active
-                                  ? 'text-rose-300 hover:bg-rose-950/25'
-                                  : 'text-emerald-300 hover:bg-emerald-950/25'
-                              }`}
-                            >
-                              {group.is_active ? 'Deactivate Group' : 'Activate Group'}
-                            </button>
-                          </div>
-                        )}
                       </td>
                     </tr>
                   ))}
@@ -855,7 +916,7 @@ export default function GroupManagement() {
             )}
 
             {/* PAGINATION */}
-            <div className="flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="management-table-footer flex flex-col gap-2 border-t border-sky-500/10 bg-[#04101f]/35 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2 text-[10px] tracking-[0.08em] text-slate-400">
                 <span>
                   Page <strong className="text-slate-400">{totalPages === 0 ? 0 : page}</strong> of{' '}
@@ -868,7 +929,7 @@ export default function GroupManagement() {
                     setPage(1);
                     setPageSize(Number(e.target.value));
                   }}
-                  className="rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[10px] text-slate-400 outline-none"
+                  className="management-input rounded-md border border-slate-600/20 bg-[#061322] px-2 py-1 text-[10px] text-slate-400 outline-none"
                 >
                   <option value={10}>10 / page</option>
                   <option value={20}>20 / page</option>
@@ -899,17 +960,41 @@ export default function GroupManagement() {
         </div>
       </div>
 
+      {actionGroup && createPortal(
+        <div ref={actionPopupRef} role="menu" aria-label={`Actions for ${actionGroup.group_name}`}
+          onClick={event => event.stopPropagation()}
+          style={{
+            position: 'fixed', top: actionPosition?.top ?? 0, left: actionPosition?.left ?? 0,
+            visibility: actionPosition ? 'visible' : 'hidden',
+            maxWidth: 'calc(100vw - 16px)', maxHeight: 'calc(100dvh - 16px)',
+          }}
+          className="management-floating-surface z-[90] w-44 overflow-y-auto rounded-lg border border-cyan-400/20 bg-[#020b17] p-1.5 text-left shadow-[0_16px_45px_rgba(0,0,0,.62)]">
+          <button type="button" role="menuitem" onClick={() => {
+            setSelectedGroup(actionGroup);
+            setActionMenuId(null);
+          }} className="w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-slate-300 hover:bg-cyan-950/25 hover:text-cyan-100">View Group</button>
+          <button type="button" role="menuitem" onClick={() => openEdit(actionGroup)}
+            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold text-cyan-200 hover:bg-cyan-950/25">Edit Group</button>
+          <button type="button" role="menuitem" onClick={() => {
+            setStatusTarget(actionGroup);
+            setActionMenuId(null);
+          }} className={`mt-1 w-full rounded-lg px-3 py-2 text-left text-[11px] font-bold ${actionGroup.is_active ? 'text-rose-300 hover:bg-rose-950/25' : 'text-emerald-300 hover:bg-emerald-950/25'}`}>
+            {actionGroup.is_active ? 'Deactivate Group' : 'Activate Group'}
+          </button>
+        </div>, document.body
+      )}
+
       {/* GROUP DETAIL DRAWER */}
       {selectedGroup && (
         <div className="absolute inset-0 z-[80] flex justify-end">
           <button
             type="button"
             aria-label="Close group detail"
-            className="absolute inset-0 bg-[#00050a]/55 backdrop-blur-[2px]"
+            className="management-overlay absolute inset-0 bg-[#00050a]/55 backdrop-blur-[2px]"
             onClick={() => setSelectedGroup(null)}
           />
 
-          <aside className="relative z-10 flex h-full w-full max-w-[420px] flex-col border-l border-cyan-400/20 bg-[#020b17]/96 shadow-[-20px_0_60px_rgba(0,0,0,.48)] backdrop-blur-xl">
+          <aside className="management-drawer relative z-10 flex h-full w-full max-w-[420px] flex-col border-l border-cyan-400/20 bg-[#020b17]/96 shadow-[-20px_0_60px_rgba(0,0,0,.48)] backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-cyan-400/15 px-4 py-3">
               <div>
                 <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">Group Profile</div>
@@ -1013,8 +1098,8 @@ export default function GroupManagement() {
       )}
 
       {accessOpen && selectedGroup && (
-        <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#00050a]/80 p-4 backdrop-blur-md">
-          <div className="flex h-[90%] w-full max-w-[1100px] flex-col overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#020b17]/98 shadow-[0_24px_80px_rgba(0,0,0,.7)]">
+        <div className="management-overlay absolute inset-0 z-[100] flex items-center justify-center bg-[#00050a]/80 p-4 backdrop-blur-md">
+          <div className="management-modal flex h-[90%] w-full max-w-[1100px] flex-col overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#020b17]/98 shadow-[0_24px_80px_rgba(0,0,0,.7)]">
             <div className="flex items-center justify-between border-b border-cyan-400/15 px-5 py-4">
               <div>
                 <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">Access Management</div>
@@ -1028,7 +1113,7 @@ export default function GroupManagement() {
                 <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400"><SearchIcon /></div>
                 <input value={accessSearch} onChange={e => setAccessSearch(e.target.value)}
                   placeholder="Find menu by name, code or route..."
-                  className="h-10 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 pl-10 pr-3 text-[12px] text-cyan-50 outline-none placeholder:text-slate-500 focus:border-cyan-300/45" />
+                  className="management-input h-10 w-full rounded-lg border border-sky-500/18 bg-[#061322]/65 pl-10 pr-3 text-[12px] text-cyan-50 outline-none placeholder:text-slate-500 focus:border-cyan-300/45" />
               </div>
               <div className="flex gap-1 rounded-lg border border-sky-500/12 bg-[#061322]/50 p-1">
                 {(['all','granted','not_granted'] as const).map(value => (
@@ -1100,6 +1185,8 @@ export default function GroupManagement() {
           mode={formMode}
           group={formTarget}
           busy={formBusy}
+          error={formError}
+          knownGroups={items}
           onClose={() => {
             if (formBusy) return;
             setFormMode(null);
@@ -1111,8 +1198,8 @@ export default function GroupManagement() {
 
       {/* CONFIRM STATUS MODAL */}
       {statusTarget && (
-        <div className="absolute inset-0 z-[110] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-[420px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
+        <div className="management-overlay absolute inset-0 z-[110] grid place-items-center bg-[#00050a]/65 p-4 backdrop-blur-sm">
+          <div className="management-modal w-full max-w-[420px] overflow-hidden rounded-2xl border border-cyan-400/20 bg-[#020b17]/98 shadow-[0_24px_70px_rgba(0,0,0,.58)]">
             <div className="border-b border-cyan-400/12 px-4 py-3">
               <div className="text-[10px] font-black tracking-[0.18em] text-cyan-400 uppercase">Confirm Group Status</div>
             </div>

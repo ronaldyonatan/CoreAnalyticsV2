@@ -775,7 +775,7 @@ export default function DailyTracking({
 
   return (
     <div
-      className="custom-scrollbar relative flex h-full w-full flex-1 flex-col gap-3 overflow-y-auto p-3 font-mono text-xs"
+      className="daily-tracking-root custom-scrollbar relative flex h-full w-full flex-1 flex-col gap-3 overflow-y-auto p-3 font-mono text-xs"
       style={{
         color: 'var(--core-primary)',
         background: 'transparent',
@@ -783,7 +783,7 @@ export default function DailyTracking({
     >
       {/* HEADER UTAMA */}
       <div
-        className="relative z-[200] flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5"
+        className="daily-page-header relative z-[200] flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5"
         style={{
           borderColor: 'var(--core-border-strong)',
           background: isLight
@@ -796,12 +796,12 @@ export default function DailyTracking({
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center space-x-3">
             <div className="relative flex h-3 w-3 flex-shrink-0 items-center justify-center">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00f2fe] opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#00f2fe] shadow-[0_0_12px_#00f2fe]" />
+              <span className="daily-page-status-dot absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00f2fe] opacity-75" />
+              <span className="daily-page-status-dot relative inline-flex h-2.5 w-2.5 rounded-full bg-[#00f2fe] shadow-[0_0_12px_#00f2fe]" />
             </div>
 
             <span
-              className="min-w-0 animate-pulse bg-clip-text text-lg font-extrabold uppercase tracking-[0.16em] text-transparent sm:text-xl sm:tracking-widest"
+              className="daily-page-title min-w-0 animate-pulse bg-clip-text text-lg font-extrabold uppercase tracking-[0.16em] text-transparent sm:text-xl sm:tracking-widest"
               style={{
                 backgroundImage: isLight
                   ? 'linear-gradient(90deg, #075985, #0a2635, #087f9d)'
@@ -883,7 +883,7 @@ export default function DailyTracking({
           }`}
         >
           <div
-            className="flex min-w-0 items-center rounded-lg border px-2.5 py-2 transition-all sm:py-1"
+            className="daily-period-control flex min-w-0 items-center rounded-lg border px-2.5 py-2 transition-all sm:py-1"
             style={{
               borderColor: 'var(--core-border-strong)',
               background: 'var(--core-control)',
@@ -917,40 +917,29 @@ export default function DailyTracking({
         <DailyMetricsGrid isLoaded={isLoaded} onExpand={setExpandedCard} />
 
         {/* Soft tint across the whole KPI group */}
-        <div className="pointer-events-none absolute inset-0 z-10 rounded-xl bg-amber-400/[0.018]" />
+        <div className="daily-comingsoon-global-tint pointer-events-none absolute inset-0 z-10 rounded-xl bg-amber-400/[0.018]" />
 
         {/* Wide diagonal ribbon - intentionally spans all KPI cards */}
-        <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-xl">
-          <div
-            className="absolute left-1/2 top-1/2 w-[112%] -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] border-y py-2 backdrop-blur-[1px]"
-            style={{
-              borderColor: isLight ? 'rgba(217,119,6,.34)' : 'rgba(252,211,77,.45)',
-              background: isLight
-                ? 'rgba(255,251,235,.82)'
-                : 'rgba(36,27,6,.70)',
-              boxShadow: isLight
-                ? '0 10px 26px rgba(180,83,9,.10)'
-                : '0 0 24px rgba(251,191,36,.14)',
-            }}
-          >
+        <div className="daily-comingsoon-global pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-xl">
+          <div className="daily-comingsoon-global-ribbon absolute left-1/2 top-1/2 w-[112%] -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] border-y py-2 backdrop-blur-[1px]">
             <div className="flex items-center justify-center gap-4 whitespace-nowrap px-4">
-              <span className="hidden h-px flex-1 bg-gradient-to-r from-transparent via-amber-300/45 to-amber-300/15 md:block" />
+              <span className="daily-comingsoon-global-line daily-comingsoon-global-line--left hidden h-px flex-1 md:block" />
 
               <div className="flex items-center gap-2.5">
-                <span className="h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_10px_rgba(252,211,77,.95)]" />
-                <span className="text-[11px] font-black uppercase tracking-[0.30em] text-amber-100 drop-shadow-[0_0_8px_rgba(251,191,36,.28)] sm:text-[12px] lg:text-[13px]">
+                <span className="daily-comingsoon-global-dot h-2 w-2 rounded-full" />
+                <span className="daily-comingsoon-global-title text-[11px] font-black uppercase tracking-[0.30em] sm:text-[12px] lg:text-[13px]">
                   Coming Soon
                 </span>
-                <span className="text-amber-300/55">•</span>
-                <span className="text-[8px] font-bold uppercase tracking-[0.22em] text-amber-200/75 sm:text-[9px]">
+                <span className="daily-comingsoon-global-divider">•</span>
+                <span className="daily-comingsoon-global-subtitle text-[8px] font-bold uppercase tracking-[0.22em] sm:text-[9px]">
                   All KPI Metrics
                 </span>
               </div>
 
-              <span className="hidden h-px flex-1 bg-gradient-to-l from-transparent via-amber-300/45 to-amber-300/15 md:block" />
+              <span className="daily-comingsoon-global-line daily-comingsoon-global-line--right hidden h-px flex-1 md:block" />
             </div>
 
-            <div className="mt-1 text-center text-[6px] font-bold uppercase tracking-[0.20em] text-amber-100/55 sm:text-[7px]">
+            <div className="daily-comingsoon-global-footnote mt-1 text-center text-[6px] font-bold uppercase tracking-[0.20em] sm:text-[7px]">
               Live KPI integration in progress
             </div>
           </div>
@@ -1047,9 +1036,9 @@ export default function DailyTracking({
         }
 
         .daily-kpi-preview-chip {
-          border-color: ${isLight ? 'rgba(217,119,6,.24)' : 'rgba(252,211,77,.20)'};
-          background: ${isLight ? 'rgba(255,251,235,.78)' : 'rgba(23,18,5,.55)'};
-          color: ${isLight ? 'rgba(146,64,14,.72)' : 'rgba(253,230,138,.60)'};
+          border-color: ${isLight ? 'rgba(49,140,255,.28)' : 'rgba(252,211,77,.20)'};
+          background: ${isLight ? 'rgba(235,248,255,.82)' : 'rgba(23,18,5,.55)'};
+          color: ${isLight ? 'rgba(29,78,216,.76)' : 'rgba(253,230,138,.60)'};
         }
 
         .daily-tracking-fullscreen-header {

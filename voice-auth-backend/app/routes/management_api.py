@@ -364,6 +364,124 @@ def list_users():
 
 
 # =============================================================
+# USER PROFILE UPDATE
+# PATCH /api/management/users/<user_id>/profile
+#
+# JSON:
+#   {"display_name": "...", "email": "..."}
+# Username and UserID intentionally remain immutable in this endpoint.
+# =============================================================
+@management_bp.route(
+    "/users/<user_id>/profile",
+    methods=["PATCH"],
+)
+def update_user_profile(
+    user_id: str,
+):
+    body = request.get_json(silent=True) or {}
+
+    display_name = str(
+        body.get("display_name") or ""
+    ).strip()
+    email = str(
+        body.get("email") or ""
+    ).strip()
+
+    if not display_name:
+        return jsonify({
+            "success": False,
+            "code": "DISPLAY_NAME_REQUIRED",
+            "message": "Display name wajib diisi.",
+        }), 400
+
+    if len(display_name) > 200:
+        return jsonify({
+            "success": False,
+            "code": "DISPLAY_NAME_TOO_LONG",
+            "message": "Display name maksimal 200 karakter.",
+        }), 400
+
+    if not email:
+        return jsonify({
+            "success": False,
+            "code": "EMAIL_REQUIRED",
+            "message": "Email wajib diisi.",
+        }), 400
+
+    if (
+        len(email) > 320
+        or re.fullmatch(
+            r"[^\s@]+@[^\s@]+\.[^\s@]+",
+            email,
+        ) is None
+    ):
+        return jsonify({
+            "success": False,
+            "code": "EMAIL_INVALID",
+            "message": "Format email tidak valid.",
+        }), 400
+
+    try:
+        result = core_api.update_user_profile(
+            user_id=user_id,
+            display_name=display_name,
+            email=email,
+        )
+        row = _first_data_row(result)
+
+        if not row:
+            return jsonify({
+                "success": False,
+                "code": "INVALID_CORE_RESPONSE",
+                "message": "Core API tidak mengembalikan data user.",
+            }), 502
+
+        if row.get("success") is False:
+            code = str(row.get("code") or "")
+            if code == "USER_NOT_FOUND":
+                status_code = 404
+            elif code in {"EMAIL_EXISTS", "USER_DUPLICATE"}:
+                status_code = 409
+            else:
+                status_code = 400
+            return jsonify(row), status_code
+
+        return jsonify({
+            "success": True,
+            "code": row.get("code", "USER_UPDATED"),
+            "message": row.get(
+                "message",
+                "Profil user berhasil diperbarui.",
+            ),
+            "user": {
+                "user_id": row.get("user_id"),
+                "username": row.get("username"),
+                "display_name": row.get("display_name"),
+                "email": row.get("email"),
+                "is_active": bool(row.get("is_active")),
+                "is_locked": bool(row.get("is_locked")),
+                "failed_login_count": int(
+                    row.get("failed_login_count") or 0
+                ),
+                "locked_at": row.get("locked_at"),
+                "lock_reason": row.get("lock_reason"),
+                "last_failed_login_at": row.get(
+                    "last_failed_login_at"
+                ),
+                "created_at": row.get("created_at"),
+                "updated_at": row.get("updated_at"),
+            },
+        }), 200
+
+    except Exception as exc:
+        return jsonify({
+            "success": False,
+            "code": "USER_UPDATE_ERROR",
+            "message": str(exc),
+        }), 500
+
+
+# =============================================================
 # USER ACTIVE / INACTIVE
 # PATCH /api/management/users/<user_id>/status
 #

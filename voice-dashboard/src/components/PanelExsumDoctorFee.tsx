@@ -83,6 +83,11 @@ const EXSUM_3D_COLORS_AURORA = [
   '#c084fc', '#5eead4', '#38bdf8', '#f0abfc', '#bae6fd'
 ];
 
+const EXSUM_3D_COLORS_SOLARIS = [
+  '#2f80ed', '#318cff', '#54a8ff', '#79c7ff', '#9cdaff',
+  '#c6edff', '#6f93ff', '#4e73dc', '#a9c8ff', '#e0f5ff'
+];
+
 const EXSUM_3D_COLORS_DARK = [
   '#00f2fe', '#00d4ff', '#00b7ff', '#0099ff', '#007aff',
   '#4d8aff', '#759dff', '#9fb0ff', '#c5c4ff', '#e0d8ff'
@@ -116,14 +121,16 @@ const formatCell3D = (value: any, column: string) => {
 function DoctorFeeCore3D({
   data,
   isAurora,
+  isSolaris,
   onHover,
 }: {
   data: RadialDatum[];
   isAurora: boolean;
+  isSolaris: boolean;
   onHover: (value: DoctorFee3DHover | null) => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const colors = isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK;
+  const colors = isSolaris ? EXSUM_3D_COLORS_SOLARIS : isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK;
 
   const total = useMemo(
     () => data.reduce((sum, item) => sum + Math.max(0, item.value), 0),
@@ -131,14 +138,31 @@ function DoctorFeeCore3D({
   );
 
   const segments = useMemo(() => {
+    const TAU = Math.PI * 2;
+
+    if (total <= 0 || data.length === 0) return [];
+
+    // Keep tiny nodes visible, then normalize every visual span back to
+    // exactly 360 degrees so the 3D ring can never overlap past 100%.
+    const MIN_VISUAL_SPAN = 0.045;
+    const baseSpans = data.map((item) => {
+      const ratio = Math.max(0, item.value) / total;
+      return Math.max(MIN_VISUAL_SPAN, ratio * TAU);
+    });
+
+    const baseTotal = baseSpans.reduce((sum, span) => sum + span, 0);
+    const normalizeScale = baseTotal > 0 ? TAU / baseTotal : 0;
+    const normalizedSpans = baseSpans.map((span) => span * normalizeScale);
+
     let cursor = 0;
-    const gap = Math.min(0.022, Math.PI * 2 / Math.max(30, data.length * 30));
+    const baseGap = Math.min(0.022, TAU / Math.max(30, data.length * 30));
 
     return data.map((item, index) => {
-      const ratio = total > 0 ? Math.max(0, item.value) / total : 0;
-      const span = Math.max(0.045, ratio * Math.PI * 2);
-      const start = cursor + gap / 2;
-      const length = Math.max(0.025, span - gap);
+      const ratio = Math.max(0, item.value) / total;
+      const span = normalizedSpans[index];
+      const segmentGap = Math.min(baseGap, span * 0.28);
+      const start = cursor + segmentGap / 2;
+      const length = Math.max(0.001, span - segmentGap);
       cursor += span;
 
       return {
@@ -160,18 +184,18 @@ function DoctorFeeCore3D({
 
   return (
     <>
-      <color attach="background" args={[isAurora ? '#092a35' : '#020916']} />
-      <fog attach="fog" args={[isAurora ? '#092a35' : '#020916', 15, 31]} />
+      <color attach="background" args={[isSolaris ? '#5f97cb' : isAurora ? '#092a35' : '#020916']} />
+      <fog attach="fog" args={[isSolaris ? '#91c8e8' : isAurora ? '#092a35' : '#020916', 15, 31]} />
 
-      <ambientLight intensity={isAurora ? 1.1 : 0.9} />
+      <ambientLight intensity={isSolaris ? 1.22 : isAurora ? 1.1 : 0.9} />
       <directionalLight position={[5, 8, 8]} intensity={2.0} color="#e7ffff" />
-      <pointLight position={[-5, 3, 5]} intensity={24} color={isAurora ? '#2dd4bf' : '#00f2fe'} distance={15} />
-      <pointLight position={[5, 3, 4]} intensity={20} color={isAurora ? '#a78bfa' : '#2563eb'} distance={14} />
+      <pointLight position={[-5, 3, 5]} intensity={24} color={isSolaris ? '#79cfff' : isAurora ? '#2dd4bf' : '#00f2fe'} distance={15} />
+      <pointLight position={[5, 3, 4]} intensity={20} color={isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'} distance={14} />
 
       <mesh position={[0, 0, -2.15]}>
         <planeGeometry args={[13.5, 8]} />
         <meshPhysicalMaterial
-          color={isAurora ? '#103744' : '#031321'}
+          color={isSolaris ? '#78afd7' : isAurora ? '#103744' : '#031321'}
           transparent
           opacity={0.68}
           metalness={0.42}
@@ -180,7 +204,7 @@ function DoctorFeeCore3D({
       </mesh>
 
       <gridHelper
-        args={[15, 28, isAurora ? '#2dd4bf' : '#087da5', isAurora ? '#315d69' : '#07304a']}
+        args={[15, 28, isSolaris ? '#a8e2ff' : isAurora ? '#2dd4bf' : '#087da5', isSolaris ? '#4f7fb0' : isAurora ? '#315d69' : '#07304a']}
         position={[0, -3.0, 0]}
         rotation={[0, 0, 0]}
       />
@@ -535,9 +559,9 @@ function BoardText({
 }
 
 function DoctorFeeWallBoardScene({
-  rows, columns, isAurora, page, onHover
+  rows, columns, isAurora, isSolaris, page, onHover
 }: {
-  rows:any[]; columns:string[]; isAurora:boolean; page:number;
+  rows:any[]; columns:string[]; isAurora:boolean; isSolaris:boolean; page:number;
   onHover:(row:any|null)=>void;
 }) {
   const rowRefs=useRef<Array<THREE.Group|null>>([]);
@@ -547,7 +571,11 @@ function DoctorFeeWallBoardScene({
   const pageRows=rows.slice(start,start+pageSize);
   const visibleColumns=columns.slice(0,4);
 
-  const p=isAurora ? {
+  const p=isSolaris ? {
+    wall:'#5f97cb', frame:'#4f7fb0', screen:'#4a82b8', cell:'#74acd4',
+    edge:'#a8e2ff', text:'#f8fdff', muted:'#d7ebf8', pos:'#8fd2ff',
+    neg:'#f05a7a', amber:'#6f8cff', glow:'#79cfff'
+  } : isAurora ? {
     wall:'#0a2630', frame:'#17414d', screen:'#092832', cell:'#123844',
     edge:'#59e8f5', text:'#efffff', muted:'#a9dce2', pos:'#5eead4',
     neg:'#fb7185', amber:'#fbbf24', glow:'#2dd4bf'
@@ -570,7 +598,7 @@ function DoctorFeeWallBoardScene({
       const material = rowMesh?.material as THREE.MeshPhysicalMaterial | undefined;
       if(material){
         const baseColor = new THREE.Color(p.cell);
-        const hoverColor = new THREE.Color(isAurora ? '#17606b' : '#07516a');
+        const hoverColor = new THREE.Color(isSolaris ? '#80b5da' : isAurora ? '#17606b' : '#07516a');
         material.color.lerp(active ? hoverColor : baseColor, 1 - Math.exp(-delta * 10));
         material.emissive.set(p.edge);
         material.emissiveIntensity = THREE.MathUtils.damp(
@@ -593,9 +621,9 @@ function DoctorFeeWallBoardScene({
     <ambientLight intensity={1.05}/>
     <directionalLight position={[4,7,7]} intensity={1.8} color="#eaffff"/>
     <pointLight position={[-7.2,2.8,1.2]} intensity={12} color={p.glow} distance={8}/>
-    <pointLight position={[7.0,-2.0,.8]} intensity={9} color={isAurora?'#a78bfa':'#2563eb'} distance={7}/>
+    <pointLight position={[7.0,-2.0,.8]} intensity={9} color={isSolaris?'#6f8cff':isAurora?'#a78bfa':'#2563eb'} distance={7}/>
 
-    <SurroundingThemeSurfaces isAurora={isAurora} />
+    <SurroundingThemeSurfaces isAurora={isAurora || isSolaris} />
 
     {/* Architectural wall: layered panels add depth without competing with the data */}
     <mesh position={[0,0,-1.30]}>
@@ -609,11 +637,11 @@ function DoctorFeeWallBoardScene({
         <mesh position={[side * 6.35, 0, -1.02]}>
           <boxGeometry args={[1.45, 7.35, .22]}/>
           <meshPhysicalMaterial
-            color={isAurora ? '#103642' : '#031725'}
+            color={isSolaris ? '#74acd4' : isAurora ? '#103642' : '#031725'}
             metalness={.42}
             roughness={.34}
             transparent
-            opacity={isAurora ? .82 : .90}
+            opacity={isSolaris ? .84 : isAurora ? .82 : .90}
           />
         </mesh>
         <mesh position={[side * 5.72, 0, -.88]}>
@@ -761,8 +789,8 @@ function DoctorFeeWallBoardScene({
 }
 
 function DoctorFeeLedger3D({
-  rows, columns, isAurora
-}: {rows:any[];columns:string[];isAurora:boolean}) {
+  rows, columns, isAurora, isSolaris
+}: {rows:any[];columns:string[];isAurora:boolean;isSolaris:boolean}) {
   const [page,setPage]=useState(0);
   const [hover,setHover]=useState<any|null>(null);
   const wheelLock=useRef(false);
@@ -785,7 +813,7 @@ function DoctorFeeLedger3D({
   return <div className="absolute inset-0" onWheel={onWheel}>
     <Canvas camera={{position:[.28,.34,10.20],fov:38,near:.1,far:100}}
       dpr={[1,1.65]} gl={{antialias:true,alpha:false}}>
-      <DoctorFeeWallBoardScene rows={rows} columns={columns} isAurora={isAurora}
+      <DoctorFeeWallBoardScene rows={rows} columns={columns} isAurora={isAurora} isSolaris={isSolaris}
         page={safePage} onHover={setHover}/>
     </Canvas>
 
@@ -822,7 +850,7 @@ function DoctorFeeExsumFullscreen({
   selectedYear: 'Current Year' | 'Full Year 2025' | 'Full Year 2024';
   setSelectedYear: (year: 'Current Year' | 'Full Year 2025' | 'Full Year 2024') => void;
 }) {
-  const { isAurora } = useTheme();
+  const { isAurora, isSolaris } = useTheme();
   const [hover, setHover] = useState<DoctorFee3DHover | null>(null);
   const [displayedMode, setDisplayedMode] = useState<DoctorFeeExsumViewMode>(viewMode);
   const [targetMode, setTargetMode] = useState<DoctorFeeExsumViewMode>(viewMode);
@@ -882,20 +910,20 @@ function DoctorFeeExsumFullscreen({
   const scannerPercent=Math.max(0,Math.min(100,scanProgress*100));
 
   const renderScene=(mode:DoctorFeeExsumViewMode, interactive:boolean) => mode === 'TABLE' ? (
-    <DoctorFeeLedger3D rows={exsumData} columns={columns} isAurora={isAurora} />
+    <DoctorFeeLedger3D rows={exsumData} columns={columns} isAurora={isAurora} isSolaris={isSolaris} />
   ) : (
     <div className="absolute inset-0">
       <Canvas camera={{position:[0,.4,9.2],fov:42,near:.1,far:100}}
         dpr={[1,1.65]} gl={{antialias:true,alpha:false}}
         style={{pointerEvents:interactive?'auto':'none'}}>
-        <DoctorFeeCore3D data={radialData} isAurora={isAurora}
+        <DoctorFeeCore3D data={radialData} isAurora={isAurora} isSolaris={isSolaris}
           onHover={interactive?setHover:()=>undefined} />
       </Canvas>
     </div>
   );
 
   return (
-    <div className="company-panel relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
+    <div className="company-panel company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
       <style>{`
         @keyframes doctorfeeScanBand {
           0% { transform:translateY(-18px);opacity:.15; }

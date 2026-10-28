@@ -51,7 +51,7 @@ export default function ThemeSwitcher({
 
       {open && (
         <div
-          className={`absolute bottom-full z-[120] mb-2 overflow-hidden rounded-lg border backdrop-blur-xl ${
+          className={`absolute top-full z-[999] mt-2 overflow-hidden rounded-lg border backdrop-blur-xl ${
             compact ? 'left-0 w-48' : 'left-0 right-0'
           }`}
           style={{

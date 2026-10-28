@@ -84,6 +84,11 @@ const EXSUM_3D_COLORS_AURORA = [
   '#c084fc', '#5eead4', '#38bdf8', '#f0abfc', '#bae6fd'
 ];
 
+const EXSUM_3D_COLORS_SOLARIS = [
+  '#2f80ed', '#318cff', '#54a8ff', '#79c7ff', '#9cdaff',
+  '#c6edff', '#6f93ff', '#4e73dc', '#a9c8ff', '#e0f5ff'
+];
+
 const EXSUM_3D_COLORS_DARK = [
   '#00f2fe', '#00d4ff', '#00b7ff', '#0099ff', '#007aff',
   '#4d8aff', '#759dff', '#9fb0ff', '#c5c4ff', '#e0d8ff'
@@ -117,14 +122,16 @@ const formatCell3D = (value: any, column: string) => {
 function RevenueCore3D({
   data,
   isAurora,
+  isSolaris,
   onHover,
 }: {
   data: RadialDatum[];
   isAurora: boolean;
+  isSolaris: boolean;
   onHover: (value: Revenue3DHover | null) => void;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const colors = isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK;
+  const colors = isSolaris ? EXSUM_3D_COLORS_SOLARIS : isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK;
 
   const total = useMemo(
     () => data.reduce((sum, item) => sum + Math.max(0, item.value), 0),
@@ -132,14 +139,34 @@ function RevenueCore3D({
   );
 
   const segments = useMemo(() => {
+    const TAU = Math.PI * 2;
+
+    if (total <= 0 || data.length === 0) return [];
+
+    // Keep very small business units visible, but normalize the visual spans
+    // afterwards so the complete ring can NEVER exceed exactly 360 degrees.
+    const MIN_VISUAL_SPAN = 0.045;
+    const baseSpans = data.map((item) => {
+      const ratio = Math.max(0, item.value) / total;
+      return Math.max(MIN_VISUAL_SPAN, ratio * TAU);
+    });
+
+    const baseTotal = baseSpans.reduce((sum, span) => sum + span, 0);
+    const normalizeScale = baseTotal > 0 ? TAU / baseTotal : 0;
+    const normalizedSpans = baseSpans.map((span) => span * normalizeScale);
+
     let cursor = 0;
-    const gap = Math.min(0.022, Math.PI * 2 / Math.max(30, data.length * 30));
+    const baseGap = Math.min(0.022, TAU / Math.max(30, data.length * 30));
 
     return data.map((item, index) => {
-      const ratio = total > 0 ? Math.max(0, item.value) / total : 0;
-      const span = Math.max(0.045, ratio * Math.PI * 2);
-      const start = cursor + gap / 2;
-      const length = Math.max(0.025, span - gap);
+      const ratio = Math.max(0, item.value) / total;
+      const span = normalizedSpans[index];
+
+      // A gap must always remain smaller than its own slice.
+      // This prevents tiny slices from visually crossing into the next segment.
+      const segmentGap = Math.min(baseGap, span * 0.28);
+      const start = cursor + segmentGap / 2;
+      const length = Math.max(0.001, span - segmentGap);
       cursor += span;
 
       return {
@@ -161,18 +188,18 @@ function RevenueCore3D({
 
   return (
     <>
-      <color attach="background" args={[isAurora ? '#092a35' : '#020916']} />
-      <fog attach="fog" args={[isAurora ? '#092a35' : '#020916', 15, 31]} />
+      <color attach="background" args={[isSolaris ? '#5f97cb' : isAurora ? '#092a35' : '#020916']} />
+      <fog attach="fog" args={[isSolaris ? '#91c8e8' : isAurora ? '#092a35' : '#020916', 15, 31]} />
 
-      <ambientLight intensity={isAurora ? 1.1 : 0.9} />
+      <ambientLight intensity={isSolaris ? 1.22 : isAurora ? 1.1 : 0.9} />
       <directionalLight position={[5, 8, 8]} intensity={2.0} color="#e7ffff" />
-      <pointLight position={[-5, 3, 5]} intensity={24} color={isAurora ? '#2dd4bf' : '#00f2fe'} distance={15} />
-      <pointLight position={[5, 3, 4]} intensity={20} color={isAurora ? '#a78bfa' : '#2563eb'} distance={14} />
+      <pointLight position={[-5, 3, 5]} intensity={24} color={isSolaris ? '#79cfff' : isAurora ? '#2dd4bf' : '#00f2fe'} distance={15} />
+      <pointLight position={[5, 3, 4]} intensity={20} color={isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'} distance={14} />
 
       <mesh position={[0, 0, -2.15]}>
         <planeGeometry args={[13.5, 8]} />
         <meshPhysicalMaterial
-          color={isAurora ? '#103744' : '#031321'}
+          color={isSolaris ? '#78afd7' : isAurora ? '#103744' : '#031321'}
           transparent
           opacity={0.68}
           metalness={0.42}
@@ -181,7 +208,7 @@ function RevenueCore3D({
       </mesh>
 
       <gridHelper
-        args={[15, 28, isAurora ? '#2dd4bf' : '#087da5', isAurora ? '#315d69' : '#07304a']}
+        args={[15, 28, isSolaris ? '#a8e2ff' : isAurora ? '#2dd4bf' : '#087da5', isSolaris ? '#4f7fb0' : isAurora ? '#315d69' : '#07304a']}
         position={[0, -3.0, 0]}
         rotation={[0, 0, 0]}
       />
@@ -307,184 +334,6 @@ function RevenueCore3D({
   );
 }
 
-
-
-function AnimatedSurfaceField({
-  position,
-  rotation = [0,0,0],
-  size,
-  isAurora,
-  strength = 1,
-  phase = 0,
-}: {
-  position: [number,number,number];
-  rotation?: [number,number,number];
-  size: [number,number];
-  isAurora: boolean;
-  strength?: number;
-  phase?: number;
-}) {
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
-
-  const uniforms = useMemo(() => ({
-    uTime: { value: 0 },
-    uMode: { value: isAurora ? 1 : 0 },
-    uStrength: { value: strength },
-    uPhase: { value: phase },
-  }), [isAurora, strength, phase]);
-
-  useEffect(() => {
-    if (!materialRef.current) return;
-    materialRef.current.uniforms.uMode.value = isAurora ? 1 : 0;
-    materialRef.current.uniforms.uStrength.value = strength;
-    materialRef.current.uniforms.uPhase.value = phase;
-  }, [isAurora, strength, phase]);
-
-  useFrame(({ clock }) => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.uTime.value = clock.elapsedTime;
-    }
-  });
-
-  return (
-    <mesh position={position} rotation={rotation} renderOrder={2}>
-      <planeGeometry args={[size[0], size[1], 1, 1]} />
-      <shaderMaterial
-        ref={materialRef}
-        transparent
-        depthWrite={false}
-        depthTest
-        side={THREE.DoubleSide}
-        blending={THREE.AdditiveBlending}
-        toneMapped={false}
-        uniforms={uniforms}
-        vertexShader={`
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `}
-        fragmentShader={`
-          precision highp float;
-          varying vec2 vUv;
-          uniform float uTime;
-          uniform float uMode;
-          uniform float uStrength;
-          uniform float uPhase;
-
-          float hash21(vec2 p) {
-            p = fract(p * vec2(123.34, 345.45));
-            p += dot(p, p + 34.345);
-            return fract(p.x * p.y);
-          }
-
-          void main() {
-            vec2 uv = vUv;
-            float edge = smoothstep(0.0, .12, uv.x) *
-                         smoothstep(0.0, .12, 1.0 - uv.x) *
-                         smoothstep(0.0, .08, uv.y) *
-                         smoothstep(0.0, .08, 1.0 - uv.y);
-
-            if (uMode > .5) {
-              // Real moving aurora ribbons painted on the 3D surface.
-              float t = uTime * .20 + uPhase;
-              float curve1 = .50 + sin(uv.y * 6.2 + t * 2.0) * .18
-                                   + sin(uv.y * 12.0 - t * 1.1) * .055;
-              float curve2 = .46 + sin(uv.y * 5.0 - t * 1.55 + 1.7) * .23
-                                   + cos(uv.y * 9.5 + t) * .045;
-              float curve3 = .53 + sin(uv.y * 7.4 + t * 1.15 + 3.1) * .14;
-
-              float band1 = exp(-pow((uv.x - curve1) * 5.2, 2.0));
-              float band2 = exp(-pow((uv.x - curve2) * 7.0, 2.0));
-              float band3 = exp(-pow((uv.x - curve3) * 10.0, 2.0));
-
-              float shimmer = .72 + .28 * sin(uv.y * 26.0 - uTime * .85 + uPhase);
-              float pulse = .82 + .18 * sin(uTime * .58 + uPhase * 2.0);
-
-              vec3 teal = vec3(.08, .96, .78);
-              vec3 cyan = vec3(.10, .78, 1.00);
-              vec3 violet = vec3(.58, .32, 1.00);
-
-              vec3 col =
-                teal * band1 * .62 +
-                violet * band2 * .48 +
-                cyan * band3 * .30;
-
-              float haze = (.10 + band1 * .32 + band2 * .24 + band3 * .16)
-                           * shimmer * pulse;
-              float alpha = clamp(haze * edge * uStrength, 0.0, .62);
-
-              gl_FragColor = vec4(col, alpha);
-            } else {
-              // Cosmic Black: animated space texture on the same 3D surfaces.
-              vec2 p = uv * vec2(14.0, 34.0);
-              vec2 cell = floor(p);
-              vec2 f = fract(p) - .5;
-              float rnd = hash21(cell + floor(uPhase * 11.0));
-              float star = step(.93, rnd) *
-                           smoothstep(.10, .0, length(f)) *
-                           (.55 + .45 * sin(uTime * (1.1 + rnd) + rnd * 8.0));
-
-              float neb1 = sin(uv.y * 5.2 + uv.x * 3.0 + uTime * .16 + uPhase);
-              float neb2 = sin(uv.y * 8.5 - uv.x * 2.3 - uTime * .11);
-              float neb = smoothstep(.35, 1.0, (neb1 + neb2) * .25 + .5);
-
-              vec3 blue = vec3(.04, .40, 1.0);
-              vec3 violet = vec3(.34, .14, .88);
-              vec3 col = mix(blue, violet, uv.y) * neb * .16 + vec3(.72,.90,1.0) * star;
-
-              float alpha = clamp((neb * .10 + star * .85) * edge * uStrength, 0.0, .48);
-              gl_FragColor = vec4(col, alpha);
-            }
-          }
-        `}
-      />
-    </mesh>
-  );
-}
-
-function SurroundingThemeSurfaces({ isAurora }: { isAurora: boolean }) {
-  return (
-    <group>
-      {/* The actual wide LEFT / RIGHT surrounding wall fields. */}
-      <AnimatedSurfaceField
-        position={[-6.72, .02, -1.072]}
-        size={[2.05, 7.65]}
-        isAurora={isAurora}
-        strength={1.28}
-        phase={0.0}
-      />
-      <AnimatedSurfaceField
-        position={[6.72, .02, -1.071]}
-        size={[2.05, 7.65]}
-        isAurora={isAurora}
-        strength={1.28}
-        phase={2.15}
-      />
-
-      {/* Subtle continuation onto floor / ceiling so it feels like one 3D room. */}
-      <AnimatedSurfaceField
-        position={[0, -3.56, -.72]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        size={[11.8, 2.25]}
-        isAurora={isAurora}
-        strength={.42}
-        phase={1.05}
-      />
-      <AnimatedSurfaceField
-        position={[0, 3.58, -.92]}
-        rotation={[Math.PI / 2, 0, 0]}
-        size={[11.8, 1.65]}
-        isAurora={isAurora}
-        strength={.34}
-        phase={3.4}
-      />
-    </group>
-  );
-}
-
-
 function WallBoardCameraRig() {
   const { camera, size } = useThree();
   const controlsRef = useRef<any>(null);
@@ -536,9 +385,9 @@ function BoardText({
 }
 
 function RevenueWallBoardScene({
-  rows, columns, isAurora, page, onHover
+  rows, columns, isAurora, isSolaris, page, onHover
 }: {
-  rows:any[]; columns:string[]; isAurora:boolean; page:number;
+  rows:any[]; columns:string[]; isAurora:boolean; isSolaris:boolean; page:number;
   onHover:(row:any|null)=>void;
 }) {
   const rowRefs=useRef<Array<THREE.Group|null>>([]);
@@ -548,7 +397,11 @@ function RevenueWallBoardScene({
   const pageRows=rows.slice(start,start+pageSize);
   const visibleColumns=columns.slice(0,4);
 
-  const p=isAurora ? {
+  const p=isSolaris ? {
+    wall:'#5f97cb', frame:'#4f7fb0', screen:'#4a82b8', cell:'#74acd4',
+    edge:'#a8e2ff', text:'#f8fdff', muted:'#d7ebf8', pos:'#8fd2ff',
+    neg:'#f05a7a', amber:'#6f8cff', glow:'#79cfff'
+  } : isAurora ? {
     wall:'#0a2630', frame:'#17414d', screen:'#092832', cell:'#123844',
     edge:'#59e8f5', text:'#efffff', muted:'#a9dce2', pos:'#5eead4',
     neg:'#fb7185', amber:'#fbbf24', glow:'#2dd4bf'
@@ -571,7 +424,7 @@ function RevenueWallBoardScene({
       const material = rowMesh?.material as THREE.MeshPhysicalMaterial | undefined;
       if(material){
         const baseColor = new THREE.Color(p.cell);
-        const hoverColor = new THREE.Color(isAurora ? '#17606b' : '#07516a');
+        const hoverColor = new THREE.Color(isSolaris ? '#80b5da' : isAurora ? '#17606b' : '#07516a');
         material.color.lerp(active ? hoverColor : baseColor, 1 - Math.exp(-delta * 10));
         material.emissive.set(p.edge);
         material.emissiveIntensity = THREE.MathUtils.damp(
@@ -585,23 +438,93 @@ function RevenueWallBoardScene({
   });
 
   const colX=[-4.15,-1.20,0.72,2.58,4.30];
-  const rowY=2.38;
-  const pitch=.61;
+  const rowY=2.25;
+  const pitch=.555;
 
   return <>
     <color attach="background" args={[p.wall]}/>
     <fog attach="fog" args={[p.wall,16,30]}/>
+
+    {/* Theme environment: Aurora = aurora sky, Cosmic Black = deep space. */}
+    {(isAurora || isSolaris) ? (
+      <group position={[0, 0, -5.8]}>
+        <mesh>
+          <planeGeometry args={[30, 18]}/>
+          <shaderMaterial
+            transparent
+            depthWrite={false}
+            uniforms={{
+              uTime: { value: 0 },
+            }}
+            vertexShader={`
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `}
+            fragmentShader={`
+              varying vec2 vUv;
+              void main() {
+                vec2 uv = vUv;
+                float band1 = exp(-pow((uv.y - (.58 + sin(uv.x * 7.0) * .075)) * 7.0, 2.0));
+                float band2 = exp(-pow((uv.y - (.42 + sin(uv.x * 5.2 + 1.7) * .055)) * 8.0, 2.0));
+                vec3 navy = vec3(.018, .095, .13);
+                vec3 teal = vec3(.05, .78, .70);
+                vec3 violet = vec3(.46, .28, .88);
+                vec3 col = navy + teal * band1 * .22 + violet * band2 * .18;
+                float vignette = smoothstep(1.15, .20, distance(uv, vec2(.5)));
+                gl_FragColor = vec4(col, .72 * vignette);
+              }
+            `}
+          />
+        </mesh>
+        {[-10,-7,-4,-1,2,5,8,11].map((x,i)=>(
+          <mesh key={`aurora-star-${i}`} position={[x, ((i*1.73)%7)-3.3, .25]}>
+            <sphereGeometry args={[.018 + (i%3)*.008,8,8]}/>
+            <meshBasicMaterial color={i%2===0?'#a7f3d0':'#c4b5fd'} transparent opacity={.65}/>
+          </mesh>
+        ))}
+      </group>
+    ) : (
+      <group position={[0, 0, -5.8]}>
+        <mesh>
+          <planeGeometry args={[30, 18]}/>
+          <meshBasicMaterial color="#01040d"/>
+        </mesh>
+        {[
+          [-11,3.4,.020],[-9,-2.1,.016],[-7.5,1.1,.024],[-5.7,3.0,.014],
+          [-4.1,-3.2,.020],[-2.4,2.2,.016],[-.8,-1.7,.024],[1.0,3.5,.015],
+          [2.8,.6,.020],[4.2,-2.8,.016],[5.9,2.6,.025],[7.4,-.9,.015],
+          [9.0,3.1,.020],[10.5,-2.2,.017],[11.6,.9,.022],[-10.2,.2,.015],
+          [-6.3,-.7,.017],[-3.3,.1,.014],[.4,1.5,.016],[3.6,3.6,.014],
+          [6.8,0,.018],[8.3,-3.4,.014]
+        ].map(([x,y,r],i)=>(
+          <mesh key={`space-star-${i}`} position={[x,y,.22]}>
+            <sphereGeometry args={[r,8,8]}/>
+            <meshBasicMaterial color={i%4===0?'#7dd3fc':'#ffffff'} transparent opacity={.55 + (i%3)*.12}/>
+          </mesh>
+        ))}
+        <mesh position={[-7.8,1.4,.08]}>
+          <planeGeometry args={[8,5]}/>
+          <meshBasicMaterial color="#08205a" transparent opacity={.075}/>
+        </mesh>
+        <mesh position={[7.4,-1.4,.10]}>
+          <planeGeometry args={[7,4.5]}/>
+          <meshBasicMaterial color="#3b0764" transparent opacity={.055}/>
+        </mesh>
+      </group>
+    )}
+
     <ambientLight intensity={1.05}/>
     <directionalLight position={[4,7,7]} intensity={1.8} color="#eaffff"/>
     <pointLight position={[-7.2,2.8,1.2]} intensity={12} color={p.glow} distance={8}/>
-    <pointLight position={[7.0,-2.0,.8]} intensity={9} color={isAurora?'#a78bfa':'#2563eb'} distance={7}/>
-
-    <SurroundingThemeSurfaces isAurora={isAurora} />
+    <pointLight position={[7.0,-2.0,.8]} intensity={9} color={isSolaris?'#6f8cff':isAurora?'#a78bfa':'#2563eb'} distance={7}/>
 
     {/* Architectural wall: layered panels add depth without competing with the data */}
     <mesh position={[0,0,-1.30]}>
       <boxGeometry args={[15.6,8.7,.42]}/>
-      <meshPhysicalMaterial color={p.wall} metalness={.28} roughness={.48}/>
+      <meshPhysicalMaterial color={p.wall} metalness={.28} roughness={.48} transparent opacity={.82}/>
     </mesh>
 
     {/* recessed side wall panels */}
@@ -610,11 +533,9 @@ function RevenueWallBoardScene({
         <mesh position={[side * 6.35, 0, -1.02]}>
           <boxGeometry args={[1.45, 7.35, .22]}/>
           <meshPhysicalMaterial
-            color={isAurora ? '#103642' : '#031725'}
+            color={isSolaris ? '#74acd4' : isAurora ? '#103642' : '#031725'}
             metalness={.42}
             roughness={.34}
-            transparent
-            opacity={isAurora ? .82 : .90}
           />
         </mesh>
         <mesh position={[side * 5.72, 0, -.88]}>
@@ -678,16 +599,39 @@ function RevenueWallBoardScene({
         metalness={.30} roughness={.16} clearcoat={.82} clearcoatRoughness={.06}/>
     </mesh>
 
-    {/* column header starts higher because title no longer consumes screen space */}
-    <group position={[0,2.86,.20]}>
+    {/* Title moved above the physical screen so the data area can be denser. */}
+    <group position={[0,3.38,-.30]}>
       <mesh>
-        <boxGeometry args={[10.68,.44,.10]}/>
+        <boxGeometry args={[8.10,.38,.12]}/>
+        <meshPhysicalMaterial
+          color={p.frame}
+          emissive={p.edge}
+          emissiveIntensity={.018}
+          metalness={.58}
+          roughness={.20}
+        />
+      </mesh>
+      <BoardText
+        position={[0,0,.075]}
+        fontSize={.145}
+        color={p.edge}
+        anchorX="center"
+        maxWidth={6.2}
+      >
+        REVENUE EXSUM · LIVE WALL
+      </BoardText>
+    </group>
+
+    {/* column header starts higher because title no longer consumes screen space */}
+    <group position={[0,2.68,.20]}>
+      <mesh>
+        <boxGeometry args={[10.62,.38,.10]}/>
         <meshPhysicalMaterial color={p.screen} emissive={p.edge} emissiveIntensity={.012}
           metalness={.28} roughness={.24}/>
       </mesh>
-      <BoardText position={[colX[0],0,.065]} fontSize={.142} color={p.muted}>UNIT BISNIS</BoardText>
+      <BoardText position={[colX[0],0,.065]} fontSize={.115} color={p.muted}>UNIT BISNIS</BoardText>
       {visibleColumns.map((c,i)=>
-        <BoardText key={c} position={[colX[i+1],0,.065]} fontSize={.128}
+        <BoardText key={c} position={[colX[i+1],0,.065]} fontSize={.105}
           color={p.muted} anchorX="right">{c.toUpperCase()}</BoardText>
       )}
     </group>
@@ -709,14 +653,14 @@ function RevenueWallBoardScene({
           if(typeof document!=='undefined')document.body.style.cursor='';
           onHover(null);}}>
         <mesh name="wall-row">
-          <boxGeometry args={[10.58,.52,.105]}/>
+          <boxGeometry args={[10.52,.47,.105]}/>
           <meshPhysicalMaterial color={p.cell} emissive={p.edge} emissiveIntensity={.010}
             metalness={.30} roughness={.19} clearcoat={.45} clearcoatRoughness={.10}/>
         </mesh>
         <mesh position={[-5.18,0,.075]}>
           <boxGeometry args={[.035,.30,.035]}/><meshBasicMaterial color={gc}/>
         </mesh>
-        <BoardText position={[colX[0],0,.075]} fontSize={.154} color={p.text}>
+        <BoardText position={[colX[0],0,.075]} fontSize={.132} color={p.text}>
           {String(unit).toUpperCase()}
         </BoardText>
         {visibleColumns.map((c,ci)=>{
@@ -724,7 +668,7 @@ function RevenueWallBoardScene({
           const growthCol=/vs|growth|%/i.test(c);
           const color=growthCol?(val<0?p.neg:val>0?p.pos:p.muted):p.text;
           return <BoardText key={c} position={[colX[ci+1],0,.075]}
-            fontSize={.154} color={color} anchorX="right">
+            fontSize={.132} color={color} anchorX="right">
             {formatCell3D(row[c],c)}
           </BoardText>
         })}
@@ -762,8 +706,8 @@ function RevenueWallBoardScene({
 }
 
 function RevenueLedger3D({
-  rows, columns, isAurora
-}: {rows:any[];columns:string[];isAurora:boolean}) {
+  rows, columns, isAurora, isSolaris
+}: {rows:any[];columns:string[];isAurora:boolean;isSolaris:boolean}) {
   const [page,setPage]=useState(0);
   const [hover,setHover]=useState<any|null>(null);
   const wheelLock=useRef(false);
@@ -784,9 +728,9 @@ function RevenueLedger3D({
   };
 
   return <div className="absolute inset-0" onWheel={onWheel}>
-    <Canvas camera={{position:[.28,.34,10.20],fov:38,near:.1,far:100}}
+    <Canvas camera={{position:[.34,.38,10.85],fov:40,near:.1,far:100}}
       dpr={[1,1.65]} gl={{antialias:true,alpha:false}}>
-      <RevenueWallBoardScene rows={rows} columns={columns} isAurora={isAurora}
+      <RevenueWallBoardScene rows={rows} columns={columns} isAurora={isAurora} isSolaris={isSolaris}
         page={safePage} onHover={setHover}/>
     </Canvas>
 
@@ -825,7 +769,7 @@ function RevenueExsumFullscreen({
   selectedYear: 'Current Year' | 'Full Year 2025' | 'Full Year 2024';
   setSelectedYear: (year: 'Current Year' | 'Full Year 2025' | 'Full Year 2024') => void;
 }) {
-  const { isAurora } = useTheme();
+  const { isAurora, isSolaris } = useTheme();
   const [hover, setHover] = useState<Revenue3DHover | null>(null);
 
   // Demography-style transition state:
@@ -938,6 +882,7 @@ function RevenueExsumFullscreen({
           rows={exsumData}
           columns={data.columns}
           isAurora={isAurora}
+          isSolaris={isSolaris}
         />
       );
     }
@@ -953,6 +898,7 @@ function RevenueExsumFullscreen({
           <RevenueCore3D
             data={data.radialData}
             isAurora={isAurora}
+            isSolaris={isSolaris}
             onHover={interactive ? setHover : () => undefined}
           />
         </Canvas>
@@ -961,7 +907,7 @@ function RevenueExsumFullscreen({
   };
 
   return (
-    <div className="company-panel relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
+    <div className="company-panel company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
       <style>{`
         @keyframes revenueExsumScanBand {
           0% { transform: translateY(-18px); opacity: .15; }
@@ -973,59 +919,53 @@ function RevenueExsumFullscreen({
         }
       `}</style>
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[110] h-[74px] border-b border-cyan-300/10 bg-[#001019]/82 px-5 backdrop-blur-xl">
-        <div className="flex h-full items-center justify-between gap-4">
-          <div className="min-w-0">
-            <div className="company-title truncate text-[13px] font-black uppercase tracking-[0.24em]">
-              Revenue Exsum
-            </div>
-            <div className="company-muted mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] uppercase tracking-[0.14em]">
-              <span>3D Intelligence Console</span>
-              <span className="text-cyan-300/35">•</span>
-              <span>{targetMode === 'SENTRA' ? sentraData.length : exsumData.length} nodes</span>
-              <span className="text-cyan-300/35">•</span>
-              <span>{targetMode === 'TABLE' ? 'Physical Data Wall' : targetMode === 'SENTRA' ? 'Sentra Core' : selectedYear}</span>
-            </div>
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[100] flex items-start justify-between p-4 pr-14">
+        <div>
+          <div className="company-title text-[11px] font-black uppercase tracking-[0.26em]">
+            Revenue Exsum · 3D Intelligence
           </div>
+          <div className="company-muted mt-1 text-[9px] uppercase tracking-[0.18em]">
+            Revenue Core ↔ Physical Holographic Wall
+          </div>
+        </div>
 
-          <div className="pointer-events-auto flex shrink-0 items-center gap-2">
-            {targetMode === 'DONUT' && !scannerActive && (
-              <select
-                value={selectedYear}
-                onChange={(event) => setSelectedYear(event.target.value as any)}
-                className="company-select rounded-lg border border-cyan-400/25 bg-[#001428]/85 px-2.5 py-2 text-[9px] font-mono text-cyan-100 outline-none"
+        <div className="pointer-events-auto flex items-center gap-2">
+          {targetMode === 'DONUT' && !scannerActive && (
+            <select
+              value={selectedYear}
+              onChange={(event) => setSelectedYear(event.target.value as any)}
+              className="company-select rounded-lg border border-cyan-400/25 bg-[#001428]/75 px-2 py-1 text-[9px] font-mono text-cyan-100 outline-none"
+            >
+              <option value="Current Year">2026 (YTD)</option>
+              <option value="Full Year 2025">2025</option>
+              <option value="Full Year 2024">2024</option>
+            </select>
+          )}
+
+          <div className="company-tabs flex overflow-hidden rounded-lg border border-cyan-400/25 bg-[#001428]/70 p-0.5 backdrop-blur-md">
+            {([
+              ['DONUT', '3D CORE'],
+              ['TABLE', 'DATA WALL'],
+              ['SENTRA', 'SENTRA CORE'],
+            ] as Array<[RevenueExsumViewMode, string]>).map(([mode, label]) => (
+              <button
+                key={mode}
+                disabled={scannerActive}
+                onClick={() => changeMode(mode)}
+                className={`px-3 py-1 text-[9px] font-black disabled:cursor-wait ${
+                  targetMode === mode ? 'company-tab-active' : 'company-tab-idle'
+                }`}
               >
-                <option value="Current Year">2026 (YTD)</option>
-                <option value="Full Year 2025">2025</option>
-                <option value="Full Year 2024">2024</option>
-              </select>
-            )}
-
-            <div className="company-tabs flex overflow-hidden rounded-xl border border-cyan-400/25 bg-[#001428]/85 p-1 backdrop-blur-md">
-              {([
-                ['DONUT', '3D CORE'],
-                ['TABLE', 'DATA WALL'],
-                ['SENTRA', 'SENTRA CORE'],
-              ] as Array<[RevenueExsumViewMode, string]>).map(([mode, label]) => (
-                <button
-                  key={mode}
-                  disabled={scannerActive}
-                  onClick={() => changeMode(mode)}
-                  className={`min-w-[88px] rounded-lg px-3 py-2 text-[9px] font-black tracking-[0.08em] disabled:cursor-wait ${
-                    targetMode === mode ? 'company-tab-active' : 'company-tab-idle'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+                {label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Outgoing scene stays physically present on the RIGHT side of the scanner. */}
       <div
-        className="absolute bottom-0 left-0 right-0 top-[74px]"
+        className="absolute inset-0"
         style={{
           clipPath: scannerActive
             ? `inset(0 0 0 ${scannerPercent}%)`
@@ -1039,7 +979,7 @@ function RevenueExsumFullscreen({
       {/* Incoming scene is reconstructed only AFTER the scanner crosses each X coordinate. */}
       {scannerActive && (
         <div
-          className="absolute bottom-0 left-0 right-0 top-[74px]"
+          className="absolute inset-0"
           style={{
             clipPath: `inset(0 ${100 - scannerPercent}% 0 0)`,
             pointerEvents: 'none',
@@ -1053,7 +993,7 @@ function RevenueExsumFullscreen({
       {scannerActive && (
         <div
           key={scannerKey}
-          className="pointer-events-none absolute bottom-0 top-[74px] z-[90]"
+          className="pointer-events-none absolute inset-y-0 z-[90]"
           style={{
             left: `calc(${scannerPercent}% - 46px)`,
             width: 92,
@@ -1108,6 +1048,19 @@ function RevenueExsumFullscreen({
           )}
         </div>
       )}
+
+      <div className="pointer-events-none absolute bottom-3 left-3 z-[100] rounded-lg border border-cyan-400/15 bg-[#00111d]/70 px-3 py-2 font-mono backdrop-blur-md">
+        <div className="text-[8px] uppercase tracking-[0.18em] text-cyan-300/55">
+          Revenue Exsum 3D
+        </div>
+        <div className="mt-0.5 text-[9px] text-cyan-100/75">
+          {scannerActive
+            ? 'Physical reconstruction in progress · scanner boundary controls geometry'
+            : displayedMode === 'TABLE'
+              ? '3D wall-mounted revenue display · wheel / arrows to navigate'
+              : 'Radial contribution core · drag to inspect'}
+        </div>
+      </div>
     </div>
   );
 }

@@ -53,6 +53,12 @@ class CoreApiClient:
             if "PasswordHash" in debug_payload:
                 debug_payload["PasswordHash"] = "<HIDDEN>"
 
+            if "ResetTokenHash" in debug_payload:
+                debug_payload["ResetTokenHash"] = "<HIDDEN>"
+
+            if "ResetSessionHash" in debug_payload:
+                debug_payload["ResetSessionHash"] = "<HIDDEN>"
+
             if "EmbeddingBase64" in debug_payload:
                 value = payload.get("EmbeddingBase64") or ""
                 debug_payload["EmbeddingBase64"] = (
@@ -142,6 +148,97 @@ class CoreApiClient:
             },
         )
 
+    def change_user_password(
+        self,
+        *,
+        user_id: str,
+        password_hash: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserPasswordChange",
+            {
+                "UserID": str(user_id),
+                "PasswordHash": password_hash,
+            },
+        )
+
+    def lookup_password_reset(
+        self,
+        identifier: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CorePasswordResetLookup",
+            {
+                "Identifier": str(identifier or ""),
+            },
+        )
+
+    def issue_password_reset(
+        self,
+        *,
+        user_id: str,
+        token_hash: str,
+        ip_address: Optional[str] = None,
+        ttl_minutes: int = 10,
+        max_requests: int = 3,
+        window_minutes: int = 15,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CorePasswordResetIssue",
+            {
+                "UserID": str(user_id),
+                "ResetTokenHash": str(token_hash),
+                "IPAddress": ip_address,
+                "ResetTTLMinutes": int(ttl_minutes),
+                "ResetMaxRequests": int(max_requests),
+                "ResetWindowMinutes": int(window_minutes),
+            },
+        )
+
+    def verify_password_reset(
+        self,
+        *,
+        user_id: str,
+        token_hash: str,
+        reset_token_hash: str,
+        max_attempts: int = 5,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CorePasswordResetVerify",
+            {
+                "UserID": str(user_id),
+                "ResetTokenHash": str(token_hash),
+                "ResetSessionHash": str(reset_token_hash),
+                "ResetMaxAttempts": int(max_attempts),
+            },
+        )
+
+    def apply_password_reset(
+        self,
+        *,
+        reset_token_hash: str,
+        password_hash: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CorePasswordResetApply",
+            {
+                "ResetSessionHash": str(reset_token_hash),
+                "PasswordHash": password_hash,
+            },
+        )
+
+    def revoke_password_reset(
+        self,
+        *,
+        reset_token_id: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CorePasswordResetRevoke",
+            {
+                "ResetTokenID": str(reset_token_id),
+            },
+        )
+
     def get_user(
         self,
         user_id: str,
@@ -150,6 +247,22 @@ class CoreApiClient:
             "CoreUserGet",
             {
                 "UserID": str(user_id),
+            },
+        )
+
+    def update_user_profile(
+        self,
+        *,
+        user_id: str,
+        display_name: str,
+        email: str,
+    ) -> dict[str, Any]:
+        return self._post_mode(
+            "CoreUserUpdate",
+            {
+                "UserID": str(user_id),
+                "DisplayName": str(display_name or "").strip(),
+                "Email": str(email or "").strip(),
             },
         )
 
