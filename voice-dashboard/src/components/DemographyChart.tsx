@@ -122,6 +122,13 @@ function Demography3DScene({
   // Responsive 3D fit:
   // keep portrait mobile as portrait and solve visibility only with camera distance.
   const { camera, size } = useThree();
+
+  // Mobile portrait needs special treatment for drei <Html> overlays.
+  // The 3D donut becomes visually smaller as the camera moves back,
+  // while a normal <Html> overlay keeps a fixed CSS pixel size.
+  // Without this guard, the PATIENT MIX capsule can cover most of the donut.
+  const isPortraitMobile = size.width <= 767 && size.height > size.width;
+
   const [fitDistance, setFitDistance] = useState(13);
   const controlsRef = useRef<any>(null);
   const patrolStartRef = useRef<number | null>(null);
@@ -836,15 +843,64 @@ function Demography3DScene({
         </mesh>
       </group>
 
-      <Html key={`center-${displayedMode}-${transitionPulse}`} position={[-3.35, 2.58, 0.48]} center style={{ pointerEvents: 'none' }}>
-        <div className="demography-3d-label-swap" style={{ width: 132, textAlign: 'center', padding: '10px 8px', borderRadius: 999, background: 'rgba(2,12,27,.76)', border: '1px solid rgba(103,232,249,.25)', boxShadow: '0 0 30px rgba(0,191,255,.12)', backdropFilter: 'blur(10px)' }}>
-          <div style={{ color: firstColor, fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}>
+      <Html
+        key={`center-${displayedMode}-${transitionPulse}`}
+        position={[-3.35, 2.58, 0.48]}
+        center
+        style={{ pointerEvents: 'none' }}
+      >
+        <div
+          className="demography-3d-label-swap"
+          style={{
+            width: isPortraitMobile ? 86 : 132,
+            textAlign: 'center',
+            padding: isPortraitMobile ? '5px 5px' : '10px 8px',
+            borderRadius: 999,
+            background: isPortraitMobile
+              ? 'rgba(2,12,27,.54)'
+              : 'rgba(2,12,27,.76)',
+            border: isPortraitMobile
+              ? '1px solid rgba(103,232,249,.20)'
+              : '1px solid rgba(103,232,249,.25)',
+            boxShadow: isPortraitMobile
+              ? '0 0 18px rgba(0,191,255,.08)'
+              : '0 0 30px rgba(0,191,255,.12)',
+            backdropFilter: isPortraitMobile ? 'blur(6px)' : 'blur(10px)',
+          }}
+        >
+          <div
+            style={{
+              color: firstColor,
+              fontSize: isPortraitMobile ? 9 : 12,
+              lineHeight: isPortraitMobile ? 1.15 : 1.25,
+              fontWeight: 900,
+              whiteSpace: 'nowrap',
+            }}
+          >
             {firstValue.toLocaleString('id-ID')} {firstShortLabel}
           </div>
-          <div style={{ color: secondColor, fontSize: 12, fontWeight: 900, whiteSpace: 'nowrap' }}>
+          <div
+            style={{
+              color: secondColor,
+              fontSize: isPortraitMobile ? 9 : 12,
+              lineHeight: isPortraitMobile ? 1.15 : 1.25,
+              fontWeight: 900,
+              whiteSpace: 'nowrap',
+            }}
+          >
             {secondValue.toLocaleString('id-ID')} {secondShortLabel}
           </div>
-          <div style={{ color: '#94a3b8', fontSize: 8, marginTop: 4, letterSpacing: 1.2 }}>PATIENT MIX</div>
+          <div
+            style={{
+              color: '#94a3b8',
+              fontSize: isPortraitMobile ? 6 : 8,
+              marginTop: isPortraitMobile ? 2 : 4,
+              letterSpacing: isPortraitMobile ? 0.75 : 1.2,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            PATIENT MIX
+          </div>
         </div>
       </Html>
 

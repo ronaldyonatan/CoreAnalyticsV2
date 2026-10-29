@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './LoginSpotlightTour.css';
+import useSpotlightNarration from './useSpotlightNarration';
+import useSpotlightLanguage, {
+  SPOTLIGHT_LANGUAGE_OPTIONS,
+  SPOTLIGHT_UI,
+  type SpotlightLanguage,
+} from './spotlightLanguage';
 
 export type LoginTourStepId =
   | 'welcome'
@@ -33,61 +39,24 @@ interface LoginSpotlightTourProps {
 
 const STORAGE_KEY = 'core_login_onboarding_v1';
 
-const STEPS: LoginTourStep[] = [
-  {
-    id: 'welcome',
-    eyebrow: 'COREANALYTICS · FIRST ACCESS',
-    title: 'Welcome to CoreAnalytics',
-    description:
-      'Sebelum masuk ke dashboard, kenali tiga jalur akses utama: Voice Authentication, Manual Login, dan Password Recovery.',
-    target: '[data-tour="login-hud"]',
-    tip: 'Tour ini tidak menjalankan proses login. Spotlight hanya memperkenalkan kontrol yang tersedia.',
-  },
-  {
-    id: 'auth-modes',
-    eyebrow: '01 · ACCESS MODE',
-    title: 'Pilih cara masuk',
-    description:
-      'Gunakan Voice Access untuk autentikasi biometrik suara, atau Manual Access untuk login dengan username dan password.',
-    target: '[data-tour="login-auth-modes"]',
-  },
-  {
-    id: 'voice-login',
-    eyebrow: '02 · VOICE AUTHENTICATION',
-    title: 'Login dengan suara',
-    description:
-      'Tekan Voice Authentication untuk mengaktifkan listener. Setelah aktif, ucapkan “Hey Friday”. CoreAnalytics akan mencocokkan voice signature dengan biometric profile yang terdaftar.',
-    target: '[data-tour="login-voice-auth"]',
-    tip: 'Voice profile harus sudah terdaftar pada Management Center.',
-  },
-  {
-    id: 'manual-login',
-    eyebrow: '03 · MANUAL ACCESS',
-    title: 'Login dengan credential',
-    description:
-      'Jika voice login tidak tersedia, pilih Manual Access lalu masukkan username dan password. Sistem melakukan secure credential verification sebelum membuka dashboard.',
-    target: '[data-tour="login-manual-form"]',
-    tip: 'Indikator login attempt membantu melihat sisa percobaan sebelum account lock.',
-  },
-  {
-    id: 'forgot-password',
-    eyebrow: '04 · PASSWORD RECOVERY',
-    title: 'Lupa password?',
-    description:
-      'Gunakan Forgot Password untuk recovery. Masukkan username atau email terdaftar, verifikasi OTP 6 digit dari email, kemudian buat password baru.',
-    target: '[data-tour="login-forgot-password"]',
-    tip: 'Kode OTP memiliki masa berlaku dan reset token hanya dapat digunakan untuk proses recovery yang valid.',
-  },
-  {
-    id: 'finish',
-    eyebrow: 'COREANALYTICS · READY',
-    title: 'Authentication gateway ready',
-    description:
-      'Anda sudah mengenal tiga jalur akses Login Portal. Setelah berhasil login, guided tour berikutnya dapat melanjutkan ke Navigation, Healthcare Selector, Dashboard, 3D View, Theme, dan Voice Command.',
-    target: '[data-tour="login-hud"]',
-    tip: 'Tekan GUIDE kapan saja untuk menjalankan tutorial Login Portal kembali.',
-  },
-];
+const LOGIN_STEPS: Record<SpotlightLanguage, LoginTourStep[]> = {
+  id: [
+    { id:'welcome', eyebrow:'COREANALYTICS · AKSES PERTAMA', title:'Selamat datang di CoreAnalytics', description:'Sebelum masuk ke dashboard, kenali tiga jalur akses utama: autentikasi suara, login manual, dan pemulihan password.', target:'[data-tour="login-hud"]', tip:'Tour ini tidak menjalankan proses login. Spotlight hanya memperkenalkan kontrol yang tersedia.' },
+    { id:'auth-modes', eyebrow:'01 · MODE AKSES', title:'Pilih cara masuk', description:'Gunakan Voice Access untuk autentikasi biometrik suara, atau Manual Access untuk login dengan username dan password.', target:'[data-tour="login-auth-modes"]' },
+    { id:'voice-login', eyebrow:'02 · AUTENTIKASI SUARA', title:'Login dengan suara', description:'Tekan Voice Authentication untuk mengaktifkan listener. Setelah aktif, ucapkan “Hey Friday”. CoreAnalytics akan mencocokkan voice signature dengan profil biometrik suara yang terdaftar.', target:'[data-tour="login-voice-auth"]', tip:'Voice profile harus sudah terdaftar sebelum voice login dapat digunakan.' },
+    { id:'manual-login', eyebrow:'03 · AKSES MANUAL', title:'Login dengan kredensial', description:'Jika voice login tidak tersedia, pilih Manual Access lalu masukkan username dan password. Sistem melakukan verifikasi kredensial sebelum membuka dashboard.', target:'[data-tour="login-manual-form"]', tip:'Indikator percobaan login membantu melihat sisa percobaan sebelum account terkunci.' },
+    { id:'forgot-password', eyebrow:'04 · PEMULIHAN PASSWORD', title:'Lupa password?', description:'Gunakan Forgot Password untuk recovery. Masukkan username atau email terdaftar, verifikasi OTP 6 digit dari email, kemudian buat password baru.', target:'[data-tour="login-forgot-password"]', tip:'Kode OTP memiliki masa berlaku dan reset token hanya dapat digunakan untuk proses recovery yang valid.' },
+    { id:'finish', eyebrow:'COREANALYTICS · SIAP', title:'Gerbang autentikasi siap', description:'Anda sudah mengenal tiga jalur akses Login Portal. Setelah berhasil login, guided tour berikutnya akan memperkenalkan navigasi, Healthcare Selector, dashboard, theme, dan My Account.', target:'[data-tour="login-hud"]', tip:'Tekan GUIDE kapan saja untuk menjalankan tutorial Login Portal kembali.' },
+  ],
+  en: [
+    { id:'welcome', eyebrow:'COREANALYTICS · FIRST ACCESS', title:'Welcome to CoreAnalytics', description:'Before entering the dashboard, get familiar with the three main access paths: Voice Authentication, Manual Login, and Password Recovery.', target:'[data-tour="login-hud"]', tip:'This tour does not perform a login. The spotlight only introduces the controls that are available.' },
+    { id:'auth-modes', eyebrow:'01 · ACCESS MODE', title:'Choose how to sign in', description:'Use Voice Access for biometric voice authentication, or Manual Access to sign in with your username and password.', target:'[data-tour="login-auth-modes"]' },
+    { id:'voice-login', eyebrow:'02 · VOICE AUTHENTICATION', title:'Sign in with your voice', description:'Press Voice Authentication to activate the listener. Once it is active, say “Hey Friday”. CoreAnalytics will match your voice signature with the registered biometric voice profile.', target:'[data-tour="login-voice-auth"]', tip:'A voice profile must already be registered before voice login can be used.' },
+    { id:'manual-login', eyebrow:'03 · MANUAL ACCESS', title:'Sign in with credentials', description:'If voice login is not available, choose Manual Access and enter your username and password. The system verifies your credentials before opening the dashboard.', target:'[data-tour="login-manual-form"]', tip:'The login attempt indicator shows how many attempts remain before the account is locked.' },
+    { id:'forgot-password', eyebrow:'04 · PASSWORD RECOVERY', title:'Forgot your password?', description:'Use Forgot Password to recover access. Enter your registered username or email, verify the six-digit OTP from your email, then create a new password.', target:'[data-tour="login-forgot-password"]', tip:'The OTP has an expiration time, and the reset token can only be used for a valid recovery process.' },
+    { id:'finish', eyebrow:'COREANALYTICS · READY', title:'Authentication gateway ready', description:'You now know the three Login Portal access paths. After you sign in, the next guided tour will introduce navigation, the Healthcare Selector, dashboards, themes, and My Account.', target:'[data-tour="login-hud"]', tip:'Press GUIDE at any time to replay the Login Portal tutorial.' },
+  ],
+};
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -101,8 +70,24 @@ export default function LoginSpotlightTour({
   const [targetRect, setTargetRect] = useState<SpotlightRect | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
   const [cardSize, setCardSize] = useState({ width: 360, height: 270 });
+  const { language, setLanguage } = useSpotlightLanguage();
+  const ui = SPOTLIGHT_UI[language];
+  const steps = LOGIN_STEPS[language];
+  const safeStepIndex = Math.min(stepIndex, steps.length - 1);
+  const step = steps[safeStepIndex];
 
-  const step = STEPS[stepIndex];
+  const {
+    audioEnabled,
+    audioSupported,
+    toggleAudio,
+  } = useSpotlightNarration({
+    active,
+    stepKey: step.id,
+    title: step.title,
+    description: step.description,
+    tip: step.tip,
+    language,
+  });
 
   const measureTarget = useCallback(() => {
     if (!active || !step.target) {
@@ -187,9 +172,9 @@ export default function LoginSpotlightTour({
         return;
       }
 
-      if (event.key === 'ArrowRight' && stepIndex < STEPS.length - 1) {
+      if (event.key === 'ArrowRight' && stepIndex < steps.length - 1) {
         event.preventDefault();
-        setStepIndex((current) => Math.min(current + 1, STEPS.length - 1));
+        setStepIndex((current) => Math.min(current + 1, steps.length - 1));
       }
 
       if (event.key === 'ArrowLeft' && stepIndex > 0) {
@@ -377,7 +362,39 @@ export default function LoginSpotlightTour({
 
         <div className="login-tour-card__topline">
           <span>{step.eyebrow}</span>
-          <span>{String(stepIndex + 1).padStart(2, '0')} / {String(STEPS.length).padStart(2, '0')}</span>
+          <div className="login-tour-card__tools">
+            <label className="login-tour-language-wrap" title={ui.languageLabel}>
+              <span aria-hidden="true">🌐</span>
+              <select
+                className="login-tour-language"
+                value={language}
+                onChange={(event) => setLanguage(event.target.value as SpotlightLanguage)}
+                aria-label={ui.languageLabel}
+              >
+                {SPOTLIGHT_LANGUAGE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              className={`login-tour-audio ${audioEnabled ? 'is-on' : 'is-off'}`}
+              onClick={toggleAudio}
+              disabled={!audioSupported}
+              aria-pressed={audioEnabled}
+              title={
+                audioSupported
+                  ? audioEnabled
+                    ? ui.audioOnTitle
+                    : ui.audioOffTitle
+                  : ui.audioUnavailableTitle
+              }
+            >
+              <span aria-hidden="true">{audioEnabled && audioSupported ? '🔊' : '🔇'}</span>
+              <span>{audioSupported ? (audioEnabled ? ui.audioOn : ui.audioOff) : ui.audioUnavailable}</span>
+            </button>
+            <span>{String(safeStepIndex + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+          </div>
         </div>
 
         <h2>{step.title}</h2>
@@ -391,17 +408,17 @@ export default function LoginSpotlightTour({
         )}
 
         <div className="login-tour-progress" aria-hidden="true">
-          {STEPS.map((item, index) => (
+          {steps.map((item, index) => (
             <span
               key={item.id}
-              className={index === stepIndex ? 'is-active' : index < stepIndex ? 'is-done' : ''}
+              className={index === safeStepIndex ? 'is-active' : index < safeStepIndex ? 'is-done' : ''}
             />
           ))}
         </div>
 
         <div className="login-tour-actions">
           <button type="button" className="login-tour-skip" onClick={closeTour}>
-            SKIP GUIDE
+            {ui.skip}
           </button>
 
           <div className="login-tour-nav">
@@ -409,22 +426,22 @@ export default function LoginSpotlightTour({
               type="button"
               className="login-tour-secondary"
               onClick={() => setStepIndex((current) => Math.max(0, current - 1))}
-              disabled={stepIndex === 0}
+              disabled={safeStepIndex === 0}
             >
-              ← BACK
+              ← {ui.back}
             </button>
 
-            {stepIndex < STEPS.length - 1 ? (
+            {safeStepIndex < steps.length - 1 ? (
               <button
                 type="button"
                 className="login-tour-primary"
-                onClick={() => setStepIndex((current) => Math.min(STEPS.length - 1, current + 1))}
+                onClick={() => setStepIndex((current) => Math.min(steps.length - 1, current + 1))}
               >
-                NEXT →
+                {ui.next} →
               </button>
             ) : (
               <button type="button" className="login-tour-primary" onClick={closeTour}>
-                FINISH TOUR ✓
+                {ui.finish}
               </button>
             )}
           </div>

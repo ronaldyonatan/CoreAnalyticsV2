@@ -5,8 +5,10 @@ import { useTheme } from '../theme/ThemeContext';
 
 export default function ThemeSwitcher({
   compact = false,
+  align = 'left',
 }: {
   compact?: boolean;
+  align?: 'left' | 'right';
 }) {
   const { themeId, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
@@ -52,7 +54,9 @@ export default function ThemeSwitcher({
       {open && (
         <div
           className={`absolute top-full z-[999] mt-2 overflow-hidden rounded-lg border backdrop-blur-xl ${
-            compact ? 'left-0 w-48' : 'left-0 right-0'
+            compact
+              ? `${align === 'right' ? 'right-0' : 'left-0'} w-48`
+              : 'left-0 right-0'
           }`}
           style={{
             background: 'var(--core-surface-strong)',

@@ -9,6 +9,18 @@ import DashboardManager from './components/DashboardManager';
 import { useVoiceCommand } from './hooks/useVoiceCommand';
 import { ThemeProvider, useTheme } from './theme/ThemeContext';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import MyAccount from './components/MyAccount';
+import VoiceCommandGuide from './components/VoiceCommandGuide';
+import {
+  GLOBAL_VOICE_COMMANDS,
+  COMPANY_PERFORMANCE_VOICE_COMMANDS,
+  DAILY_TRACKING_VOICE_COMMANDS,
+  normalizeVoiceTranscript,
+  resolveVoiceCommand,
+} from './voiceCommand/voiceCommandRegistry';
+import PostLoginSpotlightTour, {
+  type PostLoginTourStepId,
+} from './onboarding/PostLoginSpotlightTour';
 
 // Core Analytics brand asset (project-root /img folder)
 import dashboardLogo from '../img/logohorizontal.png';
@@ -379,6 +391,10 @@ function AppContent() {
       .map(menu => menu?.route_key)
       .filter((key): key is string => typeof key === 'string' && REGISTERED_ROUTES.has(key)),
   ), [authenticatedUser]);
+  const authorizedRouteList = useMemo(
+    () => Array.from(authorizedRouteKeys),
+    [authorizedRouteKeys]
+  );
   const canAccess = useCallback((routeKey: string) => (
     isWidgetMode ? routeKey === 'widget_revenue' : authorizedRouteKeys.has(routeKey)
   ), [isWidgetMode, authorizedRouteKeys]);
@@ -450,6 +466,10 @@ function AppContent() {
 
   // Management / settings dropdown in the global header.
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showMyAccount, setShowMyAccount] = useState(false);
+  const [showVoiceCommandGuide, setShowVoiceCommandGuide] = useState(false);
+  const lastGlobalVoiceCommandRef = useRef<{ transcript: string; at: number }>({ transcript: '', at: 0 });
+  const [postLoginTourReplaySignal, setPostLoginTourReplaySignal] = useState(0);
   const settingsMenuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -469,6 +489,20 @@ function AppContent() {
       document.removeEventListener('mousedown', handlePointerDown);
     };
   }, [showSettingsMenu]);
+
+  const openMyAccount = useCallback(() => {
+    SciFiAudio.playBeep(735, 'sine', 0.05, 0.028);
+    setShowMyAccount(true);
+    setShowSettingsMenu(false);
+    if (!isSidebarPinned) setIsSidebarExpanded(false);
+  }, [isSidebarPinned]);
+
+  const openVoiceCommandGuide = useCallback(() => {
+    SciFiAudio.playBeep(805, 'triangle', 0.06, 0.032);
+    setShowVoiceCommandGuide(true);
+    setShowSettingsMenu(false);
+    if (!isSidebarPinned) setIsSidebarExpanded(false);
+  }, [isSidebarPinned]);
 
   const openUserManagement = useCallback(() => {
     if (!canAccess('user_management')) return;
@@ -491,6 +525,65 @@ function AppContent() {
     SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
     setShowSettingsMenu(false);
     navigateTo('dashboard_designer');
+  }, [canAccess, effectiveRoute, navigateTo]);
+
+  const preparePostLoginTourStep = useCallback((
+    stepId: PostLoginTourStepId,
+    routeKey?: string
+  ) => {
+    setShowMyAccount(false);
+
+    if (stepId === 'navigation' || stepId === 'dashboard-switch') {
+      setShowSettingsMenu(false);
+      setExpandedGroups((prev) => ({ ...prev, financial: true }));
+      setIsSidebarExpanded(true);
+
+      if (stepId === 'dashboard-switch' && routeKey && canAccess(routeKey)) {
+        navigateTo(routeKey);
+      }
+      return;
+    }
+
+    if (stepId === 'healthcare' || stepId === 'maximize') {
+      setShowSettingsMenu(false);
+      setIsSidebarExpanded(false);
+
+      if (routeKey && canAccess(routeKey)) {
+        navigateTo(routeKey);
+      }
+
+      // Mobile dashboards keep the healthcare filter collapsed to save space.
+      // During the guided-tour healthcare step, ask the active dashboard to
+      // temporarily reveal it before Spotlight measures/highlights the target.
+      if (stepId === 'healthcare' && typeof window !== 'undefined' && window.innerWidth < 768) {
+        // Route changes can mount the active dashboard a little after this callback.
+        // Fire more than once so the dashboard-side listener cannot miss the request.
+        [80, 220, 500].forEach((delay) => {
+          window.setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('core-tour-show-healthcare-filter'));
+          }, delay);
+        });
+      }
+      return;
+    }
+
+    if (stepId === 'voice-activation') {
+      setShowSettingsMenu(false);
+      setIsSidebarExpanded(true);
+      return;
+    }
+
+    if (
+      stepId === 'voice-command' ||
+      stepId === 'theme' ||
+      stepId === 'account'
+    ) {
+      setIsSidebarExpanded(false);
+      setShowSettingsMenu(true);
+      return;
+    }
+
+    setShowSettingsMenu(false);
   }, [canAccess, navigateTo]);
 
   const [dashboardItems, setDashboardItems] = useState<any[]>(() => {
@@ -506,7 +599,7 @@ function AppContent() {
             y: 0,
             w: 6,
             h: 4,
-            content: 'Grafik 1',
+            content: 'Quarterly Revenue',
           },
           {
             id: '2',
@@ -515,7 +608,7 @@ function AppContent() {
             y: 0,
             w: 6,
             h: 4,
-            content: 'Grafik 2',
+            content: 'Revenue Summary',
           },
           {
             id: '3',
@@ -524,7 +617,7 @@ function AppContent() {
             y: 4,
             w: 6,
             h: 4,
-            content: 'Grafik 3',
+            content: 'Material Summary',
           },
           {
             id: '4',
@@ -533,7 +626,7 @@ function AppContent() {
             y: 4,
             w: 6,
             h: 4,
-            content: 'Grafik 4',
+            content: 'Doctor Fee Summary',
           },
         ];
   });
@@ -554,45 +647,73 @@ function AppContent() {
     onStatusChange: () => {},
   });
 
-  // Voice commands for Sidebar
+  // Global voice commands. Commands are resolved from one bounded-phrase registry
+  // so one transcript cannot accidentally trigger multiple generic includes().
   useEffect(() => {
     const handleGlobalVoiceCommand = (event: Event) => {
-      const customEvent = event as CustomEvent<string>;
-      const transcript = customEvent.detail?.toLowerCase() || '';
+      const rawTranscript = String((event as CustomEvent<string>).detail ?? '');
+      const transcript = normalizeVoiceTranscript(rawTranscript);
+      if (!transcript) return;
 
+      // Recognition engines can emit the same final transcript more than once.
+      const now = Date.now();
       if (
-        transcript.includes('tutup sidebar') ||
-        transcript.includes('sembunyikan sidebar') ||
-        transcript.includes('tutup menu') ||
-        transcript.includes('close sidebar') ||
-        transcript.includes('minimize sidebar')
-      ) {
-        setIsSidebarExpanded(false);
-        SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
-      } else if (
-        transcript.includes('buka sidebar') ||
-        transcript.includes('tampilkan sidebar') ||
-        transcript.includes('buka menu') ||
-        transcript.includes('open sidebar') ||
-        transcript.includes('maximize sidebar')
-      ) {
-        setIsSidebarExpanded(true);
-        SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
+        lastGlobalVoiceCommandRef.current.transcript === transcript &&
+        now - lastGlobalVoiceCommandRef.current.at < 1100
+      ) return;
+
+      // Active dashboard commands take precedence over global navigation/settings.
+      // This prevents one sentence from executing both a dashboard action and a
+      // global action when phrases happen to overlap.
+      const activeScopeCommands =
+        effectiveRoute === 'company_performance'
+          ? COMPANY_PERFORMANCE_VOICE_COMMANDS
+          : effectiveRoute === 'daily_tracking'
+            ? DAILY_TRACKING_VOICE_COMMANDS
+            : [];
+      if (activeScopeCommands.length && resolveVoiceCommand(transcript, activeScopeCommands)) {
+        return;
+      }
+
+      const command = resolveVoiceCommand(transcript, GLOBAL_VOICE_COMMANDS);
+      if (!command) return;
+      lastGlobalVoiceCommandRef.current = { transcript, at: now };
+
+      switch (command.id) {
+        case 'voice_guide_open':
+          setShowVoiceCommandGuide(true);
+          setShowSettingsMenu(false);
+          SciFiAudio.playBeep(805, 'triangle', 0.06, 0.032);
+          return;
+        case 'voice_guide_close':
+          setShowVoiceCommandGuide(false);
+          SciFiAudio.playBeep(620, 'sine', 0.05, 0.025);
+          return;
+        case 'sidebar_open':
+          setIsSidebarExpanded(true);
+          SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
+          return;
+        case 'sidebar_close':
+          setIsSidebarExpanded(false);
+          SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
+          return;
+        case 'nav_company_performance':
+          if (canAccess('company_performance')) navigateTo('company_performance');
+          return;
+        case 'nav_daily_tracking':
+          if (canAccess('daily_tracking')) navigateTo('daily_tracking');
+          return;
+        case 'nav_iol_usage':
+          if (canAccess('iol_usage')) navigateTo('iol_usage');
+          return;
+        default:
+          return;
       }
     };
 
-    window.addEventListener(
-      'coa-voice-command',
-      handleGlobalVoiceCommand as EventListener
-    );
-
-    return () => {
-      window.removeEventListener(
-        'coa-voice-command',
-        handleGlobalVoiceCommand as EventListener
-      );
-    };
-  }, []);
+    window.addEventListener('coa-voice-command', handleGlobalVoiceCommand as EventListener);
+    return () => window.removeEventListener('coa-voice-command', handleGlobalVoiceCommand as EventListener);
+  }, [canAccess, navigateTo]);
 
   useEffect(() => {
     if (isMobileView && !isSidebarPinned) {
@@ -607,6 +728,8 @@ function AppContent() {
     setIsWidgetMode(false);
     setShowManager(false);
     setShowSettingsMenu(false);
+    setShowMyAccount(false);
+    setShowVoiceCommandGuide(false);
     setActiveMenuId('company_performance');
     try { localStorage.removeItem('core_authenticated_user'); } catch {
       // Reactive identity and widget state are cleared even when storage is unavailable.
@@ -832,12 +955,51 @@ function AppContent() {
           z-index: 9999 !important;
         }
 
+        /*
+          COMPANY PERFORMANCE MAXIMIZED — integrated fullscreen.
+          Unlike v37.4, the panel is NOT position:fixed. This keeps all R3F
+          camera sizing/layout behavior inside its original dashboard flow.
+        */
+        .core-dashboard-frame:has(.company-performance-fullscreen) > .core-global-header {
+          display: none !important;
+        }
+
+        .core-dashboard-frame:has(.company-performance-fullscreen) > .core-dashboard-content {
+          z-index: 250 !important;
+        }
+
+        .core-dashboard-frame:has(.company-performance-fullscreen) .core-settings-layer {
+          display: none !important;
+        }
+
         .core-global-header {
           transition:
             opacity .18s ease,
             transform .18s ease;
         }
       `}</style>
+
+      <MyAccount
+        open={showMyAccount}
+        user={authenticatedUser}
+        onClose={() => setShowMyAccount(false)}
+        onPasswordChanged={handleResetToLogin}
+      />
+
+      <VoiceCommandGuide
+        open={showVoiceCommandGuide}
+        authorizedRoutes={authorizedRouteList}
+        activeRoute={effectiveRoute}
+        onClose={() => setShowVoiceCommandGuide(false)}
+      />
+
+      <PostLoginSpotlightTour
+        enabled={!isWidgetMode && Boolean(authenticatedUser?.user_id)}
+        userId={authenticatedUser?.user_id ?? ''}
+        authorizedRoutes={authorizedRouteList}
+        replaySignal={postLoginTourReplaySignal}
+        onPrepareStep={preparePostLoginTourStep}
+      />
 
       <div
         data-active-theme={themeId}
@@ -917,6 +1079,7 @@ function AppContent() {
               {/* Global navigation trigger: sits beside the logo and never consumes dashboard width. */}
               {firstAuthorizedRoute && <button
                 type="button"
+                data-tour="navigation-trigger"
                 onClick={() => {
                   SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
                   setIsSidebarExpanded((prev) => !prev);
@@ -962,6 +1125,7 @@ function AppContent() {
 
               <button
                 type="button"
+                data-tour="settings-button"
                 onClick={() => {
                   SciFiAudio.playBeep(720, 'sine', 0.05, 0.025);
                   setShowSettingsMenu((prev) => !prev);
@@ -1013,6 +1177,7 @@ function AppContent() {
                   </div>
 
                   <div
+                    data-tour="theme-switcher"
                     className="mb-2 rounded-lg border p-2.5"
                     style={{
                       borderColor: 'var(--core-border)',
@@ -1027,6 +1192,69 @@ function AppContent() {
                     </div>
                     <ThemeSwitcher />
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={openMyAccount}
+                    data-tour="my-account"
+                    className="core-my-account-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/40 px-3 py-2.5 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
+                  >
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/20 text-cyan-300">
+                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <circle cx="12" cy="8" r="3" />
+                        <path d="M5.5 20c.6-4 2.9-6.2 6.5-6.2s5.9 2.2 6.5 6.2" />
+                        <path d="M18.5 5.5v4M16.5 7.5h4" opacity=".7" />
+                      </svg>
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[10px] font-bold tracking-[0.06em]">My Account</span>
+                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">Password & voice identity</span>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      SciFiAudio.playBeep(815, 'triangle', 0.06, 0.032);
+                      setPostLoginTourReplaySignal((value) => value + 1);
+                      setShowSettingsMenu(false);
+                    }}
+                    className="core-guided-tour-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/40 px-3 py-2.5 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
+                    title="Replay CoreAnalytics Guided Tour"
+                  >
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-violet-400/20 bg-violet-950/20 text-violet-300">
+                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path d="M4 12a8 8 0 1 0 2.35-5.65" />
+                        <path d="M4 4v5h5" />
+                        <path d="M10 9.5l5 2.5-5 2.5v-5Z" />
+                      </svg>
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[10px] font-bold tracking-[0.06em]">Guided Tour</span>
+                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">
+                        Replay dashboard walkthrough
+                      </span>
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    data-tour="voice-command-menu"
+                    onClick={openVoiceCommandGuide}
+                    className="core-voice-guide-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/40 px-3 py-2.5 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
+                    title="Open Voice Command Guide"
+                  >
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-950/20 text-emerald-300">
+                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                        <path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" />
+                        <path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4M8.5 21h7" />
+                      </svg>
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-[10px] font-bold tracking-[0.06em]">Voice Commands</span>
+                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">Command list & examples</span>
+                    </span>
+                  </button>
 
                   {canAccess('user_management') && <button
                     type="button"
@@ -1140,6 +1368,7 @@ function AppContent() {
             )}
 
             {firstAuthorizedRoute && <aside
+              data-tour="navigation-sidebar"
               className={`z-40 flex flex-col justify-between overflow-hidden rounded-xl border p-2 backdrop-blur-xl transition-all duration-300 ease-out ${
                 isSidebarPinned
                   ? `relative flex-shrink-0 ${isSidebarExpanded ? 'w-56' : 'w-[58px]'}`
@@ -1251,6 +1480,7 @@ function AppContent() {
                               return (
                                 <button
                                   key={child.id}
+                                  data-tour={`nav-dashboard-${child.id}`}
                                   title={child.label}
                                   onClick={() => {
                                     SciFiAudio.playBeep(800, 'sine', 0.05, 0.03);
@@ -1285,6 +1515,22 @@ function AppContent() {
               {/* SIDEBAR FOOTER */}
               <div className="mt-2 flex w-full flex-col gap-2 border-t border-sky-500/15 pt-2">
                 <button
+                  onClick={openMyAccount}
+                  data-tour="my-account-sidebar"
+                  title="My Account"
+                  className="core-my-account-sidebar flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-sky-500/25 bg-sky-950/14 p-2 text-xs font-bold whitespace-nowrap text-sky-300/85 shadow-[0_0_8px_rgba(56,189,248,.06)] transition-all hover:border-cyan-300/35 hover:bg-cyan-500/10 hover:text-cyan-100"
+                >
+                  <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <circle cx="12" cy="8" r="3" />
+                    <path d="M5.5 20c.6-4 2.9-6.2 6.5-6.2s5.9 2.2 6.5 6.2" />
+                  </svg>
+                  {isSidebarExpanded && (
+                    <span className="text-[9px] tracking-wider uppercase">MY ACCOUNT</span>
+                  )}
+                </button>
+
+                <button
+                  data-tour="voice-activation-toggle"
                   onClick={toggleListening}
                   title={isListening ? 'Voice Active' : 'Voice Muted'}
                   className={`flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border p-2 text-xs font-bold whitespace-nowrap backdrop-blur-[2px] transition-all ${

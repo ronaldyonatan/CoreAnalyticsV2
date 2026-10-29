@@ -301,16 +301,16 @@ const HealthcareDashboardView = ({
       <div 
         ref={containerRef}
         data-sync-id="dashboard-main-scroll"
-        className="flex-1 min-h-0 flex flex-col relative overflow-y-auto pr-1 space-y-4 custom-scrollbar"
+        className="company-main-scroll flex-1 min-h-0 flex flex-col relative overflow-y-auto pr-1 space-y-4 custom-scrollbar"
       >
         {!isPanel5Maximized && (
-          <div className={`w-full relative grid gap-3 ${getGridClass()} ${isScanning ? 'animate-glitch-out' : 'animate-glitch-in'}`}>
+          <div className={`company-top-grid w-full relative grid gap-3 ${getGridClass()} ${isScanning ? 'animate-glitch-out' : 'animate-glitch-in'}`}>
             {activeGraphs.filter(g => g >= 1 && g <= 4).map((graphId) => renderSelectedPanel(graphId))}
           </div>
         )}
 
         {(isPanel5Maximized || !isAnyGraphMaximized) && (
-          <div className={`w-full flex flex-col pb-4 ${isPanel5Maximized ? 'h-full flex-1' : 'min-h-[78vh]'} ${isScanning ? 'animate-glitch-out' : 'animate-glitch-in'}`}>
+          <div className={`company-pnl-section w-full flex flex-col pb-4 ${isPanel5Maximized ? 'h-full flex-1' : 'min-h-[78vh]'} ${isScanning ? 'animate-glitch-out' : 'animate-glitch-in'}`}>
             <PanelDetailPNL 
               pnlData={exsumPnL} 
               animateChart={animateChart} 
@@ -345,6 +345,7 @@ export default function CompanyPerformance({
   const [activeGraphs, setActiveGraphs] = useState<number[]>([1, 2, 3, 4]);
   const [panel1Mode, setPanel1Mode] = useState<'BAR' | 'RADIANT'>('BAR');
   const [isScanning, setIsScanning] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const [isCompareMode, setIsCompareMode] = useState(false);
   
@@ -366,6 +367,26 @@ export default function CompanyPerformance({
       setLeftHealthcareId(selectedHealthcareId);
     }
   }, [selectedHealthcareId]);
+
+  // Guided Tour: on mobile the healthcare selector lives inside the collapsed
+  // FILTER area. App.tsx dispatches this event before Spotlight measures it.
+  useEffect(() => {
+    const handleTourShowHealthcareFilter = () => {
+      setIsMobileFiltersOpen(true);
+    };
+
+    window.addEventListener(
+      'core-tour-show-healthcare-filter',
+      handleTourShowHealthcareFilter
+    );
+
+    return () => {
+      window.removeEventListener(
+        'core-tour-show-healthcare-filter',
+        handleTourShowHealthcareFilter
+      );
+    };
+  }, []);
 
   useEffect(() => {
     isScrollSyncedRef.current = isScrollSynced;
@@ -576,7 +597,29 @@ export default function CompanyPerformance({
           <span className="company-page-title company-title min-w-0 text-lg font-extrabold uppercase tracking-[0.16em] sm:text-xl sm:tracking-widest">COMPANY PERFORMANCE</span>
         </div>
 
-        <div className="company-page-controls flex min-w-0 flex-wrap items-center justify-end gap-2 lg:gap-3">
+        <button
+          type="button"
+          className="company-mobile-filter-toggle"
+          onClick={() => setIsMobileFiltersOpen((open) => !open)}
+          aria-expanded={isMobileFiltersOpen}
+          aria-controls="company-mobile-filters"
+        >
+          <span>{isMobileFiltersOpen ? 'HIDE FILTER' : 'SHOW FILTER'}</span>
+          <svg
+            className={`h-3.5 w-3.5 transition-transform ${isMobileFiltersOpen ? 'rotate-180' : ''}`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+
+        <div
+          id="company-mobile-filters"
+          className={`company-page-controls ${isMobileFiltersOpen ? 'company-page-controls--mobile-open' : ''} flex min-w-0 flex-wrap items-center justify-end gap-2 lg:gap-3`}
+        >
           {isCompareMode && (
             <div className="company-control-surface flex items-center gap-1 bg-[#001428]/60 p-0.5 rounded border border-[#00f2fe]/20">
               <button
@@ -631,7 +674,10 @@ export default function CompanyPerformance({
           <div className="flex items-center gap-1.5">
             {isCompareMode && <span className="company-compare-side-label text-[10px] font-bold uppercase">Kiri:</span>}
 
-            <div className="company-healthcare-filter-wrap relative z-[260] min-w-0">
+            <div
+              data-tour="healthcare-selector"
+              className="company-healthcare-filter-wrap relative z-[260] min-w-0"
+            >
               <DailyFilterHealthcare
                 healthcareList={healthcareList}
                 selectedId={currentLeftId}

@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useTheme } from '../theme/ThemeContext';
+import './CompanyMobileGrid.css';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Sector } from 'recharts';
 
 interface PanelExsumRevenueProps {
@@ -1134,7 +1135,7 @@ export default function PanelExsumRevenue({ exsumData, sentraData, isMaximized =
   }
 
   return (
-    <div className="company-panel w-full h-full bg-[#000814]/90 border border-[#00f2fe]/40 rounded-2xl p-4 flex flex-col justify-between backdrop-blur-md shadow-[0_0_15px_rgba(0,242,254,0.15)] relative overflow-hidden">
+    <div className="company-panel company-exsum-mobile-panel w-full h-full bg-[#000814]/90 border border-[#00f2fe]/40 rounded-2xl p-4 flex flex-col justify-between backdrop-blur-md shadow-[0_0_15px_rgba(0,242,254,0.15)] relative overflow-hidden">
       
       {/* Header & Controls */}
       <div className="company-panel-header flex items-center justify-between pb-2 border-b border-[#00f2fe]/25 flex-shrink-0">
@@ -1196,7 +1197,7 @@ export default function PanelExsumRevenue({ exsumData, sentraData, isMaximized =
           </div>
         ) : viewMode === 'TABLE' ? (
           <div className="flex-1 w-full relative overflow-x-auto overflow-y-auto pr-1">
-            <table className="w-full text-left border-collapse font-mono text-xs">
+            <table className="company-exsum-grid w-full text-left border-collapse font-mono text-xs">
               <thead className="sticky top-0 z-20">
                 <tr className="company-table-head border-b border-[#00f2fe]/30 bg-[#001020] text-cyan-300 shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                   <th className="py-2.5 px-3 uppercase tracking-wider font-semibold bg-[#001020]">UNIT BISNIS</th>

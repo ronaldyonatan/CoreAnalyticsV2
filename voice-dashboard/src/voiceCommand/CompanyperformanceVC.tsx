@@ -1,4 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import {
+  COMPANY_PERFORMANCE_VOICE_COMMANDS,
+  containsVoicePhrase,
+  normalizeVoiceTranscript,
+  resolveVoiceCommand,
+} from './voiceCommandRegistry';
 
 interface HealthcareItem {
   healthcareID: string;
@@ -20,6 +26,67 @@ interface UseVoiceCommandCompanyPerformanceProps {
   };
 }
 
+const PNL_TARGETS: Record<string, { targetKey: string; exactMatch?: string }> = {
+  cp_pnl_gross_profit: { targetKey: 'gross-profit', exactMatch: 'gross-profit' },
+  cp_pnl_operating_profit: { targetKey: 'operating-profit', exactMatch: 'operating-profit' },
+  cp_pnl_eat: { targetKey: 'eat', exactMatch: 'eat' },
+  cp_pnl_ebit: { targetKey: 'ebit', exactMatch: 'ebit' },
+  cp_pnl_ebt: { targetKey: 'ebt', exactMatch: 'ebt' },
+  cp_pnl_cogs: { targetKey: 'c-o-g-s', exactMatch: 'c-o-g-s' },
+  cp_pnl_revenue: { targetKey: 'revenue' },
+};
+
+function healthcareAliases(name: string) {
+  const normalized = normalizeVoiceTranscript(name.replace(/@/g, ' '));
+  const pieces = normalized.split(' ').filter(Boolean);
+  const generic = new Set(['rs', 'mata', 'jec', 'eye', 'center', 'rumah', 'sakit']);
+  const meaningful = pieces.filter((piece) => !generic.has(piece));
+
+  const aliases = new Set<string>([normalized]);
+  if (meaningful.length) aliases.add(meaningful.join(' '));
+  if (meaningful.length) aliases.add(meaningful[meaningful.length - 1]);
+  return Array.from(aliases).filter((alias) => alias.length >= 3);
+}
+
+function findMentionedHealthcare(transcript: string, healthcareList: HealthcareItem[]) {
+  const normalizedTranscript = normalizeVoiceTranscript(transcript);
+  const matches: Array<{ id: string; index: number; aliasLength: number }> = [];
+
+  // Short aliases such as “Kedoya” are convenient, but only safe when unique.
+  // If two master records share an alias, require a longer/full healthcare name
+  // rather than silently selecting the wrong node.
+  const aliasOwners = new Map<string, Set<string>>();
+  healthcareList.forEach((healthcare) => {
+    healthcareAliases(healthcare.healthcareName).forEach((alias) => {
+      const owners = aliasOwners.get(alias) ?? new Set<string>();
+      owners.add(healthcare.healthcareID);
+      aliasOwners.set(alias, owners);
+    });
+  });
+
+  healthcareList.forEach((healthcare) => {
+    let bestIndex = -1;
+    let bestLength = -1;
+    healthcareAliases(healthcare.healthcareName).forEach((alias) => {
+      if ((aliasOwners.get(alias)?.size ?? 0) > 1) return;
+      const index = ` ${normalizedTranscript} `.indexOf(` ${alias} `);
+      if (index >= 0 && alias.length > bestLength) {
+        bestIndex = index;
+        bestLength = alias.length;
+      }
+    });
+    if (bestIndex >= 0) matches.push({ id: healthcare.healthcareID, index: bestIndex, aliasLength: bestLength });
+  });
+
+  // A site can match both its full and short name; keep one best match per healthcare ID.
+  const byId = new Map<string, { id: string; index: number; aliasLength: number }>();
+  matches.forEach((match) => {
+    const current = byId.get(match.id);
+    if (!current || match.aliasLength > current.aliasLength) byId.set(match.id, match);
+  });
+  return Array.from(byId.values()).sort((a, b) => a.index - b.index);
+}
+
 export function useVoiceCommandCompanyPerformance({
   healthcareList,
   selectedHealthcareId,
@@ -30,290 +97,184 @@ export function useVoiceCommandCompanyPerformance({
   setLeftHealthcareId,
   setRightHealthcareId,
   leftHealthcareId,
-  SciFiAudio
+  SciFiAudio,
 }: UseVoiceCommandCompanyPerformanceProps) {
+  const lastHandledRef = useRef<{ transcript: string; at: number }>({ transcript: '', at: 0 });
+
   useEffect(() => {
-    const handleVoiceCommand = (event: Event) => {
-      const customEvent = event as CustomEvent<string>;
-      const transcript = customEvent.detail?.toLowerCase() || '';
+    const scrollPnl = (target: { targetKey: string; exactMatch?: string }) => {
+      SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
+      window.setTimeout(() => {
+        (window as any).__isVoiceScrolling = true;
 
-      // 1. KELUAR DARI MODE KOMPARASI
-      const isExitCompare = 
-        transcript.includes('kembali ke mode utama') || 
-        transcript.includes('tutup mode komparasi') || 
-        transcript.includes('tutup perbandingan') || 
-        transcript.includes('keluar dari perbandingan') || 
-        transcript.includes('single view') || 
-        transcript.includes('mode normal') || 
-        transcript.includes('akhiri komparasi');
+        const leftContainer = document.querySelector<HTMLElement>('.left-pnl-scroll');
+        const rightContainer = document.querySelector<HTMLElement>('.right-pnl-scroll');
+        const fallback = document.querySelector<HTMLElement>('.company-pnl-scroll');
+        const containers = isCompareMode
+          ? [leftContainer, rightContainer].filter(Boolean) as HTMLElement[]
+          : [leftContainer || fallback].filter(Boolean) as HTMLElement[];
 
-      if (isExitCompare) {
-        setIsCompareMode(false);
-        SciFiAudio.playBeep(400, 'square', 0.1, 0.05);
-        return;
-      }
-
-      // 2. PERINTAH HAPUS / RESET FILTER CABANG
-      const isClearFilter = 
-        transcript.includes('hapus filter') || 
-        transcript.includes('reset filter') || 
-        transcript.includes('clear filter') || 
-        transcript.includes('semua cabang') || 
-        transcript.includes('tampilkan semua') || 
-        transcript.includes('semua healthcare') || 
-        transcript.includes('reset cabang') || 
-        transcript.includes('all healthcare');
-
-      if (isClearFilter) {
-        setLeftHealthcareId('');
-        setRightHealthcareId('');
-        if (isCompareMode) setIsCompareMode(false);
-        SciFiAudio.playBeep(500, 'sine', 0.1, 0.05);
-        return;
-      }
-
-      // 3. TIPE GRAFIK (BAR / RADIANT)
-      if (transcript.includes('bar') || transcript.includes('batang')) {
-        setPanel1Mode('BAR'); 
-        SciFiAudio.playBeep(700, 'sine', 0.08, 0.04);
-      } else if (transcript.includes('radiant') || transcript.includes('lingkar')) {
-        setPanel1Mode('RADIANT'); 
-        SciFiAudio.playBeep(900, 'sine', 0.08, 0.04);
-      }
-
-// 4. SCROLL OTOMATIS DENGAN SMOOTH SCROLLING & AMAN DARI INTERFERENSI SYNC
-      const isScrollPnLIntent = 
-        transcript.includes('lihat') || 
-        transcript.includes('scroll') || 
-        transcript.includes('ke bagian') || 
-        transcript.includes('posisi') || 
-        transcript.includes('tunjukkan') || 
-        transcript.includes('gross profit') ||
-        transcript.includes('operating profit') ||
-        transcript.includes('ebit') ||
-        transcript.includes('ebt') ||
-        transcript.includes('eat') ||
-        transcript.includes('cogs') ||
-        transcript.includes('revenue') ||
-        transcript.includes('laba') ||
-        transcript.includes('pendapatan');
-
-      if (isScrollPnLIntent) {
-        const pnlTargets: { keywords: string[]; targetKey: string; exactMatch?: string }[] = [
-          { keywords: ['gross profit', 'laba kotor'], targetKey: 'gross-profit', exactMatch: 'gross-profit' },
-          { keywords: ['operating profit', 'laba operasional', 'laba usaha'], targetKey: 'operating-profit', exactMatch: 'operating-profit' },
-          { keywords: ['laba bersih', 'net profit', 'eat'], targetKey: 'eat', exactMatch: 'eat' },
-          { keywords: ['ebitda', 'ebit'], targetKey: 'ebit', exactMatch: 'ebit' },
-          { keywords: ['ebt'], targetKey: 'ebt', exactMatch: 'ebt' },
-          { keywords: ['cogs', 'c.o.g.s', 'hpp', 'harga pokok'], targetKey: 'c-o-g-s', exactMatch: 'c-o-g-s' },
-          { keywords: ['revenue', 'pendapatan', 'omset', 'penjualan'], targetKey: 'revenue' }
-        ];
-
-        let matchedTarget = pnlTargets[0];
-        let found = false;
-        for (const target of pnlTargets) {
-          if (target.keywords.some(kw => transcript.includes(kw))) {
-            matchedTarget = target;
-            found = true;
-            break;
+        containers.forEach((container) => {
+          let targetRow: HTMLElement | null = null;
+          if (target.exactMatch) {
+            targetRow = container.querySelector<HTMLElement>(`tr[data-pnl-slug="${target.exactMatch}"]`);
           }
-        }
+          if (!targetRow) {
+            targetRow = container.querySelector<HTMLElement>(`tr[data-pnl-total="true"][data-pnl-slug*="${target.targetKey}"]`);
+          }
+          if (!targetRow) {
+            targetRow = container.querySelector<HTMLElement>(`tr[data-pnl-slug*="${target.targetKey}"]`);
+          }
+          if (!targetRow) return;
 
-        if (found) {
-          SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
+          const containerRect = container.getBoundingClientRect();
+          const rowRect = targetRow.getBoundingClientRect();
+          const thead = container.querySelector<HTMLElement>('thead');
+          const stickyHeaderHeight = thead?.offsetHeight ?? 38;
+          const relativeTop = rowRect.top - containerRect.top + container.scrollTop;
+          container.scrollTo({
+            top: Math.max(0, relativeTop - stickyHeaderHeight),
+            behavior: 'smooth',
+          });
+        });
 
-          setTimeout(() => {
-            (window as any).__isVoiceScrolling = true;
+        window.setTimeout(() => {
+          (window as any).__isVoiceScrolling = false;
+        }, 1000);
+      }, 80);
+    };
 
-            const leftContainer = document.querySelector<HTMLElement>('.left-pnl-scroll');
-            const rightContainer = document.querySelector<HTMLElement>('.right-pnl-scroll');
-            
-            const containers = isCompareMode 
-              ? [leftContainer, rightContainer].filter(Boolean) as HTMLElement[]
-              : [leftContainer || document.querySelector<HTMLElement>('div.overflow-auto')].filter(Boolean) as HTMLElement[];
+    const handleVoiceCommand = (event: Event) => {
+      const rawTranscript = String((event as CustomEvent<string>).detail ?? '');
+      const transcript = normalizeVoiceTranscript(rawTranscript);
+      if (!transcript) return;
 
-            containers.forEach((container, idx) => {
-              if (!container) return;
+      // Browser recognition can occasionally emit the same final phrase twice.
+      const now = Date.now();
+      if (
+        lastHandledRef.current.transcript === transcript &&
+        now - lastHandledRef.current.at < 1100
+      ) return;
+      lastHandledRef.current = { transcript, at: now };
 
-              let targetRow: HTMLElement | null = null;
+      const command = resolveVoiceCommand(transcript, COMPANY_PERFORMANCE_VOICE_COMMANDS);
 
-              if (matchedTarget.exactMatch) {
-                targetRow = container.querySelector<HTMLElement>(`tr[data-pnl-slug="${matchedTarget.exactMatch}"]`);
-              }
-              if (!targetRow) {
-                targetRow = container.querySelector<HTMLElement>(`tr[data-pnl-total="true"][data-pnl-slug*="${matchedTarget.targetKey}"]`);
-              }
-              if (!targetRow) {
-                targetRow = container.querySelector<HTMLElement>(`tr[data-pnl-slug*="${matchedTarget.targetKey}"]`);
-              }
-
-              if (targetRow) {
-                const containerRect = container.getBoundingClientRect();
-                const rowRect = targetRow.getBoundingClientRect();
-                
-                const relativeTop = rowRect.top - containerRect.top + container.scrollTop;
-                
-                const theadEl = container.querySelector<HTMLElement>('thead');
-                const stickyHeaderHeight = theadEl ? theadEl.offsetHeight : 38;
-
-                const targetScrollTop = Math.max(0, relativeTop - stickyHeaderHeight);
-
-                // Gunakan kembali smooth scroll dengan durasi kunci flag yang lebih aman (1000ms)
-                container.scrollTo({
-                  top: targetScrollTop,
-                  behavior: 'smooth'
-                });
-
-                console.log(`--- [VOICE SMOOTH SCROLL] Panel [${idx === 0 ? 'KIRI' : 'KANAN'}] ---`, {
-                  mode: isCompareMode ? 'COMPARE' : 'SINGLE',
-                  rowText: targetRow.textContent?.trim(),
-                  targetScrollTop
-                });
-              }
-            });
-
-            // Pastikan flag kunci aktif lebih lama dari durasi animasi smooth scroll (1000ms)
-            setTimeout(() => {
-              (window as any).__isVoiceScrolling = false;
-            }, 1000);
-          }, 50);
-
+      if (command) {
+        const pnlTarget = PNL_TARGETS[command.id];
+        if (pnlTarget) {
+          switchLayoutWithFade([5]);
+          window.setTimeout(() => scrollPnl(pnlTarget), 520);
           return;
         }
-      }
 
-      // 5. PERINTAH DENGAN SWITCH LAYOUT
-      const isDetailPnLCommand = 
-        transcript.includes('detail pnl') || 
-        transcript.includes('pnl') || 
-        transcript.includes('tabel pnl') || 
-        transcript.includes('profit and loss');
-
-      if (isDetailPnLCommand) {
-        switchLayoutWithFade([5]);
-        SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
-      } else {
-        const isLayoutCommand = transcript.includes('grafik') || transcript.includes('panel') || transcript.includes('semua') || transcript.includes('empat') || transcript.includes('default');
-        
-        if (isLayoutCommand) {
-          if (transcript.includes('semua') || transcript.includes('empat') || transcript.includes('default') || transcript.includes('1, 2, 3, dan 4') || transcript.includes('1 2 3 4')) {
-            switchLayoutWithFade([1, 2, 3, 4]); SciFiAudio.playBeep(800, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('1, 2, dan 3') || transcript.includes('1 2 3') || transcript.includes('tiga grafik')) {
-            switchLayoutWithFade([1, 2, 3]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('1, 2, dan 4') || transcript.includes('1 2 4')) {
-            switchLayoutWithFade([1, 2, 4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('1, 3, dan 4') || transcript.includes('1 3 4')) {
-            switchLayoutWithFade([1, 3, 4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('2, 3, dan 4') || transcript.includes('2 3 4')) {
-            switchLayoutWithFade([2, 3, 4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('1 dan 2') || transcript.includes('1 2')) {
-            switchLayoutWithFade([1, 2]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('1 dan 3') || transcript.includes('1 3')) {
-            switchLayoutWithFade([1, 3]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('1 dan 4') || transcript.includes('1 4')) {
-            switchLayoutWithFade([1, 4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('2 dan 3') || transcript.includes('2 3')) {
-            switchLayoutWithFade([2, 3]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('2 dan 4') || transcript.includes('2 4')) {
-            switchLayoutWithFade([2, 4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('3 dan 4') || transcript.includes('3 4')) {
-            switchLayoutWithFade([3, 4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('grafik 1') || transcript.includes('panel 1') || transcript.includes('grafik satu')) {
-            switchLayoutWithFade([1]); SciFiAudio.playBeep(900, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('grafik 2') || transcript.includes('panel 2') || transcript.includes?.('grafik dua')) {
-            switchLayoutWithFade([2]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('grafik 3') || transcript.includes('panel 3') || transcript.includes('grafik tiga')) {
-            switchLayoutWithFade([3]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          } else if (transcript.includes('grafik 4') || transcript.includes('panel 4') || transcript.includes('grafik empat')) {
-            switchLayoutWithFade([4]); SciFiAudio.playBeep(850, 'sine', 0.08, 0.04);
-          }
+        switch (command.id) {
+          case 'cp_exit_compare':
+            setIsCompareMode(false);
+            SciFiAudio.playBeep(400, 'square', 0.1, 0.05);
+            return;
+          case 'cp_all_healthcare':
+            setLeftHealthcareId('');
+            setRightHealthcareId('');
+            if (isCompareMode) setIsCompareMode(false);
+            SciFiAudio.playBeep(500, 'sine', 0.1, 0.05);
+            return;
+          case 'cp_bar':
+            setPanel1Mode('BAR');
+            switchLayoutWithFade([1]);
+            SciFiAudio.playBeep(700, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_radiant':
+            setPanel1Mode('RADIANT');
+            switchLayoutWithFade([1]);
+            SciFiAudio.playBeep(900, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_restore':
+            switchLayoutWithFade([1, 2, 3, 4]);
+            SciFiAudio.playBeep(800, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_quarter_revenue':
+            switchLayoutWithFade([1]);
+            SciFiAudio.playBeep(900, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_revenue_summary':
+            switchLayoutWithFade([2]);
+            SciFiAudio.playBeep(860, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_material_summary':
+            switchLayoutWithFade([3]);
+            SciFiAudio.playBeep(840, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_doctor_fee':
+            switchLayoutWithFade([4]);
+            SciFiAudio.playBeep(820, 'sine', 0.08, 0.04);
+            return;
+          case 'cp_pnl':
+            switchLayoutWithFade([5]);
+            SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
+            return;
+          default:
+            break;
         }
       }
 
-      // 6. FILTER CABANG
-      let mentionedSites: { id: string, index: number }[] = [];
-      for (const hc of healthcareList) {
-        const rawName = hc.healthcareName.toLowerCase();
-        const keyword = rawName.includes('@') ? rawName.split('@')[1] : rawName.replace('rs ', '').replace('jec ', '').trim();
-        
-        const idx = transcript.indexOf(keyword);
-        if (idx !== -1) {
-          mentionedSites.push({ id: hc.healthcareID, index: idx });
-        }
-      }
+      // Dynamic healthcare names are resolved only when the utterance clearly
+      // carries a healthcare/select/compare intent. A bare site name is ignored.
+      const mentionedSites = findMentionedHealthcare(transcript, healthcareList);
+      const healthcareContext =
+        containsVoicePhrase(transcript, 'healthcare') ||
+        containsVoicePhrase(transcript, 'cabang') ||
+        containsVoicePhrase(transcript, 'node');
+      const compareIntent = healthcareContext && (
+        containsVoicePhrase(transcript, 'bandingkan') ||
+        containsVoicePhrase(transcript, 'compare') ||
+        containsVoicePhrase(transcript, 'versus') ||
+        containsVoicePhrase(transcript, 'vs')
+      );
+      const chooseIntent = healthcareContext && (
+        containsVoicePhrase(transcript, 'pilih') ||
+        containsVoicePhrase(transcript, 'tampilkan') ||
+        containsVoicePhrase(transcript, 'buka') ||
+        containsVoicePhrase(transcript, 'ganti') ||
+        containsVoicePhrase(transcript, 'ubah')
+      );
 
-      // 7. PERINTAH SUARA: MENJELASKAN GRAFIK PNL MENGGUNAKAN BROWSER TTS (TANPA AI)
-      const isExplainPnL = 
-        transcript.includes('tolong jelaskan grafik pnl ini') || 
-        transcript.includes('jelaskan grafik pnl') || 
-        transcript.includes('jelaskan pnl');
-
-      if (isExplainPnL) {
-        SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
-
-        if ('speechSynthesis' in window) {
-          // Hentikan suara yang sedang aktif sebelumnya agar tidak tumpang tindih
-          window.speechSynthesis.cancel();
-
-          const narrationText = "Jika dilihat dari grafik pnl ini, maka jelas kedoya lebih unggul daripada menteng di pendapatan flac, sedangkan menteng menungguli kedoya di pendapatan lasik.";
-          
-          const utterance = new SpeechSynthesisUtterance(narrationText);
-          utterance.lang = 'id-ID'; // Atur bahasa ke Bahasa Indonesia
-          utterance.rate = 1.0;     // Kecepatan baca (1.0 normal)
-          utterance.pitch = 1.1;    // Nada suara
-
-          // Opsional: Cari suara bahasa Indonesia bawaan sistem jika tersedia
-          const voices = window.speechSynthesis.getVoices();
-          const indonesianVoice = voices.find(v => v.lang === 'id-ID' || v.lang.toLowerCase().includes('indonesia'));
-          if (indonesianVoice) {
-            utterance.voice = indonesianVoice;
-          }
-
-          window.speechSynthesis.speak(utterance);
-        } else {
-          console.warn("Browser Anda tidak mendukung Speech Synthesis.");
-        }
-
+      if (compareIntent && mentionedSites.length >= 2) {
+        setIsCompareMode(true);
+        setLeftHealthcareId(mentionedSites[0].id);
+        setRightHealthcareId(mentionedSites[1].id);
+        SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
         return;
       }
 
-      mentionedSites.sort((a, b) => a.index - b.index);
-
-      const hasCompareIntent = transcript.includes('bandingkan') || transcript.includes('compare') || transcript.includes('vs');
-
-      if (mentionedSites.length >= 2) {
-        setIsCompareMode(true);
-        setLeftHealthcareId(mentionedSites[0].id);   
-        setRightHealthcareId(mentionedSites[1].id);  
+      if (mentionedSites.length === 1 && compareIntent) {
+        if (!isCompareMode) setIsCompareMode(true);
+        if (!leftHealthcareId) setLeftHealthcareId(selectedHealthcareId);
+        setRightHealthcareId(mentionedSites[0].id);
         SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
-      } else if (mentionedSites.length === 1) {
-        if (hasCompareIntent) {
-          if (!isCompareMode) setIsCompareMode(true);
-          setRightHealthcareId(mentionedSites[0].id);
-          if (!leftHealthcareId) setLeftHealthcareId(selectedHealthcareId);
-          SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
-        } else if (isCompareMode && (transcript.includes('ubah') || transcript.includes('ganti') || transcript.includes('kanan'))) {
-          setRightHealthcareId(mentionedSites[0].id);
-          SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
-        } else {
-          setLeftHealthcareId(mentionedSites[0].id);
-          SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
-        }
+        return;
+      }
+
+      if (mentionedSites.length === 1 && chooseIntent) {
+        const targetId = mentionedSites[0].id;
+        const rightIntent = containsVoicePhrase(transcript, 'kanan');
+        if (isCompareMode && rightIntent) setRightHealthcareId(targetId);
+        else setLeftHealthcareId(targetId);
+        SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
       }
     };
 
     window.addEventListener('coa-voice-command', handleVoiceCommand as EventListener);
     return () => window.removeEventListener('coa-voice-command', handleVoiceCommand as EventListener);
   }, [
-    healthcareList, 
-    selectedHealthcareId, 
-    isCompareMode, 
-    leftHealthcareId, 
-    setIsCompareMode, 
-    setPanel1Mode, 
-    switchLayoutWithFade, 
-    setLeftHealthcareId, 
-    setRightHealthcareId, 
-    SciFiAudio
+    healthcareList,
+    selectedHealthcareId,
+    isCompareMode,
+    leftHealthcareId,
+    setIsCompareMode,
+    setPanel1Mode,
+    switchLayoutWithFade,
+    setLeftHealthcareId,
+    setRightHealthcareId,
+    SciFiAudio,
   ]);
 }

@@ -35,6 +35,26 @@ export default function DailyTracking({
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Guided Tour: reveal the collapsed mobile filter before Spotlight measures
+  // the Healthcare Selector.
+  useEffect(() => {
+    const handleTourShowHealthcareFilter = () => {
+      setShowFilters(true);
+    };
+
+    window.addEventListener(
+      'core-tour-show-healthcare-filter',
+      handleTourShowHealthcareFilter
+    );
+
+    return () => {
+      window.removeEventListener(
+        'core-tour-show-healthcare-filter',
+        handleTourShowHealthcareFilter
+      );
+    };
+  }, []);
+
   const [dailyRevenueData, setDailyRevenueData] = useState<any[]>([]);
   const [monthlyRevenueData, setMonthlyRevenueData] = useState<any[]>([]);
   const [demographicData, setDemographicData] = useState<any[]>([]);
@@ -902,7 +922,10 @@ export default function DailyTracking({
             />
           </div>
 
-          <div className="daily-healthcare-filter-wrap relative z-[250] min-w-0 w-full">
+          <div
+            data-tour="healthcare-selector"
+            className="daily-healthcare-filter-wrap relative z-[250] min-w-0 w-full"
+          >
             <DailyFilterHealthcare
               healthcareList={healthcareList}
               selectedId={selectedId}

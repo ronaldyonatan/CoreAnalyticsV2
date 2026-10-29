@@ -342,3 +342,501 @@
 }
 
 /* Existing semantic alert/success/amber states intentionally stay unchanged. */
+
+
+/* =========================================================
+   COMPANY PERFORMANCE — MOBILE READABILITY v35
+   Desktop/tablet behavior is intentionally unchanged.
+   ========================================================= */
+
+.company-mobile-filter-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  /* v37.2: Company Performance follows Daily Tracking's compact mobile shell.
+     Keep the dashboard inside App's fixed viewport and make THIS content area
+     the vertical scroller. */
+  .company-performance-shell {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: .4rem !important;
+  }
+
+  /* Compact header: title + FILTER on one row, exactly the same interaction
+     model as Daily Tracking. */
+  .company-page-header {
+    position: relative !important;
+    top: auto !important;
+    z-index: 80 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: .45rem .55rem !important;
+    margin-bottom: .45rem !important;
+    padding: .55rem .65rem !important;
+  }
+
+  .company-page-title-row {
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 32px;
+    gap: .55rem !important;
+  }
+
+  .company-page-title {
+    overflow: hidden;
+    font-size: .88rem !important;
+    line-height: 1.15 !important;
+    letter-spacing: .09em !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .company-mobile-filter-toggle {
+    display: flex;
+    width: auto !important;
+    min-width: 104px;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    padding: .42rem .62rem;
+    border: 1px solid var(--company-border);
+    border-radius: .65rem;
+    background: var(--company-control);
+    color: var(--company-primary-soft);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+  }
+
+  .company-page-controls {
+    display: none !important;
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .company-page-controls.company-page-controls--mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: .42rem !important;
+    padding-top: .15rem;
+  }
+
+  .company-page-controls > div,
+  .company-page-controls > .company-control-surface {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .company-healthcare-filter-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .company-healthcare-filter-wrap > *,
+  .company-healthcare-filter-wrap button,
+  .company-healthcare-filter-wrap [role="button"],
+  .company-healthcare-filter-wrap select {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  .company-healthcare-refresh {
+    width: 38px !important;
+    min-width: 38px !important;
+  }
+
+  /* Critical scroll fix:
+     App itself is a fixed h-screen/overflow-hidden shell, therefore Company
+     Performance must retain an internal scroll viewport just like Daily. */
+  .company-view-shell,
+  .company-node-view {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .company-view-shell {
+    padding: .35rem !important;
+  }
+
+  .company-node-view {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .company-main-scroll {
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-right: .2rem !important;
+    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+  }
+
+  .company-node-header {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    min-height: 32px;
+    gap: .45rem;
+    padding: .35rem .55rem !important;
+  }
+
+  .company-node-header > span:first-child {
+    font-size: 10px !important;
+    line-height: 1.2;
+  }
+
+  .company-node-header > span:last-child {
+    font-size: 8px !important;
+    text-align: right;
+  }
+
+  /* Do not let one chart become an entire long phone page.
+     Four panels are compact cards; the user scrolls card-to-card. */
+  .company-top-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    gap: .65rem !important;
+  }
+
+  .company-top-grid > * {
+    width: 100% !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    flex: 0 0 390px !important;
+  }
+
+  .company-panel-frame {
+    padding: .2rem !important;
+  }
+
+  .company-panel {
+    min-height: 0 !important;
+  }
+
+  .company-panel-header {
+    margin-bottom: .3rem !important;
+    padding-bottom: .3rem !important;
+  }
+
+  .company-panel-header h3,
+  .company-panel-header h4 {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    letter-spacing: .06em !important;
+  }
+
+  /* Revenue chart specifically: use the available card, not a tall canvas. */
+  .company-panel--revenue,
+  .company-panel--radiant {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: .6rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .company-chart-stage {
+    min-height: 0 !important;
+    gap: .55rem !important;
+    padding: 1.4rem .35rem .45rem !important;
+    border-radius: .8rem !important;
+  }
+
+  .company-chart-stage .w-10 {
+    width: 1.55rem !important;
+  }
+
+  /* P&L is table-oriented, so it gets more room but remains a card instead
+     of consuming another 78vh. Horizontal scrolling preserves readability. */
+  .company-pnl-section {
+    height: 520px !important;
+    min-height: 520px !important;
+    flex: 0 0 520px !important;
+    padding-bottom: .5rem !important;
+  }
+
+  .company-pnl-card {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: .55rem !important;
+  }
+
+  .company-panel table,
+  .company-pnl-card table {
+    width: max-content !important;
+    min-width: 760px !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  .company-panel table th,
+  .company-panel table td,
+  .company-pnl-card table th,
+  .company-pnl-card table td {
+    font-size: 11px !important;
+    padding-top: .45rem !important;
+    padding-bottom: .45rem !important;
+  }
+
+  .company-pnl-scroll {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .company-pnl-card table {
+    min-width: 820px !important;
+  }
+
+  .company-panel-header button,
+  .company-pnl-card button {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 420px) {
+  .company-page-title {
+    font-size: .82rem !important;
+    letter-spacing: .075em !important;
+  }
+
+  .company-mobile-filter-toggle {
+    min-width: 96px;
+    padding-inline: .5rem;
+  }
+
+  .company-top-grid > * {
+    height: 370px !important;
+    min-height: 370px !important;
+    flex-basis: 370px !important;
+  }
+
+  .company-pnl-section {
+    height: 500px !important;
+    min-height: 500px !important;
+    flex-basis: 500px !important;
+  }
+}
+
+
+/* v37.3 — fullscreen restore control must sit above each panel's own 3D/Data Wall HUD. */
+.company-panel-frame--maximized {
+  overflow: visible !important;
+}
+
+.company-panel-frame--maximized .company-panel-size-button--restore {
+  position: absolute !important;
+  top: .75rem !important;
+  right: .75rem !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  width: 2.35rem !important;
+  height: 2.35rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(103, 232, 249, .62) !important;
+  background: rgba(2, 16, 29, .92) !important;
+  color: #cffafe !important;
+  box-shadow: 0 0 20px rgba(34, 211, 238, .24), 0 8px 24px rgba(0, 0, 0, .38) !important;
+  backdrop-filter: blur(12px);
+}
+
+.company-panel-frame--maximized .company-panel-size-button--restore svg {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+@media (max-width: 767px) {
+  .company-panel-frame--maximized .company-panel-size-button--restore {
+    top: .5rem !important;
+    right: .5rem !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+
+/* =========================================================
+   v37.5 — STABLE INTEGRATED MAXIMIZE
+   Replaces v37.4 fixed-overlay fullscreen.
+   Keep the panel inside its original layout so R3F/Recharts sizing stays sane.
+   ========================================================= */
+
+/* Free all vertical space used by Company Performance's own header. */
+.company-performance-fullscreen > .company-page-header {
+  display: none !important;
+}
+
+/* The node header ("ALL HEALTHCARE NODES / GRAFIK MAXIMIZED") is redundant in
+   fullscreen and consumed too much mobile height. */
+.company-performance-fullscreen .company-node-header {
+  display: none !important;
+}
+
+/* The single/compare shell and node view must pass the full remaining height
+   to the active panel. */
+.company-performance-fullscreen,
+.company-performance-fullscreen > .flex-1,
+.company-performance-fullscreen .company-view-shell,
+.company-performance-fullscreen .company-node-view {
+  min-height: 0 !important;
+}
+
+.company-performance-fullscreen .company-view-shell {
+  height: 100% !important;
+  padding: 0 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+.company-performance-fullscreen .company-node-view {
+  height: 100% !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+}
+
+/* No scrolling behind a maximized graph. */
+.company-performance-fullscreen .company-main-scroll {
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+/* Override the normal mobile 370/390px card sizing only while maximized. */
+.company-performance-fullscreen .company-top-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  gap: 0 !important;
+}
+
+.company-performance-fullscreen .company-top-grid > .company-panel-frame--maximized {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0% !important;
+  margin: 0 !important;
+  padding: .3rem !important;
+  overflow: hidden !important;
+  border-radius: .8rem !important;
+}
+
+/* Let the actual Revenue / Exsum / Material / Doctor Fee panel consume that
+   height. No viewport-fixed coordinate system, no camera re-parenting. */
+.company-performance-fullscreen .company-panel-frame--maximized > .company-panel {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* P&L maximized follows the same fill behavior. */
+.company-performance-fullscreen .company-pnl-section {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  padding: 0 !important;
+}
+
+.company-performance-fullscreen .company-pnl-card {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Restore remains visible but stays relative to the panel, not the browser. */
+.company-performance-fullscreen .company-panel-size-button--restore {
+  position: absolute !important;
+  top: .65rem !important;
+  right: .65rem !important;
+  z-index: 9999 !important;
+}
+
+/* Remove normal mobile shell padding only while maximized. */
+@media (max-width: 767px) {
+  .company-performance-fullscreen {
+    padding: .15rem !important;
+    border-radius: .75rem !important;
+  }
+
+  .company-performance-fullscreen .company-panel-frame--maximized {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex-basis: auto !important;
+    padding: .2rem !important;
+  }
+
+  .company-performance-fullscreen .company-panel-size-button--restore {
+    top: .45rem !important;
+    right: .45rem !important;
+  }
+}
+
+/* =========================================================
+   v37.6 — DESKTOP INFORMATION DENSITY
+   Desktop only.
+   Mobile v37.2/v37.5 and integrated maximize remain untouched.
+   ========================================================= */
+
+@media (min-width: 1024px) {
+  /* Release the old h-[75vh] desktop squeeze. */
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-auto-rows: 470px !important;
+    align-items: stretch !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid > .company-panel-frame {
+    height: 470px !important;
+    min-height: 470px !important;
+    max-height: none !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid > .company-panel-frame > .company-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-main-scroll {
+    overflow-y: auto !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid {
+    grid-auto-rows: 510px !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid > .company-panel-frame {
+    height: 510px !important;
+    min-height: 510px !important;
+  }
+}

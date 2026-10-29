@@ -23,6 +23,7 @@ import * as THREE from 'three';
 
 import { useTheme } from './theme/ThemeContext';
 import LoginSpotlightTour, { type LoginTourStepId } from './onboarding/LoginSpotlightTour';
+import ThemeSwitcher from './components/ThemeSwitcher';
 
 // Core Analytics brand assets (project-root /img folder)
 import coreAnalyticsLogo from '../img/logo.png';
@@ -4851,18 +4852,36 @@ export default function LoginPortal({
 
         </div>
 
-        <div className="hidden items-center gap-3 rounded-lg border border-sky-500/15 bg-[#03111f]/55 px-3 py-2 backdrop-blur-lg sm:flex">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div
+            data-tour="login-theme-chooser"
+            className={`login-theme-chooser flex items-center gap-2 rounded-lg border p-1.5 backdrop-blur-lg transition-all duration-300 ${
+              isSolaris
+                ? 'border-sky-500/25 bg-white/55 shadow-[0_8px_22px_rgba(25,92,132,.09)]'
+                : 'border-sky-500/15 bg-[#03111f]/55'
+            }`}
+          >
+            <span className="hidden text-[8px] font-black tracking-[0.16em] text-slate-500 sm:inline">THEME</span>
+            <div className="login-theme-switcher-slot w-9"><ThemeSwitcher compact align="right" /></div>
+          </div>
+          <div
+            className={`login-secure-node hidden items-center gap-3 rounded-lg border px-3 py-2 backdrop-blur-lg transition-all duration-300 sm:flex ${
+              isSolaris
+                ? 'border-sky-500/25 bg-white/55 shadow-[0_8px_22px_rgba(25,92,132,.09)]'
+                : 'border-sky-500/15 bg-[#03111f]/55'
+            }`}
+          >
 
-          <span className="text-[9px] tracking-[0.20em] text-slate-500">
+          <span className="login-secure-node-label text-[9px] tracking-[0.20em] text-slate-500">
             SECURE NODE
           </span>
 
-          <span className="text-[10px] font-black text-emerald-400">
+          <span className="login-secure-node-state text-[10px] font-black text-emerald-400">
             ONLINE
           </span>
 
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-
+          <span className="login-secure-node-dot h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+          </div>
         </div>
       </header>
 
@@ -8069,10 +8088,66 @@ export default function LoginPortal({
           mix-blend-mode: multiply;
         }
 
+        /* SOLARIS_HEADER_V38 */
+        /* Solaris top HUD: keep the wrapper invisible and skin each control
+           independently so the theme switcher and Secure Node read as part
+           of the same bright-glass environment. */
         .login-solaris-mode header > div:last-child {
-          background: rgba(242,251,255,.82) !important;
-          border-color: rgba(0,143,196,.20) !important;
-          box-shadow: 0 8px 20px rgba(25,92,132,.08);
+          background: transparent !important;
+          border-color: transparent !important;
+          box-shadow: none !important;
+        }
+
+        .login-solaris-mode .login-theme-chooser,
+        .login-solaris-mode .login-secure-node {
+          background:
+            radial-gradient(circle at 88% 0%, rgba(86,220,255,.20), transparent 42%),
+            linear-gradient(135deg, rgba(249,254,255,.82), rgba(220,243,255,.64)) !important;
+          border-color: rgba(0,143,196,.24) !important;
+          box-shadow:
+            0 8px 22px rgba(25,92,132,.09),
+            inset 0 1px 0 rgba(255,255,255,.90) !important;
+          -webkit-backdrop-filter: blur(14px) saturate(112%);
+          backdrop-filter: blur(14px) saturate(112%);
+        }
+
+        .login-solaris-mode .login-theme-chooser > span,
+        .login-solaris-mode .login-secure-node-label {
+          color: #557b91 !important;
+          text-shadow: none !important;
+        }
+
+        /* ThemeSwitcher compact trigger is owned by a child component.
+           Styling it through this scoped descendant avoids changing that
+           reusable component for Cosmic Black / Aurora. */
+        .login-solaris-mode .login-theme-chooser button {
+          background:
+            linear-gradient(145deg, rgba(255,255,255,.76), rgba(214,241,255,.76)) !important;
+          border-color: rgba(0,143,196,.26) !important;
+          color: #0b7fa8 !important;
+          box-shadow:
+            0 3px 10px rgba(25,92,132,.07),
+            inset 0 1px 0 rgba(255,255,255,.96) !important;
+          color-scheme: light;
+        }
+
+        .login-solaris-mode .login-theme-chooser button:hover {
+          background:
+            linear-gradient(145deg, rgba(255,255,255,.92), rgba(205,238,255,.88)) !important;
+          border-color: rgba(0,143,196,.38) !important;
+          color: #006f9c !important;
+        }
+
+        .login-solaris-mode .login-secure-node-state {
+          color: #14795f !important;
+          text-shadow: 0 0 9px rgba(20,121,95,.15) !important;
+        }
+
+        .login-solaris-mode .login-secure-node-dot {
+          background: #20c997 !important;
+          box-shadow:
+            0 0 7px rgba(32,201,151,.58),
+            0 0 14px rgba(32,201,151,.18) !important;
         }
 
         .login-solaris-mode [class*="text-sky-"] { color: #13789d !important; }

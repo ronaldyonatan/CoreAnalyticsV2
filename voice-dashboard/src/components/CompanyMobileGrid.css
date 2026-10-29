@@ -1,0 +1,205 @@
+/* CoreAnalytics RC1 — compact data grids for portrait/tablet mobile.
+   Desktop keeps the existing spacious table typography. */
+@media (max-width: 767px) {
+  .company-exsum-mobile-panel {
+    padding: .55rem !important;
+    border-radius: .9rem !important;
+  }
+
+  .company-exsum-mobile-panel .company-panel-header {
+    padding-bottom: .35rem !important;
+    gap: .35rem !important;
+  }
+
+  .company-exsum-mobile-panel .company-panel-header h4 {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+    letter-spacing: .08em !important;
+  }
+
+  .company-exsum-mobile-panel .company-tabs {
+    font-size: 7px !important;
+  }
+
+  .company-exsum-mobile-panel .company-tabs button {
+    padding: .2rem .42rem !important;
+    min-height: 24px !important;
+  }
+
+  .company-exsum-mobile-panel .company-select {
+    max-width: 88px;
+    padding: .2rem .35rem !important;
+    font-size: 7px !important;
+  }
+
+  .company-exsum-mobile-panel .company-panel-footer {
+    padding-top: .3rem !important;
+    font-size: 6.5px !important;
+    line-height: 1.2 !important;
+  }
+
+  .company-exsum-grid {
+    min-width: 430px !important;
+    width: max-content !important;
+    font-size: 8px !important;
+    line-height: 1.15 !important;
+  }
+
+  .company-exsum-grid th,
+  .company-exsum-grid td {
+    padding: .36rem .42rem !important;
+    font-size: 8px !important;
+    line-height: 1.15 !important;
+  }
+
+  .company-exsum-grid th:first-child,
+  .company-exsum-grid td:first-child {
+    min-width: 118px !important;
+    max-width: 138px !important;
+  }
+
+  .company-exsum-grid th:not(:first-child),
+  .company-exsum-grid td:not(:first-child) {
+    min-width: 70px !important;
+  }
+
+  .company-exsum-grid th:first-child,
+  .company-exsum-grid td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: #001020;
+  }
+
+  .company-exsum-grid th:first-child {
+    z-index: 22;
+  }
+
+  /* Profit & Loss: compress the old 260/110/90px desktop columns. */
+  .company-pnl-card {
+    padding: .5rem !important;
+  }
+
+  .company-pnl-card .company-panel-header {
+    margin-bottom: .35rem !important;
+    padding-bottom: .35rem !important;
+  }
+
+  .company-pnl-card .company-panel-header h3 {
+    max-width: 240px;
+    font-size: 8.5px !important;
+    line-height: 1.2 !important;
+    letter-spacing: .055em !important;
+  }
+
+  .company-pnl-card .company-panel-header > div:last-child > span {
+    display: none !important;
+  }
+
+  .company-pnl-card .company-tooltip--warning {
+    width: min(82vw, 300px) !important;
+    max-height: 52dvh !important;
+    font-size: 8px !important;
+  }
+
+  .company-pnl-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .company-pnl-mobile-grid {
+    min-width: 505px !important;
+    width: 505px !important;
+    table-layout: fixed !important;
+    font-size: 8px !important;
+    line-height: 1.15 !important;
+  }
+
+  .company-pnl-mobile-grid th,
+  .company-pnl-mobile-grid td {
+    padding: .34rem .32rem !important;
+    font-size: 8px !important;
+    line-height: 1.15 !important;
+  }
+
+  .company-pnl-mobile-grid thead th:nth-child(1),
+  .company-pnl-mobile-grid .company-pnl-major > td:nth-child(1),
+  .company-pnl-mobile-grid .company-pnl-total > td:nth-child(1),
+  .company-pnl-mobile-grid .company-pnl-row > td:nth-child(1) {
+    width: 155px !important;
+    min-width: 155px !important;
+    max-width: 155px !important;
+  }
+
+  .company-pnl-mobile-grid thead th:nth-child(2),
+  .company-pnl-mobile-grid thead th:nth-child(3),
+  .company-pnl-mobile-grid .company-pnl-major > td:nth-child(2),
+  .company-pnl-mobile-grid .company-pnl-major > td:nth-child(3),
+  .company-pnl-mobile-grid .company-pnl-total > td:nth-child(2),
+  .company-pnl-mobile-grid .company-pnl-total > td:nth-child(3),
+  .company-pnl-mobile-grid .company-pnl-row > td:nth-child(2),
+  .company-pnl-mobile-grid .company-pnl-row > td:nth-child(3) {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+  }
+
+  .company-pnl-mobile-grid thead th:nth-child(n+4),
+  .company-pnl-mobile-grid .company-pnl-major > td:nth-child(n+4),
+  .company-pnl-mobile-grid .company-pnl-total > td:nth-child(n+4),
+  .company-pnl-mobile-grid .company-pnl-row > td:nth-child(n+4) {
+    width: 49px !important;
+    min-width: 49px !important;
+    max-width: 49px !important;
+  }
+
+  /* Keep row identity visible while the numeric columns are scrolled. */
+  .company-pnl-mobile-grid thead th:first-child,
+  .company-pnl-mobile-grid .company-pnl-major > td:first-child,
+  .company-pnl-mobile-grid .company-pnl-total > td:first-child,
+  .company-pnl-mobile-grid .company-pnl-row > td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 4;
+    background: inherit;
+  }
+
+  .company-pnl-mobile-grid thead th:first-child {
+    z-index: 12;
+    background: #001428;
+  }
+
+  .company-pnl-mobile-grid .company-pnl-group,
+  .company-pnl-mobile-grid .company-pnl-section,
+  .company-pnl-mobile-grid .company-pnl-total,
+  .company-pnl-mobile-grid .company-pnl-row {
+    height: auto !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .company-exsum-grid {
+    min-width: 410px !important;
+  }
+
+  .company-exsum-grid th,
+  .company-exsum-grid td {
+    padding-left: .34rem !important;
+    padding-right: .34rem !important;
+    font-size: 7.5px !important;
+  }
+
+  .company-pnl-mobile-grid {
+    min-width: 480px !important;
+    width: 480px !important;
+  }
+
+  .company-pnl-mobile-grid thead th:nth-child(1),
+  .company-pnl-mobile-grid .company-pnl-major > td:nth-child(1),
+  .company-pnl-mobile-grid .company-pnl-total > td:nth-child(1),
+  .company-pnl-mobile-grid .company-pnl-row > td:nth-child(1) {
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+  }
+}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './CompanyMobileGrid.css';
 
 export interface PnLItem {
   Level: number | string;
@@ -244,7 +245,7 @@ export default function PanelDetailPNL({
 
       {/* Table Container dengan kelas sync scroll kiri/kanan */}
       <div className={`company-pnl-scroll flex-1 overflow-auto relative border border-[#00f2fe]/20 rounded bg-[#000511]/75 ${isLeftSide ? 'left-pnl-scroll' : 'right-pnl-scroll'}`}>
-        <table className="w-full text-left text-xs font-mono border-collapse table-fixed">
+        <table className="company-pnl-mobile-grid w-full text-left text-xs font-mono border-collapse table-fixed">
           <thead className="company-table-head sticky top-0 bg-[#001428] text-[#00f2fe] uppercase text-[10px] tracking-wider z-10 border-b border-[#00f2fe]/40 shadow-lg">
             <tr>
               <th className="py-2.5 px-3 border-r border-[#00f2fe]/15 w-[260px] min-w-[260px] max-w-[260px] truncate whitespace-nowrap overflow-hidden">COA Name</th>
