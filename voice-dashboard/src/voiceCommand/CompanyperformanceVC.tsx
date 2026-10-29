@@ -17,6 +17,7 @@ interface UseVoiceCommandCompanyPerformanceProps {
   isCompareMode: boolean;
   setIsCompareMode: (compare: boolean) => void;
   setPanel1Mode: (mode: 'BAR' | 'RADIANT') => void;
+  activeGraphs: number[];
   switchLayoutWithFade: (graphs: number[]) => void;
   setLeftHealthcareId: (id: string) => void;
   setRightHealthcareId: (id: string) => void;
@@ -35,6 +36,90 @@ const PNL_TARGETS: Record<string, { targetKey: string; exactMatch?: string }> = 
   cp_pnl_cogs: { targetKey: 'c-o-g-s', exactMatch: 'c-o-g-s' },
   cp_pnl_revenue: { targetKey: 'revenue' },
 };
+
+function isComparePnlTranscript(transcript: string) {
+  const hasCompareWord =
+    containsVoicePhrase(transcript, 'bandingkan') ||
+    containsVoicePhrase(transcript, 'compare') ||
+    containsVoicePhrase(transcript, 'versus') ||
+    containsVoicePhrase(transcript, 'vs');
+
+  const hasPnlIntent =
+    containsVoicePhrase(transcript, 'detail pnl') ||
+    containsVoicePhrase(transcript, 'pnl') ||
+    containsVoicePhrase(transcript, 'p n l') ||
+    containsVoicePhrase(transcript, 'profit and loss') ||
+    containsVoicePhrase(transcript, 'profit loss') ||
+    containsVoicePhrase(transcript, 'detail profit and loss') ||
+    containsVoicePhrase(transcript, 'laporan laba rugi') ||
+    containsVoicePhrase(transcript, 'laba rugi');
+
+  return hasCompareWord && hasPnlIntent;
+}
+
+
+const COMPANY_GRAPH_CODE_MAP: Record<string, number> = {
+  a: 1,
+  '1': 1,
+  satu: 1,
+  b: 2,
+  '2': 2,
+  dua: 2,
+  c: 3,
+  '3': 3,
+  tiga: 3,
+  d: 4,
+  '4': 4,
+  empat: 4,
+};
+
+const COMPANY_GRAPH_SEMANTIC_MAP: Array<{ graph: number; phrases: string[] }> = [
+  { graph: 1, phrases: ['quarterly revenue', 'quarter revenue', 'revenue intelligence', 'pendapatan kuartal'] },
+  { graph: 2, phrases: ['revenue summary', 'executive revenue', 'exsum revenue'] },
+  { graph: 3, phrases: ['material summary', 'executive material', 'exsum material', 'material cost'] },
+  { graph: 4, phrases: ['doctor fee summary', 'doctor fee', 'exsum doctor fee'] },
+];
+
+/**
+ * Company Performance supports multi-panel layouts. This parser intentionally
+ * lives only in the Company Performance voice handler, so graph codes A-D can
+ * never leak into Daily Tracking or another dashboard.
+ */
+function resolveCompanyGraphSelection(transcript: string): number[] | null {
+  const normalized = normalizeVoiceTranscript(transcript);
+  if (!normalized) return null;
+
+  const selected = new Set<number>();
+  const hasGraphContext =
+    containsVoicePhrase(normalized, 'grafik') ||
+    containsVoicePhrase(normalized, 'panel');
+
+  if (hasGraphContext) {
+    normalized.split(' ').forEach((token) => {
+      const graph = COMPANY_GRAPH_CODE_MAP[token];
+      if (graph) selected.add(graph);
+    });
+  }
+
+  // Named graph combinations are also accepted, for example:
+  // "Quarterly Revenue dan Material Summary".
+  const semanticMatches: number[] = [];
+  COMPANY_GRAPH_SEMANTIC_MAP.forEach(({ graph, phrases }) => {
+    if (phrases.some((phrase) => containsVoicePhrase(normalized, phrase))) {
+      semanticMatches.push(graph);
+    }
+  });
+
+  // One semantic graph is handled by the normal registry command so names such
+  // as "Quarterly Revenue" keep their dedicated behavior. Two or more names
+  // are a layout-combination request.
+  if (semanticMatches.length >= 2) {
+    semanticMatches.forEach((graph) => selected.add(graph));
+  }
+
+  if (!selected.size) return null;
+  return Array.from(selected).sort((a, b) => a - b);
+}
 
 function healthcareAliases(name: string) {
   const normalized = normalizeVoiceTranscript(name.replace(/@/g, ' '));
@@ -93,6 +178,7 @@ export function useVoiceCommandCompanyPerformance({
   isCompareMode,
   setIsCompareMode,
   setPanel1Mode,
+  activeGraphs,
   switchLayoutWithFade,
   setLeftHealthcareId,
   setRightHealthcareId,
@@ -100,6 +186,7 @@ export function useVoiceCommandCompanyPerformance({
   SciFiAudio,
 }: UseVoiceCommandCompanyPerformanceProps) {
   const lastHandledRef = useRef<{ transcript: string; at: number }>({ transcript: '', at: 0 });
+  const previousLayoutRef = useRef<number[] | null>(null);
 
   useEffect(() => {
     const scrollPnl = (target: { targetKey: string; exactMatch?: string }) => {
@@ -144,6 +231,49 @@ export function useVoiceCommandCompanyPerformance({
       }, 80);
     };
 
+    const normalizeLayout = (graphs: number[]) =>
+      Array.from(new Set(graphs.filter((graph) => graph >= 1 && graph <= 5))).sort((a, b) => a - b);
+
+    const switchVoiceLayout = (graphs: number[]) => {
+      const current = normalizeLayout(activeGraphs);
+      const next = normalizeLayout(graphs);
+
+      const isSame =
+        current.length === next.length &&
+        current.every((graph, index) => graph === next[index]);
+
+      if (!isSame) {
+        previousLayoutRef.current = [...current];
+      }
+
+      switchLayoutWithFade(next);
+    };
+
+    const restorePreviousVoiceLayout = () => {
+      const previous = previousLayoutRef.current;
+      if (!previous?.length) {
+        switchLayoutWithFade([1, 2, 3, 4]);
+        return;
+      }
+
+      const current = normalizeLayout(activeGraphs);
+      previousLayoutRef.current = [...current];
+      switchLayoutWithFade(previous);
+    };
+
+    const tryLandscapeLock = () => {
+      if (typeof window === 'undefined' || window.innerWidth > 767) return;
+      if (!document.fullscreenElement) return;
+
+      const orientation = window.screen.orientation as ScreenOrientation & {
+        lock?: (orientation: string) => Promise<void>;
+      };
+
+      orientation?.lock?.('landscape').catch(() => {
+        // Orientation lock is browser/device dependent. Responsive layout remains usable.
+      });
+    };
+
     const handleVoiceCommand = (event: Event) => {
       const rawTranscript = String((event as CustomEvent<string>).detail ?? '');
       const transcript = normalizeVoiceTranscript(rawTranscript);
@@ -157,17 +287,73 @@ export function useVoiceCommandCompanyPerformance({
       ) return;
       lastHandledRef.current = { transcript, at: now };
 
+      // Resolve healthcare names before normal command matching. This is
+      // important for phrases such as:
+      // "Bandingkan detail PNL Menteng dan Kedoya".
+      // Without this guard, the generic "detail pnl" command wins first.
+      const mentionedSites = findMentionedHealthcare(transcript, healthcareList);
+
+      const hasCompareWord =
+        containsVoicePhrase(transcript, 'bandingkan') ||
+        containsVoicePhrase(transcript, 'compare') ||
+        containsVoicePhrase(transcript, 'versus') ||
+        containsVoicePhrase(transcript, 'vs');
+
+      // Compare Detail P&L must run before the generic P&L command resolver.
+      // This keeps phrases such as:
+      // "Bandingkan detail PNL Menteng dan Kedoya"
+      // from being swallowed by the simpler "Detail PNL" command.
+      if (isComparePnlTranscript(transcript) && mentionedSites.length >= 2) {
+        const [leftSite, rightSite] = mentionedSites;
+
+        setIsCompareMode(true);
+        setLeftHealthcareId(leftSite.id);
+        setRightHealthcareId(rightSite.id);
+
+        // switchLayoutWithFade already delays the actual layout swap, giving
+        // React enough time to commit compare mode + left/right healthcare first.
+        switchVoiceLayout([5]);
+
+        SciFiAudio.playBeep(680, 'square', 0.1, 0.05);
+        return;
+      }
+
+      // Layout combinations are resolved before normal commands. The mapping is
+      // local to Company Performance: A=Quarterly Revenue, B=Revenue Summary,
+      // C=Material Summary, D=Doctor Fee Summary.
+      const graphSelection = resolveCompanyGraphSelection(transcript);
+      if (graphSelection) {
+        switchVoiceLayout(graphSelection);
+        if (graphSelection.length >= 2) tryLandscapeLock();
+        SciFiAudio.playBeep(graphSelection.length > 1 ? 850 : 900, 'sine', 0.08, 0.04);
+        return;
+      }
+
       const command = resolveVoiceCommand(transcript, COMPANY_PERFORMANCE_VOICE_COMMANDS);
 
       if (command) {
         const pnlTarget = PNL_TARGETS[command.id];
         if (pnlTarget) {
-          switchLayoutWithFade([5]);
+          switchVoiceLayout([5]);
           window.setTimeout(() => scrollPnl(pnlTarget), 520);
           return;
         }
 
         switch (command.id) {
+          case 'cp_compare_pnl':
+            if (mentionedSites.length >= 2) {
+              const [leftSite, rightSite] = mentionedSites;
+              setIsCompareMode(true);
+              setLeftHealthcareId(leftSite.id);
+              setRightHealthcareId(rightSite.id);
+              switchVoiceLayout([5]);
+              SciFiAudio.playBeep(680, 'square', 0.1, 0.05);
+            }
+            return;
+          case 'cp_back_previous':
+            restorePreviousVoiceLayout();
+            SciFiAudio.playBeep(760, 'triangle', 0.08, 0.04);
+            return;
           case 'cp_exit_compare':
             setIsCompareMode(false);
             SciFiAudio.playBeep(400, 'square', 0.1, 0.05);
@@ -180,36 +366,36 @@ export function useVoiceCommandCompanyPerformance({
             return;
           case 'cp_bar':
             setPanel1Mode('BAR');
-            switchLayoutWithFade([1]);
+            switchVoiceLayout([1]);
             SciFiAudio.playBeep(700, 'sine', 0.08, 0.04);
             return;
           case 'cp_radiant':
             setPanel1Mode('RADIANT');
-            switchLayoutWithFade([1]);
+            switchVoiceLayout([1]);
             SciFiAudio.playBeep(900, 'sine', 0.08, 0.04);
             return;
           case 'cp_restore':
-            switchLayoutWithFade([1, 2, 3, 4]);
+            switchVoiceLayout([1, 2, 3, 4]);
             SciFiAudio.playBeep(800, 'sine', 0.08, 0.04);
             return;
           case 'cp_quarter_revenue':
-            switchLayoutWithFade([1]);
+            switchVoiceLayout([1]);
             SciFiAudio.playBeep(900, 'sine', 0.08, 0.04);
             return;
           case 'cp_revenue_summary':
-            switchLayoutWithFade([2]);
+            switchVoiceLayout([2]);
             SciFiAudio.playBeep(860, 'sine', 0.08, 0.04);
             return;
           case 'cp_material_summary':
-            switchLayoutWithFade([3]);
+            switchVoiceLayout([3]);
             SciFiAudio.playBeep(840, 'sine', 0.08, 0.04);
             return;
           case 'cp_doctor_fee':
-            switchLayoutWithFade([4]);
+            switchVoiceLayout([4]);
             SciFiAudio.playBeep(820, 'sine', 0.08, 0.04);
             return;
           case 'cp_pnl':
-            switchLayoutWithFade([5]);
+            switchVoiceLayout([5]);
             SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
             return;
           default:
@@ -217,19 +403,16 @@ export function useVoiceCommandCompanyPerformance({
         }
       }
 
-      // Dynamic healthcare names are resolved only when the utterance clearly
-      // carries a healthcare/select/compare intent. A bare site name is ignored.
-      const mentionedSites = findMentionedHealthcare(transcript, healthcareList);
+      // Dynamic healthcare selection remains scoped to Company Performance.
+      // Compare is accepted when two healthcare names are explicitly spoken,
+      // even if the user omits the word "healthcare".
       const healthcareContext =
         containsVoicePhrase(transcript, 'healthcare') ||
         containsVoicePhrase(transcript, 'cabang') ||
         containsVoicePhrase(transcript, 'node');
-      const compareIntent = healthcareContext && (
-        containsVoicePhrase(transcript, 'bandingkan') ||
-        containsVoicePhrase(transcript, 'compare') ||
-        containsVoicePhrase(transcript, 'versus') ||
-        containsVoicePhrase(transcript, 'vs')
-      );
+      const compareIntent =
+        hasCompareWord &&
+        (healthcareContext || mentionedSites.length >= 2);
       const chooseIntent = healthcareContext && (
         containsVoicePhrase(transcript, 'pilih') ||
         containsVoicePhrase(transcript, 'tampilkan') ||
@@ -272,6 +455,7 @@ export function useVoiceCommandCompanyPerformance({
     leftHealthcareId,
     setIsCompareMode,
     setPanel1Mode,
+    activeGraphs,
     switchLayoutWithFade,
     setLeftHealthcareId,
     setRightHealthcareId,

@@ -1,10 +1,20 @@
-export type CoreThemeId = 'cosmic-black' | 'aurora' | 'solaris';
+export type CoreThemeId =
+  | 'cosmic-black'
+  | 'aurora'
+  | 'solaris'
+  | 'obsidian'
+  | 'quartz';
+
+export type CoreThemeAppearance = 'dark' | 'light';
+export type CoreThemePerformance = 'immersive' | 'static';
 
 export interface CoreThemeDefinition {
   id: CoreThemeId;
   name: string;
   description: string;
   icon: string;
+  appearance: CoreThemeAppearance;
+  performance: CoreThemePerformance;
   three: {
     background: string;
     fog: string;
@@ -25,8 +35,10 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
   'cosmic-black': {
     id: 'cosmic-black',
     name: 'Cosmic Black',
-    description: 'Deep-space command center with cyan neon and dark glass.',
+    description: 'Immersive deep-space command center with cyan neon and dark glass.',
     icon: '✦',
+    appearance: 'dark',
+    performance: 'immersive',
     three: {
       background: '#00030a',
       fog: '#00030a',
@@ -41,11 +53,13 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
     },
   },
 
-  'aurora': {
+  aurora: {
     id: 'aurora',
     name: 'Aurora',
-    description: 'Luminous aurora command center with cyan, teal, violet and magenta energy.',
+    description: 'Immersive luminous command center with cyan, teal, violet and magenta energy.',
     icon: '◈',
+    appearance: 'dark',
+    performance: 'immersive',
     three: {
       background: '#102f3d',
       fog: '#163c49',
@@ -60,11 +74,13 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
     },
   },
 
-  'solaris': {
+  solaris: {
     id: 'solaris',
     name: 'Solaris',
-    description: 'Bright azure command center with white-blue solar plasma and Core cyan.',
+    description: 'Immersive bright azure command center with white-blue solar plasma and Core cyan.',
     icon: '☼',
+    appearance: 'light',
+    performance: 'immersive',
     three: {
       background: '#eaf8ff',
       fog: '#d8f1ff',
@@ -78,7 +94,57 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
       wallAccent: '#4b8cff',
     },
   },
+
+  obsidian: {
+    id: 'obsidian',
+    name: 'Obsidian',
+    description: 'Static dark command interface. Zero motion, no decorative WebGL, optimized for lower-power devices.',
+    icon: '◆',
+    appearance: 'dark',
+    performance: 'static',
+    // Compatibility palette for chart components while they migrate to 2.5D.
+    // Static themes should not mount decorative Three.js scenes.
+    three: {
+      background: '#020812',
+      fog: '#020812',
+      star: '#28d7e8',
+      ambientIntensity: 0.75,
+      floor: '#071827',
+      gridPrimary: '#1385a6',
+      gridSecondary: '#0b3448',
+      wall: '#07131f',
+      wallSecondary: '#0a1a29',
+      wallAccent: '#10263a',
+    },
+  },
+
+  quartz: {
+    id: 'quartz',
+    name: 'Quartz',
+    description: 'Static light crystalline interface. Zero motion, no decorative WebGL, optimized for lower-power devices.',
+    icon: '◇',
+    appearance: 'light',
+    performance: 'static',
+    // Compatibility palette for chart components while they migrate to 2.5D.
+    // Static themes should not mount decorative Three.js scenes.
+    three: {
+      background: '#edf8fc',
+      fog: '#e1f1f7',
+      star: '#089fc5',
+      ambientIntensity: 1.25,
+      floor: '#e2f1f6',
+      gridPrimary: '#169dbc',
+      gridSecondary: '#a8d5e2',
+      wall: '#f7fcfe',
+      wallSecondary: '#e9f6fa',
+      wallAccent: '#7acbe0',
+    },
+  },
 };
 
 export const isCoreThemeId = (value: string | null): value is CoreThemeId =>
-  value === 'cosmic-black' || value === 'aurora' || value === 'solaris';
+  value === 'cosmic-black' ||
+  value === 'aurora' ||
+  value === 'solaris' ||
+  value === 'obsidian' ||
+  value === 'quartz';

@@ -273,14 +273,35 @@ const HealthcareDashboardView = ({
   const getGridClass = () => {
     const visibleTopGridPanels = activeGraphs.filter(g => g >= 1 && g <= 4);
     const len = visibleTopGridPanels.length;
-    if (len === 1) return 'grid-cols-1 grid-rows-1 h-full shrink-0';
-    if (len === 2) return 'grid-cols-1 md:grid-cols-2 grid-rows-1 h-[75vh] shrink-0'; 
-    if (len === 3) return 'grid-cols-1 md:grid-cols-2 grid-rows-2 h-[75vh] shrink-0';
-    return 'grid-cols-1 md:grid-cols-2 grid-rows-2 h-[75vh] shrink-0';
+
+    if (len === 1) {
+      return 'company-top-grid--one grid-cols-1 grid-rows-1 h-full shrink-0';
+    }
+
+    if (len === 2) {
+      return 'company-top-grid--two grid-cols-1 md:grid-cols-2 grid-rows-1 h-[75vh] shrink-0';
+    }
+
+    // Three graph combinations are intentionally one horizontal row on
+    // tablet/desktop/phone-landscape. Portrait mobile remains stacked by the
+    // existing <=767px responsive rules.
+    if (len === 3) {
+      return 'company-top-grid--three grid-cols-1 md:grid-cols-3 grid-rows-1 h-[75vh] shrink-0';
+    }
+
+    return 'company-top-grid--four grid-cols-1 md:grid-cols-2 grid-rows-2 h-[75vh] shrink-0';
   };
 
+  const visibleTopGridPanels = activeGraphs.filter(g => g >= 1 && g <= 4);
   const isPanel5Maximized = activeGraphs.length === 1 && activeGraphs[0] === 5;
   const isAnyGraphMaximized = activeGraphs.length === 1 && activeGraphs[0] >= 1 && activeGraphs[0] <= 4;
+  const isDefaultOverview =
+    visibleTopGridPanels.length === 4 &&
+    [1, 2, 3, 4].every((graphId) => visibleTopGridPanels.includes(graphId));
+
+  // P&L belongs to the normal four-panel overview, or to its own fullscreen.
+  // It must NOT leak into 2/3 graph voice combinations.
+  const showPnlSection = isPanel5Maximized || isDefaultOverview;
 
   const handleToggleMaximizePanel5 = () => {
     SciFiAudio.playBeep(900, 'triangle', 0.1, 0.04);
@@ -294,7 +315,13 @@ const HealthcareDashboardView = ({
           {titleName || 'ALL HEALTHCARE NODES'}
         </span>
         <span className="company-muted text-[9px] font-mono text-cyan-400/80 uppercase tracking-wider">
-          {isPanel5Maximized ? 'DETAIL PNL (FULLSCREEN)' : isAnyGraphMaximized ? 'GRAFIK MAXIMIZED' : '4 GRAFIK UTAMA & DETAIL PNL'}
+          {isPanel5Maximized
+            ? 'DETAIL PNL (FULLSCREEN)'
+            : isAnyGraphMaximized
+              ? 'GRAFIK MAXIMIZED'
+              : isDefaultOverview
+                ? '4 GRAFIK UTAMA & DETAIL PNL'
+                : `${visibleTopGridPanels.length} GRAFIK AKTIF`}
         </span>
       </div>
 
@@ -309,7 +336,7 @@ const HealthcareDashboardView = ({
           </div>
         )}
 
-        {(isPanel5Maximized || !isAnyGraphMaximized) && (
+        {showPnlSection && (
           <div className={`company-pnl-section w-full flex flex-col pb-4 ${isPanel5Maximized ? 'h-full flex-1' : 'min-h-[78vh]'} ${isScanning ? 'animate-glitch-out' : 'animate-glitch-in'}`}>
             <PanelDetailPNL 
               pnlData={exsumPnL} 
@@ -573,6 +600,7 @@ export default function CompanyPerformance({
     isCompareMode,
     setIsCompareMode,
     setPanel1Mode,
+    activeGraphs,
     switchLayoutWithFade,
     setLeftHealthcareId,
     setRightHealthcareId,

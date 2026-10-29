@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { useTheme } from '../theme/ThemeContext';
 
 interface HealthcareItem {
   healthcareID: string;
@@ -227,13 +228,34 @@ function colorForCell(cell: IOLCell, mode: MetricMode, maxValue: number) {
   return new THREE.Color().lerpColors(new THREE.Color('#0ea5e9'), new THREE.Color('#34d399'), normalized);
 }
 
-function MatrixFloor({ width, depth }: { width: number; depth: number }) {
+function MatrixFloor({
+  width,
+  depth,
+  isLight,
+}: {
+  width: number;
+  depth: number;
+  isLight: boolean;
+}) {
   return (
     <group>
-      <gridHelper args={[Math.max(width, depth), 24, '#075985', '#082f49']} position={[0, 0, 0]} />
+      <gridHelper
+        args={[
+          Math.max(width, depth),
+          24,
+          isLight ? '#6fbad0' : '#075985',
+          isLight ? '#c7e7f1' : '#082f49',
+        ]}
+        position={[0, 0, 0]}
+      />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.015, 0]}>
         <planeGeometry args={[width + 2, depth + 2]} />
-        <meshBasicMaterial color="#010914" transparent opacity={0.88} side={THREE.DoubleSide} />
+        <meshBasicMaterial
+          color={isLight ? '#eef9fd' : '#010914'}
+          transparent
+          opacity={isLight ? 0.96 : 0.88}
+          side={THREE.DoubleSide}
+        />
       </mesh>
     </group>
   );
@@ -308,6 +330,7 @@ function IOLMatrixScene({
   cells,
   mode,
   isMobile,
+  isLight,
   autoRotate,
   onInteractionStart,
   onHover,
@@ -317,6 +340,7 @@ function IOLMatrixScene({
   cells: IOLCell[];
   mode: MetricMode;
   isMobile: boolean;
+  isLight: boolean;
   autoRotate: boolean;
   onInteractionStart: () => void;
   onHover: (info: HoverInfo) => void;
@@ -337,14 +361,25 @@ function IOLMatrixScene({
   return (
     <>
       <ambientLight intensity={0.82} />
-      <directionalLight position={[7, 10, 7]} intensity={1.45} color="#e8fbff" />
-      <pointLight position={[-6, 5, 4]} intensity={12} distance={22} color="#00cfff" />
-      <pointLight position={[6, 4, -4]} intensity={10} distance={20} color="#fb923c" />
+      <directionalLight
+        position={[7, 10, 7]}
+        intensity={isLight ? 1.2 : 1.45}
+        color={isLight ? '#ffffff' : '#e8fbff'}
+      />
+      <pointLight position={[-6, 5, 4]} intensity={isLight ? 7 : 12} distance={22} color="#00a9d6" />
+      <pointLight position={[6, 4, -4]} intensity={isLight ? 5 : 10} distance={20} color="#fb923c" />
 
-      <fog attach="fog" args={['#010611', isMobile ? 12 : 14, isMobile ? 24 : 28]} />
+      <fog
+        attach="fog"
+        args={[
+          isLight ? '#eaf8ff' : '#010611',
+          isMobile ? 12 : 14,
+          isMobile ? 24 : 28,
+        ]}
+      />
 
       <group position={[0, 0, 0]}>
-        <MatrixFloor width={width} depth={depth} />
+        <MatrixFloor width={width} depth={depth} isLight={isLight} />
 
         {cells.map((cell) => {
           const supplierIndex = suppliers.findIndex((s) => s.id === cell.supplierId);
@@ -377,7 +412,7 @@ function IOLMatrixScene({
               position={[x, 0.08, -depth / 2 + 0.45]}
               rotation={[-Math.PI / 2, 0, 0]}
               fontSize={isMobile ? 0.16 : 0.18}
-              color="#7dd3fc"
+              color={isLight ? '#08708f' : '#7dd3fc'}
               anchorX="center"
               anchorY="middle"
               maxWidth={1.1}
@@ -395,7 +430,7 @@ function IOLMatrixScene({
               position={[-width / 2 + 0.48, 0.08, z]}
               rotation={[-Math.PI / 2, 0, Math.PI / 2]}
               fontSize={isMobile ? 0.14 : 0.16}
-              color="#94a3b8"
+              color={isLight ? '#426a82' : '#94a3b8'}
               anchorX="center"
               anchorY="middle"
               maxWidth={1.55}
@@ -424,6 +459,7 @@ function IOLMatrixScene({
 }
 
 export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUsageProps) {
+  const { isStaticTheme, isLight } = useTheme();
   const now = new Date();
   const defaultMonth = Math.min(12, Math.max(1, now.getMonth() + 1));
   const selectedYear = String(now.getFullYear());
@@ -446,12 +482,12 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
     const media = window.matchMedia('(max-width: 767px)');
     const sync = () => {
       setIsMobile(media.matches);
-      setAutoRotate(media.matches);
+      setAutoRotate(media.matches && !isStaticTheme);
     };
     sync();
     media.addEventListener?.('change', sync);
     return () => media.removeEventListener?.('change', sync);
-  }, []);
+  }, [isStaticTheme]);
 
   useEffect(() => {
     if (!isFullscreen) return;
@@ -509,13 +545,388 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
     ? `YTD · JAN–${MONTHS[selectedMonth - 1]} ${selectedYear}`
     : `${MONTH_NAMES[selectedMonth - 1]} ${selectedYear}`;
 
+  const staticMetricMax = useMemo(
+    () =>
+      Math.max(
+        ...cells.map((cell) =>
+          getMetricValue(
+            cell,
+            metricMode
+          )
+        ),
+        1
+      ),
+    [cells, metricMode]
+  );
+
+  const renderStaticMatrix = (
+    fullscreen: boolean
+  ) => (
+    <div
+      className={`relative overflow-auto rounded-xl border p-3 ${
+        fullscreen
+          ? 'h-full min-h-0'
+          : 'h-[460px]'
+      }`}
+      style={{
+        borderColor:
+          'var(--core-border)',
+        background: isLight
+          ? 'linear-gradient(145deg, rgba(250,254,255,.98), rgba(228,244,250,.96))'
+          : 'linear-gradient(145deg, rgba(3,14,25,.99), rgba(5,25,39,.98))',
+        boxShadow: isLight
+          ? 'inset 0 1px 0 rgba(255,255,255,.9), 0 12px 26px rgba(24,91,117,.08)'
+          : 'inset 0 1px 0 rgba(80,220,255,.06), 0 12px 26px rgba(0,0,0,.22)',
+      }}
+    >
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div>
+          <div
+            className="text-[9px] font-black uppercase tracking-[0.18em]"
+            style={{
+              color:
+                'var(--core-primary-strong)',
+            }}
+          >
+            IOL Usage · Static 2.5D Matrix
+          </div>
+          <div
+            className="mt-1 text-[6px] uppercase tracking-[0.13em]"
+            style={{
+              color:
+                'var(--core-text-muted)',
+            }}
+          >
+            Supplier × Doctor × {metricLabel(metricMode)}
+          </div>
+        </div>
+        <div
+          className="rounded-lg border px-2.5 py-1.5 text-[6px] font-black uppercase tracking-[0.13em]"
+          style={{
+            borderColor:
+              'var(--core-border)',
+            background:
+              'var(--core-control)',
+            color:
+              'var(--core-text-secondary)',
+          }}
+        >
+          Zero WebGL
+        </div>
+      </div>
+
+      <div
+        className="min-w-[720px]"
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            'minmax(128px,1.35fr) repeat(6,minmax(76px,1fr))',
+          gap: '6px',
+        }}
+      >
+        <div
+          className="rounded-lg border px-2 py-2 text-[7px] font-black uppercase tracking-[0.12em]"
+          style={{
+            borderColor:
+              'var(--core-border)',
+            background:
+              'var(--core-panel)',
+            color:
+              'var(--core-text-muted)',
+          }}
+        >
+          Doctor / Supplier
+        </div>
+
+        {suppliers.map(
+          (supplier) => (
+            <div
+              key={`static-head-${supplier.id}`}
+              className="flex min-h-[44px] items-center justify-center rounded-lg border px-1.5 py-2 text-center text-[7px] font-black uppercase leading-tight"
+              style={{
+                borderColor:
+                  'var(--core-border)',
+                background:
+                  'var(--core-panel)',
+                color:
+                  'var(--core-primary-strong)',
+              }}
+            >
+              {supplier.name}
+            </div>
+          )
+        )}
+
+        {doctors.flatMap(
+          (doctor) => {
+            const doctorCells =
+              suppliers.map(
+                (supplier) =>
+                  cells.find(
+                    (cell) =>
+                      cell.doctorId ===
+                        doctor.id &&
+                      cell.supplierId ===
+                        supplier.id
+                  )
+              );
+
+            return [
+              <div
+                key={`static-doctor-${doctor.id}`}
+                className="flex min-h-[68px] items-center rounded-lg border px-2 py-2"
+                style={{
+                  borderColor:
+                    'var(--core-border)',
+                  background:
+                    'var(--core-panel)',
+                }}
+              >
+                <div className="min-w-0">
+                  <div
+                    className="truncate text-[7px] font-black"
+                    style={{
+                      color:
+                        'var(--core-text)',
+                    }}
+                  >
+                    {doctor.name}
+                  </div>
+                  <div
+                    className="mt-1 text-[6px] uppercase tracking-[0.10em]"
+                    style={{
+                      color:
+                        'var(--core-text-muted)',
+                    }}
+                  >
+                    Doctor node
+                  </div>
+                </div>
+              </div>,
+              ...doctorCells.map(
+                (cell, index) => {
+                  const value = cell
+                    ? getMetricValue(
+                        cell,
+                        metricMode
+                      )
+                    : 0;
+                  const ratio =
+                    staticMetricMax > 0
+                      ? Math.max(
+                          0,
+                          Math.min(
+                            1,
+                            value /
+                              staticMetricMax
+                          )
+                        )
+                      : 0;
+
+                  const color = cell
+                    ? colorForCell(
+                        cell,
+                        metricMode,
+                        staticMetricMax
+                      )
+                    : '#334155';
+
+                  const supplier =
+                    suppliers[index];
+
+                  return (
+                    <button
+                      key={`static-cell-${doctor.id}-${supplier.id}`}
+                      type="button"
+                      disabled={!cell}
+                      onClick={() => {
+                        if (cell) {
+                          setSelectedCell(
+                            cell
+                          );
+                        }
+                      }}
+                      title={
+                        cell
+                          ? `${doctor.name} · ${supplier.name} · ${metricLabel(metricMode)}: ${fmt(value, metricMode === 'usage' ? 0 : 1)}`
+                          : `${doctor.name} · ${supplier.name} · No data`
+                      }
+                      className="relative flex min-h-[68px] items-end justify-center overflow-hidden rounded-lg border p-1.5 text-center"
+                      style={{
+                        borderColor:
+                          'var(--core-border)',
+                        background:
+                          'var(--core-control)',
+                        cursor: cell
+                          ? 'pointer'
+                          : 'default',
+                      }}
+                    >
+                      <div
+                        className="absolute bottom-1.5 left-[18%] right-[18%] rounded-t-sm"
+                        style={{
+                          height: `${Math.max(
+                            5,
+                            ratio * 48
+                          )}px`,
+                          background: `linear-gradient(90deg, ${color}99, ${color})`,
+                          boxShadow: isLight
+                            ? `5px 5px 0 ${color}18, inset -5px -6px 10px rgba(20,80,100,.10)`
+                            : `5px 5px 0 rgba(0,0,0,.24), inset -5px -6px 10px rgba(0,0,0,.20)`,
+                          border:
+                            `1px solid ${color}88`,
+                        }}
+                      />
+
+                      <span
+                        className="relative z-10 rounded px-1 py-0.5 text-[6px] font-black"
+                        style={{
+                          background: isLight
+                            ? 'rgba(250,254,255,.88)'
+                            : 'rgba(2,12,22,.78)',
+                          color:
+                            'var(--core-text)',
+                        }}
+                      >
+                        {cell
+                          ? fmt(
+                              value,
+                              metricMode ===
+                                'usage'
+                                ? 0
+                                : 1
+                            )
+                          : '—'}
+                      </span>
+                    </button>
+                  );
+                }
+              ),
+            ];
+          }
+        )}
+      </div>
+
+      {selectedCell && (
+        <div
+          className="sticky bottom-0 mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border p-3"
+          style={{
+            borderColor:
+              'var(--core-border-strong)',
+            background: isLight
+              ? 'rgba(248,253,255,.98)'
+              : 'rgba(3,15,26,.98)',
+          }}
+        >
+          <div className="min-w-0">
+            <div
+              className="truncate text-[8px] font-black"
+              style={{
+                color:
+                  'var(--core-text)',
+              }}
+            >
+              {selectedCell.doctorName}
+            </div>
+            <div
+              className="mt-0.5 truncate text-[7px]"
+              style={{
+                color:
+                  'var(--core-primary)',
+              }}
+            >
+              {selectedCell.supplierName}
+              {' · '}
+              {selectedCell.topModel}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-right">
+            <div>
+              <div
+                className="text-[5px] uppercase"
+                style={{
+                  color:
+                    'var(--core-text-muted)',
+                }}
+              >
+                Qty
+              </div>
+              <div
+                className="text-[8px] font-black"
+                style={{
+                  color:
+                    'var(--core-text)',
+                }}
+              >
+                {fmt(
+                  selectedCell.qty
+                )}
+              </div>
+            </div>
+            <div>
+              <div
+                className="text-[5px] uppercase"
+                style={{
+                  color:
+                    'var(--core-text-muted)',
+                }}
+              >
+                Cost
+              </div>
+              <div
+                className="text-[8px] font-black text-amber-300"
+              >
+                {fmt(
+                  selectedCell.totalCost,
+                  1
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedCell(null)
+              }
+              className="rounded-md border px-2 py-1 text-[6px] font-black uppercase"
+              style={{
+                borderColor:
+                  'var(--core-border)',
+                color:
+                  'var(--core-text-secondary)',
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const sceneCamera = isMobile
     ? { position: [0, 7.2, 14.8] as [number, number, number], fov: 46 }
     : { position: [0, 7.8, 13.4] as [number, number, number], fov: 40 };
 
-  const renderMatrix = (fullscreen: boolean) => (
-    <div className={`relative overflow-hidden ${fullscreen ? 'h-full min-h-0' : 'h-[460px]'} rounded-xl border border-sky-500/20 bg-[#010813]/86`}>
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_45%,rgba(0,183,255,.055),transparent_55%)]" />
+  const renderMatrix = (fullscreen: boolean) =>
+    isStaticTheme
+      ? renderStaticMatrix(fullscreen)
+      : (
+    <div
+      className={`iol-matrix-shell relative overflow-hidden ${fullscreen ? 'h-full min-h-0' : 'h-[460px]'} rounded-xl border`}
+      style={{
+        borderColor: 'var(--core-border)',
+        background: 'var(--core-panel)',
+      }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background: isLight
+            ? 'radial-gradient(circle at 50% 45%, rgba(0,143,196,.08), transparent 55%)'
+            : 'radial-gradient(circle at 50% 45%, rgba(0,183,255,.055), transparent 55%)',
+        }}
+      />
 
       <Canvas
         camera={sceneCamera}
@@ -527,11 +938,12 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
           preserveDrawingBuffer: false,
         }}
       >
-        <color attach="background" args={['#010611']} />
+        <color attach="background" args={[isLight ? '#eaf8ff' : '#010611']} />
         <IOLMatrixScene
           cells={cells}
           mode={metricMode}
           isMobile={isMobile}
+          isLight={isLight}
           autoRotate={autoRotate}
           onInteractionStart={() => setAutoRotate(false)}
           onHover={setHovered}
@@ -606,7 +1018,13 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
 
   return (
     <>
-      <div className="custom-scrollbar h-full w-full overflow-y-auto p-3 font-mono text-sky-200">
+      <div
+        className="iol-usage-shell custom-scrollbar h-full w-full overflow-y-auto p-3 font-mono"
+        style={{
+          color: 'var(--core-text)',
+          background: 'transparent',
+        }}
+      >
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-cyan-400/25 bg-gradient-to-r from-[#04314d]/72 via-[#02121f]/92 to-[#042a43]/70 px-4 py-3 shadow-[0_0_22px_rgba(34,211,238,.08)] backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-950/30">
@@ -617,7 +1035,7 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
               </svg>
             </div>
             <div>
-              <div className="text-[14px] font-black uppercase tracking-[0.22em] text-cyan-100">IOL Usage · 3D Matrix</div>
+              <div className="text-[14px] font-black uppercase tracking-[0.22em] text-cyan-100">{isStaticTheme ? 'IOL Usage · Static 2.5D Matrix' : 'IOL Usage · 3D Matrix'}</div>
               <div className="mt-1 text-[7px] uppercase tracking-[0.18em] text-slate-500">Supplier × Doctor × Usage × Cost Intelligence</div>
             </div>
           </div>
@@ -632,7 +1050,7 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
               onClick={() => setIsFullscreen(true)}
               className="rounded-lg border border-cyan-300/30 bg-cyan-950/25 px-3 py-2 text-[7px] font-black uppercase tracking-[0.16em] text-cyan-200 transition-all hover:border-cyan-200/60 hover:bg-cyan-500/10"
             >
-              3D Fullscreen
+              {isStaticTheme ? 'Static Fullscreen' : '3D Fullscreen'}
             </button>
           </div>
         </div>
@@ -731,11 +1149,82 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
         </div>
       </div>
 
+      <style>{`
+        .iol-usage-shell,
+        .iol-fullscreen-shell {
+          color: var(--core-text);
+        }
+
+        .iol-usage-shell [class*="bg-gradient-to-r"],
+        .iol-fullscreen-shell [class*="bg-gradient-to-r"] {
+          background: var(--core-surface-strong) !important;
+        }
+
+        .iol-usage-shell [class*="bg-[#"],
+        .iol-fullscreen-shell [class*="bg-[#"] {
+          background: var(--core-panel) !important;
+        }
+
+        .iol-usage-shell [class*="bg-cyan-"],
+        .iol-usage-shell [class*="bg-sky-"],
+        .iol-fullscreen-shell [class*="bg-cyan-"],
+        .iol-fullscreen-shell [class*="bg-sky-"] {
+          background: var(--core-control) !important;
+        }
+
+        .iol-usage-shell [class*="border-cyan-"],
+        .iol-usage-shell [class*="border-sky-"],
+        .iol-fullscreen-shell [class*="border-cyan-"],
+        .iol-fullscreen-shell [class*="border-sky-"] {
+          border-color: var(--core-border) !important;
+        }
+
+        .iol-usage-shell [class*="text-white"],
+        .iol-fullscreen-shell [class*="text-white"] {
+          color: var(--core-text) !important;
+        }
+
+        .iol-usage-shell [class*="text-cyan-"],
+        .iol-fullscreen-shell [class*="text-cyan-"] {
+          color: var(--core-primary-strong) !important;
+        }
+
+        .iol-usage-shell [class*="text-sky-"],
+        .iol-fullscreen-shell [class*="text-sky-"] {
+          color: var(--core-text-secondary) !important;
+        }
+
+        .iol-usage-shell [class*="text-slate-"],
+        .iol-fullscreen-shell [class*="text-slate-"] {
+          color: var(--core-text-muted) !important;
+        }
+
+        .iol-usage-shell .iol-matrix-shell,
+        .iol-fullscreen-shell .iol-matrix-shell {
+          border-color: var(--core-border) !important;
+          background: var(--core-panel) !important;
+          box-shadow: var(--core-frame-shadow);
+        }
+
+        [data-appearance="light"] .iol-usage-shell,
+        [data-theme-appearance="light"] .iol-usage-shell,
+        [data-appearance="light"] .iol-fullscreen-shell,
+        [data-theme-appearance="light"] .iol-fullscreen-shell {
+          text-shadow: none !important;
+        }
+      `}</style>
+
       {isFullscreen && (
-        <div className="fixed inset-0 z-[9999] flex flex-col overflow-hidden bg-[#010611] p-2 font-mono text-sky-200 md:p-3">
+        <div
+          className="iol-fullscreen-shell fixed inset-0 z-[9999] flex flex-col overflow-hidden p-2 font-mono md:p-3"
+          style={{
+            background: 'var(--core-bg)',
+            color: 'var(--core-text)',
+          }}
+        >
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-cyan-400/20 bg-[#020b17]/85 px-3 py-2 backdrop-blur-xl">
             <div>
-              <div className="text-[11px] font-black uppercase tracking-[0.22em] text-cyan-100">IOL Usage · Real 3D Matrix</div>
+              <div className="text-[11px] font-black uppercase tracking-[0.22em] text-cyan-100">{isStaticTheme ? 'IOL Usage · Static 2.5D Matrix' : 'IOL Usage · Real 3D Matrix'}</div>
               <div className="mt-1 text-[7px] uppercase tracking-[0.16em] text-slate-500">Supplier · Doctor · Usage · Cost · {previewLabel}</div>
             </div>
 

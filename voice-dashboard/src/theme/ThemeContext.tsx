@@ -7,6 +7,7 @@ import {
 import type {
   CoreThemeDefinition,
   CoreThemeId,
+  CoreThemePerformance,
 } from './themes';
 import './theme.css';
 
@@ -15,12 +16,26 @@ interface ThemeContextValue {
   theme: CoreThemeDefinition;
   setTheme: (themeId: CoreThemeId) => void;
   toggleTheme: () => void;
+
   isLight: boolean;
   isAurora: boolean;
   isSolaris: boolean;
+
+  isStaticTheme: boolean;
+  isObsidian: boolean;
+  isQuartz: boolean;
+  performanceMode: CoreThemePerformance;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
+
+const THEME_CYCLE: CoreThemeId[] = [
+  'cosmic-black',
+  'aurora',
+  'solaris',
+  'obsidian',
+  'quartz',
+];
 
 const getInitialTheme = (): CoreThemeId => {
   if (typeof window === 'undefined') return 'cosmic-black';
@@ -39,12 +54,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeId, setThemeId] = useState<CoreThemeId>(getInitialTheme);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = themeId;
+    const theme = CORE_THEMES[themeId];
+    const root = document.documentElement;
 
-    // Solaris is the only true light environment. Cosmic Black and Aurora
-    // deliberately keep dark browser-native controls.
+    root.dataset.theme = themeId;
+    root.dataset.performance = theme.performance;
+    root.dataset.appearance = theme.appearance;
+
     document.documentElement.style.colorScheme =
-      themeId === 'solaris' ? 'light' : 'dark';
+      theme.appearance === 'light' ? 'light' : 'dark';
 
     window.localStorage.setItem(CORE_THEME_STORAGE_KEY, themeId);
   }, [themeId]);
@@ -56,19 +74,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       themeId,
       theme,
       setTheme: setThemeId,
-      // Kept for legacy callers. It now cycles through all available themes.
+
+      // Legacy convenience action. Cycles through all official themes.
       toggleTheme: () =>
         setThemeId((current) => {
-          if (current === 'cosmic-black') return 'aurora';
-          if (current === 'aurora') return 'solaris';
-          return 'cosmic-black';
+          const currentIndex = THEME_CYCLE.indexOf(current);
+          return THEME_CYCLE[(currentIndex + 1) % THEME_CYCLE.length];
         }),
 
-      // Existing chart components can use this flag to switch to their
-      // established light materials only for Solaris.
-      isLight: themeId === 'solaris',
+      // Light materials are shared by Solaris and Quartz.
+      isLight: theme.appearance === 'light',
       isAurora: themeId === 'aurora',
       isSolaris: themeId === 'solaris',
+
+      // Performance/rendering flags for every dashboard/chart.
+      isStaticTheme: theme.performance === 'static',
+      isObsidian: themeId === 'obsidian',
+      isQuartz: themeId === 'quartz',
+      performanceMode: theme.performance,
     };
   }, [themeId]);
 

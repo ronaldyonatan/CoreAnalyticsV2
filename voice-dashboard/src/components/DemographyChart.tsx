@@ -1132,7 +1132,7 @@ export default function DemographyChart({
   donutMode: controlledDonutMode,
   onDonutModeChange,
 }: DemographyChartProps) {
-  const { theme, isLight, isSolaris } = useTheme();
+  const { theme, isLight, isSolaris, isStaticTheme } = useTheme();
   const [hover3D, setHover3D] = useState<Hover3D | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [autoRotate, setAutoRotate] = useState(true);
@@ -1174,6 +1174,13 @@ export default function DemographyChart({
   useEffect(() => {
     if (previousCompactModeRef.current === donutMode) return;
 
+    if (isStaticTheme) {
+      previousCompactModeRef.current = donutMode;
+      setCompactPreviousMode(donutMode);
+      setAgeTransitionActive(false);
+      return;
+    }
+
     const outgoingMode = previousCompactModeRef.current;
     setCompactPreviousMode(outgoingMode);
     previousCompactModeRef.current = donutMode;
@@ -1197,7 +1204,7 @@ export default function DemographyChart({
         ageTransitionTimerRef.current = null;
       }
     };
-  }, [donutMode]);
+  }, [donutMode, isStaticTheme]);
 
   const { genderData, patientTypeData, ageGroups } = useMemo(() => {
     const raw = demographicData || [];
@@ -1316,7 +1323,7 @@ export default function DemographyChart({
   }, [safeSelectedMonth, selectedYear, ytdActive]);
 
 
-  if (isFullscreen) {
+  if (isFullscreen && !isStaticTheme) {
     return (
       <div
         className="daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative"
@@ -1763,7 +1770,7 @@ export default function DemographyChart({
             <div className="absolute inset-[18px] rounded-full border border-cyan-400/10 shadow-[0_0_24px_rgba(0,191,255,.06)]" />
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={activeDonutData} cx="50%" cy="50%" innerRadius={40} outerRadius={54} paddingAngle={2} cornerRadius={5} startAngle={90} endAngle={-270} dataKey="value" stroke="rgba(255,255,255,.08)" strokeWidth={1}>
+                <Pie data={activeDonutData} cx="50%" cy="50%" innerRadius={40} outerRadius={54} paddingAngle={2} cornerRadius={5} startAngle={90} endAngle={-270} dataKey="value" stroke="rgba(255,255,255,.08)" strokeWidth={1} isAnimationActive={!isStaticTheme}>
                   {activeDonutData.map((entry, index) => <Cell key={index} fill={entry.color} />)}
                 </Pie>
                 <Tooltip

@@ -9,8 +9,8 @@ import {
   Tooltip,
 } from 'recharts';
 import * as THREE from 'three';
-
 import { useTheme } from '../theme/ThemeContext';
+
 interface ChannelItem {
   Kriteria?: string;
   kriteria?: string;
@@ -43,7 +43,6 @@ function DonutSegment({
   startAngle,
   endAngle,
   onHover,
-
 }: {
   item: ChartItem;
   startAngle: number;
@@ -132,13 +131,11 @@ function DonutSegment({
 function Revenue3DScene({
   data,
   onHover,
-  isLight,
 }: {
   data: ChartItem[];
   onHover: (
     item: ChartItem | null
   ) => void;
-  isLight: boolean;
 }) {
   let currentAngle =
     Math.PI / 2;
@@ -147,10 +144,10 @@ function Revenue3DScene({
     <>
       <color
         attach="background"
-        args={[isLight ? '#d7e8f0' : '#020916']}
+        args={['#020916']}
       />
 
-      <ambientLight intensity={isLight ? 1.8 : 1.35} />
+      <ambientLight intensity={1.35} />
 
       <directionalLight
         position={[4, 6, 7]}
@@ -177,7 +174,7 @@ function Revenue3DScene({
         />
 
         <meshPhysicalMaterial
-          color={isLight ? '#c6dce6' : '#031321'}
+          color="#031321"
           transparent
           opacity={0.78}
           roughness={0.35}
@@ -247,7 +244,7 @@ export default function PerChannelRevenueChart({
   data = [],
   isFullscreen = false,
 }: PerChannelRevenueProps) {
-  const { isLight } = useTheme();
+  const { isStaticTheme } = useTheme();
   const [hover, setHover] =
     useState<ChartItem | null>(
       null
@@ -407,9 +404,9 @@ export default function PerChannelRevenueChart({
     };
   }, [data, isLoaded]);
 
-  if (isFullscreen) {
+  if (isFullscreen && !isStaticTheme) {
     return (
-      <div className="daily-themed-fullscreen relative w-full h-full min-h-0 overflow-hidden rounded-xl border">
+      <div className="relative w-full h-full min-h-0 overflow-hidden rounded-xl border border-cyan-500/30 bg-[#020916]">
 
         <div className="absolute top-4 left-4 z-20">
 
@@ -445,8 +442,7 @@ export default function PerChannelRevenueChart({
           <Revenue3DScene
             data={chartData}
             onHover={setHover}
-            isLight={isLight}
-/>
+          />
 
         </Canvas>
 
@@ -623,7 +619,8 @@ export default function PerChannelRevenueChart({
               endAngle={
                 -270
               }
-            >
+            
+              isAnimationActive={!isStaticTheme}>
 
               {chartData.map(
                 (
@@ -656,9 +653,11 @@ export default function PerChannelRevenueChart({
                 name,
               ]}
               contentStyle={{
-                backgroundColor: isLight ? '#e7f3f8' : '#000a17',
+                backgroundColor:
+                  '#000a17',
 
-                borderColor: isLight ? '#4b8fa8' : '#2587C8',
+                borderColor:
+                  '#2587C8',
 
                 borderRadius:
                   '6px',

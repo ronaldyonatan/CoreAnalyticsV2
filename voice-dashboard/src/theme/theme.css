@@ -1,5 +1,5 @@
 :root,
-[data-theme="cosmic-black"] {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) {
   --core-bg: #000205;
   --core-bg-secondary: #000511;
   --core-surface: rgba(0, 8, 20, 0.24);
@@ -90,7 +90,7 @@
 }
 
 
-[data-theme="solaris"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) {
   /* =======================================================
      SOLARIS AZURE THEME
      Bright white-blue solar plasma. No warm yellow/orange.
@@ -398,7 +398,7 @@ body {
    surfaces without changing chart/data/business logic.
    ========================================================= */
 
-[data-theme="solaris"] .company-theme-root {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root {
   --company-bg: rgba(239, 249, 255, .82);
   --company-surface: rgba(247, 253, 255, .91);
   --company-surface-strong: rgba(250, 254, 255, .97);
@@ -418,7 +418,7 @@ body {
   color: var(--company-text) !important;
 }
 
-[data-theme="solaris"] .company-performance-shell {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-performance-shell {
   background:
     linear-gradient(rgba(0,143,196,.022) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,143,196,.022) 1px, transparent 1px),
@@ -429,8 +429,8 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72) !important;
 }
 
-[data-theme="solaris"] .company-control-bar,
-[data-theme="solaris"] .company-node-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-control-bar,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-node-header {
   background:
     radial-gradient(ellipse at 88% 0%, rgba(86,220,255,.10), transparent 34%),
     linear-gradient(110deg, rgba(249,254,255,.94), rgba(230,247,255,.88)) !important;
@@ -438,15 +438,15 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.94) !important;
 }
 
-[data-theme="solaris"] .company-panel-frame,
-[data-theme="solaris"] .company-view-shell,
-[data-theme="solaris"] .company-view-shell--compare {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel-frame,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-view-shell,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-view-shell--compare {
   background: linear-gradient(145deg, rgba(245,252,255,.82), rgba(224,244,255,.70)) !important;
   border-color: rgba(0,143,196,.17) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.90) !important;
 }
 
-[data-theme="solaris"] .company-panel {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel {
   background:
     radial-gradient(ellipse at 92% -8%, rgba(86,220,255,.12), transparent 34%),
     radial-gradient(ellipse at 8% 108%, rgba(49,140,255,.045), transparent 34%),
@@ -456,75 +456,75 @@ body {
   box-shadow: var(--company-shadow) !important;
 }
 
-[data-theme="solaris"] .company-panel-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel-header {
   border-color: rgba(0,143,196,.18) !important;
 }
 
-[data-theme="solaris"] .company-title,
-[data-theme="solaris"] .company-text {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-title,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-text {
   color: #123c56 !important;
   text-shadow: none !important;
 }
 
-[data-theme="solaris"] .company-muted,
-[data-theme="solaris"] .company-panel-footer {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-muted,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel-footer {
   color: var(--company-muted) !important;
 }
 
-[data-theme="solaris"] .company-accent {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-accent {
   color: var(--company-primary-strong) !important;
 }
 
-[data-theme="solaris"] .company-status-dot {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-status-dot {
   background: #00bfe8 !important;
   box-shadow: 0 0 8px rgba(0,191,232,.30) !important;
 }
 
-[data-theme="solaris"] .company-control-surface,
-[data-theme="solaris"] .company-control-pill,
-[data-theme="solaris"] .company-tabs,
-[data-theme="solaris"] .company-select {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-control-surface,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-control-pill,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tabs,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-select {
   background: rgba(244,251,255,.94) !important;
   border-color: rgba(0,143,196,.22) !important;
   color: #315f78 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.94) !important;
 }
 
-[data-theme="solaris"] .company-control-pill:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-control-pill:hover {
   background: rgba(220,244,255,.98) !important;
   border-color: rgba(0,143,196,.36) !important;
   color: #086f9a !important;
 }
 
-[data-theme="solaris"] .company-tab-active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tab-active {
   background: linear-gradient(135deg, #00bfe8, #318cff) !important;
   border-color: rgba(0,143,196,.48) !important;
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0,143,196,.16) !important;
 }
 
-[data-theme="solaris"] .company-tab-idle {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tab-idle {
   color: #52778c !important;
 }
 
-[data-theme="solaris"] .company-tab-idle:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tab-idle:hover {
   background: rgba(0,191,232,.08) !important;
   color: #086f9a !important;
 }
 
-[data-theme="solaris"] .company-icon-button {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-icon-button {
   background: rgba(241,250,255,.82) !important;
   border: 1px solid rgba(0,143,196,.16) !important;
   color: #1684aa !important;
 }
 
-[data-theme="solaris"] .company-icon-button:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-icon-button:hover {
   background: rgba(216,243,255,.96) !important;
   color: #006f9c !important;
 }
 
 /* Primary 2D chart stage: remove the black chart well. */
-[data-theme="solaris"] .company-chart-stage {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-chart-stage {
   background:
     linear-gradient(rgba(0,143,196,.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,143,196,.045) 1px, transparent 1px),
@@ -535,117 +535,117 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.96), inset 0 -16px 34px rgba(49,140,255,.025) !important;
 }
 
-[data-theme="solaris"] .company-axis {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-axis {
   background: rgba(0,111,156,.30) !important;
 }
 
-[data-theme="solaris"] .company-quarter-label {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-quarter-label {
   background: rgba(247,253,255,.88) !important;
   border: 1px solid rgba(0,143,196,.10) !important;
   color: #1f5875 !important;
   box-shadow: 0 2px 7px rgba(25,92,132,.05) !important;
 }
 
-[data-theme="solaris"] .company-bar-previous {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-bar-previous {
   background: linear-gradient(to top, #1b63d9, #61b9f5) !important;
   box-shadow: 0 5px 13px rgba(27,99,217,.14) !important;
 }
 
-[data-theme="solaris"] .company-bar-current {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-bar-current {
   background: linear-gradient(to top, #008fc4, #56dcff) !important;
   box-shadow: 0 5px 14px rgba(0,191,232,.16) !important;
 }
 
 /* Ring/Radiant view keeps the sci-fi language but reads as Solaris. */
-[data-theme="solaris"] .company-panel--radiant {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel--radiant {
   background:
     radial-gradient(circle at 50% 48%, rgba(86,220,255,.12), transparent 38%),
     linear-gradient(145deg, rgba(250,254,255,.97), rgba(227,246,255,.92)) !important;
 }
 
-[data-theme="solaris"] .company-ring-track {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-ring-track {
   color: rgba(49,140,255,.12) !important;
 }
 
-[data-theme="solaris"] .company-ring-previous {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-ring-previous {
   color: #318cff !important;
 }
 
-[data-theme="solaris"] .company-ring-current {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-ring-current {
   color: #00a9d6 !important;
 }
 
 /* Donut legends and tables. */
-[data-theme="solaris"] .company-legend-row {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-legend-row {
   background: rgba(242,250,255,.88) !important;
   border-color: rgba(0,143,196,.16) !important;
   color: #285b77 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.90) !important;
 }
 
-[data-theme="solaris"] .company-legend-row:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-legend-row:hover {
   background: rgba(222,244,255,.95) !important;
   border-color: rgba(0,143,196,.26) !important;
 }
 
 
-[data-theme="solaris"] .company-legend-row--active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-legend-row--active {
   background: linear-gradient(90deg, rgba(0,191,232,.12), rgba(49,140,255,.075)) !important;
   border-color: rgba(0,143,196,.32) !important;
 }
 /* Revenue panel predates company-legend-row. Catch those legacy rows safely. */
-[data-theme="solaris"] .company-panel div[class*="bg-[#001020]/60"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel div[class*="bg-[#001020]/60"] {
   background: rgba(242,250,255,.88) !important;
   border-color: rgba(0,143,196,.16) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.90) !important;
 }
 
-[data-theme="solaris"] .company-panel div[class*="bg-[#00f2fe]/20"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel div[class*="bg-[#00f2fe]/20"] {
   background: rgba(0,191,232,.10) !important;
   border-color: rgba(0,143,196,.32) !important;
   box-shadow: 0 5px 13px rgba(0,143,196,.08) !important;
 }
 
-[data-theme="solaris"] .company-table-head,
-[data-theme="solaris"] .company-table-head th {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-table-head,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-table-head th {
   background: rgba(229,246,255,.98) !important;
   border-color: rgba(0,143,196,.20) !important;
   color: #17617f !important;
   box-shadow: 0 4px 12px rgba(25,92,132,.06) !important;
 }
 
-[data-theme="solaris"] .company-table-body {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-table-body {
   color: #335f76 !important;
 }
 
-[data-theme="solaris"] .company-table-body tr,
-[data-theme="solaris"] .company-table-body td {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-table-body tr,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-table-body td {
   border-color: rgba(0,143,196,.10) !important;
 }
 
-[data-theme="solaris"] .company-table-row:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-table-row:hover {
   background: rgba(0,191,232,.065) !important;
 }
 
-[data-theme="solaris"] .company-panel-footer {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel-footer {
   border-color: rgba(0,143,196,.14) !important;
 }
 
 /* Recharts tooltip; readable on the light theme without becoming flat white. */
-[data-theme="solaris"] .company-tooltip {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tooltip {
   background: rgba(249,253,255,.97) !important;
   border-color: rgba(0,143,196,.30) !important;
   color: #0b2740 !important;
   box-shadow: 0 12px 28px rgba(25,92,132,.13), 0 0 16px rgba(0,191,232,.07) !important;
 }
 
-[data-theme="solaris"] .company-tooltip-title {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tooltip-title {
   color: #0f6688 !important;
   border-color: rgba(0,143,196,.16) !important;
 }
 
 /* Legacy black tooltip bubbles in the quarterly chart. */
-[data-theme="solaris"] .company-chart-stage span[class*="bg-black"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-chart-stage span[class*="bg-black"] {
   background: rgba(249,253,255,.97) !important;
   color: #174f6a !important;
   border-color: rgba(0,143,196,.24) !important;
@@ -654,21 +654,21 @@ body {
 }
 
 /* Keep semantic alert colors, but remove dark-theme-only text utilities. */
-[data-theme="solaris"] .company-theme-root .text-cyan-100,
-[data-theme="solaris"] .company-theme-root .text-cyan-200,
-[data-theme="solaris"] .company-theme-root .text-cyan-300,
-[data-theme="solaris"] .company-theme-root .text-cyan-400 {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root .text-cyan-100,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root .text-cyan-200,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root .text-cyan-300,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root .text-cyan-400 {
   color: #17617f !important;
 }
 
-[data-theme="solaris"] .company-theme-root .text-white:not(.company-tab-active) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root .text-white:not(.company-tab-active) {
   color: #0b2740 !important;
 }
 
 /* Native controls should match the true-light Solaris environment. */
-[data-theme="solaris"] .company-theme-root select,
-[data-theme="solaris"] .company-theme-root input,
-[data-theme="solaris"] .company-theme-root button {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root select,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root input,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-theme-root button {
   color-scheme: light;
 }
 
@@ -975,7 +975,7 @@ body {
   color: var(--core-text-muted);
 }
 
-[data-theme="solaris"] .core-theme-option--solaris.core-theme-option-active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-theme-option--solaris.core-theme-option-active {
   background:
     radial-gradient(circle at 16% 10%, rgba(86,220,255,.28), transparent 48%),
     linear-gradient(135deg, rgba(247,253,255,.98), rgba(222,243,255,.95));
@@ -985,7 +985,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,.97);
 }
 
-[data-theme="solaris"] .core-theme-option--solaris .core-theme-option-icon {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-theme-option--solaris .core-theme-option-icon {
   color: #087ea8;
   border-color: rgba(0,143,196,.36);
   background: rgba(0,191,232,.13);
@@ -1007,7 +1007,7 @@ body {
   transition: opacity .5s ease;
 }
 
-[data-theme="solaris"] .core-solaris-field { opacity: 1; }
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field { opacity: 1; }
 
 .core-solaris-sun {
   position: absolute;
@@ -1112,16 +1112,16 @@ body {
    SOLARIS APPLICATION SURFACES
    ========================================================= */
 
-[data-theme="solaris"] body,
-[data-theme="solaris"] #root {
+:is([data-theme="solaris"], [data-theme="quartz"]) body,
+:is([data-theme="solaris"], [data-theme="quartz"]) #root {
   background:
     radial-gradient(ellipse at 82% 4%, rgba(86,220,255,.24), transparent 30%),
     radial-gradient(ellipse at 12% 76%, rgba(49,140,255,.10), transparent 35%),
     linear-gradient(145deg, #f4fbff 0%, #eaf8ff 44%, #d8f1ff 100%);
 }
 
-[data-theme="solaris"] .core-dashboard-frame,
-[data-theme="solaris"] .core-main-frame {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-dashboard-frame,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-main-frame {
   background:
     linear-gradient(rgba(0,143,196,.032) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,143,196,.032) 1px, transparent 1px),
@@ -1136,7 +1136,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,.94);
 }
 
-[data-theme="solaris"] .core-global-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-global-header {
   background:
     radial-gradient(ellipse at 84% 0%, rgba(86,220,255,.20), transparent 32%),
     radial-gradient(ellipse at 12% 100%, rgba(49,140,255,.07), transparent 31%),
@@ -1147,7 +1147,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,.97) !important;
 }
 
-[data-theme="solaris"] .core-sidebar {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-sidebar {
   background:
     radial-gradient(circle at 0% 0%, rgba(0,191,232,.08), transparent 34%),
     radial-gradient(circle at 100% 16%, rgba(49,140,255,.12), transparent 38%),
@@ -1158,25 +1158,25 @@ body {
     inset -1px 0 0 rgba(255,255,255,.88) !important;
 }
 
-[data-theme="solaris"] .core-brand-logo {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-brand-logo {
   filter: saturate(1.08) contrast(1.04) drop-shadow(0 4px 12px rgba(0,143,196,.18)) !important;
 }
 
-[data-theme="solaris"] .core-icon-button,
-[data-theme="solaris"] .core-nav-drawer-header,
-[data-theme="solaris"] .core-settings-intro {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-icon-button,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-drawer-header,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-intro {
   background: rgba(238,249,255,.90) !important;
   border-color: rgba(0,143,196,.21) !important;
   color: #137b9f !important;
 }
 
-[data-theme="solaris"] .core-icon-button:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-icon-button:hover {
   background: rgba(220,244,255,.98) !important;
   border-color: rgba(0,143,196,.40) !important;
   color: #006f9c !important;
 }
 
-[data-theme="solaris"] .core-settings-popover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover {
   background:
     radial-gradient(circle at 88% 0%, rgba(86,220,255,.14), transparent 34%),
     rgba(244,251,255,.98) !important;
@@ -1186,27 +1186,27 @@ body {
     0 0 26px rgba(0,191,232,.08) !important;
 }
 
-[data-theme="solaris"] .core-nav-group-button {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button {
   background: rgba(236,248,255,.80) !important;
   border-color: rgba(0,143,196,.15) !important;
   color: #285f7c !important;
 }
 
-[data-theme="solaris"] .core-nav-group-button:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button:hover {
   background: rgba(220,244,255,.96) !important;
   border-color: rgba(0,143,196,.30) !important;
   color: #0b7198 !important;
 }
 
-[data-theme="solaris"] .core-nav-child-button { color: #426a82 !important; }
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button { color: #426a82 !important; }
 
-[data-theme="solaris"] .core-nav-child-button:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button:hover {
   background: rgba(221,244,255,.92) !important;
   border-color: rgba(0,143,196,.18) !important;
   color: #126f96 !important;
 }
 
-[data-theme="solaris"] .core-nav-child-button.core-nav-child-active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button.core-nav-child-active {
   background:
     linear-gradient(90deg, rgba(0,191,232,.14), rgba(49,140,255,.10)) !important;
   border-color: rgba(0,143,196,.35) !important;
@@ -1216,14 +1216,14 @@ body {
     0 7px 16px rgba(25,92,132,.08) !important;
 }
 
-[data-theme="solaris"] .text-hud-glow {
+:is([data-theme="solaris"], [data-theme="quartz"]) .text-hud-glow {
   color: #0b2740 !important;
   text-shadow:
     0 0 10px rgba(0,191,232,.12),
     0 2px 12px rgba(49,140,255,.08) !important;
 }
 
-[data-theme="solaris"] .daily-themed-card {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card {
   position: relative;
   background:
     radial-gradient(ellipse at 92% -8%, rgba(86,220,255,.16), transparent 34%),
@@ -1235,8 +1235,8 @@ body {
     inset 0 1px 0 rgba(255,255,255,.97) !important;
 }
 
-[data-theme="solaris"] .daily-themed-fullscreen,
-[data-theme="solaris"] .daily-tracking-fullscreen {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-fullscreen,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-tracking-fullscreen {
   background:
     linear-gradient(rgba(0,143,196,.027) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,143,196,.027) 1px, transparent 1px),
@@ -1246,23 +1246,23 @@ body {
   color: #0b2740 !important;
 }
 
-[data-theme="solaris"] .daily-themed-fullscreen-header,
-[data-theme="solaris"] .daily-tracking-fullscreen-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-fullscreen-header,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-tracking-fullscreen-header {
   background:
     linear-gradient(100deg, rgba(248,253,255,.98), rgba(232,248,255,.97), rgba(219,242,255,.95)) !important;
   border-color: rgba(0,143,196,.21) !important;
 }
 
-[data-theme="solaris"] .daily-themed-input,
-[data-theme="solaris"] select,
-[data-theme="solaris"] input {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-input,
+:is([data-theme="solaris"], [data-theme="quartz"]) select,
+:is([data-theme="solaris"], [data-theme="quartz"]) input {
   background: rgba(246,252,255,.97) !important;
   border-color: rgba(0,143,196,.23) !important;
   color: #0b2740 !important;
   color-scheme: light;
 }
 
-[data-theme="solaris"] .grid-panel-container > div > div {
+:is([data-theme="solaris"], [data-theme="quartz"]) .grid-panel-container > div > div {
   background:
     linear-gradient(145deg, rgba(247,253,255,.96), rgba(226,245,255,.92)) !important;
   border-color: rgba(0,143,196,.20) !important;
@@ -1289,7 +1289,7 @@ body {
    ========================================================= */
 
 /* Same PanelFilterHealthcare component used by Daily Tracking. */
-[data-theme="solaris"] .company-healthcare-filter-wrap > div > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap > div > div:first-child {
   min-width: 270px !important;
   min-height: 30px !important;
   padding: 6px 10px !important;
@@ -1302,60 +1302,60 @@ body {
     inset 0 1px 0 rgba(255,255,255,.98) !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap > div > div:first-child:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap > div > div:first-child:hover {
   background: linear-gradient(135deg, #fbfeff, #e2f6ff) !important;
   border-color: rgba(0,143,196,.38) !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap > div > div:first-child svg {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap > div > div:first-child svg {
   color: #1684aa !important;
 }
 
 /* Search/list popover from PanelFilterHealthcare. */
-[data-theme="solaris"] .company-healthcare-filter-wrap > div > div:nth-child(2) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap > div > div:nth-child(2) {
   background: rgba(249,253,255,.985) !important;
   border-color: rgba(0,143,196,.27) !important;
   color: #174f6a !important;
   box-shadow: 0 18px 38px rgba(25,92,132,.15) !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap input {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap input {
   background: rgba(238,249,255,.96) !important;
   border-color: rgba(0,143,196,.22) !important;
   color: #0b2740 !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap input::placeholder {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap input::placeholder {
   color: #7897a9 !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap div[class*="text-cyan"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap div[class*="text-cyan"] {
   color: #315f78 !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap div[class*="bg-[#2587C8]/40"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap div[class*="bg-[#2587C8]/40"] {
   background: rgba(0,191,232,.14) !important;
   color: #0b5576 !important;
 }
 
-[data-theme="solaris"] .company-healthcare-filter-wrap div[class*="hover:bg-[#2587C8]/20"]:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-filter-wrap div[class*="hover:bg-[#2587C8]/20"]:hover {
   background: rgba(0,191,232,.08) !important;
   color: #086f9a !important;
 }
 
-[data-theme="solaris"] .company-healthcare-refresh {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-refresh {
   min-height: 30px;
   color: #087da6 !important;
 }
 
-[data-theme="solaris"] .company-healthcare-error {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-healthcare-error {
   border-color: rgba(190,57,75,.28) !important;
   background: rgba(255,239,242,.92) !important;
   color: #b74353 !important;
 }
 
 /* Detail Profit & Loss — remove the last black/dark table well. */
-[data-theme="solaris"] .company-pnl-card {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card {
   background:
     radial-gradient(ellipse at 88% -10%, rgba(86,220,255,.10), transparent 32%),
     linear-gradient(145deg, rgba(251,254,255,.97), rgba(231,247,255,.94)) !important;
@@ -1366,7 +1366,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,.96) !important;
 }
 
-[data-theme="solaris"] .company-pnl-scroll {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-scroll {
   background:
     linear-gradient(rgba(0,143,196,.026) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,143,196,.026) 1px, transparent 1px),
@@ -1376,59 +1376,59 @@ body {
   color: #173f57 !important;
 }
 
-[data-theme="solaris"] .company-pnl-scroll .company-table-head,
-[data-theme="solaris"] .company-pnl-scroll .company-table-head th {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-scroll .company-table-head,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-scroll .company-table-head th {
   background: rgba(221,242,252,.985) !important;
   color: #164f6a !important;
   border-color: rgba(0,143,196,.18) !important;
   box-shadow: 0 5px 12px rgba(25,92,132,.06) !important;
 }
 
-[data-theme="solaris"] .company-pnl-scroll .company-table-body {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-scroll .company-table-body {
   color: #315f78 !important;
 }
 
-[data-theme="solaris"] .company-pnl-row {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-row {
   background: rgba(251,254,255,.70) !important;
   color: #315f78 !important;
 }
 
-[data-theme="solaris"] .company-pnl-row:nth-child(even) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-row:nth-child(even) {
   background: rgba(232,247,255,.54) !important;
 }
 
-[data-theme="solaris"] .company-pnl-row:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-row:hover {
   background: rgba(0,191,232,.075) !important;
 }
 
-[data-theme="solaris"] .company-pnl-row td {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-row td {
   color: #315f78 !important;
   border-color: rgba(0,143,196,.10) !important;
 }
 
-[data-theme="solaris"] .company-pnl-group,
-[data-theme="solaris"] .company-pnl-group td {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-group,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-group td {
   background: linear-gradient(90deg, rgba(212,241,253,.96), rgba(233,248,255,.94)) !important;
   color: #0c6f94 !important;
   border-color: rgba(0,143,196,.20) !important;
 }
 
-[data-theme="solaris"] .company-pnl-section,
-[data-theme="solaris"] .company-pnl-section td {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-section,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-section td {
   background: linear-gradient(90deg, rgba(202,237,252,.97), rgba(226,246,255,.95)) !important;
   color: #085e82 !important;
   border-color: rgba(0,143,196,.24) !important;
 }
 
-[data-theme="solaris"] .company-pnl-total,
-[data-theme="solaris"] .company-pnl-total td {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-total,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-total td {
   background: linear-gradient(90deg, rgba(224,242,255,.98), rgba(235,247,255,.96)) !important;
   color: #174f6a !important;
   border-color: rgba(49,140,255,.25) !important;
 }
 
-[data-theme="solaris"] .company-pnl-major,
-[data-theme="solaris"] .company-pnl-major td {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-major,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-major td {
   background: linear-gradient(90deg, rgba(49,140,255,.14), rgba(0,191,232,.10)) !important;
   color: #0a5576 !important;
   border-color: rgba(0,143,196,.30) !important;
@@ -1437,31 +1437,31 @@ body {
 
 /* Preserve semantic positive/negative values while making neutral legacy
    text classes readable on the light P&L surface. */
-[data-theme="solaris"] .company-pnl-card .text-slate-300,
-[data-theme="solaris"] .company-pnl-card .text-cyan-100,
-[data-theme="solaris"] .company-pnl-card .text-cyan-200,
-[data-theme="solaris"] .company-pnl-card .text-cyan-300,
-[data-theme="solaris"] .company-pnl-card .text-cyan-400 {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-slate-300,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-cyan-100,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-cyan-200,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-cyan-300,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-cyan-400 {
   color: #315f78 !important;
 }
 
-[data-theme="solaris"] .company-pnl-card .text-emerald-300,
-[data-theme="solaris"] .company-pnl-card .text-emerald-400 {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-emerald-300,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-emerald-400 {
   color: #087f72 !important;
 }
 
-[data-theme="solaris"] .company-pnl-card .text-rose-300,
-[data-theme="solaris"] .company-pnl-card .text-rose-400 {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-rose-300,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-rose-400 {
   color: #b74353 !important;
 }
 
-[data-theme="solaris"] .company-pnl-card .text-amber-300,
-[data-theme="solaris"] .company-pnl-card .text-amber-400 {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-amber-300,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-pnl-card .text-amber-400 {
   color: #84621d !important;
 }
 
-[data-theme="solaris"] .company-tooltip--warning,
-[data-theme="solaris"] .company-tooltip--warning > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tooltip--warning,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-tooltip--warning > div:first-child {
   background: rgba(249,253,255,.985) !important;
   color: #244f68 !important;
   border-color: rgba(181,132,33,.25) !important;
@@ -1524,7 +1524,7 @@ body {
    Canvas scenes use a medium deep-azure room; surrounding HUD
    stays glassy and slightly darker so white/cyan data remains crisp.
    ========================================================= */
-[data-theme="solaris"] .company-3d-shell {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell {
   border-color: rgba(49, 140, 255, .34) !important;
   background:
     radial-gradient(circle at 72% 18%, rgba(86,220,255,.18), transparent 34%),
@@ -1535,7 +1535,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,.82) !important;
 }
 
-[data-theme="solaris"] .company-3d-shell::after {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell::after {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -1551,9 +1551,9 @@ body {
 /* Existing fullscreen HUD blocks intentionally stay darker than the
    normal Solaris dashboard. They are now deep-azure glass instead of
    almost-black Cosmic panels, preserving 3D readability. */
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#00111d]"],
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#001019]"],
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#001428]"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#00111d]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#001019]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#001428]"] {
   background: rgba(8, 43, 64, .78) !important;
   border-color: rgba(125,211,252,.24) !important;
   box-shadow:
@@ -1561,27 +1561,27 @@ body {
     inset 0 1px 0 rgba(255,255,255,.05) !important;
 }
 
-[data-theme="solaris"] .company-3d-shell .company-title {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-title {
   color: #dff8ff !important;
   text-shadow: 0 0 12px rgba(56,189,248,.26) !important;
 }
 
-[data-theme="solaris"] .company-3d-shell .company-muted {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-muted {
   color: #9fcce0 !important;
 }
 
-[data-theme="solaris"] .company-3d-shell .company-select,
-[data-theme="solaris"] .company-3d-shell .company-tabs {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-select,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-tabs {
   background: rgba(8, 43, 64, .74) !important;
   color: #dff8ff !important;
   border-color: rgba(125,211,252,.26) !important;
 }
 
-[data-theme="solaris"] .company-3d-shell .company-tab-idle {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-tab-idle {
   color: #b8e9f7 !important;
 }
 
-[data-theme="solaris"] .company-3d-shell .company-tab-active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-tab-active {
   background: linear-gradient(135deg, #7dd3fc, #38bdf8) !important;
   color: #08283c !important;
   box-shadow: 0 0 14px rgba(56,189,248,.28) !important;
@@ -1596,21 +1596,21 @@ body {
    ========================================================= */
 
 /* Navigation group surface: visibly blue even while idle. */
-[data-theme="solaris"] .core-nav-group-button {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button {
   background: linear-gradient(135deg, rgba(220,245,255,.96), rgba(199,234,255,.90)) !important;
   border-color: rgba(49,140,255,.24) !important;
   color: #155f83 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.92), 0 5px 14px rgba(25,92,132,.06) !important;
 }
 
-[data-theme="solaris"] .core-nav-group-button:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button:hover {
   background: linear-gradient(135deg, rgba(198,238,255,.98), rgba(173,224,255,.94)) !important;
   border-color: rgba(49,140,255,.42) !important;
   color: #07577c !important;
 }
 
 /* Group icon tile. */
-[data-theme="solaris"] .core-nav-group-button > div > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button > div > span:first-child {
   background: linear-gradient(145deg, rgba(184,230,255,.98), rgba(215,245,255,.94)) !important;
   border-color: rgba(49,140,255,.30) !important;
   color: #087aa5 !important;
@@ -1618,33 +1618,33 @@ body {
 }
 
 /* Idle child rows should never collapse to gray. */
-[data-theme="solaris"] .core-nav-child-button:not(.core-nav-child-active) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button:not(.core-nav-child-active) {
   background: rgba(230,247,255,.68) !important;
   border-color: rgba(49,140,255,.10) !important;
   color: #2b6b8b !important;
 }
 
-[data-theme="solaris"] .core-nav-child-button:not(.core-nav-child-active):hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button:not(.core-nav-child-active):hover {
   background: rgba(207,239,255,.94) !important;
   border-color: rgba(49,140,255,.28) !important;
   color: #0e648c !important;
 }
 
-[data-theme="solaris"] .core-nav-child-button:not(.core-nav-child-active) > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button:not(.core-nav-child-active) > span:first-child {
   background: linear-gradient(145deg, rgba(205,239,255,.96), rgba(232,249,255,.94)) !important;
   border-color: rgba(49,140,255,.22) !important;
   color: #2484ae !important;
 }
 
 /* Selected child: same visual language as the 3D BAR active button. */
-[data-theme="solaris"] .core-nav-child-button.core-nav-child-active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button.core-nav-child-active {
   background: linear-gradient(135deg, rgba(125,211,252,.92), rgba(56,189,248,.82)) !important;
   border-color: rgba(14,165,233,.62) !important;
   color: #063b58 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 8px 18px rgba(14,165,233,.16) !important;
 }
 
-[data-theme="solaris"] .core-nav-child-button.core-nav-child-active > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button.core-nav-child-active > span:first-child {
   background: linear-gradient(145deg, rgba(230,249,255,.98), rgba(166,226,255,.96)) !important;
   border-color: rgba(255,255,255,.64) !important;
   color: #046b96 !important;
@@ -1652,46 +1652,46 @@ body {
 }
 
 /* Sidebar footer actions: frosted color, never neutral gray. */
-[data-theme="solaris"] .core-sidebar button[title^="Voice "] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-sidebar button[title^="Voice "] {
   background: linear-gradient(135deg, rgba(221,245,255,.94), rgba(196,232,255,.90)) !important;
   border-color: rgba(49,140,255,.30) !important;
   color: #14779e !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.88), 0 6px 14px rgba(25,92,132,.07) !important;
 }
 
-[data-theme="solaris"] .core-sidebar button[title^="Voice "]:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-sidebar button[title^="Voice "]:hover {
   background: linear-gradient(135deg, rgba(195,236,255,.98), rgba(167,219,255,.95)) !important;
   border-color: rgba(14,165,233,.48) !important;
   color: #075f87 !important;
 }
 
-[data-theme="solaris"] .core-sidebar button[title="Logout"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-sidebar button[title="Logout"] {
   background: linear-gradient(135deg, rgba(236,242,255,.96), rgba(219,232,255,.92)) !important;
   border-color: rgba(99,102,241,.28) !important;
   color: #4f61b7 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.88), 0 6px 14px rgba(79,70,229,.06) !important;
 }
 
-[data-theme="solaris"] .core-sidebar button[title="Logout"]:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-sidebar button[title="Logout"]:hover {
   background: linear-gradient(135deg, rgba(225,236,255,.98), rgba(204,222,255,.96)) !important;
   border-color: rgba(79,70,229,.42) !important;
   color: #3949a3 !important;
 }
 
 /* Compare toggle: no amber in Solaris. */
-[data-theme="solaris"] .company-compare-toggle {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-compare-toggle {
   min-width: 42px;
   justify-content: center;
 }
 
-[data-theme="solaris"] .company-compare-toggle--idle {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-compare-toggle--idle {
   background: linear-gradient(135deg, rgba(222,246,255,.96), rgba(191,233,255,.90)) !important;
   border-color: rgba(49,140,255,.34) !important;
   color: #0c739d !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.88), 0 5px 12px rgba(25,92,132,.07) !important;
 }
 
-[data-theme="solaris"] .company-compare-toggle--active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-compare-toggle--active {
   background: linear-gradient(135deg, #7dd3fc, #38bdf8 58%, #60a5fa) !important;
   border-color: rgba(37,99,235,.48) !important;
   color: #073c59 !important;
@@ -1699,7 +1699,7 @@ body {
 }
 
 /* The outer 3D frame stays bright Solaris glass. */
-[data-theme="solaris"] .company-3d-shell {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell {
   background:
     radial-gradient(circle at 72% 16%, rgba(125,211,252,.24), transparent 34%),
     linear-gradient(145deg, rgba(228,247,255,.92), rgba(190,232,255,.72)) !important;
@@ -1711,16 +1711,16 @@ body {
 }
 
 /* 3D HUD glass follows Blue-Hour palette, not near-black. */
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#00111d]"],
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#001019]"],
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#001428]"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#00111d]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#001019]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#001428]"] {
   background: rgba(20, 75, 103, .82) !important;
   border-color: rgba(125,211,252,.34) !important;
   box-shadow: 0 14px 30px rgba(8,45,68,.16), inset 0 1px 0 rgba(255,255,255,.08) !important;
 }
 
-[data-theme="solaris"] .company-3d-shell .company-select,
-[data-theme="solaris"] .company-3d-shell .company-tabs {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-select,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-tabs {
   background: rgba(21, 73, 101, .80) !important;
   color: #eafaff !important;
   border-color: rgba(125,211,252,.34) !important;
@@ -1731,46 +1731,46 @@ body {
    SOLARIS V25 — DAYLIGHT ION
    Solaris = ice / electric azure / cobalt. Aurora remains teal/violet.
    ========================================================= */
-[data-theme="solaris"] .core-nav-group-button,
-[data-theme="solaris"] .core-nav-child-button:not(.core-nav-child-active) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button:not(.core-nav-child-active) {
   background: linear-gradient(135deg, rgba(241,250,255,.98), rgba(218,237,255,.94)) !important;
   border-color: rgba(49,140,255,.18) !important;
   color: #356b9f !important;
 }
-[data-theme="solaris"] .core-nav-group-button > div > span:first-child,
-[data-theme="solaris"] .core-nav-child-button:not(.core-nav-child-active) > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-group-button > div > span:first-child,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button:not(.core-nav-child-active) > span:first-child {
   background: linear-gradient(145deg, #f8fdff, #dcefff) !important;
   border-color: rgba(49,140,255,.24) !important;
   color: #2f71bc !important;
 }
-[data-theme="solaris"] .core-nav-child-button.core-nav-child-active,
-[data-theme="solaris"] .company-compare-toggle--active {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-child-button.core-nav-child-active,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-compare-toggle--active {
   background: linear-gradient(135deg, #9ad6ff 0%, #5aacff 34%, #318cff 66%, #2563eb 100%) !important;
   border-color: rgba(37,99,235,.58) !important;
   color: #ffffff !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.64), 0 8px 20px rgba(49,140,255,.18) !important;
 }
-[data-theme="solaris"] .company-compare-toggle--idle {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-compare-toggle--idle {
   background: linear-gradient(135deg, rgba(238,249,255,.98), rgba(211,234,255,.95)) !important;
   border-color: rgba(49,140,255,.28) !important;
   color: #2d68a8 !important;
 }
-[data-theme="solaris"] .company-3d-shell {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell {
   background:
     radial-gradient(circle at 72% 14%, rgba(116,185,255,.23), transparent 34%),
     linear-gradient(145deg, rgba(246,252,255,.97), rgba(213,235,255,.86)) !important;
   border-color: rgba(49,140,255,.38) !important;
   box-shadow: 0 20px 48px rgba(37,99,235,.10), 0 0 28px rgba(49,140,255,.09), inset 0 1px 0 rgba(255,255,255,.97) !important;
 }
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#00111d]"],
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#001019]"],
-[data-theme="solaris"] .company-3d-shell [class*="bg-[#001428]"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#00111d]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#001019]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell [class*="bg-[#001428]"] {
   background: rgba(45, 91, 144, .84) !important;
   border-color: rgba(177,220,255,.42) !important;
   color: #f8fdff !important;
 }
-[data-theme="solaris"] .company-3d-shell .company-select,
-[data-theme="solaris"] .company-3d-shell .company-tabs {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-select,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-3d-shell .company-tabs {
   background: rgba(46, 91, 145, .84) !important;
   border-color: rgba(178,220,255,.42) !important;
   color: #f8fdff !important;
@@ -1783,8 +1783,8 @@ body {
    ========================================================= */
 
 /* Daily Tracking and Company Performance share the same page-header language. */
-[data-theme="solaris"] .daily-page-header,
-[data-theme="solaris"] .company-page-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-page-header,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-page-header {
   background:
     radial-gradient(ellipse at 88% -20%, rgba(90,172,255,.18), transparent 38%),
     linear-gradient(105deg, rgba(220,242,255,.98), rgba(250,254,255,.98) 48%, rgba(216,239,255,.96)) !important;
@@ -1795,8 +1795,8 @@ body {
     0 9px 24px rgba(37,99,235,.08) !important;
 }
 
-[data-theme="solaris"] .daily-page-title,
-[data-theme="solaris"] .company-page-title {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-page-title,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-page-title {
   background: linear-gradient(90deg, #0b4f78 0%, #176fb9 48%, #2563eb 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
@@ -1807,134 +1807,134 @@ body {
   animation: none !important;
 }
 
-[data-theme="solaris"] .daily-page-status-dot,
-[data-theme="solaris"] .company-page-status-dot {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-page-status-dot,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-page-status-dot {
   background: #318cff !important;
   box-shadow: 0 0 10px rgba(49,140,255,.32) !important;
 }
 
-[data-theme="solaris"] .daily-period-control {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-period-control {
   background: linear-gradient(135deg, rgba(252,254,255,.99), rgba(224,242,255,.97)) !important;
   border-color: rgba(49,140,255,.34) !important;
   color: #123c56 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.98), 0 4px 12px rgba(37,99,235,.07) !important;
 }
 
-[data-theme="solaris"] .daily-period-control input {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-period-control input {
   color: #153e5b !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
 }
 
-[data-theme="solaris"] .company-page-controls {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-page-controls {
   color: #245f7e !important;
 }
 
-[data-theme="solaris"] .company-compare-side-label {
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-compare-side-label {
   color: #2f6da7 !important;
 }
 
 /* Navigation HUD intro: avoid nearly-white labels on an ice surface. */
-[data-theme="solaris"] .core-nav-drawer-header > div:first-child > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-drawer-header > div:first-child > div:first-child {
   color: #0c5f8f !important;
   text-shadow: none !important;
 }
 
-[data-theme="solaris"] .core-nav-drawer-header > div:first-child > div:last-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-nav-drawer-header > div:first-child > div:last-child {
   color: #6b8798 !important;
 }
 
 /* Header online state remains green, but darker enough for daylight Solaris. */
-[data-theme="solaris"] .core-global-header [class*="text-emerald-300"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-global-header [class*="text-emerald-300"] {
   color: #13795c !important;
   text-shadow: none !important;
 }
 
 /* Management Center: readable dark-azure typography on the light popover. */
-[data-theme="solaris"] .core-settings-popover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover {
   color: #123c56 !important;
 }
 
-[data-theme="solaris"] .core-settings-intro {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-intro {
   background: linear-gradient(135deg, rgba(231,247,255,.98), rgba(216,239,255,.96)) !important;
   border-color: rgba(49,140,255,.23) !important;
 }
 
-[data-theme="solaris"] .core-settings-intro > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-intro > div:first-child {
   color: #0b527e !important;
   text-shadow: none !important;
 }
 
-[data-theme="solaris"] .core-settings-intro > div:last-child,
-[data-theme="solaris"] .core-settings-popover [class*="text-slate-500"],
-[data-theme="solaris"] .core-settings-popover [class*="text-slate-600"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-intro > div:last-child,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover [class*="text-slate-500"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover [class*="text-slate-600"] {
   color: #607f92 !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > div:nth-child(2) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > div:nth-child(2) {
   background: rgba(239,249,255,.92) !important;
   border-color: rgba(49,140,255,.18) !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > div:nth-child(2) > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > div:nth-child(2) > div:first-child {
   color: #4f7187 !important;
 }
 
-[data-theme="solaris"] .core-settings-popover .core-control {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover .core-control {
   background: linear-gradient(135deg, rgba(252,254,255,.98), rgba(222,241,255,.96)) !important;
   border-color: rgba(49,140,255,.28) !important;
   color: #165f91 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.98) !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button {
   background: linear-gradient(135deg, rgba(248,253,255,.84), rgba(227,243,255,.76)) !important;
   border-color: rgba(49,140,255,.10) !important;
   color: #245f7e !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button:hover {
   background: linear-gradient(135deg, rgba(235,248,255,.98), rgba(211,235,255,.96)) !important;
   border-color: rgba(49,140,255,.28) !important;
   color: #0b527e !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button[class*="bg-cyan-500/10"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button[class*="bg-cyan-500/10"] {
   background: linear-gradient(135deg, #9ad6ff, #5aacff 45%, #318cff) !important;
   border-color: rgba(37,99,235,.44) !important;
   color: #ffffff !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button > span:first-child {
   background: linear-gradient(145deg, #f7fcff, #d9edff) !important;
   border-color: rgba(49,140,255,.24) !important;
   color: #246fb3 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.96) !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button > span:last-child > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button > span:last-child > span:first-child {
   color: #174f6f !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button > span:last-child > span:last-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button > span:last-child > span:last-child {
   color: #668497 !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > button[class*="bg-cyan-500/10"] > span:last-child > span:first-child,
-[data-theme="solaris"] .core-settings-popover > button[class*="bg-cyan-500/10"] > span:last-child > span:last-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button[class*="bg-cyan-500/10"] > span:last-child > span:first-child,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > button[class*="bg-cyan-500/10"] > span:last-child > span:last-child {
   color: #ffffff !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > div:last-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > div:last-child {
   border-color: rgba(49,140,255,.15) !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > div:last-child > span:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > div:last-child > span:first-child {
   color: #668497 !important;
 }
 
-[data-theme="solaris"] .core-settings-popover > div:last-child > span:last-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover > div:last-child > span:last-child {
   color: #13795c !important;
 }
 
@@ -1944,7 +1944,7 @@ body {
    - Coming Soon becomes Solaris azure instead of amber/brown
    - Rev/day badge becomes frosted azure instead of black
    ========================================================= */
-[data-theme="solaris"] .daily-comingsoon-badge {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-badge {
   border-color: rgba(191, 219, 254, .58) !important;
   background: rgba(29, 99, 217, .56) !important;
   box-shadow:
@@ -1952,30 +1952,30 @@ body {
     inset 0 1px 0 rgba(255,255,255,.16) !important;
   backdrop-filter: blur(6px);
 }
-[data-theme="solaris"] .daily-comingsoon-badge-ping,
-[data-theme="solaris"] .daily-comingsoon-badge-dot,
-[data-theme="solaris"] .daily-comingsoon-dot {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-badge-ping,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-badge-dot,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-dot {
   background: #dff6ff !important;
   box-shadow: 0 0 10px rgba(191, 234, 255, .88) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-badge-text,
-[data-theme="solaris"] .daily-comingsoon-title {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-badge-text,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-title {
   color: #ffffff !important;
   text-shadow: 0 1px 8px rgba(9, 50, 110, .30);
 }
-[data-theme="solaris"] .daily-comingsoon-watermark {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-watermark {
   color: rgba(49, 140, 255, .055) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-tint {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-tint {
   background: linear-gradient(to top, rgba(49, 140, 255, .045), transparent) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-pattern {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-pattern {
   background-image: repeating-linear-gradient(-24deg, rgba(49,140,255,.20) 0px, rgba(49,140,255,.20) 1px, transparent 1px, transparent 15px) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-corner {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-corner {
   border-color: rgba(191, 219, 254, .58) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-ribbon {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-ribbon {
   border-color: rgba(191, 219, 254, .46) !important;
   background:
     linear-gradient(
@@ -1990,19 +1990,19 @@ body {
     inset 0 1px 0 rgba(255,255,255,.12) !important;
   backdrop-filter: blur(4px);
 }
-[data-theme="solaris"] .daily-comingsoon-subtitle {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-subtitle {
   color: rgba(255, 255, 255, .86) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-footnote {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-footnote {
   color: rgba(255, 255, 255, .62) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-preview {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-preview {
   border-color: rgba(191, 219, 254, .42) !important;
   background: rgba(29, 99, 217, .50) !important;
   color: rgba(255, 255, 255, .86) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
 }
-[data-theme="solaris"] .utilization-comingsoon-sweep {
+:is([data-theme="solaris"], [data-theme="quartz"]) .utilization-comingsoon-sweep {
   background: linear-gradient(
     90deg,
     transparent,
@@ -2012,25 +2012,25 @@ body {
     transparent
   ) !important;
 }
-[data-theme="solaris"] .daily-revday-badge {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-revday-badge {
   color: #164e7a !important;
   background: linear-gradient(135deg, rgba(229,246,255,.94), rgba(207,235,255,.90)) !important;
   border-color: rgba(49,140,255,.32) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 5px 16px rgba(49,140,255,.08) !important;
 }
-[data-theme="solaris"] .daily-revday-badge .daily-revday-ytd {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-revday-badge .daily-revday-ytd {
   color: #1b63d9 !important;
 }
-[data-theme="solaris"] .daily-revday-badge .daily-revday-current {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-revday-badge .daily-revday-current {
   color: #047857 !important;
 }
 
-[data-theme="solaris"] .daily-comingsoon-global-tint {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-tint {
   background: rgba(29, 99, 217, .035) !important;
 }
 
 
-[data-theme="solaris"] .daily-comingsoon-global-ribbon {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-ribbon {
   border-color: rgba(191, 219, 254, .48) !important;
   background:
     linear-gradient(
@@ -2048,16 +2048,16 @@ body {
 
 /* The large diagonal Solaris ribbons use white typography on translucent blue.
    Force the inherited Tailwind blue/sky text utilities to remain readable. */
-[data-theme="solaris"] .daily-comingsoon-global-ribbon span,
-[data-theme="solaris"] .daily-comingsoon-global-ribbon div {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-ribbon span,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-ribbon div {
   color: rgba(255,255,255,.90) !important;
 }
 
-[data-theme="solaris"] .daily-comingsoon-global-ribbon > div:last-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-ribbon > div:last-child {
   color: rgba(255,255,255,.62) !important;
 }
 
-[data-theme="solaris"] .daily-comingsoon-global-ribbon span[class*="bg-gradient"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-ribbon span[class*="bg-gradient"] {
   color: transparent !important;
 }
 
@@ -2068,123 +2068,123 @@ body {
    ========================================================= */
 
 /* Normal Daily Tracking panels must stay in the daylight Solaris family. */
-[data-theme="solaris"] .daily-themed-card {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card {
   color: #123c56 !important;
 }
 
-[data-theme="solaris"] .daily-themed-card [class*="text-cyan-100"],
-[data-theme="solaris"] .daily-themed-card [class*="text-cyan-200"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-cyan-100"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-cyan-200"] {
   color: #174f78 !important;
 }
 
-[data-theme="solaris"] .daily-themed-card [class*="text-cyan-300"],
-[data-theme="solaris"] .daily-themed-card [class*="text-cyan-400"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-cyan-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-cyan-400"] {
   color: #087db3 !important;
 }
 
-[data-theme="solaris"] .daily-themed-card [class*="text-slate-300"],
-[data-theme="solaris"] .daily-themed-card [class*="text-slate-400"],
-[data-theme="solaris"] .daily-themed-card [class*="text-slate-500"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-slate-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-slate-400"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-slate-500"] {
   color: #587388 !important;
 }
 
-[data-theme="solaris"] .daily-themed-card [class*="text-white"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="text-white"] {
   color: #0b2740 !important;
 }
 
-[data-theme="solaris"] .daily-themed-card [class*="bg-[#001428]"],
-[data-theme="solaris"] .daily-themed-card [class*="bg-[#031222]"],
-[data-theme="solaris"] .daily-themed-card [class*="bg-[#031426]"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="bg-[#001428]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="bg-[#031222]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="bg-[#031426]"] {
   background: linear-gradient(145deg, rgba(250,254,255,.96), rgba(218,239,255,.90)) !important;
   border-color: rgba(49,140,255,.24) !important;
   color: #123c56 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 4px 14px rgba(37,99,235,.06) !important;
 }
 
-[data-theme="solaris"] .daily-themed-card [class*="border-[#2587C8]"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card [class*="border-[#2587C8]"] {
   border-color: rgba(49,140,255,.22) !important;
 }
 
 /* 3D fullscreen: the WebGL canvas stays blue, but HTML chrome becomes frosted-light. */
-[data-theme="solaris"] .daily-3d-shell {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell {
   background: linear-gradient(145deg, rgba(244,251,255,.99), rgba(215,238,255,.96)) !important;
   border-color: rgba(49,140,255,.38) !important;
   color: #0b2740 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.98), 0 18px 42px rgba(37,99,235,.10) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell > div:first-child {
   background: linear-gradient(105deg, rgba(246,252,255,.98), rgba(224,242,255,.97), rgba(215,234,255,.94)) !important;
   border-color: rgba(49,140,255,.28) !important;
   color: #0b3c61 !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-50"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-100"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-200"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-50"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-100"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-200"] {
   color: #0b4f78 !important;
   text-shadow: none !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-300"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-400"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-400"] {
   color: #176fb9 !important;
   text-shadow: none !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-sky-300"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-sky-400"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-sky-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-sky-400"] {
   color: #2369a8 !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-slate-300"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-slate-400"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-slate-500"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-slate-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-slate-400"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-slate-500"] {
   color: #536f84 !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-white"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-white"] {
   color: #0b2740 !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#03111f]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#031421]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#041426]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#02101d]"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#03111f]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#031421]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#041426]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#02101d]"] {
   background: rgba(239,249,255,.91) !important;
   border-color: rgba(49,140,255,.26) !important;
   color: #123c56 !important;
   box-shadow: 0 7px 18px rgba(37,99,235,.08) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="bg-cyan-950"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-sky-950"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-cyan-950"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-sky-950"] {
   background: rgba(222,241,255,.90) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="border-cyan-"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="border-cyan-"] {
   border-color: rgba(49,140,255,.30) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell button {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell button {
   text-shadow: none !important;
 }
 
 /* Inactive controls must still be readable; active states keep their semantic color. */
-[data-theme="solaris"] .daily-3d-shell button:not(:disabled) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell button:not(:disabled) {
   backdrop-filter: blur(10px);
 }
 
-[data-theme="solaris"] .daily-3d-shell .daily-revenue-filter-panel,
-[data-theme="solaris"] .daily-3d-shell .weekly-filter-panel,
-[data-theme="solaris"] .daily-3d-shell .per-channel-filter-panel {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell .daily-revenue-filter-panel,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell .weekly-filter-panel,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell .per-channel-filter-panel {
   background: rgba(239,249,255,.93) !important;
   border-color: rgba(49,140,255,.26) !important;
   color: #123c56 !important;
 }
 
 /* Empty-data fullscreen still looks intentional instead of disabled/dim. */
-[data-theme="solaris"] .daily-3d-shell canvas {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell canvas {
   filter: saturate(1.08) contrast(1.03) brightness(1.04);
 }
 
@@ -2197,7 +2197,7 @@ body {
    ========================================================= */
 
 /* Daily healthcare selector = Company Performance selector. */
-[data-theme="solaris"] .daily-healthcare-filter-wrap > div > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap > div > div:first-child {
   min-width: 270px !important;
   min-height: 30px !important;
   padding: 6px 10px !important;
@@ -2207,16 +2207,16 @@ body {
   box-shadow: 0 5px 14px rgba(25,92,132,.07), inset 0 1px 0 rgba(255,255,255,.98) !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap > div > div:first-child:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap > div > div:first-child:hover {
   background: linear-gradient(135deg, #fbfeff, #e2f6ff) !important;
   border-color: rgba(0,143,196,.38) !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap > div > div:first-child svg {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap > div > div:first-child svg {
   color: #1684aa !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap > div > div:nth-child(2) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap > div > div:nth-child(2) {
   background: rgba(249,253,255,.985) !important;
   border-color: rgba(0,143,196,.27) !important;
   color: #174f6a !important;
@@ -2224,32 +2224,32 @@ body {
   backdrop-filter: blur(14px) !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap input {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap input {
   background: rgba(238,249,255,.96) !important;
   border-color: rgba(0,143,196,.22) !important;
   color: #0b2740 !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap input::placeholder {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap input::placeholder {
   color: #7897a9 !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap div[class*="text-cyan"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap div[class*="text-cyan"] {
   color: #315f78 !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap div[class*="bg-[#2587C8]/40"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap div[class*="bg-[#2587C8]/40"] {
   background: rgba(0,191,232,.14) !important;
   color: #0b5576 !important;
 }
 
-[data-theme="solaris"] .daily-healthcare-filter-wrap div[class*="hover:bg-[#2587C8]/20"]:hover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-healthcare-filter-wrap div[class*="hover:bg-[#2587C8]/20"]:hover {
   background: rgba(0,191,232,.08) !important;
   color: #086f9a !important;
 }
 
 /* Match Company Performance 3D composition instead of the pale v27 scene. */
-[data-theme="solaris"] .daily-3d-shell {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell {
   background: #5f97cb !important;
   border-color: rgba(168,226,255,.46) !important;
   color: #f8fdff !important;
@@ -2257,70 +2257,70 @@ body {
 }
 
 /* Dark-blue glass toolbar, equivalent to Company Performance 3D HUD. */
-[data-theme="solaris"] .daily-3d-shell > div:first-child {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell > div:first-child {
   background: linear-gradient(100deg, rgba(36,82,127,.94), rgba(50,100,148,.91), rgba(66,94,157,.88)) !important;
   border-color: rgba(168,226,255,.30) !important;
   color: #f8fdff !important;
   box-shadow: 0 10px 30px rgba(22,67,107,.18) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-50"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-100"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-200"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-50"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-100"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-200"] {
   color: #f8fdff !important;
   text-shadow: 0 1px 4px rgba(8,47,73,.28) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-300"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-cyan-400"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-sky-300"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-sky-400"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-cyan-400"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-sky-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-sky-400"] {
   color: #c3ecff !important;
   text-shadow: 0 1px 4px rgba(8,47,73,.28) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-slate-300"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-slate-400"],
-[data-theme="solaris"] .daily-3d-shell [class*="text-slate-500"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-slate-300"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-slate-400"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-slate-500"] {
   color: #d7edf9 !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="text-white"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="text-white"] {
   color: #ffffff !important;
 }
 
 /* HUD cards / period filters use the same dark glass language as Company Performance. */
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#03111f]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#031421]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#041426]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-[#02101d]"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-cyan-950"],
-[data-theme="solaris"] .daily-3d-shell [class*="bg-sky-950"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#03111f]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#031421]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#041426]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-[#02101d]"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-cyan-950"],
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="bg-sky-950"] {
   background: rgba(15,55,87,.78) !important;
   border-color: rgba(168,226,255,.26) !important;
   color: #f8fdff !important;
   box-shadow: 0 7px 18px rgba(16,63,91,.16) !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell .daily-revenue-filter-panel,
-[data-theme="solaris"] .daily-3d-shell .weekly-filter-panel,
-[data-theme="solaris"] .daily-3d-shell .per-channel-filter-panel {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell .daily-revenue-filter-panel,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell .weekly-filter-panel,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell .per-channel-filter-panel {
   background: rgba(15,55,87,.82) !important;
   border-color: rgba(168,226,255,.24) !important;
   color: #f8fdff !important;
 }
 
-[data-theme="solaris"] .daily-3d-shell [class*="border-cyan-"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell [class*="border-cyan-"] {
   border-color: rgba(168,226,255,.30) !important;
 }
 
 /* Keep semantic active states visible on dark glass. */
-[data-theme="solaris"] .daily-3d-shell button:not(:disabled) {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell button:not(:disabled) {
   backdrop-filter: blur(10px);
 }
 
 /* v27.1 was deliberately brightened; Company Performance does not need this boost. */
-[data-theme="solaris"] .daily-3d-shell canvas {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-3d-shell canvas {
   filter: saturate(1.03) contrast(1.02) !important;
 }
 
@@ -2331,7 +2331,7 @@ body {
    ========================================================= */
 
 /* Cosmic Black: warm warning/preview hologram. */
-[data-theme="cosmic-black"] .daily-comingsoon-ribbon {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-ribbon {
   border-color: rgba(251, 191, 36, .38) !important;
   background: linear-gradient(90deg,
     rgba(39, 27, 5, .72),
@@ -2339,15 +2339,15 @@ body {
     rgba(39, 27, 5, .72)) !important;
   box-shadow: 0 0 24px rgba(251,191,36,.10), inset 0 1px 0 rgba(255,244,190,.07) !important;
 }
-[data-theme="cosmic-black"] .daily-comingsoon-dot {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-dot {
   background: #fcd34d !important;
   box-shadow: 0 0 9px rgba(252,211,77,.95) !important;
 }
-[data-theme="cosmic-black"] .daily-comingsoon-title { color: #fff7d6 !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-subtitle { color: rgba(254,240,183,.72) !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-footnote { color: rgba(255,247,214,.55) !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-corner { border-color: rgba(251,191,36,.52) !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-pattern {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-title { color: #fff7d6 !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-subtitle { color: rgba(254,240,183,.72) !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-footnote { color: rgba(255,247,214,.55) !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-corner { border-color: rgba(251,191,36,.52) !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-pattern {
   background-image: repeating-linear-gradient(-24deg, rgba(251,191,36,.28) 0px, rgba(251,191,36,.28) 1px, transparent 1px, transparent 15px) !important;
 }
 
@@ -2374,8 +2374,8 @@ body {
 
 /* Solaris stays bright electric azure. These rules intentionally match the
    existing Solaris polish but now apply identically to Utilization + OL. */
-[data-theme="solaris"] .daily-comingsoon-ribbon--ol,
-[data-theme="solaris"] .daily-comingsoon-ribbon--util {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-ribbon--ol,
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-ribbon--util {
   border-color: rgba(191, 219, 254, .46) !important;
   background: linear-gradient(90deg,
     rgba(29, 99, 217, .48),
@@ -2391,10 +2391,10 @@ body {
    ========================================================= */
 
 /* Cosmic Black */
-[data-theme="cosmic-black"] .daily-comingsoon-global-tint {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-tint {
   background: rgba(251,191,36,.018) !important;
 }
-[data-theme="cosmic-black"] .daily-comingsoon-global-ribbon {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-ribbon {
   border-color: rgba(251,191,36,.42) !important;
   background: linear-gradient(90deg,
     rgba(31,22,5,.76),
@@ -2402,18 +2402,18 @@ body {
     rgba(31,22,5,.76)) !important;
   box-shadow: 0 0 24px rgba(251,191,36,.12), inset 0 1px 0 rgba(255,244,190,.07) !important;
 }
-[data-theme="cosmic-black"] .daily-comingsoon-global-dot {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-dot {
   background: #fcd34d !important;
   box-shadow: 0 0 10px rgba(252,211,77,.95) !important;
 }
-[data-theme="cosmic-black"] .daily-comingsoon-global-title { color: #fff7d6 !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-global-divider { color: rgba(252,211,77,.58) !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-global-subtitle { color: rgba(254,240,183,.76) !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-global-footnote { color: rgba(255,247,214,.56) !important; }
-[data-theme="cosmic-black"] .daily-comingsoon-global-line--left {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-title { color: #fff7d6 !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-divider { color: rgba(252,211,77,.58) !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-subtitle { color: rgba(254,240,183,.76) !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-footnote { color: rgba(255,247,214,.56) !important; }
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-line--left {
   background: linear-gradient(90deg, transparent, rgba(252,211,77,.45), rgba(252,211,77,.15)) !important;
 }
-[data-theme="cosmic-black"] .daily-comingsoon-global-line--right {
+:is([data-theme="cosmic-black"], [data-theme="obsidian"]) .daily-comingsoon-global-line--right {
   background: linear-gradient(90deg, rgba(252,211,77,.15), rgba(252,211,77,.45), transparent) !important;
 }
 
@@ -2452,18 +2452,18 @@ body {
 }
 
 /* Solaris */
-[data-theme="solaris"] .daily-comingsoon-global-dot {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-dot {
   background: #ffffff !important;
   box-shadow: 0 0 10px rgba(191,234,255,.92) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-global-title { color: #ffffff !important; }
-[data-theme="solaris"] .daily-comingsoon-global-divider { color: rgba(255,255,255,.70) !important; }
-[data-theme="solaris"] .daily-comingsoon-global-subtitle { color: rgba(255,255,255,.86) !important; }
-[data-theme="solaris"] .daily-comingsoon-global-footnote { color: rgba(255,255,255,.64) !important; }
-[data-theme="solaris"] .daily-comingsoon-global-line--left {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-title { color: #ffffff !important; }
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-divider { color: rgba(255,255,255,.70) !important; }
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-subtitle { color: rgba(255,255,255,.86) !important; }
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-footnote { color: rgba(255,255,255,.64) !important; }
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-line--left {
   background: linear-gradient(90deg, transparent, rgba(191,234,255,.48), rgba(255,255,255,.18)) !important;
 }
-[data-theme="solaris"] .daily-comingsoon-global-line--right {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-comingsoon-global-line--right {
   background: linear-gradient(90deg, rgba(255,255,255,.18), rgba(191,234,255,.48), transparent) !important;
 }
 
@@ -2596,30 +2596,30 @@ body {
 /* Hardcoded dark surfaces are converted only for the non-Cosmic skins.
    Semantic danger/success/amber surfaces remain untouched. */
 [data-theme="aurora"] .management-themed-root [class*="bg-[#"],
-[data-theme="solaris"] .management-themed-root [class*="bg-[#"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root [class*="bg-[#"] {
   background-color: color-mix(in srgb, var(--core-control) 84%, transparent) !important;
 }
 
 [data-theme="aurora"] .management-themed-root .management-page-header,
-[data-theme="solaris"] .management-themed-root .management-page-header,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-page-header,
 [data-theme="aurora"] .management-themed-root .management-metric-card,
-[data-theme="solaris"] .management-themed-root .management-metric-card,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-metric-card,
 [data-theme="aurora"] .management-themed-root .management-toolbar,
-[data-theme="solaris"] .management-themed-root .management-toolbar,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-toolbar,
 [data-theme="aurora"] .management-themed-root .management-table-shell,
-[data-theme="solaris"] .management-themed-root .management-table-shell,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-table-shell,
 [data-theme="aurora"] .management-themed-root .management-table-head,
-[data-theme="solaris"] .management-themed-root .management-table-head,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-table-head,
 [data-theme="aurora"] .management-themed-root .management-table-footer,
-[data-theme="solaris"] .management-themed-root .management-table-footer,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-table-footer,
 [data-theme="aurora"] .management-themed-root .management-input,
-[data-theme="solaris"] .management-themed-root .management-input,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-input,
 [data-theme="aurora"] .management-themed-root .management-drawer,
-[data-theme="solaris"] .management-themed-root .management-drawer,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-drawer,
 [data-theme="aurora"] .management-themed-root .management-modal,
-[data-theme="solaris"] .management-themed-root .management-modal,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-modal,
 [data-theme="aurora"] .management-themed-root .management-floating-surface,
-[data-theme="solaris"] .management-themed-root .management-floating-surface {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root .management-floating-surface {
   background-color: unset !important;
 }
 
@@ -2632,11 +2632,11 @@ body {
   background: rgba(3, 22, 31, .55) !important;
 }
 
-[data-theme="solaris"] .management-overlay {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-overlay {
   background: rgba(22, 65, 93, .24) !important;
 }
 
-[data-theme="solaris"] .management-themed-root {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root {
   background:
     radial-gradient(circle at 12% 0%, rgba(86,220,255,.16), transparent 30%),
     radial-gradient(circle at 88% 14%, rgba(49,140,255,.08), transparent 32%),
@@ -2644,7 +2644,7 @@ body {
     var(--core-bg);
 }
 
-[data-theme="solaris"] .management-page-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-page-header {
   background:
     linear-gradient(112deg,
       rgba(248,253,255,.96),
@@ -2656,12 +2656,12 @@ body {
     inset 0 -1px 0 rgba(0,143,196,.12);
 }
 
-[data-theme="solaris"] .management-metric-card,
-[data-theme="solaris"] .management-toolbar,
-[data-theme="solaris"] .management-table-shell,
-[data-theme="solaris"] .management-drawer,
-[data-theme="solaris"] .management-modal,
-[data-theme="solaris"] .management-floating-surface {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-metric-card,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-toolbar,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-table-shell,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-drawer,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-modal,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-floating-surface {
   background:
     linear-gradient(145deg, rgba(250,254,255,.96), rgba(232,248,255,.92)) !important;
   box-shadow:
@@ -2669,25 +2669,25 @@ body {
     inset 0 1px 0 rgba(255,255,255,.96);
 }
 
-[data-theme="solaris"] .management-toolbar,
-[data-theme="solaris"] .management-table-head,
-[data-theme="solaris"] .management-table-footer {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-toolbar,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-table-head,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-table-footer {
   background: rgba(229,246,255,.92) !important;
 }
 
-[data-theme="solaris"] .management-input {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-input {
   background: rgba(247,252,255,.96) !important;
   color: #0b2740 !important;
 }
 
-[data-theme="solaris"] .management-themed-root button[class*="bg-cyan-500"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root button[class*="bg-cyan-500"] {
   background: linear-gradient(135deg, #27bdf6, #318cff 58%, #1b63d9) !important;
   border-color: rgba(49,140,255,.42) !important;
   color: #ffffff !important;
   box-shadow: 0 8px 20px rgba(49,140,255,.14);
 }
 
-[data-theme="solaris"] .management-themed-root button[class*="bg-cyan-950"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-themed-root button[class*="bg-cyan-950"] {
   background: rgba(213,241,255,.86) !important;
   color: #0b5f91 !important;
 }
@@ -2924,7 +2924,7 @@ body {
 /* =========================================================
    SOLARIS — clearly visible solar motion + frosted transparency
    ========================================================= */
-[data-theme="solaris"] {
+:is([data-theme="solaris"], [data-theme="quartz"]) {
   --core-surface: rgba(235, 249, 255, .34);
   --core-surface-strong: rgba(243, 252, 255, .72);
   --core-panel: rgba(236, 249, 255, .56);
@@ -2934,12 +2934,12 @@ body {
   --core-control-hover: rgba(218, 243, 255, .86);
 }
 
-[data-theme="solaris"] .core-solaris-field {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field {
   opacity: 1 !important;
   filter: saturate(1.20) contrast(1.03);
 }
 
-[data-theme="solaris"] .core-solaris-sun {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-sun {
   right: 4%;
   top: -12%;
   width: min(48vw, 650px);
@@ -2956,7 +2956,7 @@ body {
     0 0 210px rgba(49,140,255,.18) !important;
 }
 
-[data-theme="solaris"] .core-solaris-corona {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-corona {
   opacity: .92;
   filter: blur(10px);
   background:
@@ -2972,7 +2972,7 @@ body {
     ) !important;
 }
 
-[data-theme="solaris"] .core-solaris-ring {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-ring {
   border-color: rgba(0,143,196,.40) !important;
   box-shadow:
     0 0 0 20px rgba(0,191,232,.045),
@@ -2980,17 +2980,17 @@ body {
     0 0 40px rgba(0,191,232,.18) !important;
 }
 
-[data-theme="solaris"] .core-solaris-ring--b {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-ring--b {
   border-color: rgba(79,108,255,.30) !important;
 }
 
-[data-theme="solaris"] .core-solaris-dust {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-dust {
   opacity: .68 !important;
   filter: drop-shadow(0 0 3px rgba(49,140,255,.24));
 }
 
-[data-theme="solaris"] .core-solaris-field::before,
-[data-theme="solaris"] .core-solaris-field::after {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field::before,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field::after {
   content: "";
   position: absolute;
   pointer-events: none;
@@ -2998,7 +2998,7 @@ body {
 }
 
 /* Horizontal ion / solar-wind band: deliberately different from Aurora curtains. */
-[data-theme="solaris"] .core-solaris-field::before {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field::before {
   left: -30%;
   top: 34%;
   width: 165%;
@@ -3021,7 +3021,7 @@ body {
 }
 
 /* Thin moving ion traces make the motion readable even through pale panels. */
-[data-theme="solaris"] .core-solaris-field::after {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field::after {
   inset: 5%;
   opacity: .48;
   background:
@@ -3048,8 +3048,8 @@ body {
   to   { transform: translate3d(90px, -18px, 0); }
 }
 
-[data-theme="solaris"] .core-dashboard-frame,
-[data-theme="solaris"] .core-main-frame {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-dashboard-frame,
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-main-frame {
   background:
     linear-gradient(rgba(0,143,196,.022) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,143,196,.022) 1px, transparent 1px),
@@ -3058,14 +3058,14 @@ body {
   backdrop-filter: blur(7px) saturate(1.08) !important;
 }
 
-[data-theme="solaris"] .core-global-header {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-global-header {
   background:
     radial-gradient(ellipse at 84% 0%, rgba(86,220,255,.14), transparent 34%),
     linear-gradient(105deg, rgba(250,254,255,.76), rgba(231,247,255,.66), rgba(213,240,255,.62)) !important;
   backdrop-filter: blur(13px) saturate(1.10) !important;
 }
 
-[data-theme="solaris"] .core-sidebar {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-sidebar {
   background:
     radial-gradient(circle at 0% 0%, rgba(0,191,232,.09), transparent 36%),
     radial-gradient(circle at 100% 18%, rgba(49,140,255,.12), transparent 40%),
@@ -3073,24 +3073,24 @@ body {
   backdrop-filter: blur(13px) saturate(1.08) !important;
 }
 
-[data-theme="solaris"] .daily-themed-card,
-[data-theme="solaris"] .company-panel,
-[data-theme="solaris"] .company-panel-frame,
-[data-theme="solaris"] .company-view-shell,
-[data-theme="solaris"] .company-view-shell--compare,
-[data-theme="solaris"] .management-metric-card,
-[data-theme="solaris"] .management-toolbar,
-[data-theme="solaris"] .management-table-shell,
-[data-theme="solaris"] .management-drawer,
-[data-theme="solaris"] .management-modal,
-[data-theme="solaris"] .management-floating-surface {
+:is([data-theme="solaris"], [data-theme="quartz"]) .daily-themed-card,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-panel-frame,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-view-shell,
+:is([data-theme="solaris"], [data-theme="quartz"]) .company-view-shell--compare,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-metric-card,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-toolbar,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-table-shell,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-drawer,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-modal,
+:is([data-theme="solaris"], [data-theme="quartz"]) .management-floating-surface {
   background:
     radial-gradient(ellipse at 92% -6%, rgba(86,220,255,.12), transparent 34%),
     linear-gradient(145deg, rgba(250,254,255,.72), rgba(224,245,255,.58)) !important;
   backdrop-filter: blur(10px) saturate(1.06) !important;
 }
 
-[data-theme="solaris"] .core-settings-popover {
+:is([data-theme="solaris"], [data-theme="quartz"]) .core-settings-popover {
   background:
     radial-gradient(circle at 88% 0%, rgba(86,220,255,.14), transparent 34%),
     rgba(244,251,255,.78) !important;
@@ -3108,8 +3108,351 @@ body {
 @media (prefers-reduced-motion: reduce) {
   [data-theme="aurora"] .core-aurora-field::before,
   [data-theme="aurora"] .core-aurora-field::after,
-  [data-theme="solaris"] .core-solaris-field::before,
-  [data-theme="solaris"] .core-solaris-field::after {
+  :is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field::before,
+  :is([data-theme="solaris"], [data-theme="quartz"]) .core-solaris-field::after {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   CORE STATIC PERFORMANCE THEMES
+   Obsidian = dark / Quartz = light
+   Zero CSS motion + no expensive backdrop blur.
+   Decorative WebGL is conditionally unmounted in React.
+   ========================================================= */
+
+[data-theme="obsidian"] {
+  --core-bg: #020812;
+  --core-bg-secondary: #04101c;
+
+  --core-surface: rgba(5, 17, 29, 0.96);
+  --core-surface-strong: rgba(5, 18, 31, 0.99);
+
+  --core-panel: rgba(7, 24, 39, 0.98);
+  --core-panel-hover: rgba(9, 34, 53, 0.99);
+
+  --core-text: #e8fbff;
+  --core-text-secondary: #9ab7c4;
+  --core-text-muted: #678493;
+
+  --core-primary: #22d3e6;
+  --core-primary-soft: #7debf5;
+  --core-primary-strong: #13a9c3;
+  --core-primary-rgb: 34, 211, 230;
+
+  --core-border: rgba(34, 211, 230, 0.26);
+  --core-border-strong: rgba(34, 211, 230, 0.52);
+
+  --core-glow: rgba(34, 211, 230, 0.12);
+  --core-frame-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255,255,255,0.025);
+
+  --core-sidebar: #061521;
+  --core-control: #092033;
+  --core-control-hover: #0b2940;
+
+  --core-purple-surface: #1f1c35;
+  --core-purple-border: rgba(167, 139, 250, 0.34);
+  --core-purple-text: #c7b7f4;
+
+  --core-danger-surface: #29151d;
+  --core-danger-border: rgba(251, 113, 133, 0.34);
+  --core-danger-text: #f58ba0;
+
+  --core-success-surface: #0d2c26;
+  --core-success-border: rgba(52, 211, 153, 0.36);
+  --core-success-text: #73ddb4;
+}
+
+[data-theme="quartz"] {
+  --core-bg: #edf8fc;
+  --core-bg-secondary: #dfeff5;
+
+  --core-surface: rgba(247, 252, 254, 0.98);
+  --core-surface-strong: rgba(250, 254, 255, 0.995);
+
+  --core-panel: rgba(240, 249, 252, 0.99);
+  --core-panel-hover: rgba(230, 244, 249, 1);
+
+  --core-text: #14384a;
+  --core-text-secondary: #4b7081;
+  --core-text-muted: #72909d;
+
+  --core-primary: #149fbd;
+  --core-primary-soft: #4bc1d7;
+  --core-primary-strong: #087f9e;
+  --core-primary-rgb: 20, 159, 189;
+
+  --core-border: rgba(8, 127, 158, 0.24);
+  --core-border-strong: rgba(8, 127, 158, 0.46);
+
+  --core-glow: rgba(20, 159, 189, 0.10);
+  --core-frame-shadow:
+    0 12px 28px rgba(36, 91, 112, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.98);
+
+  --core-sidebar: #f1f9fc;
+  --core-control: #e8f5f9;
+  --core-control-hover: #dff0f5;
+
+  --core-purple-surface: #eef0fb;
+  --core-purple-border: rgba(92, 107, 192, 0.24);
+  --core-purple-text: #5969a6;
+
+  --core-danger-surface: #f9ecef;
+  --core-danger-border: rgba(185, 67, 74, 0.24);
+  --core-danger-text: #a24754;
+
+  --core-success-surface: #e5f5f1;
+  --core-success-border: rgba(20, 142, 112, 0.25);
+  --core-success-text: #177b65;
+
+  --quartz-ice: #edf8fc;
+  --quartz-crystal: #f9fdff;
+  --quartz-cyan: #149fbd;
+  --quartz-blue: #4ba7c5;
+}
+
+/* Static technical background: no keyframes, no canvas, no particles. */
+.core-static-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+[data-theme="obsidian"] .core-static-field {
+  background:
+    linear-gradient(rgba(34,211,230,.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,230,.032) 1px, transparent 1px),
+    radial-gradient(circle at 78% 18%, rgba(34,211,230,.08), transparent 31%),
+    radial-gradient(circle at 18% 82%, rgba(37,99,235,.05), transparent 30%),
+    linear-gradient(145deg, #020812 0%, #061522 55%, #020812 100%);
+  background-size:
+    48px 48px,
+    48px 48px,
+    auto,
+    auto,
+    auto;
+}
+
+[data-theme="obsidian"] .core-static-field::before,
+[data-theme="obsidian"] .core-static-field::after,
+[data-theme="quartz"] .core-static-field::before,
+[data-theme="quartz"] .core-static-field::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+[data-theme="obsidian"] .core-static-field::before {
+  inset: 8% 6%;
+  border: 1px solid rgba(34,211,230,.07);
+  background:
+    linear-gradient(135deg, rgba(34,211,230,.025), transparent 28%),
+    linear-gradient(315deg, rgba(59,130,246,.025), transparent 30%);
+  clip-path: polygon(0 7%, 4% 7%, 4% 0, 96% 0, 96% 7%, 100% 7%, 100% 93%, 96% 93%, 96% 100%, 4% 100%, 4% 93%, 0 93%);
+}
+
+[data-theme="obsidian"] .core-static-field::after {
+  right: 7%;
+  top: 12%;
+  width: min(28vw, 420px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(34,211,230,.10);
+  box-shadow:
+    inset 0 0 0 18px rgba(34,211,230,.012),
+    inset 0 0 0 40px rgba(34,211,230,.009);
+}
+
+[data-theme="quartz"] .core-static-field {
+  background:
+    linear-gradient(rgba(8,127,158,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8,127,158,.045) 1px, transparent 1px),
+    radial-gradient(circle at 79% 17%, rgba(20,159,189,.11), transparent 30%),
+    radial-gradient(circle at 18% 82%, rgba(75,167,197,.08), transparent 30%),
+    linear-gradient(145deg, #f8fdff 0%, #edf8fc 52%, #e4f2f7 100%);
+  background-size:
+    48px 48px,
+    48px 48px,
+    auto,
+    auto,
+    auto;
+}
+
+[data-theme="quartz"] .core-static-field::before {
+  inset: 8% 6%;
+  border: 1px solid rgba(8,127,158,.10);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.72), transparent 24%),
+    linear-gradient(315deg, rgba(20,159,189,.035), transparent 30%);
+  clip-path: polygon(0 7%, 4% 7%, 4% 0, 96% 0, 96% 7%, 100% 7%, 100% 93%, 96% 93%, 96% 100%, 4% 100%, 4% 93%, 0 93%);
+}
+
+[data-theme="quartz"] .core-static-field::after {
+  right: 7%;
+  top: 12%;
+  width: min(28vw, 420px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(8,127,158,.13);
+  box-shadow:
+    inset 0 0 0 18px rgba(20,159,189,.018),
+    inset 0 0 0 40px rgba(20,159,189,.012);
+}
+
+/* =========================================================
+   ZERO-MOTION CONTRACT
+   The theme is intentionally instant: no CSS animation,
+   no transition interpolation and no backdrop-filter passes.
+   ========================================================= */
+[data-performance="static"] *,
+[data-performance="static"] *::before,
+[data-performance="static"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+  will-change: auto !important;
+}
+
+[data-performance="static"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Preserve depth with inexpensive static surfaces instead of blur. */
+[data-theme="obsidian"] .core-dashboard-frame,
+[data-theme="obsidian"] .core-global-header,
+[data-theme="obsidian"] .core-sidebar,
+[data-theme="obsidian"] .core-settings-popover {
+  background-color: rgba(5, 18, 31, .985) !important;
+}
+
+[data-theme="quartz"] .core-dashboard-frame,
+[data-theme="quartz"] .core-global-header,
+[data-theme="quartz"] .core-sidebar,
+[data-theme="quartz"] .core-settings-popover {
+  background-color: rgba(248, 253, 255, .99) !important;
+}
+
+/* Static theme options have their own material identity. */
+.core-theme-option--obsidian .core-theme-option-icon {
+  background: #071827;
+  color: #67e8f9;
+  border: 1px solid rgba(34,211,230,.22);
+}
+
+.core-theme-option--quartz .core-theme-option-icon {
+  background: #f7fdff;
+  color: #087f9e;
+  border: 1px solid rgba(8,127,158,.18);
+}
+
+[data-theme="obsidian"] .core-theme-option--obsidian.core-theme-option-active,
+[data-theme="quartz"] .core-theme-option--quartz.core-theme-option-active {
+  border-color: var(--core-border-strong);
+  background: color-mix(in srgb, var(--core-primary) 11%, var(--core-panel));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--core-primary) 7%, transparent);
+}
+
+/* Lightweight login static environment. */
+.login-static-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.login-static-sky--obsidian {
+  background:
+    linear-gradient(rgba(34,211,230,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,230,.035) 1px, transparent 1px),
+    radial-gradient(circle at 74% 44%, rgba(34,211,230,.10), transparent 24%),
+    linear-gradient(140deg, #020812, #061522 58%, #020812);
+  background-size: 44px 44px, 44px 44px, auto, auto;
+}
+
+.login-static-sky--quartz {
+  background:
+    linear-gradient(rgba(8,127,158,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8,127,158,.045) 1px, transparent 1px),
+    radial-gradient(circle at 74% 44%, rgba(20,159,189,.13), transparent 25%),
+    linear-gradient(140deg, #fbfeff, #edf8fc 58%, #e2f1f6);
+  background-size: 44px 44px, 44px 44px, auto, auto;
+}
+
+.login-static-core {
+  position: relative;
+  width: clamp(190px, 25vw, 360px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.login-static-core::before,
+.login-static-core::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.login-static-core::before {
+  inset: 2%;
+  border: 1px solid var(--core-border-strong);
+  box-shadow:
+    inset 0 0 0 14px color-mix(in srgb, var(--core-primary) 3%, transparent),
+    inset 0 0 0 34px color-mix(in srgb, var(--core-primary) 2%, transparent);
+}
+
+.login-static-core::after {
+  inset: 20%;
+  border: 1px solid var(--core-border);
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255,255,255,.24), transparent 22%),
+    radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--core-primary) 20%, transparent), transparent 60%);
+}
+
+.login-static-core__diamond {
+  width: 42%;
+  aspect-ratio: 1;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  border: 1px solid var(--core-border-strong);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--core-primary) 14%, var(--core-panel)),
+      color-mix(in srgb, var(--core-bg) 84%, var(--core-primary)));
+  box-shadow:
+    inset 0 0 0 9px color-mix(in srgb, var(--core-primary) 3%, transparent),
+    0 12px 24px rgba(0,0,0,.10);
+}
+
+.login-static-core__diamond::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 45%, transparent);
+}
+
+.login-static-core__caption {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .22em;
+  color: var(--core-primary-strong);
+  text-transform: uppercase;
+}
+
+/* Quartz behaves as a true light environment anywhere generic light styling is used. */
+[data-theme="quartz"] .text-hud-glow {
+  text-shadow: 0 0 7px rgba(20,159,189,.12);
+}
+

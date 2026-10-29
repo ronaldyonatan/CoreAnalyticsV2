@@ -5,6 +5,11 @@ import DemographyChart from '../../components/DemographyChart';
 import DailyLowerWidgets from '../../components/DailyLowerWidgets';
 import DailyFilterHealthcare from '../../components/PanelFilterHealthcare';
 import { useTheme } from '../../theme/ThemeContext';
+import {
+  DAILY_TRACKING_VOICE_COMMANDS,
+  normalizeVoiceTranscript,
+  resolveVoiceCommand,
+} from '../../voiceCommand/voiceCommandRegistry';
 
 // Import komponen individual untuk mode Full Screen
 import SurgeryBdChart from '../../components/SurgeryBdChart';
@@ -34,6 +39,18 @@ export default function DailyTracking({
   const [selectedDate, setSelectedDate] = useState<string>('2026-10');
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const lastVoiceHandledRef = useRef<{ transcript: string; at: number }>({ transcript: '', at: 0 });
+  const currentDailyVoiceViewRef = useRef<{
+    expandedCard: string | null;
+    demographyDonutMode: 'gender' | 'patient_type';
+  }>({
+    expandedCard: null,
+    demographyDonutMode: 'gender',
+  });
+  const previousDailyVoiceViewRef = useRef<{
+    expandedCard: string | null;
+    demographyDonutMode: 'gender' | 'patient_type';
+  } | null>(null);
 
   // Guided Tour: reveal the collapsed mobile filter before Spotlight measures
   // the Healthcare Selector.
@@ -119,6 +136,13 @@ export default function DailyTracking({
   const selectedYear = selectedDate.split('-')[0] || '2026';
 
   useEffect(() => {
+    currentDailyVoiceViewRef.current = {
+      expandedCard,
+      demographyDonutMode,
+    };
+  }, [expandedCard, demographyDonutMode]);
+
+  useEffect(() => {
     if (selectedHealthcareId !== undefined) {
       setSelectedId(selectedHealthcareId);
     }
@@ -131,6 +155,100 @@ export default function DailyTracking({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+
+  // Daily Tracking owns its own scoped commands. Because this component is only
+  // mounted while Daily Tracking is the active route, these commands cannot
+  // trigger Company Performance panels or another dashboard.
+  useEffect(() => {
+    const switchVoiceView = (
+      nextCard: string | null,
+      nextMode: 'gender' | 'patient_type' = currentDailyVoiceViewRef.current.demographyDonutMode
+    ) => {
+      const current = currentDailyVoiceViewRef.current;
+
+      if (
+        current.expandedCard !== nextCard ||
+        current.demographyDonutMode !== nextMode
+      ) {
+        previousDailyVoiceViewRef.current = { ...current };
+      }
+
+      if (current.demographyDonutMode !== nextMode) {
+        setDemographyDonutMode(nextMode);
+      }
+
+      setExpandedCard(nextCard);
+    };
+
+    const restorePreviousVoiceView = () => {
+      const previous = previousDailyVoiceViewRef.current;
+      if (!previous) {
+        setExpandedCard(null);
+        return;
+      }
+
+      const current = { ...currentDailyVoiceViewRef.current };
+      previousDailyVoiceViewRef.current = current;
+      setDemographyDonutMode(previous.demographyDonutMode);
+      setExpandedCard(previous.expandedCard);
+    };
+    const handleVoiceCommand = (event: Event) => {
+      const rawTranscript = String((event as CustomEvent<string>).detail ?? '');
+      const transcript = normalizeVoiceTranscript(rawTranscript);
+      if (!transcript) return;
+
+      const now = Date.now();
+      if (
+        lastVoiceHandledRef.current.transcript === transcript &&
+        now - lastVoiceHandledRef.current.at < 1100
+      ) return;
+      lastVoiceHandledRef.current = { transcript, at: now };
+
+      const command = resolveVoiceCommand(transcript, DAILY_TRACKING_VOICE_COMMANDS);
+      if (!command) return;
+
+      switch (command.id) {
+        case 'daily_back_previous':
+          restorePreviousVoiceView();
+          return;
+        case 'daily_restore':
+          switchVoiceView(null);
+          return;
+        case 'daily_revenue':
+          switchVoiceView('daily-revenue');
+          return;
+        case 'daily_demography':
+          switchVoiceView('demography');
+          return;
+        case 'daily_surgery_bd':
+          switchVoiceView('surgery-bd');
+          return;
+        case 'daily_weekly_revenue':
+          switchVoiceView('weekly-revenue');
+          return;
+        case 'daily_monthly_revenue':
+          switchVoiceView('monthly-revenue');
+          return;
+        case 'daily_per_channel':
+          switchVoiceView('per-channel');
+          return;
+        case 'daily_demography_gender':
+          switchVoiceView('demography', 'gender');
+          return;
+        case 'daily_demography_patient_type':
+          switchVoiceView('demography', 'patient_type');
+          return;
+        default:
+          return;
+      }
+    };
+
+    window.addEventListener('coa-voice-command', handleVoiceCommand as EventListener);
+    return () => {
+      window.removeEventListener('coa-voice-command', handleVoiceCommand as EventListener);
+    };
   }, []);
 
   useEffect(() => {

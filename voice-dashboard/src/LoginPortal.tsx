@@ -3105,7 +3105,7 @@ function AuroraOrbVisual({
 export default function LoginPortal({
   onLoginSuccess,
 }: LoginPortalProps) {
-  const { isAurora, isSolaris } = useTheme();
+  const { isAurora, isSolaris, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
   const authenticatedSessionRef = useRef<AuthenticatedUser | null>(null);
   const rememberAuthenticatedUser = useCallback((
     identity: VoiceIdentityUser,
@@ -4665,7 +4665,7 @@ export default function LoginPortal({
       className={`login-portal-root fixed inset-0 z-50 h-[100dvh] w-screen overflow-hidden font-mono text-sky-100 select-none ${
         isAurora
           ? 'login-aurora-mode bg-[#071b25]'
-          : isSolaris
+          : isLight
           ? 'login-solaris-mode bg-[#eaf8ff]'
           : 'bg-[#010611]'
       }`}
@@ -4710,43 +4710,55 @@ export default function LoginPortal({
       )}
 
       {/* ===================================================
-          3D SPACE BACKGROUND
+          IMMERSIVE 3D SPACE BACKGROUND
+          Obsidian / Quartz never mount this Canvas.
+          Solaris also avoids mounting a hidden space Canvas.
       =================================================== */}
 
-      <div className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-700 ${isSolaris ? 'opacity-0' : 'opacity-100'}`}>
+      {!isStaticTheme && !isSolaris && (
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <Canvas
+            style={{ pointerEvents: 'none' }}
+            camera={{
+              position: [
+                0,
+                1.3,
+                11,
+              ],
+              fov: 52,
+            }}
+            dpr={[
+              1,
+              1.4,
+            ]}
+            gl={{
+              antialias:
+                true,
+            }}
+          >
+            <SpaceScene
+              phase={phase}
+              isAurora={isAurora}
+            />
+          </Canvas>
+        </div>
+      )}
 
-        <Canvas
-          style={{ pointerEvents: 'none' }}
-          camera={{
-            position: [
-              0,
-              1.3,
-              11,
-            ],
-            fov: 52,
-          }}
-          dpr={[
-            1,
-            1.4,
-          ]}
-          gl={{
-            antialias:
-              true,
-          }}
-        >
-          <SpaceScene
-            phase={phase}
-            isAurora={isAurora}
-          />
-        </Canvas>
-
-      </div>
+      {/* STATIC PERFORMANCE SKY — zero WebGL / zero motion */}
+      {isStaticTheme && (
+        <div
+          className={`login-static-sky ${
+            isQuartz ? 'login-static-sky--quartz' : 'login-static-sky--obsidian'
+          }`}
+          aria-hidden="true"
+        />
+      )}
 
       {/* ===================================================
           CSS NEBULA
       =================================================== */}
 
-      {!isAurora && !isSolaris && (
+      {!isAurora && !isSolaris && !isStaticTheme && (
         <div
           className="
             absolute
@@ -4764,7 +4776,7 @@ export default function LoginPortal({
         className={`absolute inset-0 z-[2] pointer-events-none ${
           isAurora
             ? 'bg-gradient-to-r from-[#06131d]/82 via-[#071923]/32 to-transparent'
-            : isSolaris
+            : isLight
             ? 'login-solaris-sidewash'
             : 'bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08'
         }`}
@@ -4856,7 +4868,7 @@ export default function LoginPortal({
           <div
             data-tour="login-theme-chooser"
             className={`login-theme-chooser flex items-center gap-2 rounded-lg border p-1.5 backdrop-blur-lg transition-all duration-300 ${
-              isSolaris
+              isLight
                 ? 'border-sky-500/25 bg-white/55 shadow-[0_8px_22px_rgba(25,92,132,.09)]'
                 : 'border-sky-500/15 bg-[#03111f]/55'
             }`}
@@ -4866,7 +4878,7 @@ export default function LoginPortal({
           </div>
           <div
             className={`login-secure-node hidden items-center gap-3 rounded-lg border px-3 py-2 backdrop-blur-lg transition-all duration-300 sm:flex ${
-              isSolaris
+              isLight
                 ? 'border-sky-500/25 bg-white/55 shadow-[0_8px_22px_rgba(25,92,132,.09)]'
                 : 'border-sky-500/15 bg-[#03111f]/55'
             }`}
@@ -4957,7 +4969,7 @@ export default function LoginPortal({
 
             <div
               data-tour="login-hud"
-              className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} ${isSolaris ? 'login-hud-surface--solaris' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
+              className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} ${isLight ? 'login-hud-surface--solaris' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
             >
               {/* Holographic rails instead of a large boxed frame */}
               <div className="pointer-events-none absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/65 to-transparent" />
@@ -4974,10 +4986,10 @@ export default function LoginPortal({
                   </div>
                   <div>
                     <div className="text-[13px] font-black tracking-[0.22em] text-sky-100">
-                      {isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : 'IDENTITY GATEWAY'}
+                      {isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : isQuartz ? 'QUARTZ COMMAND LOGIN' : isObsidian ? 'OBSIDIAN COMMAND LOGIN' : 'IDENTITY GATEWAY'}
                     </div>
                     <div className="mt-0.5 text-[10px] tracking-[0.22em] text-slate-600">
-                      {isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : 'BIOMETRIC NODE // 01'}
+                      {isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : isQuartz ? 'EXECUTIVE NODE // QUARTZ' : isObsidian ? 'EXECUTIVE NODE // OBSIDIAN' : 'BIOMETRIC NODE // 01'}
                     </div>
                   </div>
                 </div>
@@ -5547,7 +5559,7 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/90' : isSolaris ? 'login-solaris-portal-base' : 'bg-[#010611]'
+                isAurora ? 'bg-[#020b10]/90' : isLight ? 'login-solaris-portal-base' : 'bg-[#010611]'
               }`}
             />
             <div
@@ -5567,7 +5579,7 @@ export default function LoginPortal({
           <div
             className={`
               absolute inset-0 transition-opacity duration-500
-              ${isAurora ? 'aurora-portal-stage' : ''} ${isSolaris ? 'solaris-portal-stage' : ''}
+              ${isAurora ? 'aurora-portal-stage' : ''} ${isLight ? 'solaris-portal-stage' : ''}
               ${
                 phase === 'charging' || phase === 'portal' || phase === 'flash'
                   ? 'opacity-100'
@@ -5577,7 +5589,7 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/88' : isSolaris ? 'login-solaris-portal-base' : 'bg-[#010611]'
+                isAurora ? 'bg-[#020b10]/88' : isLight ? 'login-solaris-portal-base' : 'bg-[#010611]'
               }`}
             />
             <div
@@ -5686,12 +5698,35 @@ export default function LoginPortal({
             </div>
           )}
 
-          {/* CORE CANVAS */}
+          {/* STATIC PERFORMANCE CORE
+              Pure CSS Holographic 2.5D: no Canvas, no orbit and no rotation. */}
+          {isStaticTheme && (
+            <div
+              className={`pointer-events-none absolute inset-0 z-[3] flex items-center justify-center ${
+                phase === 'portal'
+                  ? 'scale-[2.85] opacity-100 translate-x-0'
+                  : phase === 'charging'
+                  ? 'scale-[1.30] opacity-100 translate-x-0'
+                  : phase === 'flash'
+                  ? 'scale-[3.20] opacity-0 translate-x-0'
+                  : 'scale-100 opacity-100 lg:translate-x-[23vw]'
+              }`}
+            >
+              <div className="login-static-core">
+                <div className="login-static-core__diamond" />
+                <div className="login-static-core__caption">
+                  {isQuartz ? 'QUARTZ CORE' : isObsidian ? 'OBSIDIAN CORE' : 'STATIC CORE'}
+                </div>
+              </div>
+            </div>
+          )}
 
+          {/* CORE CANVAS
+              Only Cosmic Black needs this central Three.js scene.
+              Aurora and Solaris already use dedicated visual layers. */}
+          {!isAurora && !isSolaris && !isStaticTheme && (
           <div
-            className={`pointer-events-none relative h-screen w-screen transition-opacity duration-700 ${
-              isAurora || isSolaris ? 'opacity-0' : 'opacity-100'
-            }`}
+            className="pointer-events-none relative h-screen w-screen"
           >
 
             <Canvas
@@ -5760,6 +5795,7 @@ export default function LoginPortal({
             </div>
 
           </div>
+          )}
 
           {/* CORE STATUS */}
 

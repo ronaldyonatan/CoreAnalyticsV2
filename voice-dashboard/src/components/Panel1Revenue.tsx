@@ -1010,6 +1010,8 @@ export default function Panel1Revenue({
   isMaximized = false,
 }: Panel1Props) {
   
+  const { isStaticTheme } = useTheme();
+  const effectiveAnimateChart = isStaticTheme ? true : animateChart;
   const [internalMode, setInternalMode] = useState<'BAR' | 'RADIANT'>('BAR');
   const panel1Mode = externalMode || internalMode;
   const setPanel1Mode = externalSetMode || setInternalMode;
@@ -1071,7 +1073,7 @@ export default function Panel1Revenue({
   // Same pattern as Daily Tracking:
   // compact/normal Company Performance remains 2D,
   // maximized Revenue becomes the interactive 3D scene.
-  if (isMaximized) {
+  if (isMaximized && !isStaticTheme) {
     return (
       <Revenue3DFullscreen
         data={quartalData}
@@ -1126,7 +1128,7 @@ export default function Panel1Revenue({
                 className="company-ring-previous text-cyan-600 transition-all duration-1200 ease-out" 
                 strokeWidth="16" 
                 strokeDasharray={circumference} 
-                strokeDashoffset={animateChart ? strokeDashoffset2025 : circumference} 
+                strokeDashoffset={effectiveAnimateChart ? strokeDashoffset2025 : circumference} 
                 strokeLinecap="round" 
                 stroke="currentColor" 
                 fill="transparent" 
@@ -1137,7 +1139,7 @@ export default function Panel1Revenue({
                 className={`company-ring-current transition-all duration-1200 ease-out ${isAlert ? 'text-rose-500' : 'text-[#00f2fe]'}`} 
                 strokeWidth="14" 
                 strokeDasharray={2 * Math.PI * (radius - 20)} 
-                strokeDashoffset={animateChart ? strokeDashoffset2026 : (2 * Math.PI * (radius - 20))} 
+                strokeDashoffset={effectiveAnimateChart ? strokeDashoffset2026 : (2 * Math.PI * (radius - 20))} 
                 strokeLinecap="round" 
                 stroke="currentColor" 
                 fill="transparent" 
@@ -1214,7 +1216,7 @@ export default function Panel1Revenue({
               fill="none"
               stroke="var(--company-target, #f59e0b)"
               strokeWidth="2"
-              points={animateChart ? targetPoints.map(p => `${p.x},${p.y}`).join(' ') : '12.5,100 37.5,100 62.5,100 87.5,100'}
+              points={effectiveAnimateChart ? targetPoints.map(p => `${p.x},${p.y}`).join(' ') : '12.5,100 37.5,100 62.5,100 87.5,100'}
             />
           </svg>
 
@@ -1224,7 +1226,7 @@ export default function Panel1Revenue({
               className="absolute w-2.5 h-2.5 rounded-full border border-black transform -translate-x-1/2 translate-y-1/2 z-30 pointer-events-auto cursor-pointer group/dot transition-all duration-1000 ease-out"
               style={{
                 left: `${p.x}%`,
-                bottom: animateChart ? `${100 - p.y}%` : '0%',
+                bottom: effectiveAnimateChart ? `${100 - p.y}%` : '0%',
                 backgroundColor: p.dotColor,
                 boxShadow: `0 0 8px ${p.dotColor}`
               }}
@@ -1256,7 +1258,7 @@ export default function Panel1Revenue({
                   <span className="absolute -top-7 px-1.5 py-0.5 rounded bg-black/90 text-[10px] text-cyan-300 font-bold border border-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap shadow-[0_0_10px_#00f2fe]">
                     25: {rev2025.toFixed(1)}B
                   </span>
-                  <div style={{ height: animateChart ? `${height2025}%` : '0%' }} className="company-bar-previous w-full bg-gradient-to-t from-cyan-950 to-cyan-600 rounded-t transition-all duration-1000 ease-out" />
+                  <div style={{ height: effectiveAnimateChart ? `${height2025}%` : '0%' }} className="company-bar-previous w-full bg-gradient-to-t from-cyan-950 to-cyan-600 rounded-t transition-all duration-1000 ease-out" />
                 </div>
 
                 {/* Batang 2026 */}
@@ -1264,7 +1266,7 @@ export default function Panel1Revenue({
                   <span className="absolute -top-7 px-1.5 py-0.5 rounded bg-black/90 text-[10px] text-white font-bold border border-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap shadow-[0_0_12px_#00f2fe]">
                     26: {rev2026 > 0 ? `${rev2026.toFixed(1)}B` : '0B'}
                   </span>
-                  <div style={{ height: animateChart ? `${height2026}%` : '0%' }} className={`w-full rounded-t transition-all duration-1000 ease-out ${isAlert ? 'bg-gradient-to-t from-rose-950 to-rose-500' : 'company-bar-current bg-gradient-to-t from-cyan-900 to-[#00f2fe]'}`} />
+                  <div style={{ height: effectiveAnimateChart ? `${height2026}%` : '0%' }} className={`w-full rounded-t transition-all duration-1000 ease-out ${isAlert ? 'bg-gradient-to-t from-rose-950 to-rose-500' : 'company-bar-current bg-gradient-to-t from-cyan-900 to-[#00f2fe]'}`} />
                 </div>
 
               </div>

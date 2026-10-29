@@ -371,7 +371,7 @@ function readStoredAuthenticatedUser(): AuthenticatedUser | null {
 // =========================================================
 
 function AppContent() {
-  const { themeId, isAurora, isSolaris } = useTheme();
+  const { themeId, isAurora, isSolaris, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
   const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(
     () => readStoredAuthenticatedUser()
   );
@@ -1003,30 +1003,47 @@ function AppContent() {
 
       <div
         data-active-theme={themeId}
+        data-theme-appearance={isLight ? 'light' : 'dark'}
+        data-rendering-mode={isStaticTheme ? 'static-2.5d' : 'immersive-3d'}
         className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden p-1.5 font-mono select-none md:p-2"
         style={{
           background: 'var(--core-bg)',
           color: 'var(--core-primary)',
         }}
       >
-        {/* SPACE BACKGROUND */}
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 1, 5], fov: 50 }}>
-            <CyberTunnelBackground />
-          </Canvas>
-        </div>
+        {/* IMMERSIVE SPACE BACKGROUND
+            Static Performance themes intentionally do not mount WebGL. */}
+        {!isStaticTheme && (
+          <div className="pointer-events-none absolute inset-0 z-0">
+            <Canvas camera={{ position: [0, 1, 5], fov: 50 }}>
+              <CyberTunnelBackground />
+            </Canvas>
+          </div>
+        )}
 
-        {/* SOFT BLUE NEBULA */}
-        <div
-          className="pointer-events-none absolute inset-0 z-[1]"
-          style={{
-            background: isAurora
-              ? 'radial-gradient(ellipse at 78% 19%, rgba(139,92,246,.10) 0%, transparent 43%), radial-gradient(ellipse at 20% 72%, rgba(45,212,191,.09) 0%, transparent 38%)'
-              : isSolaris
-              ? 'radial-gradient(ellipse at 84% 9%, rgba(86,220,255,.22) 0%, transparent 38%), radial-gradient(ellipse at 18% 78%, rgba(49,140,255,.09) 0%, transparent 36%)'
-              : 'radial-gradient(ellipse at 80% 25%, rgba(0,140,255,.10) 0%, rgba(20,60,160,.035) 25%, transparent 48%), radial-gradient(ellipse at 20% 75%, rgba(0,115,255,.055) 0%, transparent 36%)',
-          }}
-        />
+        {/* STATIC PERFORMANCE BACKGROUND
+            Pure CSS technical depth: zero Canvas / zero requestAnimationFrame. */}
+        {isStaticTheme && (
+          <div
+            className="core-static-field"
+            data-static-theme={isObsidian ? 'obsidian' : isQuartz ? 'quartz' : undefined}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* IMMERSIVE ATMOSPHERIC NEBULA */}
+        {!isStaticTheme && (
+          <div
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{
+              background: isAurora
+                ? 'radial-gradient(ellipse at 78% 19%, rgba(139,92,246,.10) 0%, transparent 43%), radial-gradient(ellipse at 20% 72%, rgba(45,212,191,.09) 0%, transparent 38%)'
+                : isSolaris
+                ? 'radial-gradient(ellipse at 84% 9%, rgba(86,220,255,.22) 0%, transparent 38%), radial-gradient(ellipse at 18% 78%, rgba(49,140,255,.09) 0%, transparent 36%)'
+                : 'radial-gradient(ellipse at 80% 25%, rgba(0,140,255,.10) 0%, rgba(20,60,160,.035) 25%, transparent 48%), radial-gradient(ellipse at 20% 75%, rgba(0,115,255,.055) 0%, transparent 36%)',
+            }}
+          />
+        )}
 
         {/* MOVING AURORA FIELD
             Only rendered for the Aurora theme so Cosmic Black remains unchanged. */}
@@ -1072,6 +1089,10 @@ function AppContent() {
                 ? 'linear-gradient(105deg, rgba(14,43,55,.94), rgba(24,70,83,.90), rgba(25,56,76,.92))'
                 : isSolaris
                 ? 'linear-gradient(105deg, rgba(248,253,255,.97), rgba(235,248,255,.95), rgba(222,243,255,.95))'
+                : isQuartz
+                ? 'linear-gradient(105deg, #fbfeff, #eef9fc, #e5f3f7)'
+                : isObsidian
+                ? 'linear-gradient(105deg, #061521, #071827, #06131f)'
                 : 'var(--core-surface-strong)',
             }}
           >
@@ -1156,10 +1177,10 @@ function AppContent() {
 
               {showSettingsMenu && (
                 <div
-                  className="core-settings-popover absolute right-0 top-[calc(100%+10px)] z-[9999] w-[270px] overflow-hidden rounded-xl border p-2 backdrop-blur-xl"
+                  className="core-settings-popover absolute right-0 top-[calc(100%+10px)] z-[9999] max-h-[calc(100dvh-84px)] w-[330px] max-w-[calc(100vw-20px)] overflow-y-auto overflow-x-hidden rounded-xl border p-2.5"
                   style={{
                     borderColor: 'var(--core-border)',
-                    background: 'var(--core-surface-strong)',
+                    background: 'color-mix(in srgb, var(--core-bg) 96%, var(--core-primary) 4%)',
                     boxShadow: isAurora
                       ? '0 20px 60px rgba(0,0,0,.36), 0 0 30px rgba(45,212,191,.10)'
                       : isSolaris
@@ -1167,25 +1188,25 @@ function AppContent() {
                       : '0 18px 60px rgba(0,0,0,.72), 0 0 34px rgba(0,183,255,.18)',
                   }}
                 >
-                  <div className="core-settings-intro mb-2 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3 py-2.5">
-                    <div className="text-[9px] font-black tracking-[0.20em] text-cyan-100 uppercase">
+                  <div className="core-settings-intro mb-2.5 rounded-lg border border-sky-500/20 bg-[#061426]/70 px-3.5 py-3">
+                    <div className="text-[11px] font-black tracking-[0.16em] text-cyan-100 uppercase">
                       Management Center
                     </div>
-                    <div className="mt-1 text-[7px] tracking-[0.14em] text-slate-500 uppercase">
+                    <div className="mt-1 text-[8px] tracking-[0.11em] text-slate-400 uppercase">
                       Administration & system tools
                     </div>
                   </div>
 
                   <div
                     data-tour="theme-switcher"
-                    className="mb-2 rounded-lg border p-2.5"
+                    className="mb-2.5 rounded-lg border p-3"
                     style={{
                       borderColor: 'var(--core-border)',
                       background: 'var(--core-panel)',
                     }}
                   >
                     <div
-                      className="mb-2 text-[7px] font-black uppercase tracking-[0.18em]"
+                      className="mb-2.5 text-[9px] font-black uppercase tracking-[0.15em]"
                       style={{ color: 'var(--core-text-secondary)' }}
                     >
                       Appearance
@@ -1197,18 +1218,18 @@ function AppContent() {
                     type="button"
                     onClick={openMyAccount}
                     data-tour="my-account"
-                    className="core-my-account-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/40 px-3 py-2.5 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
+                    className="core-my-account-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3.5 py-3 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
                   >
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/20 text-cyan-300">
-                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/20 text-cyan-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <circle cx="12" cy="8" r="3" />
                         <path d="M5.5 20c.6-4 2.9-6.2 6.5-6.2s5.9 2.2 6.5 6.2" />
                         <path d="M18.5 5.5v4M16.5 7.5h4" opacity=".7" />
                       </svg>
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-bold tracking-[0.06em]">My Account</span>
-                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">Password & voice identity</span>
+                      <span className="block text-[12px] font-bold tracking-[0.045em]">My Account</span>
+                      <span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">Password & voice identity</span>
                     </span>
                   </button>
 
@@ -1219,19 +1240,19 @@ function AppContent() {
                       setPostLoginTourReplaySignal((value) => value + 1);
                       setShowSettingsMenu(false);
                     }}
-                    className="core-guided-tour-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/40 px-3 py-2.5 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
+                    className="core-guided-tour-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3.5 py-3 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
                     title="Replay CoreAnalytics Guided Tour"
                   >
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-violet-400/20 bg-violet-950/20 text-violet-300">
-                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-violet-400/20 bg-violet-950/20 text-violet-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <path d="M4 12a8 8 0 1 0 2.35-5.65" />
                         <path d="M4 4v5h5" />
                         <path d="M10 9.5l5 2.5-5 2.5v-5Z" />
                       </svg>
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-bold tracking-[0.06em]">Guided Tour</span>
-                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">
+                      <span className="block text-[12px] font-bold tracking-[0.045em]">Guided Tour</span>
+                      <span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">
                         Replay dashboard walkthrough
                       </span>
                     </span>
@@ -1241,42 +1262,42 @@ function AppContent() {
                     type="button"
                     data-tour="voice-command-menu"
                     onClick={openVoiceCommandGuide}
-                    className="core-voice-guide-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/40 px-3 py-2.5 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
+                    className="core-voice-guide-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3.5 py-3 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
                     title="Open Voice Command Guide"
                   >
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-950/20 text-emerald-300">
-                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-950/20 text-emerald-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" />
                         <path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4M8.5 21h7" />
                       </svg>
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-bold tracking-[0.06em]">Voice Commands</span>
-                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">Command list & examples</span>
+                      <span className="block text-[12px] font-bold tracking-[0.045em]">Voice Commands</span>
+                      <span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">Command list & examples</span>
                     </span>
                   </button>
 
                   {canAccess('user_management') && <button
                     type="button"
                     onClick={openUserManagement}
-                    className={`group flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all ${
+                    className={`group flex w-full items-center gap-3 rounded-lg border px-3.5 py-3 text-left transition-all ${
                       effectiveRoute === 'user_management'
                         ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50'
                         : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'
                     }`}
                   >
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/25 text-cyan-300">
-                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/25 text-cyan-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <circle cx="10" cy="8" r="3" />
                         <path d="M4 19c.55-3.55 2.6-5.5 6-5.5 2.3 0 4.05.9 5.05 2.6" />
                         <path d="M18 13v6M15 16h6" />
                       </svg>
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-bold tracking-[0.06em]">
+                      <span className="block text-[12px] font-bold tracking-[0.045em]">
                         User Management
                       </span>
-                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">
+                      <span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">
                         Account & voice identity enrollment
                       </span>
                     </span>
@@ -1285,14 +1306,14 @@ function AppContent() {
                   {canAccess('group_management') && <button
                     type="button"
                     onClick={openGroupManagement}
-                    className={`group mt-1 flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all ${
+                    className={`group mt-1 flex w-full items-center gap-3 rounded-lg border px-3.5 py-3 text-left transition-all ${
                       effectiveRoute === 'group_management'
                         ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50'
                         : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'
                     }`}
                   >
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/25 text-cyan-300">
-                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/25 text-cyan-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <circle cx="8" cy="9" r="2.7" />
                         <circle cx="16.5" cy="10" r="2.3" />
                         <path d="M3 19c.5-3.3 2.3-5 5-5s4.5 1.7 5 5" />
@@ -1300,10 +1321,10 @@ function AppContent() {
                       </svg>
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-bold tracking-[0.06em]">
+                      <span className="block text-[12px] font-bold tracking-[0.045em]">
                         Group Management
                       </span>
-                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">
+                      <span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">
                         Access groups & permission foundation
                       </span>
                     </span>
@@ -1312,26 +1333,26 @@ function AppContent() {
                   {canAccess('dashboard_designer') && <button
                     type="button"
                     onClick={openDashboardDesigner}
-                    className="group mt-1 flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-left text-indigo-200/80 transition-all hover:border-indigo-400/20 hover:bg-indigo-950/30 hover:text-indigo-100"
+                    className="group mt-1 flex w-full items-center gap-3 rounded-lg border border-transparent px-3.5 py-3 text-left text-indigo-200/80 transition-all hover:border-indigo-400/20 hover:bg-indigo-950/30 hover:text-indigo-100"
                   >
-                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-indigo-400/20 bg-indigo-950/30 text-indigo-300">
-                      <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-indigo-400/20 bg-indigo-950/30 text-indigo-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <path d="M14.7 6.3a4 4 0 01-5 5L4 17v3h3l5.7-5.7a4 4 0 005-5l-2.2 2.2-3-3 2.2-2.2z" />
                         <path d="M16 16l4 4" opacity=".7" />
                       </svg>
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[10px] font-bold tracking-[0.06em]">
+                      <span className="block text-[12px] font-bold tracking-[0.045em]">
                         Dashboard Designer
                       </span>
-                      <span className="mt-0.5 block text-[7px] tracking-[0.05em] text-slate-500">
+                      <span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">
                         Layout & presentation tools
                       </span>
                     </span>
                   </button>}
 
                   <div className="mt-2 flex items-center justify-between border-t border-sky-500/10 px-2 pt-2">
-                    <span className="text-[7px] tracking-[0.14em] text-slate-600 uppercase">
+                    <span className="text-[8px] tracking-[0.12em] text-slate-500 uppercase">
                       CoreAnalytics
                     </span>
                     <span className="flex items-center gap-1.5 text-[7px] font-bold tracking-[0.14em] text-emerald-300/70 uppercase">
@@ -1391,10 +1412,10 @@ function AppContent() {
                 }`}>
                   {isSidebarExpanded && (
                     <div className="min-w-0 pl-1">
-                      <div className="text-[8px] font-black tracking-[0.20em] text-cyan-100 uppercase">
+                      <div className="text-[10px] font-black tracking-[0.18em] text-cyan-100 uppercase">
                         Navigation
                       </div>
-                      <div className="mt-0.5 text-[6px] tracking-[0.17em] text-slate-600 uppercase">
+                      <div className="mt-0.5 text-[8px] tracking-[0.14em] text-slate-500 uppercase">
                         Core command rail
                       </div>
                     </div>
@@ -1525,7 +1546,7 @@ function AppContent() {
                     <path d="M5.5 20c.6-4 2.9-6.2 6.5-6.2s5.9 2.2 6.5 6.2" />
                   </svg>
                   {isSidebarExpanded && (
-                    <span className="text-[9px] tracking-wider uppercase">MY ACCOUNT</span>
+                    <span className="text-[11px] tracking-[0.08em] uppercase">MY ACCOUNT</span>
                   )}
                 </button>
 
@@ -1550,7 +1571,7 @@ function AppContent() {
                     </svg>
                   )}
                   {isSidebarExpanded && (
-                    <span className="text-[9px] tracking-wider uppercase">
+                    <span className="text-[11px] tracking-[0.08em] uppercase">
                       {isListening ? 'VOICE ON' : 'VOICE OFF'}
                     </span>
                   )}
@@ -1566,7 +1587,7 @@ function AppContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                   </svg>
                   {isSidebarExpanded && (
-                    <span className="text-[9px] tracking-wider uppercase">LOGOUT</span>
+                    <span className="text-[11px] tracking-[0.08em] uppercase">LOGOUT</span>
                   )}
                 </button>
               </div>

@@ -840,3 +840,117 @@
     min-height: 510px !important;
   }
 }
+
+
+/* =========================================================
+   v37.7 — VOICE COMBINATION / MOBILE LANDSCAPE
+   ---------------------------------------------------------
+   A 3-graph combination must remain one horizontal row when
+   the phone is physically rotated to landscape, including
+   devices whose CSS viewport remains below Tailwind's md
+   breakpoint. Portrait mobile keeps the existing stacked flow.
+   ========================================================= */
+@media (max-width: 767px) and (orientation: landscape) {
+  .company-performance-shell:not(.company-performance-fullscreen)
+  .company-top-grid.company-top-grid--three {
+    display: grid !important;
+    flex-direction: initial !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: 1fr !important;
+    gap: 8px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen)
+  .company-top-grid.company-top-grid--three
+  > .company-panel-frame {
+    width: auto !important;
+    height: 76vh !important;
+    min-height: 300px !important;
+    max-height: none !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen)
+  .company-top-grid.company-top-grid--three
+  > .company-panel-frame
+  > .company-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+
+
+/* =========================================================
+   v38.2 — LIGHT THEME P&L COMPARE COLOR CODING
+   ---------------------------------------------------------
+   Solaris + Quartz only.
+   Restores strong semantic compare visibility without
+   changing base table colors or any dark theme.
+   ========================================================= */
+
+/* Positive / favorable comparison */
+[data-theme="solaris"] .company-pnl-card .bg-emerald-950\/40,
+[data-theme="quartz"] .company-pnl-card .bg-emerald-950\/40 {
+  background: rgba(16, 185, 129, .16) !important;
+  border-color: rgba(5, 150, 105, .48) !important;
+  color: #047857 !important;
+  box-shadow:
+    inset 3px 0 0 rgba(5, 150, 105, .72),
+    0 0 0 1px rgba(16, 185, 129, .06) !important;
+  font-weight: 800 !important;
+}
+
+/* Negative / unfavorable comparison */
+[data-theme="solaris"] .company-pnl-card .bg-rose-950\/40,
+[data-theme="quartz"] .company-pnl-card .bg-rose-950\/40 {
+  background: rgba(244, 63, 94, .15) !important;
+  border-color: rgba(225, 29, 72, .46) !important;
+  color: #be123c !important;
+  box-shadow:
+    inset 3px 0 0 rgba(225, 29, 72, .70),
+    0 0 0 1px rgba(244, 63, 94, .05) !important;
+  font-weight: 800 !important;
+}
+
+/* Keep semantic text colors strong even when no background utility is present. */
+[data-theme="solaris"] .company-pnl-card .text-emerald-300,
+[data-theme="solaris"] .company-pnl-card .text-emerald-400,
+[data-theme="quartz"] .company-pnl-card .text-emerald-300,
+[data-theme="quartz"] .company-pnl-card .text-emerald-400 {
+  color: #047857 !important;
+}
+
+[data-theme="solaris"] .company-pnl-card .text-rose-300,
+[data-theme="solaris"] .company-pnl-card .text-rose-400,
+[data-theme="quartz"] .company-pnl-card .text-rose-300,
+[data-theme="quartz"] .company-pnl-card .text-rose-400 {
+  color: #be123c !important;
+}
+
+/* Amber financial totals / warning values remain visible on the light surface. */
+[data-theme="solaris"] .company-pnl-card .text-amber-300,
+[data-theme="solaris"] .company-pnl-card .text-amber-400,
+[data-theme="quartz"] .company-pnl-card .text-amber-300,
+[data-theme="quartz"] .company-pnl-card .text-amber-400 {
+  color: #9a6700 !important;
+}
+
+/* The losing/peer value is intentionally muted, but must remain readable. */
+[data-theme="solaris"] .company-pnl-card .text-slate-400.opacity-70,
+[data-theme="quartz"] .company-pnl-card .text-slate-400.opacity-70 {
+  color: #64748b !important;
+  opacity: .62 !important;
+}
+
+/* Compare highlights should stay compact and clearly separate from the cell. */
+[data-theme="solaris"] .company-pnl-card .bg-emerald-950\/40,
+[data-theme="solaris"] .company-pnl-card .bg-rose-950\/40,
+[data-theme="quartz"] .company-pnl-card .bg-emerald-950\/40,
+[data-theme="quartz"] .company-pnl-card .bg-rose-950\/40 {
+  border-radius: .3rem !important;
+  padding-left: .3rem !important;
+  padding-right: .3rem !important;
+}

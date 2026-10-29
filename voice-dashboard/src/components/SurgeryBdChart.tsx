@@ -263,13 +263,13 @@ function Real3DSurgeryScene({
 
       <color
         attach="background"
-        args={[isSolaris ? '#5f97cb' : '#020916']}
+        args={[isSolaris ? '#79b5df' : '#020916']}
       />
 
       <fog
         attach="fog"
         args={[
-          isSolaris ? '#91c8e8' : '#020916',
+          isSolaris ? '#c4e7f8' : '#020916',
           25,
           52,
         ]}
@@ -325,7 +325,7 @@ function Real3DSurgeryScene({
         />
 
         <meshPhysicalMaterial
-          color={isSolaris ? "#78afd7" : "#031321"}
+          color={isSolaris ? "#b6ddf3" : "#031321"}
           transparent
           opacity={isSolaris ? 0.56 : 0.8}
           roughness={isSolaris ? 0.46 : 0.28}
@@ -355,7 +355,7 @@ function Real3DSurgeryScene({
         />
 
         <meshPhysicalMaterial
-          color={isSolaris ? "#5875bd" : "#041727"}
+          color={isSolaris ? "#8fb9df" : "#041727"}
           transparent
           opacity={isSolaris ? 0.38 : 0.74}
           roughness={isSolaris ? 0.5 : 0.3}
@@ -385,7 +385,7 @@ function Real3DSurgeryScene({
         />
 
         <meshPhysicalMaterial
-          color={isSolaris ? "#5875bd" : "#041727"}
+          color={isSolaris ? "#8fb9df" : "#041727"}
           transparent
           opacity={isSolaris ? 0.38 : 0.74}
           roughness={isSolaris ? 0.5 : 0.3}
@@ -478,7 +478,7 @@ function Real3DSurgeryScene({
             )
           ),
           isSolaris ? '#a8e2ff' : '#087da5',
-          isSolaris ? '#4f7fb0' : '#07304a',
+          isSolaris ? '#4f86bb' : '#07304a',
         ]}
         position={[0, 0, 0]}
       />
@@ -504,7 +504,7 @@ function Real3DSurgeryScene({
         />
 
         <meshStandardMaterial
-          color={isSolaris ? "#24527f" : "#031523"}
+          color={isSolaris ? "#245f96" : "#031523"}
           metalness={0.62}
           roughness={0.3}
           transparent
@@ -992,7 +992,7 @@ export default function SurgeryBdChart({
   onMonthChange,
   onYtdToggle,
 }: SurgeryBdChartProps) {
-  const { isSolaris } = useTheme();
+  const { isSolaris, isStaticTheme } = useTheme();
   const [
     hover3D,
     setHover3D,
@@ -1174,7 +1174,7 @@ export default function SurgeryBdChart({
      FULLSCREEN REAL 3D
   ========================================================= */
 
-  if (isFullscreen) {
+  if (isFullscreen && !isStaticTheme) {
     const hasData = isLoaded && chartData.length > 0;
 
     return (
@@ -1705,6 +1705,7 @@ export default function SurgeryBdChart({
               maxBarSize={
                 32
               }
+              isAnimationActive={!isStaticTheme}
             />
 
           </BarChart>

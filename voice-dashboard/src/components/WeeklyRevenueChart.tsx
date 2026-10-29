@@ -348,7 +348,7 @@ export default function WeeklyRevenueChart({
   isPeriodLoading = false,
   onMonthChange,
 }: WeeklyRevenueChartProps) {
-  const { isSolaris } = useTheme();
+  const { isSolaris, isStaticTheme } = useTheme();
   const [hover3D, setHover3D] = useState<Revenue3DTooltip | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
@@ -395,7 +395,7 @@ export default function WeeklyRevenueChart({
   const leftTicks = Array.from({ length: 5 }, (_, i) => Math.round((dynamicMaxQty / 4) * i));
   const rightTicks = Array.from({ length: 5 }, (_, i) => Math.round((dynamicMaxRev / 4) * i));
 
-  if (isFullscreen) {
+  if (isFullscreen && !isStaticTheme) {
     return (
       <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
         <div className={`relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl ${isSolaris ? 'border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]' : 'border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/80 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]'}`}>
@@ -740,7 +740,7 @@ export default function WeeklyRevenueChart({
               stackId="qty"
               fill="#00bfff"
               radius={[2, 2, 0, 0]}
-              isAnimationActive
+              isAnimationActive={!isStaticTheme}
               animationDuration={650}
               animationEasing="ease-out"
             />
@@ -751,7 +751,7 @@ export default function WeeklyRevenueChart({
               stackId="qty"
               fill="#00d084"
               radius={[2, 2, 0, 0]}
-              isAnimationActive
+              isAnimationActive={!isStaticTheme}
               animationDuration={750}
               animationEasing="ease-out"
             />
@@ -764,7 +764,7 @@ export default function WeeklyRevenueChart({
               strokeWidth={2.2}
               dot={{ r: 3, fill: '#fb923c', stroke: '#fb923c', strokeWidth: 1 }}
               activeDot={{ r: 5, fill: '#fb923c', stroke: '#ffffff', strokeWidth: 1.5 }}
-              isAnimationActive
+              isAnimationActive={!isStaticTheme}
               animationDuration={900}
               animationEasing="ease-out"
             />

@@ -262,7 +262,7 @@ function Monthly3DScene({
 }
 
 export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpand, isFullscreen = false }: MonthlyRevenueChartProps) {
-  const { isSolaris } = useTheme();
+  const { isSolaris, isStaticTheme } = useTheme();
   const [hover3D,setHover3D]=useState<Hover3D|null>(null);
   const [tip,setTip]=useState({x:20,y:20});
   const [autoRotate, setAutoRotate] = useState(true);
@@ -297,7 +297,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
   const leftTicks = Array.from({ length: 5 }, (_, i) => Math.round((dynamicMaxQty / 4) * i));
   const rightTicks = Array.from({ length: 5 }, (_, i) => Math.round((dynamicMaxRev / 4) * i));
 
-  if (isFullscreen) {
+  if (isFullscreen && !isStaticTheme) {
     return (
       <div className={`daily-3d-shell w-full h-full min-h-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-cyan-500/30 shrink-0 bg-gradient-to-r from-cyan-950/30 via-[#020916]/90 to-orange-950/25">
@@ -416,8 +416,8 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
                 color: '#fff'
               }} 
             />
-            <Bar yAxisId="left" dataKey="adm" name="adm" stackId="qty" fill="#00bfff" radius={[0, 0, 0, 0]} barSize={20} />
-            <Bar yAxisId="left" dataKey="sur" name="sur" stackId="qty" fill="#00b050" radius={[3, 3, 0, 0]} barSize={20} />
+            <Bar yAxisId="left" dataKey="adm" name="adm" stackId="qty" fill="#00bfff" radius={[0, 0, 0, 0]} barSize={20} isAnimationActive={!isStaticTheme} />
+            <Bar yAxisId="left" dataKey="sur" name="sur" stackId="qty" fill="#00b050" radius={[3, 3, 0, 0]} barSize={20} isAnimationActive={!isStaticTheme} />
             <Line 
               yAxisId="right" 
               type="monotone" 
@@ -427,6 +427,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
               strokeWidth={2} 
               dot={{ r: 3, fill: '#ef4444', stroke: '#ffffff', strokeWidth: 1 }}
               activeDot={{ r: 5, fill: '#ef4444' }}
+              isAnimationActive={!isStaticTheme}
             />
           </ComposedChart>
         </ResponsiveContainer>

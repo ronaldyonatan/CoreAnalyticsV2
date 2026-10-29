@@ -223,6 +223,276 @@ function buildMetric(
   };
 }
 
+
+function buildStaticDonutGradient(
+  slices: ChannelSlice[]
+) {
+  if (!slices.length) {
+    return 'conic-gradient(rgba(100,116,139,.18) 0deg 360deg)';
+  }
+
+  let cursor = 0;
+  const stops: string[] = [];
+
+  slices.forEach((slice) => {
+    const start = cursor;
+    const end = Math.min(
+      100,
+      cursor + slice.percentage
+    );
+
+    stops.push(
+      `${slice.color} ${start}% ${end}%`
+    );
+
+    cursor = end;
+  });
+
+  if (cursor < 100) {
+    stops.push(
+      `rgba(100,116,139,.12) ${cursor}% 100%`
+    );
+  }
+
+  return `conic-gradient(${stops.join(', ')})`;
+}
+
+function StaticPerChannelMetric({
+  metric,
+  isLight,
+}: {
+  metric: MetricData;
+  isLight: boolean;
+}) {
+  return (
+    <div
+      className="relative flex min-h-[250px] flex-col overflow-hidden rounded-2xl border p-3 md:min-h-0 md:p-4"
+      style={{
+        borderColor:
+          'var(--core-border)',
+        background: isLight
+          ? 'linear-gradient(145deg, rgba(255,255,255,.94), rgba(225,244,250,.90))'
+          : 'linear-gradient(145deg, rgba(4,18,31,.96), rgba(6,29,45,.92))',
+        boxShadow: isLight
+          ? 'inset 0 1px 0 rgba(255,255,255,.9), 0 12px 28px rgba(21,90,120,.08)'
+          : 'inset 0 1px 0 rgba(90,225,255,.08), 0 12px 28px rgba(0,0,0,.22)',
+      }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div
+            className="text-[10px] font-black uppercase tracking-[0.20em]"
+            style={{
+              color:
+                'var(--core-primary-strong)',
+            }}
+          >
+            {metric.title}
+          </div>
+
+          <div
+            className="mt-1 text-[7px] uppercase tracking-[0.14em]"
+            style={{
+              color:
+                'var(--core-text-muted)',
+            }}
+          >
+            {metric.subtitle}
+            {' · '}
+            Static 2.5D
+          </div>
+        </div>
+
+        <div className="text-right">
+          <div
+            className="text-[7px] uppercase tracking-[0.14em]"
+            style={{
+              color:
+                'var(--core-text-muted)',
+            }}
+          >
+            Total
+          </div>
+
+          <div
+            className="mt-0.5 text-[13px] font-black"
+            style={{
+              color:
+                'var(--core-text)',
+            }}
+          >
+            {formatTotal(metric)}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(108px,0.95fr)_minmax(0,1.25fr)] items-center gap-3 py-3 md:grid-cols-[minmax(130px,1fr)_minmax(0,1.2fr)]">
+        <div className="relative mx-auto aspect-square w-full max-w-[185px]">
+          {/* Static depth plate. No Canvas, WebGL, animation, camera or rotation. */}
+          <div
+            className="absolute inset-[10%] rounded-full"
+            style={{
+              background: isLight
+                ? 'linear-gradient(145deg, rgba(167,221,236,.68), rgba(255,255,255,.96))'
+                : 'linear-gradient(145deg, rgba(4,25,40,.96), rgba(10,51,72,.84))',
+              boxShadow: isLight
+                ? '8px 10px 0 rgba(42,123,151,.08), inset -10px -12px 22px rgba(40,140,170,.08)'
+                : '8px 10px 0 rgba(0,0,0,.24), inset -10px -12px 24px rgba(0,0,0,.24)',
+            }}
+          />
+
+          <div
+            className="absolute inset-[5%] rounded-full"
+            style={{
+              background:
+                buildStaticDonutGradient(
+                  metric.slices
+                ),
+              boxShadow:
+                'inset -8px -10px 18px rgba(0,0,0,.16), 0 0 0 1px var(--core-border)',
+            }}
+          />
+
+          <div
+            className="absolute inset-[30%] flex flex-col items-center justify-center rounded-full border text-center"
+            style={{
+              borderColor:
+                'var(--core-border)',
+              background: isLight
+                ? 'rgba(248,253,255,.98)'
+                : 'rgba(3,17,29,.98)',
+              boxShadow: isLight
+                ? 'inset 0 0 14px rgba(0,150,190,.06)'
+                : 'inset 0 0 18px rgba(0,191,255,.06)',
+            }}
+          >
+            <div
+              className="text-[6px] font-black uppercase tracking-[0.14em]"
+              style={{
+                color:
+                  'var(--core-text-muted)',
+              }}
+            >
+              Dominant
+            </div>
+
+            <div
+              className="mt-1 max-w-[90%] truncate text-[9px] font-black"
+              style={{
+                color:
+                  metric.dominant?.color ??
+                  'var(--core-primary)',
+              }}
+            >
+              {metric.dominant?.name ??
+                '—'}
+            </div>
+
+            <div
+              className="mt-0.5 text-[11px] font-black"
+              style={{
+                color:
+                  'var(--core-text)',
+              }}
+            >
+              {metric.dominant
+                ? `${metric.dominant.percentage.toFixed(1)}%`
+                : '0%'}
+            </div>
+          </div>
+        </div>
+
+        <div className="min-w-0 space-y-2">
+          {metric.slices.map(
+            (slice) => (
+              <div
+                key={`${metric.key}-${slice.name}`}
+                className="min-w-0"
+              >
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-sm"
+                      style={{
+                        background:
+                          slice.color,
+                        boxShadow: `0 0 7px ${slice.color}55`,
+                      }}
+                    />
+
+                    <span
+                      className="truncate text-[8px] font-bold uppercase tracking-[0.08em]"
+                      style={{
+                        color:
+                          'var(--core-text-secondary)',
+                      }}
+                    >
+                      {slice.name}
+                    </span>
+                  </span>
+
+                  <span
+                    className="shrink-0 text-[8px] font-black"
+                    style={{
+                      color:
+                        'var(--core-text)',
+                    }}
+                  >
+                    {slice.percentage.toFixed(
+                      1
+                    )}
+                    %
+                  </span>
+                </div>
+
+                <div
+                  className="h-2 overflow-hidden rounded-sm border"
+                  style={{
+                    borderColor:
+                      'var(--core-border)',
+                    background:
+                      'var(--core-control)',
+                  }}
+                >
+                  <div
+                    className="h-full"
+                    style={{
+                      width: `${Math.max(
+                        0,
+                        Math.min(
+                          100,
+                          slice.percentage
+                        )
+                      )}%`,
+                      background: `linear-gradient(90deg, ${slice.color}99, ${slice.color})`,
+                      boxShadow:
+                        'inset -6px 0 8px rgba(255,255,255,.10)',
+                    }}
+                  />
+                </div>
+              </div>
+            )
+          )}
+
+          {!metric.slices.length && (
+            <div
+              className="rounded-lg border px-3 py-4 text-center text-[8px] uppercase tracking-[0.16em]"
+              style={{
+                borderColor:
+                  'var(--core-border)',
+                color:
+                  'var(--core-text-muted)',
+              }}
+            >
+              No data
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function formatTotal(
   metric: MetricData
 ) {
@@ -1394,7 +1664,7 @@ export default function PerChannel3DChart({
   onMonthChange,
   onYtdToggle,
 }: PerChannel3DChartProps) {
-  const { isSolaris } = useTheme();
+  const { isSolaris, isStaticTheme, isLight } = useTheme();
   const [
     hover,
     setHover,
@@ -1519,6 +1789,7 @@ export default function PerChannel3DChart({
               {selectedYear}
             </div>
 
+              {!isStaticTheme && (
               <button
                 type="button"
                 onClick={() => setAutoRotate((prev) => !prev)}
@@ -1542,6 +1813,7 @@ export default function PerChannel3DChart({
                 <span className="hidden sm:inline">Auto Rotate</span>
                 <span>{autoRotate ? 'ON' : 'OFF'}</span>
               </button>
+              )}
 
               <button
                 type="button"
@@ -1691,6 +1963,19 @@ export default function PerChannel3DChart({
           ))}
         </div>
 
+        {isStaticTheme ? (
+          <div className="absolute inset-0 overflow-y-auto p-4 pt-14 md:p-6 md:pt-16">
+            <div className="grid min-h-full grid-cols-1 gap-3 md:grid-cols-3">
+              {metrics.map((metric) => (
+                <StaticPerChannelMetric
+                  key={metric.key}
+                  metric={metric}
+                  isLight={isLight}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
         <div
           className={`absolute inset-0 transition-all duration-500 ease-out ${
             isPeriodLoading
@@ -1713,6 +1998,7 @@ export default function PerChannel3DChart({
             />
           </Canvas>
         </div>
+        )}
 
         {/* PERIOD TRANSITION */}
         {isPeriodLoading && (
