@@ -597,6 +597,7 @@ export default function CompanyPerformance({
   useVoiceCommandCompanyPerformance({
     healthcareList,
     selectedHealthcareId,
+    onHealthcareChange,
     isCompareMode,
     setIsCompareMode,
     setPanel1Mode,

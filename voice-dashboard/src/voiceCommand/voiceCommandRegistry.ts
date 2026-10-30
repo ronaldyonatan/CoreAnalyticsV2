@@ -232,16 +232,30 @@ export const COMPANY_PERFORMANCE_VOICE_COMMANDS: VoiceCommandDefinition[] = [
     examples: ['Tampilkan Radiant'], priority: 30,
   },
   {
-    id: 'cp_all_healthcare', scope: 'company_performance', section: 'Healthcare', label: 'Semua Healthcare',
-    description: 'Menghapus filter healthcare dan kembali ke agregasi seluruh node.', routeKey: 'company_performance',
-    aliases: ['semua healthcare', 'tampilkan semua healthcare', 'reset healthcare', 'hapus filter healthcare', 'all healthcare'],
-    examples: ['Semua Healthcare'], priority: 35,
+    id: 'cp_all_healthcare', scope: 'company_performance', section: 'Healthcare', label: 'Semua Healthcare / Cabang / Unit Bisnis / Site',
+    description: 'Menghapus filter healthcare/cabang/unit bisnis/site dan kembali ke agregasi seluruh node.', routeKey: 'company_performance',
+    aliases: [
+      'semua healthcare', 'tampilkan semua healthcare', 'munculkan semua healthcare', 'reset healthcare', 'hapus filter healthcare', 'all healthcare',
+      'semua cabang', 'tampilkan semua cabang', 'munculkan semua cabang', 'reset cabang', 'hapus filter cabang',
+      'semua unit bisnis', 'tampilkan semua unit bisnis', 'munculkan semua unit bisnis', 'reset unit bisnis', 'hapus filter unit bisnis',
+      'semua business unit', 'tampilkan semua business unit', 'munculkan semua business unit', 'reset business unit',
+      'semua site', 'tampilkan semua site', 'munculkan semua site', 'reset site', 'hapus filter site',
+      'semua node', 'tampilkan semua node', 'munculkan semua node', 'reset node',
+    ],
+    examples: ['Semua Healthcare', 'Tampilkan semua cabang', 'Semua unit bisnis', 'Tampilkan semua site'], priority: 35,
   },
   {
-    id: 'cp_choose_healthcare', scope: 'company_performance', section: 'Healthcare', label: 'Pilih Healthcare',
-    description: 'Memilih satu healthcare berdasarkan nama node yang diucapkan.', routeKey: 'company_performance',
-    aliases: ['pilih healthcare', 'tampilkan healthcare', 'buka healthcare', 'ganti healthcare'],
-    examples: ['Pilih Healthcare Kedoya'], priority: 32,
+    id: 'cp_choose_healthcare', scope: 'company_performance', section: 'Healthcare', label: 'Pilih Healthcare / Cabang / Unit Bisnis / Site',
+    description: 'Memilih satu healthcare berdasarkan nama cabang, unit bisnis, site, atau node yang diucapkan.', routeKey: 'company_performance',
+    aliases: [
+      'pilih healthcare', 'tampilkan healthcare', 'munculkan healthcare', 'buka healthcare', 'ganti healthcare', 'ubah healthcare', 'filter healthcare', 'gunakan healthcare',
+      'pilih cabang', 'tampilkan cabang', 'munculkan cabang', 'buka cabang', 'ganti cabang', 'ubah cabang', 'filter cabang', 'gunakan cabang',
+      'pilih unit bisnis', 'tampilkan unit bisnis', 'munculkan unit bisnis', 'buka unit bisnis', 'ganti unit bisnis', 'ubah unit bisnis', 'filter unit bisnis', 'gunakan unit bisnis',
+      'pilih business unit', 'tampilkan business unit', 'munculkan business unit', 'buka business unit', 'ganti business unit', 'filter business unit', 'gunakan business unit',
+      'pilih site', 'tampilkan site', 'munculkan site', 'buka site', 'ganti site', 'ubah site', 'filter site', 'gunakan site',
+      'pilih node', 'tampilkan node', 'munculkan node', 'buka node', 'ganti node', 'ubah node', 'filter node', 'gunakan node',
+    ],
+    examples: ['Pilih Healthcare Kedoya', 'Pilih cabang Menteng', 'Filter cabang Kedoya', 'Munculkan unit bisnis Cibubur', 'Tampilkan site Surabaya'], priority: 32,
   },
   {
     id: 'cp_compare_pnl',
@@ -267,10 +281,17 @@ export const COMPANY_PERFORMANCE_VOICE_COMMANDS: VoiceCommandDefinition[] = [
     priority: 95,
   },
   {
-    id: 'cp_compare_healthcare', scope: 'company_performance', section: 'Healthcare', label: 'Bandingkan Healthcare',
-    description: 'Membandingkan dua healthcare yang disebutkan dalam satu perintah.', routeKey: 'company_performance',
-    aliases: ['bandingkan healthcare', 'compare healthcare'],
-    examples: ['Bandingkan Healthcare Kedoya dengan Menteng'], priority: 38,
+    id: 'cp_compare_healthcare', scope: 'company_performance', section: 'Healthcare', label: 'Bandingkan Healthcare / Cabang / Unit Bisnis / Site',
+    description: 'Membandingkan dua healthcare/site yang disebutkan dalam satu perintah.', routeKey: 'company_performance',
+    aliases: [
+      'bandingkan healthcare', 'compare healthcare',
+      'bandingkan cabang', 'compare cabang',
+      'bandingkan unit bisnis', 'compare unit bisnis',
+      'bandingkan business unit', 'compare business unit',
+      'bandingkan site', 'compare site',
+      'bandingkan node', 'compare node',
+    ],
+    examples: ['Bandingkan Healthcare Kedoya dengan Menteng', 'Bandingkan cabang Kedoya dengan Menteng', 'Bandingkan site Surabaya dengan Semarang'], priority: 38,
   },
   {
     id: 'cp_exit_compare', scope: 'company_performance', section: 'Healthcare', label: 'Keluar Compare Mode',
@@ -323,6 +344,32 @@ export const COMPANY_PERFORMANCE_VOICE_COMMANDS: VoiceCommandDefinition[] = [
 ];
 
 export const DAILY_TRACKING_VOICE_COMMANDS: VoiceCommandDefinition[] = [
+  {
+    id: 'daily_all_healthcare', scope: 'daily_tracking', section: 'Healthcare', label: 'Semua Healthcare / Cabang / Unit Bisnis / Site',
+    description: 'Mengosongkan pilihan healthcare/cabang/unit bisnis/site pada Daily Tracking.', routeKey: 'daily_tracking',
+    aliases: [
+      'semua healthcare', 'tampilkan semua healthcare', 'munculkan semua healthcare', 'reset healthcare', 'all healthcare',
+      'semua cabang', 'tampilkan semua cabang', 'munculkan semua cabang', 'reset cabang',
+      'semua unit bisnis', 'tampilkan semua unit bisnis', 'munculkan semua unit bisnis', 'reset unit bisnis',
+      'semua business unit', 'tampilkan semua business unit', 'munculkan semua business unit', 'reset business unit',
+      'semua site', 'tampilkan semua site', 'munculkan semua site', 'reset site',
+      'semua node', 'tampilkan semua node', 'munculkan semua node', 'reset node',
+    ],
+    examples: ['Tampilkan semua cabang', 'Munculkan semua unit bisnis', 'Semua healthcare', 'Semua site'], priority: 35,
+  },
+  {
+    id: 'daily_choose_healthcare', scope: 'daily_tracking', section: 'Healthcare', label: 'Pilih Healthcare / Cabang / Unit Bisnis / Site',
+    description: 'Memilih healthcare Daily Tracking berdasarkan nama cabang/unit bisnis/site yang diucapkan.', routeKey: 'daily_tracking',
+    aliases: [
+      'pilih healthcare', 'tampilkan healthcare', 'munculkan healthcare', 'buka healthcare', 'ganti healthcare', 'ubah healthcare', 'filter healthcare', 'gunakan healthcare',
+      'pilih cabang', 'tampilkan cabang', 'munculkan cabang', 'buka cabang', 'ganti cabang', 'ubah cabang', 'filter cabang', 'gunakan cabang',
+      'pilih unit bisnis', 'tampilkan unit bisnis', 'munculkan unit bisnis', 'buka unit bisnis', 'ganti unit bisnis', 'ubah unit bisnis', 'filter unit bisnis', 'gunakan unit bisnis',
+      'pilih business unit', 'tampilkan business unit', 'munculkan business unit', 'buka business unit', 'ganti business unit', 'filter business unit', 'gunakan business unit',
+      'pilih site', 'tampilkan site', 'munculkan site', 'buka site', 'ganti site', 'ubah site', 'filter site', 'gunakan site',
+      'pilih node', 'tampilkan node', 'munculkan node', 'buka node', 'ganti node', 'ubah node', 'filter node', 'gunakan node',
+    ],
+    examples: ['Pilih cabang Kedoya', 'Filter cabang Kedoya', 'Ganti unit bisnis Menteng', 'Munculkan site Cibubur'], priority: 32,
+  },
   {
     id: 'daily_back_previous',
     scope: 'daily_tracking',

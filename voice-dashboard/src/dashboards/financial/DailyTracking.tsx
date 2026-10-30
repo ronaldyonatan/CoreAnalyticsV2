@@ -7,6 +7,7 @@ import DailyFilterHealthcare from '../../components/PanelFilterHealthcare';
 import { useTheme } from '../../theme/ThemeContext';
 import {
   DAILY_TRACKING_VOICE_COMMANDS,
+  containsVoicePhrase,
   normalizeVoiceTranscript,
   resolveVoiceCommand,
 } from '../../voiceCommand/voiceCommandRegistry';
@@ -20,6 +21,67 @@ import PerChannel3DChart from '../../components/PerChannel3DChart';
 interface HealthcareItem {
   healthcareID: string;
   healthcareName: string;
+}
+
+function dailyHealthcareAliases(name: string) {
+  const normalized = normalizeVoiceTranscript(name.replace(/@/g, ' '));
+  const pieces = normalized.split(' ').filter(Boolean);
+  const generic = new Set(['rs', 'mata', 'jec', 'eye', 'center', 'rumah', 'sakit']);
+  const meaningful = pieces.filter((piece) => !generic.has(piece));
+
+  const aliases = new Set<string>([normalized]);
+  if (meaningful.length) aliases.add(meaningful.join(' '));
+  if (meaningful.length) aliases.add(meaningful[meaningful.length - 1]);
+
+  return Array.from(aliases).filter((alias) => alias.length >= 3);
+}
+
+function findMentionedDailyHealthcare(transcript: string, healthcareList: HealthcareItem[], allowAmbiguous = false) {
+  const normalizedTranscript = normalizeVoiceTranscript(transcript);
+  const matches: Array<{ id: string; index: number; aliasLength: number }> = [];
+
+  // Short site aliases are accepted only when they are unique in the healthcare master.
+  const aliasOwners = new Map<string, Set<string>>();
+  healthcareList.forEach((healthcare) => {
+    dailyHealthcareAliases(healthcare.healthcareName).forEach((alias) => {
+      const owners = aliasOwners.get(alias) ?? new Set<string>();
+      owners.add(healthcare.healthcareID);
+      aliasOwners.set(alias, owners);
+    });
+  });
+
+  healthcareList.forEach((healthcare) => {
+    let bestIndex = -1;
+    let bestLength = -1;
+
+    dailyHealthcareAliases(healthcare.healthcareName).forEach((alias) => {
+      if (!allowAmbiguous && (aliasOwners.get(alias)?.size ?? 0) > 1) return;
+
+      const index = ` ${normalizedTranscript} `.indexOf(` ${alias} `);
+      if (index >= 0 && alias.length > bestLength) {
+        bestIndex = index;
+        bestLength = alias.length;
+      }
+    });
+
+    if (bestIndex >= 0) {
+      matches.push({
+        id: healthcare.healthcareID,
+        index: bestIndex,
+        aliasLength: bestLength,
+      });
+    }
+  });
+
+  const byId = new Map<string, { id: string; index: number; aliasLength: number }>();
+  matches.forEach((match) => {
+    const current = byId.get(match.id);
+    if (!current || match.aliasLength > current.aliasLength) {
+      byId.set(match.id, match);
+    }
+  });
+
+  return Array.from(byId.values()).sort((a, b) => a.index - b.index);
 }
 
 interface DailyTrackingProps {
@@ -157,6 +219,11 @@ export default function DailyTracking({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const handleHealthcareSelect = useCallback((newId: string) => {
+    setSelectedId(newId);
+    onHealthcareChange?.(newId);
+  }, [onHealthcareChange]);
+
 
   // Daily Tracking owns its own scoped commands. Because this component is only
   // mounted while Daily Tracking is the active route, these commands cannot
@@ -206,6 +273,78 @@ export default function DailyTracking({
       ) return;
       lastVoiceHandledRef.current = { transcript, at: now };
 
+      // Healthcare selector voice commands use the same state path as the manual selector.
+      // Supported selector terms: healthcare, cabang, unit bisnis, business unit, site, node.
+      const healthcareContext =
+        containsVoicePhrase(transcript, 'healthcare') ||
+        containsVoicePhrase(transcript, 'cabang') ||
+        containsVoicePhrase(transcript, 'unit bisnis') ||
+        containsVoicePhrase(transcript, 'business unit') ||
+        containsVoicePhrase(transcript, 'site') ||
+        containsVoicePhrase(transcript, 'node');
+
+      const resetHealthcareIntent = [
+        'semua healthcare',
+        'tampilkan semua healthcare',
+        'munculkan semua healthcare',
+        'seluruh healthcare',
+        'all healthcare',
+        'hapus filter healthcare',
+        'semua cabang',
+        'tampilkan semua cabang',
+        'munculkan semua cabang',
+        'seluruh cabang',
+        'hapus filter cabang',
+        'semua unit bisnis',
+        'tampilkan semua unit bisnis',
+        'munculkan semua unit bisnis',
+        'seluruh unit bisnis',
+        'hapus filter unit bisnis',
+        'semua business unit',
+        'tampilkan semua business unit',
+        'munculkan semua business unit',
+        'semua site',
+        'tampilkan semua site',
+        'munculkan semua site',
+        'seluruh site',
+        'hapus filter site',
+        'semua node',
+        'tampilkan semua node',
+        'munculkan semua node',
+        'reset healthcare',
+        'reset cabang',
+        'reset unit bisnis',
+        'reset site',
+        'reset node',
+      ].some((phrase) => containsVoicePhrase(transcript, phrase));
+
+      if (resetHealthcareIntent) {
+        handleHealthcareSelect('');
+        return;
+      }
+
+      const mentionedHealthcare = findMentionedDailyHealthcare(transcript, healthcareList, true);
+      const chooseHealthcareIntent = healthcareContext && (
+        containsVoicePhrase(transcript, 'pilih') ||
+        containsVoicePhrase(transcript, 'tampilkan') ||
+        containsVoicePhrase(transcript, 'munculkan') ||
+        containsVoicePhrase(transcript, 'buka') ||
+        containsVoicePhrase(transcript, 'ganti') ||
+        containsVoicePhrase(transcript, 'ubah') ||
+        containsVoicePhrase(transcript, 'filter') ||
+        containsVoicePhrase(transcript, 'gunakan') ||
+        containsVoicePhrase(transcript, 'set')
+      );
+
+      if (chooseHealthcareIntent && mentionedHealthcare.length >= 1) {
+        // For normal single-site selection, prefer the first site mentioned.
+        // This also keeps short commands such as "pilih cabang Kedoya" usable
+        // when the healthcare master contains duplicate/alternate records for
+        // the same branch alias.
+        handleHealthcareSelect(mentionedHealthcare[0].id);
+        return;
+      }
+
       const command = resolveVoiceCommand(transcript, DAILY_TRACKING_VOICE_COMMANDS);
       if (!command) return;
 
@@ -245,11 +384,18 @@ export default function DailyTracking({
       }
     };
 
-    window.addEventListener('coa-voice-command', handleVoiceCommand as EventListener);
+    const listener = handleVoiceCommand as EventListener;
+
+    // Capture-phase listener also receives commands dispatched from document-level
+    // sources. Document listener is retained as a compatibility fallback.
+    window.addEventListener('coa-voice-command', listener, true);
+    document.addEventListener('coa-voice-command', listener, true);
+
     return () => {
-      window.removeEventListener('coa-voice-command', handleVoiceCommand as EventListener);
+      window.removeEventListener('coa-voice-command', listener, true);
+      document.removeEventListener('coa-voice-command', listener, true);
     };
-  }, []);
+  }, [healthcareList, handleHealthcareSelect]);
 
   useEffect(() => {
     if (!expandedCard) return;
@@ -794,11 +940,6 @@ export default function DailyTracking({
     demographyYtdActive,
     fetchDemographyFullscreen,
   ]);
-
-  const handleHealthcareSelect = (newId: string) => {
-    setSelectedId(newId);
-    onHealthcareChange?.(newId);
-  };
 
   const isLoaded = Boolean(selectedId);
 

@@ -18,6 +18,22 @@ const SCOPE_META: Record<VoiceCommandScope, { label: string; short: string }> = 
   daily_tracking: { label: 'Daily Tracking', short: 'DAILY ONLY' },
 };
 
+const HEALTHCARE_TERMS = ['Healthcare', 'Cabang', 'Unit Bisnis', 'Site', 'Node'];
+
+const HEALTHCARE_CHOOSE_EXAMPLES = [
+  'Pilih cabang Kedoya',
+  'Tampilkan site Menteng',
+  'Filter cabang Cibubur',
+  'Munculkan unit bisnis Surabaya',
+];
+
+const HEALTHCARE_RESET_EXAMPLES = [
+  'Tampilkan semua cabang',
+  'Munculkan semua unit bisnis',
+  'Semua site',
+  'Reset healthcare',
+];
+
 
 function commandSearchText(command: VoiceCommandDefinition) {
   return [
@@ -216,6 +232,120 @@ export default function VoiceCommandGuide({
               {visibleCommands.length} commands
             </span>
           </div>
+
+          {(companyAuthorized || dailyAuthorized) && (
+            <div
+              className="rounded-xl border p-2.5 sm:p-3"
+              style={{
+                borderColor: 'var(--core-border-strong)',
+                background: 'color-mix(in srgb, var(--core-primary) 5%, var(--core-panel))',
+              }}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div
+                    className="text-[10px] font-black uppercase tracking-[0.14em]"
+                    style={{ color: 'var(--core-primary-strong)' }}
+                  >
+                    Healthcare / Branch Voice Shortcuts
+                  </div>
+                  <div
+                    className="mt-1 text-[9px] leading-relaxed sm:text-[10px]"
+                    style={{ color: 'var(--core-text-secondary)' }}
+                  >
+                    Semua istilah berikut dianggap setara saat memilih unit layanan. Sebutkan aksi + istilah + nama cabang/site.
+                  </div>
+                </div>
+                <span
+                  className="rounded-md border px-2 py-1 text-[7px] font-black uppercase tracking-[0.09em]"
+                  style={{
+                    borderColor: 'var(--core-border)',
+                    background: 'var(--core-control)',
+                    color: 'var(--core-text-muted)',
+                  }}
+                >
+                  Company + Daily
+                </span>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {HEALTHCARE_TERMS.map((term) => (
+                  <span
+                    key={term}
+                    className="rounded-md border px-2 py-1 text-[8px] font-black uppercase"
+                    style={{
+                      borderColor: 'var(--core-border)',
+                      background: 'var(--core-control)',
+                      color: 'var(--core-primary-strong)',
+                    }}
+                  >
+                    {term}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
+                <div>
+                  <div
+                    className="mb-1.5 text-[7px] font-black uppercase tracking-[0.12em]"
+                    style={{ color: 'var(--core-text-muted)' }}
+                  >
+                    Pilih / Filter Unit
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {HEALTHCARE_CHOOSE_EXAMPLES.map((example) => (
+                      <span
+                        key={example}
+                        className="rounded-md border px-1.5 py-1 text-[8px] font-bold sm:text-[9px]"
+                        style={{
+                          borderColor: 'var(--core-border-strong)',
+                          background: 'var(--core-control)',
+                          color: 'var(--core-primary-strong)',
+                        }}
+                      >
+                        “{example}”
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div
+                    className="mb-1.5 text-[7px] font-black uppercase tracking-[0.12em]"
+                    style={{ color: 'var(--core-text-muted)' }}
+                  >
+                    Kembali ke Semua Unit
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {HEALTHCARE_RESET_EXAMPLES.map((example) => (
+                      <span
+                        key={example}
+                        className="rounded-md border px-1.5 py-1 text-[8px] font-bold sm:text-[9px]"
+                        style={{
+                          borderColor: 'var(--core-border)',
+                          background: 'var(--core-control)',
+                          color: 'var(--core-text-secondary)',
+                        }}
+                      >
+                        “{example}”
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="mt-3 rounded-lg border px-3 py-2 text-[8px] leading-relaxed sm:text-[9px]"
+                style={{
+                  borderColor: 'var(--core-border)',
+                  background: 'color-mix(in srgb, var(--core-control) 76%, transparent)',
+                  color: 'var(--core-text-muted)',
+                }}
+              >
+                Kata kerja yang umum: pilih, tampilkan, munculkan, filter, buka, ganti, ubah, gunakan. Untuk menghapus filter gunakan semua / tampilkan semua / munculkan semua / reset.
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
@@ -227,7 +357,7 @@ export default function VoiceCommandGuide({
               No commands match this search.
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {grouped.map((group) => {
                 const meta = SCOPE_META[group.scope];
                 const active = group.scope !== 'general' && group.scope === activeRoute;
@@ -235,13 +365,13 @@ export default function VoiceCommandGuide({
                 return (
                   <section
                     key={group.key}
-                    className="rounded-xl border p-3 sm:p-4"
+                    className="rounded-xl border p-2.5 sm:p-3"
                     style={{
                       borderColor: 'var(--core-border)',
                       background: 'color-mix(in srgb, var(--core-panel) 54%, transparent)',
                     }}
                   >
-                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
                       <h3 className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: 'var(--core-primary-strong)' }}>
                         {group.section}
                       </h3>
@@ -257,19 +387,19 @@ export default function VoiceCommandGuide({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 items-start gap-2 md:grid-cols-2 xl:grid-cols-3">
                       {group.commands.map((command) => (
                         <article
                           key={command.id}
-                          className="self-start rounded-xl border p-3 sm:p-4"
+                          className="self-start rounded-lg border p-2.5 sm:p-3"
                           style={{ borderColor: 'var(--core-border)', background: 'var(--core-panel)' }}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <div className="text-[12px] font-black" style={{ color: 'var(--core-text)' }}>
+                              <div className="text-[11px] font-black sm:text-[12px]" style={{ color: 'var(--core-text)' }}>
                                 {command.label}
                               </div>
-                              <div className="mt-1 text-[10px] leading-relaxed" style={{ color: 'var(--core-text-secondary)' }}>
+                              <div className="mt-1 text-[9px] leading-snug sm:text-[10px]" style={{ color: 'var(--core-text-secondary)' }}>
                                 {command.description}
                               </div>
                             </div>
@@ -282,15 +412,15 @@ export default function VoiceCommandGuide({
                           </div>
 
                           {command.examples.length > 0 && (
-                            <div className="mt-3">
+                            <div className="mt-1.5">
                               <div className="mb-1 text-[7px] font-black uppercase tracking-[0.12em]" style={{ color: 'var(--core-text-muted)' }}>
                                 Say
                               </div>
-                              <div className="flex flex-wrap gap-1.5">
+                              <div className="flex flex-wrap gap-1">
                                 {command.examples.map((example) => (
                                   <span
                                     key={example}
-                                    className="rounded-md border px-2 py-1 text-[9px] font-bold"
+                                    className="rounded-md border px-1.5 py-1 text-[8px] font-bold sm:text-[9px]"
                                     style={{ borderColor: 'var(--core-border-strong)', background: 'var(--core-control)', color: 'var(--core-primary-strong)' }}
                                   >
                                     “{example}”
@@ -301,11 +431,11 @@ export default function VoiceCommandGuide({
                           )}
 
                           {command.aliases.length > 0 && (
-                            <details className="mt-2">
+                            <details className="mt-1.5" open={command.section === 'Healthcare'}>
                               <summary className="cursor-pointer text-[8px] font-black uppercase tracking-[0.10em]" style={{ color: 'var(--core-text-muted)' }}>
                                 Accepted aliases ({command.aliases.length})
                               </summary>
-                              <div className="mt-2 flex flex-wrap gap-1">
+                              <div className="mt-1.5 flex flex-wrap gap-1">
                                 {command.aliases.map((alias) => (
                                   <span
                                     key={alias}
@@ -332,7 +462,7 @@ export default function VoiceCommandGuide({
           className="flex flex-shrink-0 items-center justify-between gap-3 border-t px-4 py-3 text-[9px] sm:px-6"
           style={{ borderColor: 'var(--core-border)', color: 'var(--core-text-muted)' }}
         >
-          <span>Tip: use specific phrases to avoid accidental matches.</span>
+          <span>Tip: untuk cabang/unit bisnis/site, sebutkan aksi + istilah + nama unit. Contoh: “Pilih cabang Kedoya”.</span>
           <button
             type="button"
             onClick={onClose}

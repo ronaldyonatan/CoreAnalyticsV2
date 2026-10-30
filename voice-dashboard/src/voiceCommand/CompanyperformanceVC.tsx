@@ -14,6 +14,7 @@ interface HealthcareItem {
 interface UseVoiceCommandCompanyPerformanceProps {
   healthcareList: HealthcareItem[];
   selectedHealthcareId: string;
+  onHealthcareChange?: (id: string) => void;
   isCompareMode: boolean;
   setIsCompareMode: (compare: boolean) => void;
   setPanel1Mode: (mode: 'BAR' | 'RADIANT') => void;
@@ -133,7 +134,7 @@ function healthcareAliases(name: string) {
   return Array.from(aliases).filter((alias) => alias.length >= 3);
 }
 
-function findMentionedHealthcare(transcript: string, healthcareList: HealthcareItem[]) {
+function findMentionedHealthcare(transcript: string, healthcareList: HealthcareItem[], allowAmbiguous = false) {
   const normalizedTranscript = normalizeVoiceTranscript(transcript);
   const matches: Array<{ id: string; index: number; aliasLength: number }> = [];
 
@@ -153,7 +154,7 @@ function findMentionedHealthcare(transcript: string, healthcareList: HealthcareI
     let bestIndex = -1;
     let bestLength = -1;
     healthcareAliases(healthcare.healthcareName).forEach((alias) => {
-      if ((aliasOwners.get(alias)?.size ?? 0) > 1) return;
+      if (!allowAmbiguous && (aliasOwners.get(alias)?.size ?? 0) > 1) return;
       const index = ` ${normalizedTranscript} `.indexOf(` ${alias} `);
       if (index >= 0 && alias.length > bestLength) {
         bestIndex = index;
@@ -175,6 +176,7 @@ function findMentionedHealthcare(transcript: string, healthcareList: HealthcareI
 export function useVoiceCommandCompanyPerformance({
   healthcareList,
   selectedHealthcareId,
+  onHealthcareChange,
   isCompareMode,
   setIsCompareMode,
   setPanel1Mode,
@@ -189,6 +191,13 @@ export function useVoiceCommandCompanyPerformance({
   const previousLayoutRef = useRef<number[] | null>(null);
 
   useEffect(() => {
+    // Keep voice healthcare selection on the same state path as the manual selector.
+    // This updates both the local Company Performance state and the parent/global selector.
+    const selectPrimaryHealthcare = (id: string) => {
+      setLeftHealthcareId(id);
+      onHealthcareChange?.(id);
+    };
+
     const scrollPnl = (target: { targetKey: string; exactMatch?: string }) => {
       SciFiAudio.playBeep(950, 'sine', 0.08, 0.04);
       window.setTimeout(() => {
@@ -299,6 +308,52 @@ export function useVoiceCommandCompanyPerformance({
         containsVoicePhrase(transcript, 'versus') ||
         containsVoicePhrase(transcript, 'vs');
 
+      // Handle "all" selector commands before the generic resolver.
+      // This guarantees phrases such as "Tampilkan semua cabang" reset
+      // both the local selector and the parent/global healthcare selection.
+      const resetHealthcareIntent = [
+        'semua healthcare',
+        'tampilkan semua healthcare',
+        'munculkan semua healthcare',
+        'seluruh healthcare',
+        'all healthcare',
+        'hapus filter healthcare',
+        'semua cabang',
+        'tampilkan semua cabang',
+        'munculkan semua cabang',
+        'seluruh cabang',
+        'hapus filter cabang',
+        'semua unit bisnis',
+        'tampilkan semua unit bisnis',
+        'munculkan semua unit bisnis',
+        'seluruh unit bisnis',
+        'hapus filter unit bisnis',
+        'semua business unit',
+        'tampilkan semua business unit',
+        'munculkan semua business unit',
+        'semua site',
+        'tampilkan semua site',
+        'munculkan semua site',
+        'seluruh site',
+        'hapus filter site',
+        'semua node',
+        'tampilkan semua node',
+        'munculkan semua node',
+        'reset healthcare',
+        'reset cabang',
+        'reset unit bisnis',
+        'reset site',
+        'reset node',
+      ].some((phrase) => containsVoicePhrase(transcript, phrase));
+
+      if (resetHealthcareIntent) {
+        selectPrimaryHealthcare('');
+        setRightHealthcareId('');
+        if (isCompareMode) setIsCompareMode(false);
+        SciFiAudio.playBeep(500, 'sine', 0.1, 0.05);
+        return;
+      }
+
       // Compare Detail P&L must run before the generic P&L command resolver.
       // This keeps phrases such as:
       // "Bandingkan detail PNL Menteng dan Kedoya"
@@ -359,7 +414,7 @@ export function useVoiceCommandCompanyPerformance({
             SciFiAudio.playBeep(400, 'square', 0.1, 0.05);
             return;
           case 'cp_all_healthcare':
-            setLeftHealthcareId('');
+            selectPrimaryHealthcare('');
             setRightHealthcareId('');
             if (isCompareMode) setIsCompareMode(false);
             SciFiAudio.playBeep(500, 'sine', 0.1, 0.05);
@@ -409,6 +464,9 @@ export function useVoiceCommandCompanyPerformance({
       const healthcareContext =
         containsVoicePhrase(transcript, 'healthcare') ||
         containsVoicePhrase(transcript, 'cabang') ||
+        containsVoicePhrase(transcript, 'unit bisnis') ||
+        containsVoicePhrase(transcript, 'business unit') ||
+        containsVoicePhrase(transcript, 'site') ||
         containsVoicePhrase(transcript, 'node');
       const compareIntent =
         hasCompareWord &&
@@ -416,9 +474,13 @@ export function useVoiceCommandCompanyPerformance({
       const chooseIntent = healthcareContext && (
         containsVoicePhrase(transcript, 'pilih') ||
         containsVoicePhrase(transcript, 'tampilkan') ||
+        containsVoicePhrase(transcript, 'munculkan') ||
         containsVoicePhrase(transcript, 'buka') ||
         containsVoicePhrase(transcript, 'ganti') ||
-        containsVoicePhrase(transcript, 'ubah')
+        containsVoicePhrase(transcript, 'ubah') ||
+        containsVoicePhrase(transcript, 'filter') ||
+        containsVoicePhrase(transcript, 'gunakan') ||
+        containsVoicePhrase(transcript, 'set')
       );
 
       if (compareIntent && mentionedSites.length >= 2) {
@@ -437,20 +499,34 @@ export function useVoiceCommandCompanyPerformance({
         return;
       }
 
-      if (mentionedSites.length === 1 && chooseIntent) {
-        const targetId = mentionedSites[0].id;
+      const selectionSites = chooseIntent
+        ? findMentionedHealthcare(transcript, healthcareList, true)
+        : [];
+
+      if (selectionSites.length >= 1 && chooseIntent) {
+        const targetId = selectionSites[0].id;
         const rightIntent = containsVoicePhrase(transcript, 'kanan');
         if (isCompareMode && rightIntent) setRightHealthcareId(targetId);
-        else setLeftHealthcareId(targetId);
+        else selectPrimaryHealthcare(targetId);
         SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
       }
     };
 
-    window.addEventListener('coa-voice-command', handleVoiceCommand as EventListener);
-    return () => window.removeEventListener('coa-voice-command', handleVoiceCommand as EventListener);
+    const listener = handleVoiceCommand as EventListener;
+
+    // Capture-phase listener also receives commands dispatched from document-level
+    // sources. Document listener is retained as a compatibility fallback.
+    window.addEventListener('coa-voice-command', listener, true);
+    document.addEventListener('coa-voice-command', listener, true);
+
+    return () => {
+      window.removeEventListener('coa-voice-command', listener, true);
+      document.removeEventListener('coa-voice-command', listener, true);
+    };
   }, [
     healthcareList,
     selectedHealthcareId,
+    onHealthcareChange,
     isCompareMode,
     leftHealthcareId,
     setIsCompareMode,

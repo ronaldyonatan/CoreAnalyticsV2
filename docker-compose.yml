@@ -2,11 +2,11 @@ services:
 
   # ==========================================
   # Voice Authentication Backend
+  # CPU-only AMD64 image
   # ==========================================
   voice-auth:
-    build:
-      context: ./voice-auth-backend
-      dockerfile: Dockerfile
+    image: coreanalyticsv2-voice-auth:amd64-cpu
+    platform: linux/amd64
 
     container_name: coreanalytics-voice-auth
 
@@ -35,6 +35,8 @@ services:
     build:
       context: ./voice-dashboard
       dockerfile: Dockerfile
+
+      
 
     container_name: coreanalytics-dashboard
 

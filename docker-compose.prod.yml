@@ -1,0 +1,55 @@
+services:
+
+  # ==========================================
+  # Voice Authentication Backend - PROD
+  # ==========================================
+  voice-auth:
+    image: container-registry-1-registry.ap-southeast-5.cr.aliyuncs.com/poc-acs/coreanalytics/voice-auth:v1.0.1
+    platform: linux/amd64
+
+    container_name: coreanalytics-voice-auth
+    restart: unless-stopped
+
+    env_file:
+      - ./voice-auth-backend/.env
+
+    environment:
+      VOICE_STORAGE_ROOT: /app/voice-profiles
+
+    volumes:
+      - voice_profiles:/app/voice-profiles
+
+    expose:
+      - "5001"
+
+    networks:
+      - coreanalytics
+
+
+  # ==========================================
+  # CoreAnalytics Dashboard - PROD
+  # ==========================================
+  voice-dashboard:
+    image: container-registry-1-registry.ap-southeast-5.cr.aliyuncs.com/poc-acs/coreanalytics/voice-dashboard:v1.0.1
+    platform: linux/amd64
+
+    container_name: coreanalytics-dashboard
+    restart: unless-stopped
+
+    depends_on:
+      - voice-auth
+
+    ports:
+      - "18080:80"
+
+    networks:
+      - coreanalytics
+
+
+volumes:
+  voice_profiles:
+
+
+networks:
+  coreanalytics:
+    driver: bridge

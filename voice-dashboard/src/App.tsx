@@ -15,6 +15,7 @@ import {
   GLOBAL_VOICE_COMMANDS,
   COMPANY_PERFORMANCE_VOICE_COMMANDS,
   DAILY_TRACKING_VOICE_COMMANDS,
+  containsVoicePhrase,
   normalizeVoiceTranscript,
   resolveVoiceCommand,
 } from './voiceCommand/voiceCommandRegistry';
@@ -37,6 +38,65 @@ import GroupManagement from './management/GroupManagement';
 interface HealthcareItem {
   healthcareID: string;
   healthcareName: string;
+}
+
+function voiceHealthcareAliases(name: string) {
+  const normalized = normalizeVoiceTranscript(name.replace(/@/g, ' '));
+  const pieces = normalized.split(' ').filter(Boolean);
+  const generic = new Set(['rs', 'mata', 'jec', 'eye', 'center', 'rumah', 'sakit']);
+  const meaningful = pieces.filter((piece) => !generic.has(piece));
+
+  const aliases = new Set<string>([normalized]);
+  if (meaningful.length) aliases.add(meaningful.join(' '));
+  if (meaningful.length) aliases.add(meaningful[meaningful.length - 1]);
+  return Array.from(aliases).filter((alias) => alias.length >= 3);
+}
+
+function findVoiceHealthcare(
+  transcript: string,
+  healthcareList: HealthcareItem[]
+) {
+  const normalizedTranscript = normalizeVoiceTranscript(transcript);
+  const aliasOwners = new Map<string, Set<string>>();
+
+  healthcareList.forEach((healthcare) => {
+    voiceHealthcareAliases(healthcare.healthcareName).forEach((alias) => {
+      const owners = aliasOwners.get(alias) ?? new Set<string>();
+      owners.add(healthcare.healthcareID);
+      aliasOwners.set(alias, owners);
+    });
+  });
+
+  const matches: Array<{ id: string; index: number; aliasLength: number }> = [];
+  healthcareList.forEach((healthcare) => {
+    let bestIndex = -1;
+    let bestLength = -1;
+
+    voiceHealthcareAliases(healthcare.healthcareName).forEach((alias) => {
+      if ((aliasOwners.get(alias)?.size ?? 0) > 1) return;
+      const index = ` ${normalizedTranscript} `.indexOf(` ${alias} `);
+      if (index >= 0 && alias.length > bestLength) {
+        bestIndex = index;
+        bestLength = alias.length;
+      }
+    });
+
+    if (bestIndex >= 0) {
+      matches.push({
+        id: healthcare.healthcareID,
+        index: bestIndex,
+        aliasLength: bestLength,
+      });
+    }
+  });
+
+  const byId = new Map<string, { id: string; index: number; aliasLength: number }>();
+  matches.forEach((match) => {
+    const current = byId.get(match.id);
+    if (!current || match.aliasLength > current.aliasLength) byId.set(match.id, match);
+  });
+
+  return Array.from(byId.values()).sort((a, b) => a.index - b.index);
 }
 
 interface MenuItem {
@@ -662,6 +722,60 @@ function AppContent() {
         now - lastGlobalVoiceCommandRef.current.at < 1100
       ) return;
 
+      // Healthcare selection is application-level state, so handle it here before
+      // scoped dashboard resolution. App owns selectedHealthcareId; processing it
+      // here makes Company Performance and Daily Tracking follow the same state path
+      // as manual healthcare selection, without relying on dashboard-local listeners.
+      const healthcareDashboardActive =
+        effectiveRoute === 'company_performance' || effectiveRoute === 'daily_tracking';
+
+      if (healthcareDashboardActive) {
+        const healthcareContext =
+          containsVoicePhrase(transcript, 'healthcare') ||
+          containsVoicePhrase(transcript, 'cabang') ||
+          containsVoicePhrase(transcript, 'unit bisnis') ||
+          containsVoicePhrase(transcript, 'business unit') ||
+          containsVoicePhrase(transcript, 'site') ||
+          containsVoicePhrase(transcript, 'node');
+
+        if (healthcareContext) {
+          const resetHealthcareIntent =
+            containsVoicePhrase(transcript, 'semua') ||
+            containsVoicePhrase(transcript, 'seluruh') ||
+            containsVoicePhrase(transcript, 'all') ||
+            containsVoicePhrase(transcript, 'reset') ||
+            containsVoicePhrase(transcript, 'hapus filter');
+
+          if (resetHealthcareIntent) {
+            lastGlobalVoiceCommandRef.current = { transcript, at: now };
+            setSelectedHealthcareId('');
+            SciFiAudio.playBeep(500, 'sine', 0.1, 0.05);
+            return;
+          }
+
+          const chooseHealthcareIntent =
+            containsVoicePhrase(transcript, 'pilih') ||
+            containsVoicePhrase(transcript, 'tampilkan') ||
+            containsVoicePhrase(transcript, 'munculkan') ||
+            containsVoicePhrase(transcript, 'buka') ||
+            containsVoicePhrase(transcript, 'ganti') ||
+            containsVoicePhrase(transcript, 'ubah') ||
+            containsVoicePhrase(transcript, 'filter') ||
+            containsVoicePhrase(transcript, 'gunakan') ||
+            containsVoicePhrase(transcript, 'set');
+
+          if (chooseHealthcareIntent) {
+            const mentionedHealthcare = findVoiceHealthcare(transcript, healthcareList);
+            if (mentionedHealthcare.length === 1) {
+              lastGlobalVoiceCommandRef.current = { transcript, at: now };
+              setSelectedHealthcareId(mentionedHealthcare[0].id);
+              SciFiAudio.playBeep(650, 'square', 0.1, 0.05);
+              return;
+            }
+          }
+        }
+      }
+
       // Active dashboard commands take precedence over global navigation/settings.
       // This prevents one sentence from executing both a dashboard action and a
       // global action when phrases happen to overlap.
@@ -713,7 +827,7 @@ function AppContent() {
 
     window.addEventListener('coa-voice-command', handleGlobalVoiceCommand as EventListener);
     return () => window.removeEventListener('coa-voice-command', handleGlobalVoiceCommand as EventListener);
-  }, [canAccess, navigateTo]);
+  }, [canAccess, navigateTo, effectiveRoute, healthcareList]);
 
   useEffect(() => {
     if (isMobileView && !isSidebarPinned) {

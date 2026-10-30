@@ -1,8 +1,6 @@
 flask
 flask-cors
-torch
-torchaudio
-speechbrain
+speechbrain==1.1.2
 requests>=2.32
 python-dotenv>=1.0
 numpy>=1.26

@@ -20,6 +20,11 @@ RUN apt-get update && apt-get install -y \
 # supaya Docker layer bisa di-cache
 COPY requirements.txt .
 
+RUN pip install --no-cache-dir \
+    torch==2.15.0+cpu \
+    torchaudio==2.11.1+cpu \
+    --index-url https://download.pytorch.org/whl/cpu
+
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
