@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
+import { DashboardExpandButton } from '../design-system';
 
 interface DailyDataModel {
   day: number;
@@ -639,19 +640,11 @@ export default function WeeklyRevenueChart({
     <div className="daily-themed-card bg-[#000a17]/80 border border-[#00cfff]/40 rounded-xl p-3 flex flex-col backdrop-blur-sm relative group h-full min-h-0 overflow-hidden shadow-[inset_0_0_22px_rgba(0,191,255,0.045),0_0_14px_rgba(0,191,255,0.06)]">
       {/* Expand / restore button: preserves the existing onExpand contract */}
       <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onExpand('weekly-revenue');
-          }}
-          className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-300"
-          title="Maximize / restore chart"
-          aria-label="Maximize or restore Weekly Revenue chart"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-          </svg>
-        </button>
+        <DashboardExpandButton
+          size="sm"
+          onClick={() => onExpand('weekly-revenue')}
+          label="Expand Weekly Revenue chart"
+        />
       </div>
 
       {/* Header */}

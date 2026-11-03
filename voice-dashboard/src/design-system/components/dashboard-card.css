@@ -1,0 +1,11 @@
+/* =========================================================
+   COREANALYTICS DESIGN SYSTEM — CARD PRIMITIVE
+   Foundation only in Phase 1. Existing dashboard cards are
+   NOT migrated yet, so current transparency remains unchanged.
+   ========================================================= */
+
+.ds-dashboard-card {
+  color: var(--ds-text);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-card);
+}

@@ -3545,109 +3545,177 @@ body {
   -webkit-backdrop-filter: blur(7px) saturate(1.05) !important;
 }
 
-/* =========================================================
-   v39.1 — DAILY TRACKING MAXIMIZE ALWAYS 100% VISIBLE
-   Final override. Keep the compact 28px control, but remove
-   the v39.0 50% resting opacity on every Daily Tracking card.
-   ========================================================= */
-.daily-themed-card button[title="View Full Screen"],
-.daily-themed-card button[aria-label="View Full Screen"],
-.daily-themed-card button[title*="Full Screen"] {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
 
-.daily-themed-card button[title="View Full Screen"] svg,
-.daily-themed-card button[aria-label="View Full Screen"] svg,
-.daily-themed-card button[title*="Full Screen"] svg {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Some widgets wrap the expand control in an opacity utility container. */
-.daily-themed-card .group-hover\:opacity-100:has(button[title="View Full Screen"]),
-.daily-themed-card .group-hover\:opacity-100:has(button[aria-label="View Full Screen"]),
-.daily-themed-card .group-hover\:opacity-100:has(button[title*="Full Screen"]) {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
 
 /* =========================================================
-   v39.2 — COMPANY PERFORMANCE MAXIMIZE TRANSPARENT FIX
-   Scope: Company Performance only.
-   - Keep maximize control compact and aligned.
-   - Remove opaque/white button box in Solaris/Quartz.
-   - Do not alter Daily Tracking.
+   DESIGN SYSTEM — THEME CONSUMER TOKENS
+   Components consume these semantic values; active themes continue
+   to own the underlying --core-* palette through [data-theme].
+   ========================================================= */
+:root {
+  --ui-surface: var(--core-surface);
+  --ui-surface-strong: var(--core-surface-strong);
+  --ui-panel: var(--core-panel);
+  --ui-control: var(--core-control);
+  --ui-control-hover: var(--core-control-hover);
+  --ui-text: var(--core-text);
+  --ui-text-secondary: var(--core-text-secondary);
+  --ui-text-muted: var(--core-text-muted);
+  --ui-primary: var(--core-primary);
+  --ui-primary-strong: var(--core-primary-strong);
+  --ui-border: var(--core-border);
+  --ui-border-strong: var(--core-border-strong);
+  --ui-glow: var(--core-glow);
+
+  --login-top-surface: color-mix(in srgb, var(--ui-control) 76%, transparent);
+  --login-top-border: var(--ui-border);
+  --login-top-shadow: 0 8px 22px color-mix(in srgb, var(--ui-primary) 10%, transparent);
+  --login-top-text: var(--ui-text);
+  --login-top-muted: var(--ui-text-muted);
+  --login-top-control: color-mix(in srgb, var(--ui-control) 86%, transparent);
+  --login-top-control-hover: var(--ui-control-hover);
+  --login-status-online: var(--core-success-text);
+  --login-status-dot: #34d399;
+}
+
+/* Login Portal top controls: no theme names and no light/dark branching. */
+.ds-login-top-control {
+  background: var(--login-top-surface);
+  border-color: var(--login-top-border);
+  color: var(--login-top-text);
+  box-shadow: var(--login-top-shadow);
+  -webkit-backdrop-filter: blur(14px) saturate(112%);
+  backdrop-filter: blur(14px) saturate(112%);
+}
+
+.ds-login-top-label {
+  color: var(--login-top-muted);
+  text-shadow: none;
+}
+
+.ds-login-status-online {
+  color: var(--login-status-online);
+}
+
+.ds-login-status-dot {
+  background: var(--login-status-dot);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--login-status-dot) 72%, transparent);
+}
+
+/* ThemeSwitcher: all visual values come from semantic tokens. */
+.ds-theme-trigger {
+  background: var(--login-top-control);
+  border-color: var(--login-top-border);
+  color: var(--ui-primary-strong);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ui-text) 10%, transparent);
+}
+
+.ds-theme-trigger:hover {
+  background: var(--login-top-control-hover);
+  border-color: var(--ui-border-strong);
+  color: var(--ui-text);
+}
+
+.ds-theme-menu {
+  background: var(--ui-surface-strong);
+  border-color: var(--ui-border);
+  color: var(--ui-text);
+  box-shadow: 0 18px 42px color-mix(in srgb, #000 28%, transparent), 0 0 20px var(--ui-glow);
+}
+
+.ds-theme-menu-heading {
+  border-color: var(--ui-border);
+  color: var(--ui-text-secondary);
+}
+
+.ds-theme-menu-section {
+  border-color: var(--ui-border);
+  color: var(--ui-text-muted);
+}
+
+.ds-theme-menu-row {
+  background: transparent;
+  color: var(--ui-text);
+}
+
+.ds-theme-menu-row:hover {
+  background: var(--ui-control-hover);
+}
+
+.ds-theme-menu-row--active {
+  background: color-mix(in srgb, var(--ui-primary) 12%, transparent);
+  color: var(--ui-primary-strong);
+}
+
+.ds-theme-menu-description {
+  color: var(--ui-text-secondary);
+}
+
+/* Static performance themes intentionally avoid expensive backdrop blur. */
+[data-performance="static"] .ds-login-top-control,
+[data-performance="static"] .ds-theme-menu {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* =========================================================
+   PHASE 2B SAFE — LOGIN TOP HUD SEMANTIC OVERRIDE
+   Scope: Login Portal top-right HUD only.
+   No Login Portal skin, gateway, orb, or legacy JEC rules are migrated here.
    ========================================================= */
 
-.company-theme-root .company-icon-button[title*="Full Screen"],
-.company-theme-root button.company-icon-button[title*="Full Screen"],
-.company-theme-root .company-icon-button[aria-label*="Full Screen"],
-.company-theme-root button.company-icon-button[aria-label*="Full Screen"] {
-  width: 28px !important;
-  min-width: 28px !important;
-  height: 28px !important;
-  min-height: 28px !important;
-  padding: 0 !important;
-  border-radius: 7px !important;
+/* Separate outer HUD surface from the actual theme trigger button. */
+:root {
+  --login-top-control-border: var(--ui-border);
+  --login-top-control-shadow: inset 0 1px 0 color-mix(in srgb, var(--ui-text) 10%, transparent);
+}
 
-  background: transparent !important;
+/* Bright immersive themes use a frameless outer HUD.
+   This is theme configuration, not component hardcoding. */
+[data-theme="solaris"],
+[data-theme="jec-skywave"] {
+  --login-top-surface: transparent;
+  --login-top-border: transparent;
+  --login-top-shadow: none;
+
+  /* The small clickable theme trigger remains visible. */
+  --login-top-control: color-mix(in srgb, var(--core-control) 82%, transparent);
+  --login-top-control-hover: var(--core-control-hover);
+  --login-top-control-border: var(--core-border);
+}
+
+/* Generic consumer rule with enough specificity to win over legacy
+   Login Portal theme selectors that are loaded after theme.css. */
+html[data-theme] body .login-top-hud .ds-login-top-control {
+  background: var(--login-top-surface) !important;
   background-color: transparent !important;
-  box-shadow: none !important;
-
-  color: var(--company-primary, var(--core-primary)) !important;
-  border: 1px solid color-mix(
-    in srgb,
-    var(--company-primary, var(--core-primary)) 28%,
-    transparent
-  ) !important;
-
-  opacity: 1 !important;
-  visibility: visible !important;
+  border-color: var(--login-top-border) !important;
+  color: var(--login-top-text) !important;
+  box-shadow: var(--login-top-shadow) !important;
 }
 
-.company-theme-root .company-icon-button[title*="Full Screen"] svg,
-.company-theme-root button.company-icon-button[title*="Full Screen"] svg,
-.company-theme-root .company-icon-button[aria-label*="Full Screen"] svg,
-.company-theme-root button.company-icon-button[aria-label*="Full Screen"] svg {
-  width: 14px !important;
-  height: 14px !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  stroke: currentColor !important;
+html[data-theme] body .login-top-hud .ds-login-top-label {
+  color: var(--login-top-muted) !important;
 }
 
-/* Solaris / Quartz previously receive an opaque background from
-   the generic .company-icon-button rule. Override only maximize. */
-:is([data-theme="solaris"], [data-theme="quartz"])
-.company-theme-root .company-icon-button[title*="Full Screen"],
-:is([data-theme="solaris"], [data-theme="quartz"])
-.company-theme-root button.company-icon-button[title*="Full Screen"],
-:is([data-theme="solaris"], [data-theme="quartz"])
-.company-theme-root .company-icon-button[aria-label*="Full Screen"],
-:is([data-theme="solaris"], [data-theme="quartz"])
-.company-theme-root button.company-icon-button[aria-label*="Full Screen"] {
-  background: rgba(255,255,255,0) !important;
-  background-color: rgba(255,255,255,0) !important;
-  border-color: rgba(0,143,196,.24) !important;
-  color: #087ea8 !important;
-  box-shadow: none !important;
+html[data-theme] body .login-top-hud .ds-theme-trigger {
+  background: var(--login-top-control) !important;
+  border-color: var(--login-top-control-border) !important;
+  color: var(--ui-primary-strong) !important;
+  box-shadow: var(--login-top-control-shadow) !important;
 }
 
-/* Hover gets only a very light glass cue, not an opaque white tile. */
-.company-theme-root .company-icon-button[title*="Full Screen"]:hover,
-.company-theme-root button.company-icon-button[title*="Full Screen"]:hover,
-.company-theme-root .company-icon-button[aria-label*="Full Screen"]:hover,
-.company-theme-root button.company-icon-button[aria-label*="Full Screen"]:hover {
-  background: color-mix(
-    in srgb,
-    var(--company-primary, var(--core-primary)) 10%,
-    transparent
-  ) !important;
-  box-shadow: 0 0 10px color-mix(
-    in srgb,
-    var(--company-primary, var(--core-primary)) 12%,
-    transparent
-  ) !important;
+html[data-theme] body .login-top-hud .ds-theme-trigger:hover {
+  background: var(--login-top-control-hover) !important;
+  border-color: var(--ui-border-strong) !important;
+  color: var(--ui-text) !important;
 }
 
+html[data-theme] body .login-top-hud .ds-login-status-online {
+  color: var(--login-status-online) !important;
+}
+
+html[data-theme] body .login-top-hud .ds-login-status-dot {
+  background: var(--login-status-dot) !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--login-status-dot) 72%, transparent) !important;
+}

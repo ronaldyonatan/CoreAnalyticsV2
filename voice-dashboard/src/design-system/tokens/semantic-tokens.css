@@ -1,0 +1,50 @@
+/* =========================================================
+   COREANALYTICS DESIGN SYSTEM — SEMANTIC TOKENS
+   Map shared components to the existing CoreAnalytics theme
+   variables. No page-specific selector belongs here.
+   ========================================================= */
+
+:root {
+  --ds-text: var(--core-text, #e6fbff);
+  --ds-text-secondary: var(--core-text-secondary, #94a3b8);
+  --ds-text-muted: var(--core-text-muted, #64748b);
+
+  --ds-primary: var(--core-primary, #00f2fe);
+  --ds-primary-soft: var(--core-primary-soft, #67e8f9);
+  --ds-primary-strong: var(--core-primary-strong, #00bfff);
+
+  --ds-surface: var(--core-surface, rgba(0, 8, 20, .24));
+  --ds-surface-strong: var(--core-surface-strong, rgba(0, 12, 27, .78));
+  --ds-panel: var(--core-panel, rgba(0, 8, 20, .34));
+  --ds-control: var(--core-control, rgba(0, 20, 40, .44));
+  --ds-control-hover: var(--core-control-hover, rgba(0, 242, 254, .14));
+
+  --ds-border: var(--core-border, rgba(0, 242, 254, .30));
+  --ds-border-strong: var(--core-border-strong, rgba(0, 242, 254, .60));
+  --ds-glow: var(--core-glow, rgba(0, 242, 254, .22));
+
+  --ds-expand-fg: var(--ds-primary-soft);
+  --ds-expand-border: var(--ds-border);
+  --ds-expand-hover-fg: var(--ds-text);
+  --ds-expand-hover-bg: color-mix(in srgb, var(--ds-primary) 10%, transparent);
+
+  --ds-restore-fg: #eaf8ff;
+  --ds-restore-bg: rgba(4, 25, 40, .82);
+  --ds-restore-border: rgba(188, 231, 249, .48);
+  --ds-restore-hover-bg: rgba(10, 57, 84, .92);
+}
+
+/* Bright themes use a dark blue control glyph on light surfaces. */
+html[data-appearance="light"] {
+  --ds-expand-fg: var(--core-primary-strong, #014e78);
+  --ds-expand-border: color-mix(in srgb, var(--core-primary-strong, #014e78) 22%, transparent);
+  --ds-expand-hover-fg: var(--core-primary-strong, #014e78);
+  --ds-expand-hover-bg: color-mix(in srgb, var(--core-primary, #2587c8) 10%, transparent);
+}
+
+/* Dark themes keep the luminous control language. */
+html[data-appearance="dark"] {
+  --ds-expand-fg: var(--core-primary-soft, #67e8f9);
+  --ds-expand-border: var(--core-border, rgba(0, 242, 254, .30));
+  --ds-expand-hover-fg: var(--core-text, #e6fbff);
+}

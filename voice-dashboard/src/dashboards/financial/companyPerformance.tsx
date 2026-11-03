@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { DashboardExpandButton, DashboardRestoreButton } from '../../design-system';
 
 // Import komponen panel
 import Panel1Revenue from '../../components/Panel1Revenue';
@@ -299,24 +300,13 @@ const HealthcareDashboardView = ({
 
     return (
       <div key={`panel-wrapper-${id}`} className="company-panel-frame relative w-full h-full rounded-lg p-0 overflow-hidden flex flex-col">
-        <button
+        <DashboardExpandButton
+          size="md"
           onClick={handleOpenPreview}
-          title="Preview fullscreen"
-          aria-label="Preview fullscreen"
-          className="company-panel-size-button absolute top-2 right-2 z-[60] flex h-8 w-8 items-center justify-center rounded-md text-cyan-500 transition-all cursor-pointer hover:text-cyan-300"
-          style={{
-            background: 'transparent',
-            backgroundColor: 'transparent',
-            border: '1px solid rgba(34, 211, 238, 0.28)',
-            boxShadow: 'none',
-            opacity: 0.72,
-            backdropFilter: 'none',
-            WebkitBackdropFilter: 'none',
-          }}
-        >
-          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
-        </button>
-        {renderPanelContent(id, false)}
+          label="Expand Company Performance panel"
+          className="absolute top-2 right-2 z-[60]"
+        />
+{renderPanelContent(id, false)}
       </div>
     );
   };
@@ -362,19 +352,14 @@ const HealthcareDashboardView = ({
   const fullscreenPortal = expandedPanel !== null && typeof document !== 'undefined'
     ? createPortal(
         <div className="company-preview-fullscreen fixed inset-0 z-[10000] isolate flex h-[100dvh] w-screen flex-col overflow-hidden bg-[#020916]">
-          <button
-            type="button"
+          <DashboardRestoreButton
+            size="lg"
             onClick={closeExpandedPanel}
-            className="company-preview-restore fixed right-3 top-3 z-[10050] flex h-9 w-9 items-center justify-center rounded-lg border border-sky-200/35 bg-[#061d2b]/88 text-white shadow-[0_10px_26px_rgba(0,0,0,.32)] backdrop-blur-xl transition hover:bg-[#0b3b55]"
-            title="Restore display"
-            aria-label="Restore display"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
-            </svg>
-          </button>
+            label="Restore display"
+            className="fixed right-3 top-3 z-[10050]"
+          />
 
-          <div className="company-preview-fullscreen-body min-h-0 flex-1 overflow-hidden">
+<div className="company-preview-fullscreen-body min-h-0 flex-1 overflow-hidden">
             {expandedPanel === 5 ? (
               <PanelDetailPNL
                 pnlData={exsumPnL}

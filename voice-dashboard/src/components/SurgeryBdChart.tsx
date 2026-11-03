@@ -11,6 +11,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
+import { DashboardExpandButton } from '../design-system';
 
 interface SurgeryBdItem {
   Sentra?: string;
@@ -1487,37 +1488,11 @@ export default function SurgeryBdChart({
 
       <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
 
-        <button
-          onClick={(
-            e
-          ) => {
-            e.stopPropagation();
-
-            onExpand(
-              'surgery-bd'
-            );
-          }}
-          className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white"
-          title="View Full Screen"
-        >
-
-          <svg
-            className="w-3.5 h-3.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-            />
-
-          </svg>
-
-        </button>
+        <DashboardExpandButton
+          size="sm"
+          onClick={() => onExpand('surgery-bd')}
+          label="Expand Surgery BD chart"
+        />
 
       </div>
 

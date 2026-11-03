@@ -5,6 +5,7 @@ import SurgeryBdChart from './SurgeryBdChart';
 import PerChannelVisitsChart from './PerChannelVisitsChart';
 import PerChannelSurgeryChart from './PerChannelSurgeryChart';
 import PerChannelRevenueChart from './PerChannelRevenueChart';
+import { DashboardExpandButton } from '../design-system';
 
 interface DailyLowerWidgetsProps {
   isLoaded: boolean;
@@ -28,73 +29,86 @@ export default function DailyLowerWidgets({
   onExpand,
 }: DailyLowerWidgetsProps) {
   const ExpandButton = ({ cardKey }: { cardKey: string }) => (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onExpand(cardKey);
-      }}
-      className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white"
-      title="View Full Screen"
-    >
-      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-      </svg>
-    </button>
+    <DashboardExpandButton
+      size="sm"
+      onClick={() => onExpand(cardKey)}
+      label={`Expand ${cardKey.replace(/-/g, ' ')} chart`}
+    />
   );
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
         {/* UTILIZATION & PRODUCTIVITY - COMING SOON */}
-        <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3 flex flex-col justify-between space-y-2 backdrop-blur-sm relative group overflow-hidden">
+        <div className="daily-themed-card border rounded-xl p-3 flex flex-col justify-between space-y-2 backdrop-blur-sm relative group overflow-hidden"
+          style={{
+            background: 'var(--core-panel)',
+            borderColor: 'var(--core-border)',
+            color: 'var(--core-text)',
+          }}>
           <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
             <ExpandButton cardKey="utilization" />
           </div>
 
           <div className="relative z-10 grid grid-cols-2 gap-2 text-center pt-5">
-            <div className="daily-themed-inset bg-[#001428]/90 p-2 rounded-lg border border-[#2587C8]/30 shadow-inner">
-              <div className="text-[9px] text-cyan-400/80 mb-1">Utilization</div>
-              <div className="grid grid-cols-2 text-[9px] font-bold border-b border-[#2587C8]/30 pb-1 mb-1">
+            <div className="daily-themed-inset p-2 rounded-lg border shadow-inner"
+              style={{
+                background: 'var(--core-control)',
+                borderColor: 'var(--core-border)',
+                color: 'var(--core-text)',
+              }}>
+              <div className="text-[9px] mb-1" style={{ color: 'var(--core-primary-strong)' }}>Utilization</div>
+              <div className="grid grid-cols-2 text-[9px] font-bold border-b pb-1 mb-1" style={{ borderColor: 'var(--core-border)' }}>
                 <span>Poli</span><span>OT</span>
               </div>
               <div className="grid grid-cols-2 text-[10px]">
-                <div><span className="text-[8px] text-cyan-400 block">A</span>{isLoaded ? '34.3%' : '0%'}</div>
-                <div><span className="text-[8px] text-cyan-400 block">A</span>{isLoaded ? '18.8%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>A</span>{isLoaded ? '34.3%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>A</span>{isLoaded ? '18.8%' : '0%'}</div>
               </div>
               <div className="grid grid-cols-2 text-[10px] text-rose-400 mt-1">
-                <div><span className="text-[8px] text-cyan-400 block">T</span>{isLoaded ? '55.2%' : '0%'}</div>
-                <div><span className="text-[8px] text-cyan-400 block">T</span>{isLoaded ? '20.2%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>T</span>{isLoaded ? '55.2%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>T</span>{isLoaded ? '20.2%' : '0%'}</div>
               </div>
             </div>
 
-            <div className="daily-themed-inset bg-[#001428]/90 p-2 rounded-lg border border-[#2587C8]/30 shadow-inner">
-              <div className="text-[9px] text-cyan-400/80 mb-1">Conversion</div>
-              <div className="grid grid-cols-2 text-[9px] font-bold border-b border-[#2587C8]/30 pb-1 mb-1">
+            <div className="daily-themed-inset p-2 rounded-lg border shadow-inner"
+              style={{
+                background: 'var(--core-control)',
+                borderColor: 'var(--core-border)',
+                color: 'var(--core-text)',
+              }}>
+              <div className="text-[9px] mb-1" style={{ color: 'var(--core-primary-strong)' }}>Conversion</div>
+              <div className="grid grid-cols-2 text-[9px] font-bold border-b pb-1 mb-1" style={{ borderColor: 'var(--core-border)' }}>
                 <span>Incl PO</span><span>excl PO*</span>
               </div>
               <div className="grid grid-cols-2 text-[10px]">
-                <div><span className="text-[8px] text-cyan-400 block">A</span>{isLoaded ? '5.6%' : '0%'}</div>
-                <div><span className="text-[8px] text-cyan-400 block">A</span>{isLoaded ? '7%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>A</span>{isLoaded ? '5.6%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>A</span>{isLoaded ? '7%' : '0%'}</div>
               </div>
               <div className="grid grid-cols-2 text-[10px] text-[#4ade80] mt-1">
-                <div><span className="text-[8px] text-cyan-400 block">T</span>{isLoaded ? '6.3%' : '0%'}</div>
-                <div><span className="text-[8px] text-cyan-400 block">T</span>{isLoaded ? '8.4%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>T</span>{isLoaded ? '6.3%' : '0%'}</div>
+                <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>T</span>{isLoaded ? '8.4%' : '0%'}</div>
               </div>
             </div>
           </div>
 
-          <div className="daily-themed-inset relative z-10 bg-[#001428]/90 p-2 rounded-lg border border-[#2587C8]/30 text-center shadow-inner">
-            <div className="text-[9px] text-cyan-400/80 mb-1">Prod Index</div>
-            <div className="grid grid-cols-2 text-[9px] font-bold border-b border-[#2587C8]/30 pb-1 mb-1">
+          <div className="daily-themed-inset relative z-10 p-2 rounded-lg border text-center shadow-inner"
+            style={{
+              background: 'var(--core-control)',
+              borderColor: 'var(--core-border)',
+              color: 'var(--core-text)',
+            }}>
+            <div className="text-[9px] mb-1" style={{ color: 'var(--core-primary-strong)' }}>Prod Index</div>
+            <div className="grid grid-cols-2 text-[9px] font-bold border-b pb-1 mb-1" style={{ borderColor: 'var(--core-border)' }}>
               <span>Emp</span><span>SpM</span>
             </div>
-            <div className="grid grid-cols-2 text-xs font-extrabold text-white">
-              <div><span className="text-[8px] text-cyan-400 block">A</span>{isLoaded ? '8.2 X' : '0 X'}</div>
-              <div><span className="text-[8px] text-cyan-400 block">A</span>{isLoaded ? '3.2 X' : '0 X'}</div>
+            <div className="grid grid-cols-2 text-xs font-extrabold" style={{ color: 'var(--core-text)' }}>
+              <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>A</span>{isLoaded ? '8.2 X' : '0 X'}</div>
+              <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>A</span>{isLoaded ? '3.2 X' : '0 X'}</div>
             </div>
-            <div className="grid grid-cols-2 text-xs font-extrabold text-amber-400 mt-1">
-              <div><span className="text-[8px] text-cyan-400 block">T</span>{isLoaded ? '8.6 X' : '0 X'}</div>
-              <div><span className="text-[8px] text-cyan-400 block">T</span>{isLoaded ? '3.6 X' : '0 X'}</div>
+            <div className="grid grid-cols-2 text-xs font-extrabold mt-1" style={{ color: 'var(--core-primary-strong)' }}>
+              <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>T</span>{isLoaded ? '8.6 X' : '0 X'}</div>
+              <div><span className="text-[8px] block" style={{ color: 'var(--core-text-secondary)' }}>T</span>{isLoaded ? '3.6 X' : '0 X'}</div>
             </div>
           </div>
 
@@ -104,34 +118,45 @@ export default function DailyLowerWidgets({
               className="daily-comingsoon-pattern absolute inset-0 opacity-[0.055]"
               style={{
                 backgroundImage:
-                  'repeating-linear-gradient(-24deg, rgba(251,191,36,.34) 0px, rgba(251,191,36,.34) 1px, transparent 1px, transparent 15px)',
+                  'repeating-linear-gradient(-24deg, color-mix(in srgb, var(--core-primary) 30%, transparent) 0px, color-mix(in srgb, var(--core-primary) 30%, transparent) 1px, transparent 1px, transparent 15px)',
               }}
             />
 
-            <span className="daily-comingsoon-corner absolute left-2 top-2 h-4 w-4 border-l border-t border-amber-300/55" />
-            <span className="daily-comingsoon-corner absolute right-2 top-2 h-4 w-4 border-r border-t border-amber-300/55" />
-            <span className="daily-comingsoon-corner absolute bottom-2 left-2 h-4 w-4 border-b border-l border-amber-300/55" />
-            <span className="daily-comingsoon-corner absolute bottom-2 right-2 h-4 w-4 border-b border-r border-amber-300/55" />
+            <span className="daily-comingsoon-corner absolute left-2 top-2 h-4 w-4 border-l border-t" style={{ borderColor: 'var(--core-border-strong)' }} />
+            <span className="daily-comingsoon-corner absolute right-2 top-2 h-4 w-4 border-r border-t" style={{ borderColor: 'var(--core-border-strong)' }} />
+            <span className="daily-comingsoon-corner absolute bottom-2 left-2 h-4 w-4 border-b border-l" style={{ borderColor: 'var(--core-border-strong)' }} />
+            <span className="daily-comingsoon-corner absolute bottom-2 right-2 h-4 w-4 border-b border-r" style={{ borderColor: 'var(--core-border-strong)' }} />
 
-            <div className="daily-comingsoon-ribbon daily-comingsoon-ribbon--util absolute left-1/2 top-1/2 w-[132%] -translate-x-1/2 -translate-y-1/2 -rotate-[7deg] border-y border-amber-300/35 bg-[#3a2705]/55 py-2.5 shadow-[0_0_24px_rgba(251,191,36,.09)] backdrop-blur-[1px]">
+            <div className="daily-comingsoon-ribbon daily-comingsoon-ribbon--util absolute left-1/2 top-1/2 w-[132%] -translate-x-1/2 -translate-y-1/2 -rotate-[7deg] border-y py-2.5 backdrop-blur-[1px]"
+              style={{
+                background: 'color-mix(in srgb, var(--core-primary) 16%, var(--core-panel))',
+                borderColor: 'var(--core-border-strong)',
+                boxShadow: '0 0 24px color-mix(in srgb, var(--core-glow) 45%, transparent)',
+                color: 'var(--core-text)',
+              }}>
               <div className="flex items-center justify-center gap-2.5 whitespace-nowrap">
-                <span className="daily-comingsoon-dot h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_9px_rgba(252,211,77,.95)]" />
-                <span className="daily-comingsoon-title text-[11px] font-black uppercase tracking-[0.28em] text-amber-100">
+                <span className="daily-comingsoon-dot h-1.5 w-1.5 rounded-full" style={{ background: 'var(--core-primary)', boxShadow: '0 0 9px var(--core-glow)' }} />
+                <span className="daily-comingsoon-title text-[11px] font-black uppercase tracking-[0.28em]" style={{ color: 'var(--core-primary-strong)' }}>
                   Coming Soon
                 </span>
-                <span className="daily-comingsoon-subtitle text-[8px] font-bold uppercase tracking-[0.18em] text-amber-200/65">
+                <span className="daily-comingsoon-subtitle text-[8px] font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--core-text-secondary)' }}>
                   Utilization · Conversion · Prod Index
                 </span>
-                <span className="daily-comingsoon-dot h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_9px_rgba(252,211,77,.95)]" />
+                <span className="daily-comingsoon-dot h-1.5 w-1.5 rounded-full" style={{ background: 'var(--core-primary)', boxShadow: '0 0 9px var(--core-glow)' }} />
               </div>
-              <div className="daily-comingsoon-footnote mt-1 text-center text-[7px] font-bold uppercase tracking-[0.19em]">
+              <div className="daily-comingsoon-footnote mt-1 text-center text-[7px] font-bold uppercase tracking-[0.19em]" style={{ color: 'var(--core-text-muted)' }}>
                 Live data integration in progress
               </div>
             </div>
 
-            <div className="utilization-comingsoon-sweep absolute inset-y-0 -left-1/3 w-[32%] bg-[linear-gradient(90deg,transparent,rgba(251,191,36,.06),rgba(255,244,190,.16),rgba(251,191,36,.06),transparent)] blur-sm" />
+            <div className="utilization-comingsoon-sweep absolute inset-y-0 -left-1/3 w-[32%] blur-sm" style={{ background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--core-primary) 6%, transparent), color-mix(in srgb, var(--core-primary-soft) 18%, transparent), color-mix(in srgb, var(--core-primary) 6%, transparent), transparent)' }} />
 
-            <div className="daily-comingsoon-preview absolute bottom-2.5 right-3 rounded-full border border-amber-300/25 bg-[#211704]/70 px-2 py-0.5 text-[6px] font-black uppercase tracking-[0.18em] text-amber-200/65">
+            <div className="daily-comingsoon-preview absolute bottom-2.5 right-3 rounded-full border px-2 py-0.5 text-[6px] font-black uppercase tracking-[0.18em]"
+              style={{
+                background: 'var(--core-control)',
+                borderColor: 'var(--core-border)',
+                color: 'var(--core-text-secondary)',
+              }}>
               Preview Data
             </div>
           </div>

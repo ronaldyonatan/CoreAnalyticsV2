@@ -12,6 +12,7 @@ import {
   ResponsiveContainer, 
   CartesianGrid 
 } from 'recharts';
+import { DashboardExpandButton } from '../design-system';
 
 interface MonthlyRevenueChartProps {
   isLoaded: boolean;
@@ -346,15 +347,11 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
     <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3 flex flex-col justify-between backdrop-blur-sm relative group h-full">
       
       <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
-        <button 
-          onClick={(e) => { e.stopPropagation(); onExpand('monthly-revenue'); }}
-          className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white"
-          title="View Full Screen"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-          </svg>
-        </button>
+        <DashboardExpandButton
+          size="sm"
+          onClick={() => onExpand('monthly-revenue')}
+          label="Expand Monthly Revenue chart"
+        />
       </div>
 
       <div>

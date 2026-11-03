@@ -1,0 +1,27 @@
+/* =========================================================
+   COREANALYTICS DESIGN SYSTEM — CORE TOKENS
+   Phase 1: geometry / spacing / motion only.
+   Theme colors remain owned by the existing --core-* tokens.
+   ========================================================= */
+
+:root {
+  --ds-control-size-sm: 24px;
+  --ds-control-size-md: 32px;
+  --ds-control-size-lg: 36px;
+
+  --ds-control-icon-sm: 14px;
+  --ds-control-icon-md: 14px;
+  --ds-control-icon-lg: 16px;
+
+  --ds-radius-control: 8px;
+  --ds-radius-card: 14px;
+  --ds-radius-header: 12px;
+
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+
+  --ds-transition-fast: 160ms ease;
+  --ds-transition-normal: 220ms ease;
+}

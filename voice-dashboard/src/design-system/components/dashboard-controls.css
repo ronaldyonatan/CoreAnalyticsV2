@@ -1,0 +1,102 @@
+/* =========================================================
+   COREANALYTICS DESIGN SYSTEM — DASHBOARD CONTROLS
+   Single owner for expand / restore button visual behavior.
+   ========================================================= */
+
+.ds-dashboard-control {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+
+  padding: 0 !important;
+  border-radius: var(--ds-radius-control) !important;
+
+  cursor: pointer !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  transition:
+    color var(--ds-transition-fast),
+    background-color var(--ds-transition-fast),
+    border-color var(--ds-transition-fast),
+    opacity var(--ds-transition-fast) !important;
+}
+
+.ds-dashboard-control--sm {
+  width: var(--ds-control-size-sm) !important;
+  min-width: var(--ds-control-size-sm) !important;
+  height: var(--ds-control-size-sm) !important;
+  min-height: var(--ds-control-size-sm) !important;
+}
+
+.ds-dashboard-control--md {
+  width: var(--ds-control-size-md) !important;
+  min-width: var(--ds-control-size-md) !important;
+  height: var(--ds-control-size-md) !important;
+  min-height: var(--ds-control-size-md) !important;
+}
+
+.ds-dashboard-control--lg {
+  width: var(--ds-control-size-lg) !important;
+  min-width: var(--ds-control-size-lg) !important;
+  height: var(--ds-control-size-lg) !important;
+  min-height: var(--ds-control-size-lg) !important;
+}
+
+.ds-dashboard-control--sm svg {
+  width: var(--ds-control-icon-sm) !important;
+  height: var(--ds-control-icon-sm) !important;
+}
+
+.ds-dashboard-control--md svg {
+  width: var(--ds-control-icon-md) !important;
+  height: var(--ds-control-icon-md) !important;
+}
+
+.ds-dashboard-control--lg svg {
+  width: var(--ds-control-icon-lg) !important;
+  height: var(--ds-control-icon-lg) !important;
+}
+
+/* Normal dashboard expand button:
+   transparent tile, one theme-aware color language. */
+.ds-dashboard-expand {
+  color: var(--ds-expand-fg) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 1px solid var(--ds-expand-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.ds-dashboard-expand:hover,
+.ds-dashboard-expand:focus-visible {
+  color: var(--ds-expand-hover-fg) !important;
+  background: var(--ds-expand-hover-bg) !important;
+  border-color: var(--ds-border-strong) !important;
+  outline: none !important;
+}
+
+/* Fullscreen restore:
+   intentionally dark because fullscreen 3D stages are dark in every theme. */
+.ds-dashboard-restore {
+  color: var(--ds-restore-fg) !important;
+  background: var(--ds-restore-bg) !important;
+  border: 1px solid var(--ds-restore-border) !important;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .10) !important;
+  backdrop-filter: blur(12px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+}
+
+.ds-dashboard-restore:hover,
+.ds-dashboard-restore:focus-visible {
+  background: var(--ds-restore-hover-bg) !important;
+  border-color: rgba(188, 231, 249, .70) !important;
+  color: #fff !important;
+  outline: none !important;
+}

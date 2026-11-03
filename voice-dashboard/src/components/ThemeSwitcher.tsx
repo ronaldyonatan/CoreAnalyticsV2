@@ -43,15 +43,7 @@ export default function ThemeSwitcher({
         type="button"
         key={item.id}
         onClick={() => selectTheme(item.id)}
-        className="core-theme-menu-row flex w-full items-start gap-2 px-3 py-2.5 text-left"
-        style={{
-          background: active
-            ? 'color-mix(in srgb, var(--core-primary) 12%, transparent)'
-            : 'transparent',
-          color: active
-            ? 'var(--core-primary-strong)'
-            : 'var(--core-text)',
-        }}
+        className={`core-theme-menu-row ds-theme-menu-row flex w-full items-start gap-2 px-3 py-2.5 text-left ${active ? 'ds-theme-menu-row--active' : ''}`}
       >
         <span className="mt-0.5 text-sm">{item.icon}</span>
 
@@ -59,10 +51,7 @@ export default function ThemeSwitcher({
           <span className="block text-[11px] font-black uppercase tracking-[0.08em]">
             {item.name}
           </span>
-          <span
-            className="mt-0.5 block text-[9px] leading-relaxed"
-            style={{ color: 'var(--core-text-secondary)' }}
-          >
+          <span className="ds-theme-menu-description mt-0.5 block text-[9px] leading-relaxed">
             {item.description}
           </span>
         </span>
@@ -239,7 +228,7 @@ export default function ThemeSwitcher({
         type="button"
         onClick={() => setOpen((value) => !value)}
         title={`Theme: ${activeTheme.name}`}
-        className="core-control flex w-full items-center justify-center gap-2 rounded-md border p-1.5 text-xs font-bold"
+        className="core-control ds-theme-trigger flex w-full items-center justify-center gap-2 rounded-md border p-1.5 text-xs font-bold"
         aria-expanded={open}
       >
         <span className="text-sm">{activeTheme.icon}</span>
@@ -247,40 +236,20 @@ export default function ThemeSwitcher({
 
       {open && (
         <div
-          className={`absolute top-full z-[999] mt-2 w-[260px] overflow-hidden rounded-lg border ${
+          className={`ds-theme-menu absolute top-full z-[999] mt-2 w-[260px] overflow-hidden rounded-lg border ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
-          style={{
-            background: 'var(--core-surface-strong)',
-            borderColor: 'var(--core-border)',
-            boxShadow: '0 18px 42px rgba(0, 0, 0, .28), 0 0 20px var(--core-glow)',
-          }}
         >
-          <div
-            className="border-b px-3 py-2 text-[9px] font-black uppercase tracking-[0.18em]"
-            style={{
-              borderColor: 'var(--core-border)',
-              color: 'var(--core-text-secondary)',
-            }}
-          >
+          <div className="ds-theme-menu-heading border-b px-3 py-2 text-[9px] font-black uppercase tracking-[0.18em]">
             Appearance
           </div>
 
-          <div
-            className="px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]"
-            style={{ color: 'var(--core-text-muted)' }}
-          >
+          <div className="ds-theme-menu-section px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]">
             Immersive
           </div>
           {IMMERSIVE_THEMES.map(renderCompactThemeRow)}
 
-          <div
-            className="mt-1 border-t px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]"
-            style={{
-              borderColor: 'var(--core-border)',
-              color: 'var(--core-text-muted)',
-            }}
-          >
+          <div className="ds-theme-menu-section mt-1 border-t px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]">
             Static Performance · Zero Motion
           </div>
           {STATIC_THEMES.map(renderCompactThemeRow)}

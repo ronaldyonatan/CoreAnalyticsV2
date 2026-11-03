@@ -1,0 +1,8 @@
+/* CoreAnalytics shared Design System entry point.
+   Keep this import LAST after legacy theme files during migration. */
+
+@import './tokens/core-tokens.css';
+@import './tokens/semantic-tokens.css';
+@import './components/dashboard-card.css';
+@import './components/dashboard-header.css';
+@import './components/dashboard-controls.css';

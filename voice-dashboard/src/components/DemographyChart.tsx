@@ -5,6 +5,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import * as THREE from 'three';
 import { useTheme } from '../theme/ThemeContext';
 import type { CoreThemeDefinition } from '../theme/themes';
+import { DashboardExpandButton } from '../design-system';
 
 interface DemographicDataModel {
   RegistrationNo: string;
@@ -1742,20 +1743,14 @@ export default function DemographyChart({
         boxShadow: 'inset 0 0 22px var(--core-glow)',
       }}
     >
-      <button
-        type="button"
-        onClick={(e) => { e.stopPropagation(); onExpand('demography'); }}
-        className="daily-maximize-button absolute top-2 right-2 z-[60] flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-300/35 bg-transparent text-cyan-500 transition-all cursor-pointer hover:bg-cyan-400/10 hover:text-cyan-300"
-        style={{ backgroundColor: 'transparent', opacity: 1 }}
-        title="View Full Screen 3D"
-        aria-label="View Full Screen 3D"
-      >
-        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-        </svg>
-      </button>
+      <DashboardExpandButton
+        size="md"
+        onClick={() => onExpand('demography')}
+        label="Expand Demography chart"
+        className="absolute top-2 right-2 z-[60]"
+      />
 
-      <div className="flex items-center justify-between pb-2 border-b border-[#2587C8]/20 pr-7">
+<div className="flex items-center justify-between pb-2 border-b border-[#2587C8]/20 pr-7">
         <div className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee]" /><span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider">Demography</span></div>
         <span className="text-[8px] uppercase tracking-[0.18em] text-slate-500">Patient Mix</span>
       </div>

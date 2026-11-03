@@ -12,6 +12,7 @@ import type {
 import './theme.css';
 import './jec-brand-themes.css';
 import './jec-blue-field-v4.5.css';
+import '../design-system/index.css';
 
 interface ThemeContextValue {
   themeId: CoreThemeId;
