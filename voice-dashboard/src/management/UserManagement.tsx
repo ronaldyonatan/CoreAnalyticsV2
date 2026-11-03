@@ -1247,7 +1247,8 @@ export default function UserManagement(
     'register'
   ) {
     return (
-      <div className="management-themed-root user-management-root h-full min-h-0 w-full overflow-y-auto">
+      <div className="management-themed-root user-management-root box-border h-full min-h-0 w-full overflow-y-auto p-3 sm:p-4 lg:p-5">
+        <div className="management-stage mx-auto min-h-full w-full max-w-[1560px] overflow-hidden rounded-2xl border border-white/30 bg-white/[.10] shadow-[0_18px_48px_rgba(1,78,120,.14)] backdrop-blur-md">
         <div className="management-page-header sticky top-0 z-20 flex items-center justify-between border-b border-cyan-400/15 bg-[#010817]/88 px-3 py-2 backdrop-blur-xl sm:px-4">
           <button
             type="button"
@@ -1270,12 +1271,13 @@ export default function UserManagement(
         </div>
 
         <UserVoiceRegistration />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="management-themed-root user-management-root relative h-full min-h-0 w-full overflow-hidden text-slate-200">
+    <div className="management-themed-root user-management-root relative box-border h-full min-h-0 w-full overflow-hidden p-3 text-slate-200 sm:p-4 lg:p-5">
       <div
         className="
           absolute
@@ -1285,7 +1287,7 @@ export default function UserManagement(
         "
       />
 
-      <div className="relative flex h-full min-h-0 flex-col">
+      <div className="management-stage relative mx-auto flex h-full min-h-0 w-full max-w-[1560px] flex-col overflow-hidden rounded-2xl border border-white/30 bg-white/[.10] shadow-[0_18px_48px_rgba(1,78,120,.14)] backdrop-blur-md">
         {/* HEADER */}
         <div className="management-page-header flex flex-shrink-0 flex-col gap-3 border-b border-cyan-400/15 bg-[#020b18]/48 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">

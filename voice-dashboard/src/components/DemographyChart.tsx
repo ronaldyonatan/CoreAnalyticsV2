@@ -1132,7 +1132,9 @@ export default function DemographyChart({
   donutMode: controlledDonutMode,
   onDonutModeChange,
 }: DemographyChartProps) {
-  const { theme, isLight, isSolaris, isStaticTheme } = useTheme();
+  const { theme, isLight, isSolaris, isStaticTheme, isJecHorizon, isJecSkywave } = useTheme();
+  const isJecTheme = isJecHorizon || isJecSkywave;
+  const sceneIsLight = isLight && !isJecTheme;
   const [hover3D, setHover3D] = useState<Hover3D | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [autoRotate, setAutoRotate] = useState(true);
@@ -1147,20 +1149,33 @@ export default function DemographyChart({
   const previousCompactModeRef = useRef<DemographyDonutMode>(
     controlledDonutMode ?? 'gender'
   );
-  const sceneTheme = isSolaris
+  const sceneTheme = isJecTheme
     ? {
         ...theme.three,
-        background: '#5f97cb',
-        fog: '#91c8e8',
-        floor: '#24527f',
-        gridPrimary: '#a8e2ff',
-        gridSecondary: '#4f7fb0',
-        wall: '#78afd7',
-        wallSecondary: '#6f96c9',
-        wallAccent: '#5875bd',
-        ambientIntensity: 1.45,
+        background: '#010b16',
+        fog: '#03182b',
+        floor: '#06233a',
+        gridPrimary: '#167da8',
+        gridSecondary: '#0b4968',
+        wall: '#08283d',
+        wallSecondary: '#0b3550',
+        wallAccent: '#0f5f89',
+        ambientIntensity: 1.12,
       }
-    : theme.three;
+    : isSolaris
+      ? {
+          ...theme.three,
+          background: '#5f97cb',
+          fog: '#91c8e8',
+          floor: '#24527f',
+          gridPrimary: '#a8e2ff',
+          gridSecondary: '#4f7fb0',
+          wall: '#78afd7',
+          wallSecondary: '#6f96c9',
+          wallAccent: '#5875bd',
+          ambientIntensity: 1.45,
+        }
+      : theme.three;
 
   const donutMode = controlledDonutMode ?? internalDonutMode;
   const setDonutMode = (mode: DemographyDonutMode) => {
@@ -1328,9 +1343,9 @@ export default function DemographyChart({
       <div
         className="daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative"
         style={{
-          background: 'var(--core-bg-secondary)',
-          borderColor: 'var(--core-border)',
-          color: 'var(--core-text)',
+          background: isJecTheme ? '#020916' : 'var(--core-bg-secondary)',
+          borderColor: isJecTheme ? 'rgba(37,135,200,.42)' : 'var(--core-border)',
+          color: isJecTheme ? '#e9f8ff' : 'var(--core-text)',
         }}
       >
         {/* HEADER + PERIOD FILTER */}
@@ -1338,9 +1353,9 @@ export default function DemographyChart({
           className="relative shrink-0 border-b px-4 pt-4 pb-3 backdrop-blur-xl"
           style={{
             borderColor: 'var(--core-border)',
-            background: isLight
+            background: sceneIsLight
               ? 'linear-gradient(90deg, rgba(238,242,255,.86), rgba(247,252,255,.94), rgba(253,242,248,.78))'
-              : 'linear-gradient(90deg, rgba(30,27,75,.35), rgba(2,9,22,.80), rgba(80,7,36,.25))',
+              : 'linear-gradient(90deg, rgba(1,78,120,.42), rgba(2,9,22,.92), rgba(1,78,120,.28))',
           }}
         >
           <div className="absolute inset-x-8 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
@@ -1579,7 +1594,7 @@ export default function DemographyChart({
                   autoRotate={autoRotate}
                   onInteractionStart={() => setAutoRotate(false)}
                   sceneTheme={sceneTheme}
-                  isLight={isLight}
+                  isLight={sceneIsLight}
                 />
               </Canvas>
             </div>
@@ -1727,11 +1742,18 @@ export default function DemographyChart({
         boxShadow: 'inset 0 0 22px var(--core-glow)',
       }}
     >
-      <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-        <button onClick={(e) => { e.stopPropagation(); onExpand('demography'); }} className="p-1 hover:bg-[#2587C8]/20 rounded text-[#2587C8] hover:text-white transition-colors" title="View Full Screen 3D">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onExpand('demography'); }}
+        className="daily-maximize-button absolute top-2 right-2 z-[60] flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-300/35 bg-transparent text-cyan-500 transition-all cursor-pointer hover:bg-cyan-400/10 hover:text-cyan-300"
+        style={{ backgroundColor: 'transparent', opacity: 1 }}
+        title="View Full Screen 3D"
+        aria-label="View Full Screen 3D"
+      >
+        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+        </svg>
+      </button>
 
       <div className="flex items-center justify-between pb-2 border-b border-[#2587C8]/20 pr-7">
         <div className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee]" /><span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider">Demography</span></div>

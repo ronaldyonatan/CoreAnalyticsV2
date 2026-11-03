@@ -25,7 +25,7 @@
   --ma-input: rgba(4, 27, 35, .72);
 }
 
-[data-theme="solaris"] .my-account-overlay {
+:is([data-theme="solaris"], [data-theme="jec-horizon"], [data-theme="jec-skywave"]) .my-account-overlay {
   --ma-accent: #168fc4;
   --ma-accent-2: #4f6ee8;
   --ma-accent-soft: rgba(49, 140, 255, .10);
@@ -41,7 +41,7 @@
   cursor: default;
 }
 
-[data-theme="solaris"] .my-account-backdrop {
+:is([data-theme="solaris"], [data-theme="jec-horizon"], [data-theme="jec-skywave"]) .my-account-backdrop {
   background: rgba(31, 88, 126, .28);
 }
 
@@ -185,8 +185,8 @@
 .my-account-alert.error { border: 1px solid rgba(251,113,133,.26); background: rgba(136,19,55,.16); color: #fecdd3; }
 .my-account-alert.success { border: 1px solid rgba(52,211,153,.26); background: rgba(6,78,59,.16); color: #a7f3d0; }
 .my-account-alert.info { border: 1px solid color-mix(in srgb, var(--ma-accent) 28%, transparent); background: var(--ma-accent-soft); color: var(--ma-accent); }
-[data-theme="solaris"] .my-account-alert.error { color: #a51d44; }
-[data-theme="solaris"] .my-account-alert.success { color: #087a54; }
+:is([data-theme="solaris"], [data-theme="jec-horizon"], [data-theme="jec-skywave"]) .my-account-alert.error { color: #a51d44; }
+:is([data-theme="solaris"], [data-theme="jec-horizon"], [data-theme="jec-skywave"]) .my-account-alert.success { color: #087a54; }
 
 .my-account-voice-verify { display: grid; gap: 10px; }
 .my-account-voice-status { display: grid; gap: 14px; border: 1px solid rgba(52,211,153,.24); border-radius: 16px; padding: 16px; background: rgba(6,78,59,.10); }

@@ -3,7 +3,9 @@ export type CoreThemeId =
   | 'aurora'
   | 'solaris'
   | 'obsidian'
-  | 'quartz';
+  | 'quartz'
+  | 'jec-horizon'
+  | 'jec-skywave';
 
 export type CoreThemeAppearance = 'dark' | 'light';
 export type CoreThemePerformance = 'immersive' | 'static';
@@ -140,6 +142,49 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
       wallAccent: '#7acbe0',
     },
   },
+
+  'jec-horizon': {
+    id: 'jec-horizon',
+    name: 'JEC Horizon',
+    description: 'Static bright JEC blue command interface with clean clinical glass and brand-forward azure accents.',
+    icon: '▰',
+    appearance: 'light',
+    performance: 'static',
+    three: {
+      background: '#eef9ff',
+      fog: '#dff3ff',
+      star: '#168fd3',
+      ambientIntensity: 1.28,
+      floor: '#d9effa',
+      gridPrimary: '#168fd3',
+      gridSecondary: '#9ccfe8',
+      wall: '#f8fdff',
+      wallSecondary: '#e6f5fc',
+      wallAccent: '#0072bc',
+    },
+  },
+
+  'jec-skywave': {
+    id: 'jec-skywave',
+    name: 'JEC Skywave',
+    description: 'Immersive bright JEC blue atmosphere with animated sky-energy waves, luminous data grid and clinical glass.',
+    icon: '≋',
+    appearance: 'light',
+    performance: 'immersive',
+    three: {
+      background: '#e8f7ff',
+      fog: '#d5effc',
+      star: '#168fd3',
+      ambientIntensity: 1.42,
+      floor: '#d8effa',
+      gridPrimary: '#0072bc',
+      gridSecondary: '#8fc9e6',
+      wall: '#f5fcff',
+      wallSecondary: '#dff2fb',
+      wallAccent: '#00a7e1',
+    },
+  },
+
 };
 
 export const isCoreThemeId = (value: string | null): value is CoreThemeId =>
@@ -147,4 +192,6 @@ export const isCoreThemeId = (value: string | null): value is CoreThemeId =>
   value === 'aurora' ||
   value === 'solaris' ||
   value === 'obsidian' ||
-  value === 'quartz';
+  value === 'quartz' ||
+  value === 'jec-horizon' ||
+  value === 'jec-skywave';

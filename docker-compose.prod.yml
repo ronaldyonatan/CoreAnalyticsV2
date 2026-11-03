@@ -4,7 +4,7 @@ services:
   # Voice Authentication Backend - PROD
   # ==========================================
   voice-auth:
-    image: container-registry-1-registry.ap-southeast-5.cr.aliyuncs.com/poc-acs/coreanalytics/voice-auth:v1.0.1
+    image: container-registry-1-registry.ap-southeast-5.cr.aliyuncs.com/poc-acs/coreanalytics/voice-auth:v1.0.2
     platform: linux/amd64
 
     container_name: coreanalytics-voice-auth
@@ -30,7 +30,7 @@ services:
   # CoreAnalytics Dashboard - PROD
   # ==========================================
   voice-dashboard:
-    image: container-registry-1-registry.ap-southeast-5.cr.aliyuncs.com/poc-acs/coreanalytics/voice-dashboard:v1.0.1
+    image: container-registry-1-registry.ap-southeast-5.cr.aliyuncs.com/poc-acs/coreanalytics/voice-dashboard:v1.0.3
     platform: linux/amd64
 
     container_name: coreanalytics-dashboard

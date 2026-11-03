@@ -1,0 +1,238 @@
+/* =========================================================
+   COREANALYTICS — JEC HORIZON / JEC SKYWAVE V5.1
+   Dedicated POST-LOGIN environment.
+   Ownership:
+   - This file: app canvas/background only.
+   - jec-brand-themes.css: shared JEC component styling.
+   - company-performance-theme.css: Company Performance internals.
+   ========================================================= */
+
+.core-jec-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 72% 34%, rgba(132,220,255,.34), transparent 22%),
+    radial-gradient(circle at 91% 14%, rgba(0,59,92,.32), transparent 32%),
+    linear-gradient(
+      90deg,
+      #f8fcfe 0%,
+      #f2f9fc 14%,
+      #e8f4fa 23%,
+      #c9e6f4 29%,
+      #79c2e4 41%,
+      #349bd0 57%,
+      #1179b6 78%,
+      #075f96 100%
+    );
+}
+
+.core-jec-field__glow,
+.core-jec-field__grid,
+.core-jec-field__stars,
+.core-jec-field__wave {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* 25% light / 75% blue atmosphere. */
+.core-jec-field__glow {
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 14% 15%, rgba(255,255,255,.72), transparent 22%),
+    radial-gradient(circle at 67% 42%, rgba(103,211,250,.28), transparent 25%),
+    radial-gradient(circle at 92% 78%, rgba(0,45,76,.20), transparent 29%);
+}
+
+.core-jec-field__grid {
+  z-index: 2;
+  top: 0;
+  right: 0;
+  width: 75%;
+  height: 100%;
+  opacity: .56;
+  background-image:
+    linear-gradient(rgba(255,255,255,.20) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px),
+    linear-gradient(rgba(0,79,122,.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,79,122,.11) 1px, transparent 1px);
+  background-size: 52px 52px, 52px 52px, 208px 208px, 208px 208px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.55) 9%, #000 28%, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.55) 9%, #000 28%, #000 100%);
+}
+
+.core-jec-field__stars {
+  z-index: 3;
+  top: 0;
+  right: 0;
+  width: 75%;
+  height: 100%;
+}
+
+.core-jec-field__stars--a {
+  opacity: .80;
+  background-image:
+    radial-gradient(circle at 15px 22px, rgba(255,255,255,.98) 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 92px 58px, rgba(214,244,255,.92) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 48px 125px, rgba(140,218,248,.94) 0 1.1px, transparent 1.7px),
+    radial-gradient(circle at 126px 92px, rgba(255,255,255,.74) 0 .9px, transparent 1.5px);
+  background-size: 146px 146px, 211px 211px, 277px 277px, 331px 331px;
+}
+
+.core-jec-field__stars--b {
+  opacity: .48;
+  background-image:
+    radial-gradient(circle at 70px 36px, rgba(255,255,255,.92) 0 .9px, transparent 1.5px),
+    radial-gradient(circle at 130px 94px, rgba(184,232,251,.82) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 208px 54px, rgba(255,255,255,.65) 0 .8px, transparent 1.4px);
+  background-size: 318px 318px, 407px 407px, 487px 487px;
+}
+
+.core-jec-field__wave {
+  z-index: 2;
+  right: 0;
+  width: 75%;
+  filter: blur(24px) saturate(128%);
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+}
+
+.core-jec-field__wave--a {
+  top: 16%;
+  height: 21%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(105,218,255,.05) 10%,
+    rgba(44,169,223,.31) 38%,
+    rgba(1,78,120,.23) 66%,
+    transparent 100%
+  );
+}
+
+.core-jec-field__wave--b {
+  bottom: 9%;
+  height: 17%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(1,78,120,.09) 14%,
+    rgba(92,201,240,.24) 48%,
+    rgba(37,135,200,.19) 75%,
+    transparent 100%
+  );
+}
+
+/* App/frame must reveal the environment. */
+html[data-theme="jec-skywave"] body,
+html[data-theme="jec-horizon"] body,
+html[data-theme="jec-skywave"] #root,
+html[data-theme="jec-horizon"] #root {
+  overflow-x: hidden !important;
+}
+
+[data-active-theme="jec-skywave"],
+[data-active-theme="jec-horizon"] {
+  background: transparent !important;
+}
+
+[data-active-theme="jec-skywave"] .core-dashboard-frame,
+[data-active-theme="jec-horizon"] .core-dashboard-frame {
+  position: relative;
+  z-index: 10;
+  background: rgba(255,255,255,.045) !important;
+  border-color: rgba(255,255,255,.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 16px 42px rgba(0,59,92,.10) !important;
+}
+
+[data-theme="jec-skywave"] .core-global-header,
+[data-theme="jec-horizon"] .core-global-header {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.88) 0%,
+      rgba(248,252,254,.80) 36%,
+      rgba(213,239,249,.67) 66%,
+      rgba(115,195,230,.52) 100%
+    ) !important;
+  border-color: rgba(255,255,255,.40) !important;
+  border-bottom: 2px solid rgba(37,135,200,.86) !important;
+  box-shadow:
+    0 10px 28px rgba(0,48,78,.12),
+    inset 0 1px 0 rgba(255,255,255,.72) !important;
+  backdrop-filter: blur(12px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+}
+
+/* Motion belongs only to Skywave. */
+.core-jec-field--skywave .core-jec-field__grid {
+  animation: jecFieldGrid 16s linear infinite;
+}
+
+.core-jec-field--skywave .core-jec-field__stars--a {
+  animation: jecFieldStarsA 23s linear infinite, jecFieldTwinkle 4.8s ease-in-out infinite;
+}
+
+.core-jec-field--skywave .core-jec-field__stars--b {
+  animation: jecFieldStarsB 31s linear infinite reverse, jecFieldTwinkle 6.2s ease-in-out infinite reverse;
+}
+
+.core-jec-field--skywave .core-jec-field__wave--a {
+  animation: jecFieldWaveA 10s ease-in-out infinite alternate;
+}
+
+.core-jec-field--skywave .core-jec-field__wave--b {
+  animation: jecFieldWaveB 14s ease-in-out infinite alternate-reverse;
+}
+
+.core-jec-field--horizon * {
+  animation: none !important;
+}
+
+@keyframes jecFieldGrid {
+  from { background-position: 0 0, 0 0, 0 0, 0 0; }
+  to   { background-position: 52px 26px, 26px 52px, 104px 52px, 52px 104px; }
+}
+
+@keyframes jecFieldStarsA {
+  from { background-position: 0 0, 0 0, 0 0, 0 0; }
+  to   { background-position: -78px 38px, -52px 28px, -106px 50px, -44px 22px; }
+}
+
+@keyframes jecFieldStarsB {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to   { background-position: 74px -38px, 48px -24px, 102px -48px; }
+}
+
+@keyframes jecFieldTwinkle {
+  0%,100% { opacity: .52; }
+  50% { opacity: .94; }
+}
+
+@keyframes jecFieldWaveA {
+  from { background-position: 110% 50%; opacity: .26; }
+  to   { background-position: -110% 50%; opacity: .60; }
+}
+
+@keyframes jecFieldWaveB {
+  from { background-position: -100% 50%; opacity: .18; }
+  to   { background-position: 100% 50%; opacity: .46; }
+}
+
+@media (max-width: 760px) {
+  .core-jec-field__grid,
+  .core-jec-field__stars,
+  .core-jec-field__wave {
+    width: 72%;
+  }
+
+  .core-jec-field__grid {
+    opacity: .40;
+  }
+}

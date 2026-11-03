@@ -10,6 +10,8 @@ import type {
   CoreThemePerformance,
 } from './themes';
 import './theme.css';
+import './jec-brand-themes.css';
+import './jec-blue-field-v4.5.css';
 
 interface ThemeContextValue {
   themeId: CoreThemeId;
@@ -20,6 +22,8 @@ interface ThemeContextValue {
   isLight: boolean;
   isAurora: boolean;
   isSolaris: boolean;
+  isJecHorizon: boolean;
+  isJecSkywave: boolean;
 
   isStaticTheme: boolean;
   isObsidian: boolean;
@@ -35,6 +39,8 @@ const THEME_CYCLE: CoreThemeId[] = [
   'solaris',
   'obsidian',
   'quartz',
+  'jec-horizon',
+  'jec-skywave',
 ];
 
 const getInitialTheme = (): CoreThemeId => {
@@ -86,6 +92,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isLight: theme.appearance === 'light',
       isAurora: themeId === 'aurora',
       isSolaris: themeId === 'solaris',
+      isJecHorizon: themeId === 'jec-horizon',
+      isJecSkywave: themeId === 'jec-skywave',
 
       // Performance/rendering flags for every dashboard/chart.
       isStaticTheme: theme.performance === 'static',

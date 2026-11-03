@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 // Import komponen panel
 import Panel1Revenue from '../../components/Panel1Revenue';
@@ -114,6 +115,7 @@ const HealthcareDashboardView = ({
   peerData
 }: HealthcareDashboardViewProps) => {
   const [animateChart, setAnimateChart] = useState(false);
+  const [expandedPanel, setExpandedPanel] = useState<number | null>(null);
 
   const [trenPendapatan, setTrenPendapatan] = useState<TrenPendapatanItem[]>([]);
   const [exsumRevenue, setExsumRevenue] = useState<ExsumRevenueItem[]>([]);
@@ -196,9 +198,48 @@ const HealthcareDashboardView = ({
     fetchDashboardData(healthcareId);
   }, [healthcareId, fetchDashboardData]);
 
-  const renderSelectedPanel = (id: number) => {
-    const isMaximized = activeGraphs.length === 1 && activeGraphs[0] === id;
+  // Company Performance preview/fullscreen now follows the same model as
+  // Daily Tracking: a dedicated portal is rendered directly under body.
+  // The normal dashboard layout remains untouched behind it.
+  useEffect(() => {
+    if (expandedPanel === null || typeof document === 'undefined') return;
 
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setExpandedPanel(null);
+        if (activeGraphs.length === 1) setActiveGraphs([1, 2, 3, 4]);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [expandedPanel, activeGraphs, setActiveGraphs]);
+
+  // Preserve single-graph voice commands: when the voice registry changes
+  // activeGraphs to one panel, open that panel in the same portal preview.
+  useEffect(() => {
+    if (isCompareMode || !isLeftSide) return;
+    if (activeGraphs.length === 1 && activeGraphs[0] >= 1 && activeGraphs[0] <= 5) {
+      setExpandedPanel(activeGraphs[0]);
+    }
+  }, [activeGraphs, isCompareMode, isLeftSide]);
+
+  const closeExpandedPanel = () => {
+    SciFiAudio.playBeep(480, 'triangle', 0.08, 0.035);
+    setExpandedPanel(null);
+    if (activeGraphs.length === 1) setActiveGraphs([1, 2, 3, 4]);
+  };
+
+  const renderPanelContent = (id: number, isFullscreen = false) => {
     let panelContent = null;
     switch(id) {
       case 1: 
@@ -209,7 +250,7 @@ const HealthcareDashboardView = ({
             setPanel1Mode={setPanel1Mode} 
             trenPendapatan={trenPendapatan} 
             animateChart={animateChart}
-            isMaximized={isMaximized}
+            isMaximized={isFullscreen}
           />
         ); 
         break;
@@ -220,7 +261,7 @@ const HealthcareDashboardView = ({
             exsumData={exsumRevenue} 
             sentraData={exsumSentra} 
             animateChart={animateChart}
-            isMaximized={isMaximized}
+            isMaximized={isFullscreen}
           />
         ); 
         break;
@@ -230,7 +271,7 @@ const HealthcareDashboardView = ({
             key="panel-3" 
             exsumData={exsumMaterial} 
             animateChart={animateChart}
-            isMaximized={isMaximized}
+            isMaximized={isFullscreen}
           />
         ); 
         break;
@@ -240,32 +281,42 @@ const HealthcareDashboardView = ({
             key="panel-4" 
             exsumData={exsumDoctorFee} 
             animateChart={animateChart}
-            isMaximized={isMaximized}
+            isMaximized={isFullscreen}
           />
         ); 
         break;
       default: return null;
     }
 
-    const handleToggleMaximize = () => {
+    return panelContent;
+  };
+
+  const renderSelectedPanel = (id: number) => {
+    const handleOpenPreview = () => {
       SciFiAudio.playBeep(900, 'triangle', 0.1, 0.04);
-      isMaximized ? switchLayoutWithFade([1, 2, 3, 4]) : switchLayoutWithFade([id]);
+      setExpandedPanel(id);
     };
 
     return (
-      <div key={`panel-wrapper-${id}`} className="company-panel-frame relative w-full h-full bg-[#001428]/20 border border-[#00f2fe]/10 rounded-lg p-1 overflow-hidden flex flex-col">
+      <div key={`panel-wrapper-${id}`} className="company-panel-frame relative w-full h-full rounded-lg p-0 overflow-hidden flex flex-col">
         <button
-          onClick={handleToggleMaximize}
-          title={isMaximized ? "Restore Layout" : "Maximize Panel"}
-          className="company-icon-button absolute top-2 right-2 z-[60] p-1 rounded-lg bg-[#001428]/40 text-[#00f2fe]/70 hover:bg-[#00f2fe]/20 hover:text-white transition-all cursor-pointer backdrop-blur-sm"
+          onClick={handleOpenPreview}
+          title="Preview fullscreen"
+          aria-label="Preview fullscreen"
+          className="company-panel-size-button absolute top-2 right-2 z-[60] flex h-8 w-8 items-center justify-center rounded-md text-cyan-500 transition-all cursor-pointer hover:text-cyan-300"
+          style={{
+            background: 'transparent',
+            backgroundColor: 'transparent',
+            border: '1px solid rgba(34, 211, 238, 0.28)',
+            boxShadow: 'none',
+            opacity: 0.72,
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
+          }}
         >
-          {isMaximized ? (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" /></svg>
-          ) : (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
-          )}
+          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
         </button>
-        {panelContent}
+        {renderPanelContent(id, false)}
       </div>
     );
   };
@@ -305,10 +356,48 @@ const HealthcareDashboardView = ({
 
   const handleToggleMaximizePanel5 = () => {
     SciFiAudio.playBeep(900, 'triangle', 0.1, 0.04);
-    isPanel5Maximized ? switchLayoutWithFade([1, 2, 3, 4]) : switchLayoutWithFade([5]);
+    setExpandedPanel(5);
   };
 
+  const fullscreenPortal = expandedPanel !== null && typeof document !== 'undefined'
+    ? createPortal(
+        <div className="company-preview-fullscreen fixed inset-0 z-[10000] isolate flex h-[100dvh] w-screen flex-col overflow-hidden bg-[#020916]">
+          <button
+            type="button"
+            onClick={closeExpandedPanel}
+            className="company-preview-restore fixed right-3 top-3 z-[10050] flex h-9 w-9 items-center justify-center rounded-lg border border-sky-200/35 bg-[#061d2b]/88 text-white shadow-[0_10px_26px_rgba(0,0,0,.32)] backdrop-blur-xl transition hover:bg-[#0b3b55]"
+            title="Restore display"
+            aria-label="Restore display"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25" />
+            </svg>
+          </button>
+
+          <div className="company-preview-fullscreen-body min-h-0 flex-1 overflow-hidden">
+            {expandedPanel === 5 ? (
+              <PanelDetailPNL
+                pnlData={exsumPnL}
+                animateChart={animateChart}
+                isMaximized
+                onToggleMaximize={closeExpandedPanel}
+                isCompareMode={isCompareMode}
+                isLeftSide={isLeftSide}
+                peerPnLData={peerData?.exsumPnL}
+                closingInfo={closingInfo}
+                currentSiteName={titleName}
+              />
+            ) : (
+              renderPanelContent(expandedPanel, true)
+            )}
+          </div>
+        </div>,
+        document.body
+      )
+    : null;
+
   return (
+    <>
     <div className="company-node-view flex flex-col h-full w-full relative overflow-hidden space-y-2">
       <div className="company-node-header flex justify-between items-center py-1 px-3 bg-[#00f2fe]/10 border-b border-[#00f2fe]/30 rounded-t-lg flex-shrink-0">
         <span className="company-title text-[10px] font-bold text-[#00f2fe] tracking-widest uppercase text-hud-glow">
@@ -353,6 +442,8 @@ const HealthcareDashboardView = ({
         )}
       </div>
     </div>
+    {fullscreenPortal}
+    </>
   );
 };
 
@@ -614,10 +705,10 @@ export default function CompanyPerformance({
   };
 
   return (
-    <div className="company-theme-root company-performance-shell relative flex-1 min-w-0 min-h-0 flex flex-col h-full bg-[#000511]/40 rounded-xl p-2 overflow-hidden">
+    <div className="company-theme-root company-performance-shell relative flex-1 min-w-0 min-h-0 flex flex-col h-full p-3 overflow-hidden">
       
       {/* HEADER CONTROL BAR */}
-      <div className="company-page-header company-control-bar relative z-[200] mb-2 flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border border-[#00f2fe]/40 px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5">
+      <div className="company-page-header company-control-bar relative z-[200] mb-2 flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5">
         <div className="company-page-title-row flex min-w-0 items-center space-x-3">
           <div className="relative flex h-3 w-3 flex-shrink-0 items-center justify-center">
             <span className="company-page-status-dot absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-60" />
@@ -777,7 +868,7 @@ export default function CompanyPerformance({
       <div className="flex-1 flex gap-3 h-full min-h-0 min-w-0 overflow-hidden">
         
         {/* VIEW KIRI */}
-        <div className="company-view-shell flex-1 h-full min-w-0 flex flex-col border border-[#00f2fe]/20 rounded-lg p-2 bg-[#000a1a]/40 shadow-inner overflow-hidden">
+        <div className="company-view-shell flex-1 h-full min-w-0 flex flex-col rounded-lg p-0 overflow-hidden">
           <HealthcareDashboardView 
             healthcareId={currentLeftId} 
             titleName={getHealthcareName(currentLeftId)}
@@ -796,7 +887,7 @@ export default function CompanyPerformance({
 
         {/* VIEW KANAN (JIKA MODE KOMPARASI) */}
         {isCompareMode && (
-          <div className="company-view-shell company-view-shell--compare flex-1 h-full min-w-0 flex flex-col border border-amber-500/30 rounded-lg p-2 bg-[#1a0f00]/40 shadow-inner animate-glitch-in overflow-hidden">
+          <div className="company-view-shell company-view-shell--compare flex-1 h-full min-w-0 flex flex-col rounded-lg p-0 animate-glitch-in overflow-hidden">
             <HealthcareDashboardView 
               healthcareId={currentRightId} 
               titleName={getHealthcareName(rightHealthcareId)}

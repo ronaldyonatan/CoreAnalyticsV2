@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import DailyMetricsGrid from '../../components/DailyMetricsGrid';
 import DailyRevenueChart from '../../components/DailyRevenueChart';
 import DemographyChart from '../../components/DemographyChart';
@@ -95,7 +96,8 @@ export default function DailyTracking({
   healthcareList = [],
   onHealthcareChange,
 }: DailyTrackingProps) {
-  const { isLight } = useTheme();
+  const { isLight, isJecHorizon, isJecSkywave } = useTheme();
+  const isJecTheme = isJecHorizon || isJecSkywave;
 
   const [selectedId, setSelectedId] = useState<string>(selectedHealthcareId);
   const [selectedDate, setSelectedDate] = useState<string>('2026-10');
@@ -943,6 +945,22 @@ export default function DailyTracking({
 
   const isLoaded = Boolean(selectedId);
 
+  // Daily fullscreen locks document scrolling and renders through a portal.
+  // This avoids transformed/overflow ancestors making `position: fixed` behave like an in-panel overlay.
+  useEffect(() => {
+    if (!expandedCard || typeof document === 'undefined') return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [expandedCard]);
+
   const renderExpandedContent = () => {
     switch (expandedCard) {
       case 'daily-revenue':
@@ -1065,10 +1083,14 @@ export default function DailyTracking({
         className="daily-page-header relative z-[200] flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5"
         style={{
           borderColor: 'var(--core-border-strong)',
-          background: isLight
-            ? 'linear-gradient(90deg, rgba(194,222,234,.96), rgba(222,238,245,.96), rgba(206,226,239,.94))'
-            : 'linear-gradient(90deg, rgba(1,78,120,.90), rgba(0,24,48,.95), rgba(1,78,120,.90))',
-          boxShadow: '0 0 20px var(--core-glow)',
+          background: isJecTheme
+            ? 'linear-gradient(100deg, rgba(1,78,120,.96), rgba(20,125,182,.93), rgba(37,135,200,.90))'
+            : isLight
+              ? 'linear-gradient(90deg, rgba(194,222,234,.96), rgba(222,238,245,.96), rgba(206,226,239,.94))'
+              : 'linear-gradient(90deg, rgba(1,78,120,.90), rgba(0,24,48,.95), rgba(1,78,120,.90))',
+          boxShadow: isJecTheme
+            ? '0 8px 20px rgba(1,78,120,.14)'
+            : '0 0 20px var(--core-glow)',
         }}
       >
         {/* Title row */}
@@ -1080,15 +1102,25 @@ export default function DailyTracking({
             </div>
 
             <span
-              className="daily-page-title min-w-0 animate-pulse bg-clip-text text-lg font-extrabold uppercase tracking-[0.16em] text-transparent sm:text-xl sm:tracking-widest"
-              style={{
-                backgroundImage: isLight
-                  ? 'linear-gradient(90deg, #075985, #0a2635, #087f9d)'
-                  : 'linear-gradient(90deg, #00f2fe, #ffffff, #00f2fe)',
-                filter: isLight
-                  ? 'drop-shadow(0 0 7px rgba(2,132,199,.18))'
-                  : 'drop-shadow(0 0 12px rgba(0,242,254,.80))',
-              }}
+              className={`daily-page-title min-w-0 text-lg font-extrabold uppercase tracking-[0.16em] sm:text-xl sm:tracking-widest ${
+                isJecTheme ? 'text-white' : 'animate-pulse bg-clip-text text-transparent'
+              }`}
+              style={
+                isJecTheme
+                  ? {
+                      color: '#FFFFFF',
+                      textShadow: '0 1px 7px rgba(0,48,76,.26)',
+                      WebkitTextFillColor: '#FFFFFF',
+                    }
+                  : {
+                      backgroundImage: isLight
+                        ? 'linear-gradient(90deg, #075985, #0a2635, #087f9d)'
+                        : 'linear-gradient(90deg, #00f2fe, #ffffff, #00f2fe)',
+                      filter: isLight
+                        ? 'drop-shadow(0 0 7px rgba(2,132,199,.18))'
+                        : 'drop-shadow(0 0 12px rgba(0,242,254,.80))',
+                    }
+              }
             >
               DAILY TRACKING
             </span>
@@ -1263,12 +1295,13 @@ export default function DailyTracking({
         onExpand={setExpandedCard}
       />
 
-      {expandedCard && (
+      {expandedCard && typeof document !== 'undefined' && createPortal(
+        (
         <div
           className="daily-tracking-fullscreen fixed inset-0 z-[9999] isolate flex flex-col overflow-hidden p-2 animate-fadeIn md:p-3"
           style={{
-            background: 'var(--core-bg)',
-            color: 'var(--core-text)',
+            background: isJecTheme ? '#020916' : 'var(--core-bg)',
+            color: isJecTheme ? '#EAF8FF' : 'var(--core-text)',
           }}
         >
           {expandedCard !== 'daily-revenue' &&
@@ -1300,14 +1333,16 @@ export default function DailyTracking({
           <div
             className="daily-tracking-fullscreen-body relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border"
             style={{
-              borderColor: 'var(--core-border-strong)',
-              background: 'var(--core-panel)',
-              boxShadow: '0 0 30px var(--core-glow)',
+              borderColor: isJecTheme ? 'rgba(37,135,200,.34)' : 'var(--core-border-strong)',
+              background: isJecTheme ? '#020916' : 'var(--core-panel)',
+              boxShadow: isJecTheme ? 'none' : '0 0 30px var(--core-glow)',
             }}
           >
             {renderExpandedContent()}
           </div>
         </div>
+        ),
+        document.body,
       )}
 
       <style>{`
@@ -1432,6 +1467,51 @@ export default function DailyTracking({
           .daily-tracking-fullscreen-body .daily-tracking-channel-panel .recharts-responsive-container {
             min-height: 0 !important;
           }
+        }
+
+
+        /* JEC fullscreen is a true dark viewport stage.
+           Override the normal JEC light-card typography only here. */
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen {
+          padding: 0 !important;
+          background: #020916 !important;
+          color: #EAF8FF !important;
+        }
+
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen-body {
+          border: 0 !important;
+          border-radius: 0 !important;
+          background: #020916 !important;
+          box-shadow: none !important;
+        }
+
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen .daily-3d-shell {
+          border: 0 !important;
+          border-radius: 0 !important;
+          background: #020916 !important;
+          color: #EAF8FF !important;
+        }
+
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-white"] {
+          color: #FFFFFF !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+        }
+
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-cyan-"],
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-sky-"] {
+          color: #C9F2FF !important;
+          -webkit-text-fill-color: currentColor !important;
+        }
+
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-slate-"] {
+          color: #9ABFD0 !important;
+        }
+
+        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen button[title="Close fullscreen"] {
+          background: rgba(3,25,40,.82) !important;
+          border-color: rgba(188,231,249,.48) !important;
+          color: #FFFFFF !important;
+          box-shadow: 0 8px 22px rgba(0,0,0,.28) !important;
         }
       `}</style>
     </div>

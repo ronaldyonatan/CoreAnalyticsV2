@@ -12,11 +12,13 @@ const IMMERSIVE_THEMES: CoreThemeId[] = [
   'cosmic-black',
   'aurora',
   'solaris',
+  'jec-skywave',
 ];
 
 const STATIC_THEMES: CoreThemeId[] = [
   'obsidian',
   'quartz',
+  'jec-horizon',
 ];
 
 export default function ThemeSwitcher({

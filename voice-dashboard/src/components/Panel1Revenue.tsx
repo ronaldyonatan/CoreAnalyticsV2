@@ -916,7 +916,7 @@ function Revenue3DFullscreen({
   const [hover, setHover] = useState<RevenueHover3D | null>(null);
 
   return (
-    <div className="company-panel company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
+    <div className="company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#2587C8]/40 bg-[#020916]">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between p-4 pr-14">
         <div>
           <div className="company-title text-[11px] font-black uppercase tracking-[0.26em]">

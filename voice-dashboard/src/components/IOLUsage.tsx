@@ -459,7 +459,9 @@ function IOLMatrixScene({
 }
 
 export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUsageProps) {
-  const { isStaticTheme, isLight } = useTheme();
+  const { isStaticTheme, isLight, isJecHorizon, isJecSkywave } = useTheme();
+  const isJecTheme = isJecHorizon || isJecSkywave;
+  const sceneIsLight = isLight && !isJecTheme;
   const now = new Date();
   const defaultMonth = Math.min(12, Math.max(1, now.getMonth() + 1));
   const selectedYear = String(now.getFullYear());
@@ -915,16 +917,16 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
     <div
       className={`iol-matrix-shell relative overflow-hidden ${fullscreen ? 'h-full min-h-0' : 'h-[460px]'} rounded-xl border`}
       style={{
-        borderColor: 'var(--core-border)',
-        background: 'var(--core-panel)',
+        borderColor: isJecTheme ? 'rgba(37,135,200,.42)' : 'var(--core-border)',
+        background: isJecTheme ? '#010611' : 'var(--core-panel)',
       }}
     >
       <div
         className="pointer-events-none absolute inset-0 z-10"
         style={{
-          background: isLight
+          background: sceneIsLight
             ? 'radial-gradient(circle at 50% 45%, rgba(0,143,196,.08), transparent 55%)'
-            : 'radial-gradient(circle at 50% 45%, rgba(0,183,255,.055), transparent 55%)',
+            : 'radial-gradient(circle at 50% 45%, rgba(37,135,200,.10), transparent 55%)',
         }}
       />
 
@@ -938,12 +940,12 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
           preserveDrawingBuffer: false,
         }}
       >
-        <color attach="background" args={[isLight ? '#eaf8ff' : '#010611']} />
+        <color attach="background" args={[sceneIsLight ? '#eaf8ff' : '#010611']} />
         <IOLMatrixScene
           cells={cells}
           mode={metricMode}
           isMobile={isMobile}
-          isLight={isLight}
+          isLight={sceneIsLight}
           autoRotate={autoRotate}
           onInteractionStart={() => setAutoRotate(false)}
           onHover={setHovered}

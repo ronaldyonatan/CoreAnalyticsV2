@@ -649,13 +649,13 @@ export default function DailyRevenueChart({
   return (
     <div className="daily-themed-card lg:col-span-2 bg-[#000a17]/80 border border-[#00cfff]/40 rounded-xl p-3 flex flex-col backdrop-blur-sm relative group h-full min-h-0 overflow-hidden shadow-[inset_0_0_22px_rgba(0,191,255,0.045),0_0_14px_rgba(0,191,255,0.06)]">
       {/* Expand / restore button: preserves the existing onExpand contract */}
-      <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity z-10">
+      <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
         <button
           onClick={(e) => {
             e.stopPropagation();
             onExpand('daily-revenue');
           }}
-          className="p-1 hover:bg-[#00bfff]/20 rounded text-[#00d9ff] hover:text-white transition-colors focus:outline-none focus:ring-1 focus:ring-cyan-300"
+          className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white focus:outline-none focus:ring-1 focus:ring-cyan-300"
           title="Maximize / restore chart"
           aria-label="Maximize or restore Daily Revenue chart"
         >

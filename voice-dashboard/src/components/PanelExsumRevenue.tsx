@@ -709,50 +709,120 @@ function RevenueWallBoardScene({
 function RevenueLedger3D({
   rows, columns, isAurora, isSolaris
 }: {rows:any[];columns:string[];isAurora:boolean;isSolaris:boolean}) {
-  const [page,setPage]=useState(0);
-  const [hover,setHover]=useState<any|null>(null);
-  const wheelLock=useRef(false);
-  const pageSize=7;
-  const totalPages=Math.max(1,Math.ceil(rows.length/pageSize));
-  const safePage=Math.min(page,totalPages-1);
+  void isAurora;
+  void isSolaris;
+  const [page, setPage] = useState(0);
+  const pageSize = 8;
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageRows = rows.slice(safePage * pageSize, safePage * pageSize + pageSize);
 
-  const movePage=(dir:number)=>{
-    setPage(v=>Math.max(0,Math.min(totalPages-1,v+dir)));
+  const movePage = (dir:number) => {
+    setPage((value) => Math.max(0, Math.min(totalPages - 1, value + dir)));
   };
 
-  const onWheel=(e:React.WheelEvent<HTMLDivElement>)=>{
-    e.preventDefault(); e.stopPropagation();
-    if(wheelLock.current || Math.abs(e.deltaY)<5)return;
-    wheelLock.current=true;
-    movePage(e.deltaY>0?1:-1);
-    window.setTimeout(()=>{wheelLock.current=false},420);
-  };
+  return (
+    <div
+      className="absolute inset-0 flex flex-col overflow-hidden p-4 font-mono text-[#eaf8ff]"
+      style={{
+        background:
+          'radial-gradient(circle at 78% 12%, rgba(54,170,220,.22), transparent 26%), radial-gradient(circle at 18% 86%, rgba(1,78,120,.24), transparent 30%), linear-gradient(145deg, #020916 0%, #06263b 52%, #03131f 100%)',
+      }}
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-30"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(89,185,226,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(89,185,226,.10) 1px, transparent 1px)',
+          backgroundSize: '42px 42px',
+        }}
+      />
 
-  return <div className="absolute inset-0" onWheel={onWheel}>
-    <Canvas camera={{position:[.34,.38,10.85],fov:40,near:.1,far:100}}
-      dpr={[1,1.65]} gl={{antialias:true,alpha:false}}>
-      <RevenueWallBoardScene rows={rows} columns={columns} isAurora={isAurora} isSolaris={isSolaris}
-        page={safePage} onHover={setHover}/>
-    </Canvas>
-
-    <div className="pointer-events-auto absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl border border-cyan-300/15 bg-[#00111d]/82 px-2 py-1.5 font-mono backdrop-blur-md">
-      <button onClick={()=>movePage(-1)} disabled={safePage===0}
-        className="rounded border border-cyan-300/20 px-2 py-1 text-[9px] text-cyan-100 disabled:opacity-25">▲</button>
-      <span className="min-w-[100px] text-center text-[8px] uppercase tracking-[.14em] text-cyan-100/60">
-        PAGE {safePage+1} / {totalPages}
-      </span>
-      <button onClick={()=>movePage(1)} disabled={safePage>=totalPages-1}
-        className="rounded border border-cyan-300/20 px-2 py-1 text-[9px] text-cyan-100 disabled:opacity-25">▼</button>
-    </div>
-
-    {hover&&<div className="pointer-events-none absolute bottom-4 right-4 z-50 min-w-[220px] rounded-xl border border-cyan-300/25 bg-[#00111d]/90 p-3 font-mono shadow-2xl backdrop-blur-md">
-      <div className="company-title text-[10px] font-black uppercase tracking-[.16em]">{hover.__unitName}</div>
-      <div className="mt-1 text-[9px] text-cyan-100/55">Wall display node</div>
-      <div className="mt-1 text-[9px] font-bold" style={{color:hover.__growth<0?'#fb7185':'#2dd4bf'}}>
-        Growth: {Number(hover.__growth||0).toFixed(1)}%
+      <div className="relative z-10 mb-3 flex shrink-0 items-center justify-between gap-4 rounded-2xl border border-sky-200/30 bg-[linear-gradient(100deg,rgba(8,52,78,.92),rgba(12,73,105,.78),rgba(8,44,67,.88))] px-4 py-3 shadow-[0_14px_34px_rgba(0,0,0,.24),inset_0_1px_0_rgba(255,255,255,.10)] backdrop-blur-xl">
+        <div className="min-w-0">
+          <div className="truncate text-[13px] font-black uppercase tracking-[.20em] text-white drop-shadow-[0_1px_5px_rgba(0,0,0,.42)]">Revenue Exsum · Data Table</div>
+          <div className="mt-1 text-[9px] uppercase tracking-[.13em] text-sky-100/80">Readable fullscreen ledger · simple mode</div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="rounded-xl border border-sky-300/25 bg-[#0a3852]/70 px-3 py-2 text-[9px] font-black uppercase tracking-[.13em] text-sky-100">
+            {rows.length} nodes
+          </div>
+          <div className="rounded-xl border border-sky-300/20 bg-[#06273b]/70 px-3 py-2 text-[9px] font-black uppercase tracking-[.13em] text-sky-200/85">
+            Page {safePage + 1} / {totalPages}
+          </div>
+        </div>
       </div>
-    </div>}
-  </div>;
+
+      <div className="relative z-10 min-h-0 flex-1 overflow-auto rounded-2xl border border-sky-200/30 bg-[linear-gradient(180deg,rgba(4,28,44,.88),rgba(2,17,29,.92))] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.08),0_20px_48px_rgba(0,0,0,.26)] backdrop-blur-xl">
+        <table className="w-full min-w-[820px] border-separate border-spacing-y-2 text-left text-[11px]">
+          <thead className="sticky top-0 z-20 bg-[#0a3650]/96 backdrop-blur-xl">
+            <tr className="text-[9px] uppercase tracking-[.13em] text-[#E8F9FF]">
+              <th className="rounded-l-xl border-y border-l border-sky-200/20 bg-[#0d4868]/95 px-5 py-3.5 font-black shadow-[inset_0_1px_0_rgba(255,255,255,.08)]">Unit Bisnis</th>
+              {columns.map((column) => (
+                <th key={column} className="border-y border-sky-200/20 bg-[#0d4868]/95 px-5 py-3.5 text-right font-black last:rounded-r-xl last:border-r">{column}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {pageRows.length > 0 ? pageRows.map((row, rowIndex) => {
+              const unitName = row['UNIT BISNIS'] || row['healthcareName'] || row['Center'] || `Node ${safePage * pageSize + rowIndex + 1}`;
+              const growth = Number(row['2026 vs 2025'] ?? row['Growth_Percentage'] ?? 0);
+              return (
+                <tr
+                  key={`${unitName}-${rowIndex}`}
+                  className="group transition-transform duration-150 hover:-translate-y-[1px]"
+                >
+                  <td className="rounded-l-xl border-y border-l border-sky-200/15 bg-[linear-gradient(90deg,rgba(15,64,91,.90),rgba(8,42,62,.92))] px-5 py-4 font-black tracking-[.01em] text-white shadow-[0_7px_16px_rgba(0,0,0,.16),inset_0_1px_0_rgba(255,255,255,.06)] group-hover:bg-[#124f70]">{unitName}</td>
+                  {columns.map((column) => (
+                    <td
+                      key={column}
+                      className="border-y border-sky-200/15 bg-[linear-gradient(90deg,rgba(7,35,52,.94),rgba(5,29,44,.94))] px-5 py-4 text-right font-bold tabular-nums last:rounded-r-xl last:border-r shadow-[0_7px_16px_rgba(0,0,0,.12),inset_0_1px_0_rgba(255,255,255,.04)] group-hover:bg-[#0a3d58]"
+                      style={{
+                        color: /2026 vs 2025|Growth_Percentage|Variance/i.test(column)
+                          ? (growth < 0 ? '#fb7185' : '#4ade80')
+                          : '#E6F7FF',
+                      }}
+                    >
+                      {formatCell3D(row[column], column)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            }) : (
+              <tr>
+                <td colSpan={columns.length + 1} className="px-5 py-14 text-center text-[10px] uppercase tracking-[.18em] text-sky-200/55">
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="relative z-10 mt-3 flex shrink-0 items-center justify-between gap-3">
+        <div className="text-[9px] font-bold uppercase tracking-[.14em] text-sky-100/80">
+          Showing {pageRows.length} of {rows.length} nodes
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => movePage(-1)}
+            disabled={safePage === 0}
+            className="rounded-xl border border-sky-300/25 bg-[#0a3852]/72 px-4 py-2.5 text-[9px] font-black uppercase tracking-[.12em] text-sky-100 transition hover:bg-[#105173] disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            Prev
+          </button>
+          <button
+            type="button"
+            onClick={() => movePage(1)}
+            disabled={safePage >= totalPages - 1}
+            className="rounded-xl border border-sky-300/35 bg-[#147db6]/82 px-4 py-2.5 text-[9px] font-black uppercase tracking-[.12em] text-white shadow-[0_0_18px_rgba(37,135,200,.18)] transition hover:bg-[#2587c8] disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function RevenueExsumFullscreen({
@@ -908,7 +978,7 @@ function RevenueExsumFullscreen({
   };
 
   return (
-    <div className="company-panel company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#00f2fe]/30">
+    <div className="company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#2587C8]/40 bg-[#020916]">
       <style>{`
         @keyframes revenueExsumScanBand {
           0% { transform: translateY(-18px); opacity: .15; }
@@ -926,7 +996,7 @@ function RevenueExsumFullscreen({
             Revenue Exsum · 3D Intelligence
           </div>
           <div className="company-muted mt-1 text-[9px] uppercase tracking-[0.18em]">
-            Revenue Core ↔ Physical Holographic Wall
+            Revenue Core ↔ Readable Data Table
           </div>
         </div>
 
@@ -946,7 +1016,7 @@ function RevenueExsumFullscreen({
           <div className="company-tabs flex overflow-hidden rounded-lg border border-cyan-400/25 bg-[#001428]/70 p-0.5 backdrop-blur-md">
             {([
               ['DONUT', '3D CORE'],
-              ['TABLE', 'DATA WALL'],
+              ['TABLE', 'TABLE'],
               ['SENTRA', 'SENTRA CORE'],
             ] as Array<[RevenueExsumViewMode, string]>).map(([mode, label]) => (
               <button

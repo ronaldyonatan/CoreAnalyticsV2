@@ -33,7 +33,7 @@ export default function DailyLowerWidgets({
         e.stopPropagation();
         onExpand(cardKey);
       }}
-      className="p-1 hover:bg-[#2587C8]/20 rounded text-[#2587C8] hover:text-white transition-colors"
+      className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white"
       title="View Full Screen"
     >
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ export default function DailyLowerWidgets({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0">
         {/* UTILIZATION & PRODUCTIVITY - COMING SOON */}
         <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3 flex flex-col justify-between space-y-2 backdrop-blur-sm relative group overflow-hidden">
-          <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+          <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
             <ExpandButton cardKey="utilization" />
           </div>
 
@@ -156,7 +156,7 @@ export default function DailyLowerWidgets({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-shrink-0 pb-1">
         {/* PER CHANNEL */}
         <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3.5 flex flex-col justify-between backdrop-blur-sm min-h-[120px] relative group">
-          <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
             <ExpandButton cardKey="per-channel" />
           </div>
           <div className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider pb-1 border-b border-[#2587C8]/20 text-center pr-6">
@@ -183,7 +183,7 @@ export default function DailyLowerWidgets({
 
         {/* 2025 - OL */}
         <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3.5 flex flex-col justify-between backdrop-blur-sm min-h-[120px] relative group">
-          <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
             <ExpandButton cardKey="ol-2025" />
           </div>
           <div className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider pb-1.5 border-b border-[#2587C8]/20 pr-7">

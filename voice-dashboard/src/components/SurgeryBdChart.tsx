@@ -1485,7 +1485,7 @@ export default function SurgeryBdChart({
 
       {/* EXPAND BUTTON */}
 
-      <div className="absolute top-2.5 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+      <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
 
         <button
           onClick={(
@@ -1497,7 +1497,7 @@ export default function SurgeryBdChart({
               'surgery-bd'
             );
           }}
-          className="p-1 hover:bg-[#2587C8]/20 rounded text-[#2587C8] hover:text-white transition-colors"
+          className="daily-themed-icon-button flex h-6 w-6 items-center justify-center rounded border border-cyan-400/30 text-cyan-300 opacity-100 visible transition-colors hover:bg-[#2587C8]/20 hover:text-white"
           title="View Full Screen"
         >
 

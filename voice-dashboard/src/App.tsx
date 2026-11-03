@@ -34,6 +34,8 @@ import WidgetRevenuePage from './dashboards/WidgetRevenuePage';
 import IOLUsage from './components/IOLUsage';
 import UserManagement from './management/UserManagement';
 import GroupManagement from './management/GroupManagement';
+import ExecutiveBriefing from './executiveIntelligence/components/ExecutiveBriefing';
+import { queueExecutiveBriefingAutoRun } from './executiveIntelligence/engine/executiveBriefingTrigger';
 
 interface HealthcareItem {
   healthcareID: string;
@@ -126,6 +128,14 @@ function GroupManagementView() {
   );
 }
 
+function ExecutiveBriefingView() {
+  return (
+    <div className="h-full min-h-0 w-full overflow-hidden">
+      <ExecutiveBriefing />
+    </div>
+  );
+}
+
 // =========================================================
 // DASHBOARD REGISTRY
 // =========================================================
@@ -147,6 +157,7 @@ const DASHBOARD_COMPONENTS: Record<
   iol_usage: IOLUsage,
   user_management: UserManagementView,
   group_management: GroupManagementView,
+  executive_briefing: ExecutiveBriefingView,
 };
 
 // =========================================================
@@ -159,6 +170,11 @@ const HARDCODED_MENU: MenuItem[] = [
     label: 'Financial',
     icon: 'financial',
     children: [
+      {
+        id: 'executive_briefing',
+        label: 'Executive Briefing',
+        icon: 'performance',
+      },
       {
         id: 'company_performance',
         label: 'Company Performance',
@@ -431,7 +447,8 @@ function readStoredAuthenticatedUser(): AuthenticatedUser | null {
 // =========================================================
 
 function AppContent() {
-  const { themeId, isAurora, isSolaris, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
+  const { themeId, isAurora, isSolaris, isJecHorizon, isJecSkywave, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
+  const isJecTheme = isJecHorizon || isJecSkywave;
   const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(
     () => readStoredAuthenticatedUser()
   );
@@ -811,6 +828,19 @@ function AppContent() {
           setIsSidebarExpanded(false);
           SciFiAudio.playBeep(700, 'sine', 0.05, 0.03);
           return;
+        case 'nav_executive_briefing':
+          if (canAccess('executive_briefing')) {
+            // Stop recognition before Friday starts speaking. Keeping Chrome
+            // SpeechRecognition active while mounting Executive Briefing can
+            // prevent the first TTS narration from starting reliably.
+            if (isListening) {
+              toggleListening();
+            }
+            queueExecutiveBriefingAutoRun('voice');
+            console.info('[CoreAnalytics] Executive Briefing auto-run queued from dashboard voice command');
+            navigateTo('executive_briefing');
+          }
+          return;
         case 'nav_company_performance':
           if (canAccess('company_performance')) navigateTo('company_performance');
           return;
@@ -827,7 +857,7 @@ function AppContent() {
 
     window.addEventListener('coa-voice-command', handleGlobalVoiceCommand as EventListener);
     return () => window.removeEventListener('coa-voice-command', handleGlobalVoiceCommand as EventListener);
-  }, [canAccess, navigateTo, effectiveRoute, healthcareList]);
+  }, [canAccess, navigateTo, effectiveRoute, healthcareList, isListening, toggleListening]);
 
   useEffect(() => {
     if (isMobileView && !isSidebarPinned) {
@@ -920,11 +950,29 @@ function AppContent() {
   if (!isLoggedIn) {
     return (
       <LoginPortal
-        onLoginSuccess={(hcId, session) => {
+        onLoginSuccess={(hcId, session, requestedRoute) => {
           setSelectedHealthcareId(hcId || '');
           setAuthenticatedUser(session ?? null);
           setIsWidgetMode(false);
           setShowManager(false);
+
+          const requestedRouteIsAuthorized = Boolean(
+            requestedRoute &&
+            REGISTERED_ROUTES.has(requestedRoute) &&
+            session?.menus?.some(
+              (menu) => menu?.route_key === requestedRoute
+            )
+          );
+
+          if (requestedRouteIsAuthorized && requestedRoute) {
+            setActiveMenuId(requestedRoute);
+
+            if (requestedRoute === 'executive_briefing') {
+              queueExecutiveBriefingAutoRun('voice');
+              console.info('[CoreAnalytics] Executive Briefing auto-run queued from login voice flow');
+            }
+          }
+
           setIsLoggedIn(true);
         }}
       />
@@ -1121,13 +1169,13 @@ function AppContent() {
         data-rendering-mode={isStaticTheme ? 'static-2.5d' : 'immersive-3d'}
         className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden p-1.5 font-mono select-none md:p-2"
         style={{
-          background: 'var(--core-bg)',
+          background: isJecTheme ? 'transparent' : 'var(--core-bg)',
           color: 'var(--core-primary)',
         }}
       >
         {/* IMMERSIVE SPACE BACKGROUND
             Static Performance themes intentionally do not mount WebGL. */}
-        {!isStaticTheme && (
+        {!isStaticTheme && !isJecTheme && (
           <div className="pointer-events-none absolute inset-0 z-0">
             <Canvas camera={{ position: [0, 1, 5], fov: 50 }}>
               <CyberTunnelBackground />
@@ -1137,7 +1185,7 @@ function AppContent() {
 
         {/* STATIC PERFORMANCE BACKGROUND
             Pure CSS technical depth: zero Canvas / zero requestAnimationFrame. */}
-        {isStaticTheme && (
+        {isStaticTheme && !isJecTheme && (
           <div
             className="core-static-field"
             data-static-theme={isObsidian ? 'obsidian' : isQuartz ? 'quartz' : undefined}
@@ -1146,7 +1194,7 @@ function AppContent() {
         )}
 
         {/* IMMERSIVE ATMOSPHERIC NEBULA */}
-        {!isStaticTheme && (
+        {!isStaticTheme && !isJecTheme && (
           <div
             className="pointer-events-none absolute inset-0 z-[1]"
             style={{
@@ -1182,13 +1230,31 @@ function AppContent() {
           </div>
         )}
 
+        {/* JEC BRAND FIELD
+            Environment only. Styling lives in theme/jec-blue-field-v4.5.css. */}
+        {isJecTheme && (
+          <div
+            className={`core-jec-field ${isJecSkywave ? 'core-jec-field--skywave' : 'core-jec-field--horizon'}`}
+            aria-hidden="true"
+          >
+            <div className="core-jec-field__glow" />
+            <div className="core-jec-field__grid" />
+            <div className="core-jec-field__stars core-jec-field__stars--a" />
+            <div className="core-jec-field__stars core-jec-field__stars--b" />
+            <div className="core-jec-field__wave core-jec-field__wave--a" />
+            <div className="core-jec-field__wave core-jec-field__wave--b" />
+          </div>
+        )}
+
         {/* MAIN FRAME */}
         <div
           className="core-dashboard-frame relative z-10 flex h-full min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden rounded-xl border p-2 backdrop-blur-[3px] md:p-3"
           style={{
             borderColor: 'var(--core-border)',
-            background: 'var(--core-surface)',
-            boxShadow: 'var(--core-frame-shadow)',
+            background: isJecTheme ? 'rgba(255,255,255,.055)' : 'var(--core-surface)',
+            boxShadow: isJecTheme
+              ? 'inset 0 1px 0 rgba(255,255,255,.18), 0 18px 46px rgba(0,42,72,.14)'
+              : 'var(--core-frame-shadow)',
           }}
         >
           {/* =================================================
@@ -1708,7 +1774,10 @@ function AppContent() {
             </aside>}
 
             {/* DYNAMIC DASHBOARD */}
-            <div className="relative z-10 min-h-0 min-w-0 flex-1 overflow-hidden transition-all duration-300">
+            <div
+              data-core-route={effectiveRoute}
+              className="core-dashboard-route relative z-10 min-h-0 min-w-0 flex-1 overflow-hidden transition-all duration-300"
+            >
               {ActiveDashboardComponent ? (
                 <ActiveDashboardComponent
                   selectedHealthcareId={selectedHealthcareId}

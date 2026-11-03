@@ -24,6 +24,11 @@ import * as THREE from 'three';
 import { useTheme } from './theme/ThemeContext';
 import LoginSpotlightTour, { type LoginTourStepId } from './onboarding/LoginSpotlightTour';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import {
+  GLOBAL_VOICE_COMMANDS,
+  normalizeVoiceTranscript,
+  resolveVoiceCommand,
+} from './voiceCommand/voiceCommandRegistry';
 
 // Core Analytics brand assets (project-root /img folder)
 import coreAnalyticsLogo from '../img/logo.png';
@@ -36,7 +41,8 @@ import coreAnalyticsLogoWithName from '../img/logowithname.png';
 interface LoginPortalProps {
   onLoginSuccess?: (
     selectedHealthcareId?: string,
-    authenticatedUser?: AuthenticatedUser
+    authenticatedUser?: AuthenticatedUser,
+    requestedRoute?: string
   ) => void;
 }
 
@@ -3098,6 +3104,69 @@ function AuroraOrbVisual({
   );
 }
 
+
+/* =========================================================
+   JEC BRAND ORB
+   Dedicated Friday visual for JEC Horizon / JEC Skywave.
+   Horizon remains static through the theme's reduced-motion rules;
+   Skywave receives slow brand-blue motion from jec-brand-themes.css.
+========================================================= */
+
+function JecBrandOrb({
+  phase,
+  isListening,
+  isSpeaking,
+}: {
+  phase: PortalPhase;
+  isListening: boolean;
+  isSpeaking: boolean;
+}) {
+  const stateClass =
+    phase === 'verified'
+      ? 'jec-brand-orb--verified'
+      : phase === 'authenticating'
+      ? 'jec-brand-orb--authenticating'
+      : phase === 'charging' || phase === 'portal'
+      ? 'jec-brand-orb--charged'
+      : isSpeaking
+      ? 'jec-brand-orb--speaking'
+      : isListening
+      ? 'jec-brand-orb--listening'
+      : 'jec-brand-orb--idle';
+
+  return (
+    <div className={`jec-brand-orb ${stateClass}`} aria-hidden="true">
+      <div className="jec-brand-orb__halo" />
+
+      <div className="jec-brand-orb__orbit jec-brand-orb__orbit--outer">
+        <span className="jec-brand-orb__satellite" />
+      </div>
+      <div className="jec-brand-orb__orbit jec-brand-orb__orbit--tilt-a" />
+      <div className="jec-brand-orb__orbit jec-brand-orb__orbit--tilt-b" />
+
+      <div className="jec-brand-orb__shell">
+        <div className="jec-brand-orb__grid" />
+        <div className="jec-brand-orb__wave jec-brand-orb__wave--a" />
+        <div className="jec-brand-orb__wave jec-brand-orb__wave--b" />
+        <div className="jec-brand-orb__wave jec-brand-orb__wave--c" />
+        <div className="jec-brand-orb__core" />
+        <div className="jec-brand-orb__specular" />
+        <div className="jec-brand-orb__state-ring" />
+
+        <div className="jec-brand-orb__copy">
+          <span>JEC</span>
+          <strong>FRIDAY CORE</strong>
+        </div>
+      </div>
+
+      <div className="jec-brand-orb__floor">
+        <i />
+        <i />
+      </div>
+    </div>
+  );
+}
+
 /* =========================================================
    LOGIN PORTAL
 ========================================================= */
@@ -3105,7 +3174,8 @@ function AuroraOrbVisual({
 export default function LoginPortal({
   onLoginSuccess,
 }: LoginPortalProps) {
-  const { isAurora, isSolaris, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
+  const { isAurora, isSolaris, isJecHorizon, isJecSkywave, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
+  const isJecTheme = isJecHorizon || isJecSkywave;
   const authenticatedSessionRef = useRef<AuthenticatedUser | null>(null);
   const rememberAuthenticatedUser = useCallback((
     identity: VoiceIdentityUser,
@@ -3146,6 +3216,11 @@ export default function LoginPortal({
 
   const [loginMode, setLoginMode] =
     useState<LoginMode>('voice');
+
+  // Tracks only the voice-auth flow, so mobile voice focus never hides
+  // the form during a normal username/password submission.
+  const [voiceSessionActive, setVoiceSessionActive] =
+    useState(false);
 
   const [manualUsername, setManualUsername] =
     useState('');
@@ -3197,7 +3272,7 @@ export default function LoginPortal({
     statusMessage,
     setStatusMessage,
   ] = useState(
-    'Neural gateway online. Choose voice or manual authentication.'
+    'Sistem siap. Pilih login suara atau login manual.'
   );
 
   const [
@@ -3215,6 +3290,19 @@ export default function LoginPortal({
 
   const recognitionRef =
     useRef<any>(null);
+
+  // A voice command can be spoken together with the wake phrase on the login
+  // screen. Keep it pending until biometric identity has been verified.
+  const pendingPostLoginRouteRef =
+    useRef<string | null>(null);
+
+  // After a successful biometric login Friday can briefly listen for a second
+  // command before opening the normal dashboard.
+  const postAuthRecognitionRef =
+    useRef<any>(null);
+
+  const postAuthCommandTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isProcessingRef =
     useRef(false);
@@ -3273,8 +3361,32 @@ export default function LoginPortal({
             timer
           )
       );
+
+      if (postAuthCommandTimerRef.current) {
+        clearTimeout(postAuthCommandTimerRef.current);
+        postAuthCommandTimerRef.current = null;
+      }
+
+      try {
+        recognitionRef.current?.abort?.();
+      } catch (e) {}
+
+      try {
+        postAuthRecognitionRef.current?.abort?.();
+      } catch (e) {}
     };
   }, []);
+
+  useEffect(() => {
+    if (
+      voiceSessionActive &&
+      phase === 'idle' &&
+      !isListening &&
+      !isAuthenticating
+    ) {
+      setVoiceSessionActive(false);
+    }
+  }, [isAuthenticating, isListening, phase, voiceSessionActive]);
 
   useEffect(() => {
     if (resendSeconds <= 0) return;
@@ -3302,16 +3414,16 @@ export default function LoginPortal({
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
+        utterance.lang = 'id-ID';
         utterance.rate = 0.92;
         utterance.pitch = 0.92;
         utterance.volume = 1;
 
         const voices = window.speechSynthesis.getVoices();
         const preferred =
-          voices.find((v) => /en-US/i.test(v.lang) && /female|samantha|zira|ava|aria|jenny/i.test(v.name)) ||
-          voices.find((v) => /en-US/i.test(v.lang)) ||
-          voices.find((v) => /^en/i.test(v.lang));
+          voices.find((v) => /^id/i.test(v.lang) && /female|woman|damayanti|siti|gadis|indonesia|google bahasa indonesia/i.test(v.name)) ||
+          voices.find((v) => /^id/i.test(v.lang)) ||
+          voices.find((v) => /^ms/i.test(v.lang));
 
         if (preferred) utterance.voice = preferred;
 
@@ -3395,6 +3507,60 @@ export default function LoginPortal({
     [speakWithBrowser]
   );
 
+  const resolveRequestedPostLoginRoute =
+    useCallback((transcript: string): string | null => {
+      const normalized = normalizeVoiceTranscript(transcript);
+      if (!normalized) return null;
+
+      const command = resolveVoiceCommand(
+        normalized,
+        GLOBAL_VOICE_COMMANDS
+      );
+
+      if (command?.id === 'nav_executive_briefing') {
+        return 'executive_briefing';
+      }
+
+      // Login speech recognition often writes "JEC" differently or splits
+      // the sentence after the wake phrase. Keep this intent deliberately
+      // tolerant, but still require JEC + an information/condition question.
+      const compact = normalized.replace(/\s+/g, '');
+      const mentionsJec =
+        normalized.includes('jec') ||
+        normalized.includes('j e c') ||
+        compact.includes('jec');
+
+      const asksAboutCondition = [
+        'bagaimana',
+        'kabar',
+        'kondisi',
+        'keadaan',
+        'performa',
+        'performance',
+        'keuangan',
+        'info',
+        'informasi',
+        'analisa',
+        'analisis',
+        'briefing',
+        'hari ini',
+        'saat ini',
+      ].some((phrase) => normalized.includes(phrase));
+
+      return mentionsJec && asksAboutCondition
+        ? 'executive_briefing'
+        : null;
+    }, []);
+
+  const authenticatedSessionCanAccess =
+    useCallback((routeKey: string): boolean => {
+      return Boolean(
+        authenticatedSessionRef.current?.menus?.some(
+          (menu) => menu?.route_key === routeKey
+        )
+      );
+    }, []);
+
   /* =======================================================
      GREETING
   ======================================================= */
@@ -3402,35 +3568,7 @@ export default function LoginPortal({
   const getGreeting =
     useCallback(
       (name: string) => {
-        const hour =
-          new Date().getHours();
-
-        let greeting =
-          'Good morning';
-
-        if (
-          hour >= 12 &&
-          hour < 18
-        ) {
-          greeting =
-            'Good afternoon';
-        } else if (
-          hour >= 18 ||
-          hour < 4
-        ) {
-          greeting =
-            'Good evening';
-        }
-
-        /*
-          Sengaja dibuat dua kalimat.
-
-          Friday menyapa user dulu,
-          baru memberi tahu dashboard
-          akan dibuka.
-        */
-
-        return `${greeting} ${name}. Good to see you. Directing you to the executive dashboard now.`;
+        return `Hai ${name}, apa yang bisa saya bantu?`;
       },
       []
     );
@@ -3442,7 +3580,8 @@ export default function LoginPortal({
   const beginPortalTransition =
     useCallback(
       (
-        userName: string
+        userName: string,
+        requestedRoute?: string | null
       ) => {
         if (
           transitionStartedRef.current
@@ -3462,7 +3601,7 @@ export default function LoginPortal({
         );
 
         setStatusMessage(
-          `Identity verified. Welcome ${userName}.`
+          `Identitas terverifikasi. Selamat datang ${userName}.`
         );
 
         SciFiAudio.success();
@@ -3480,7 +3619,7 @@ export default function LoginPortal({
               );
 
               setStatusMessage(
-                'Core Analytics gateway charging...'
+                'Membuka Core Analytics...'
               );
 
               SciFiAudio.portalCharge();
@@ -3501,7 +3640,7 @@ export default function LoginPortal({
               );
 
               setStatusMessage(
-                'Gateway open. Entering Core Analytics...'
+                'Portal siap. Membuka Core Analytics...'
               );
             },
             1550
@@ -3532,7 +3671,8 @@ export default function LoginPortal({
             () => {
               onLoginSuccess?.(
                 '',
-                authenticatedSessionRef.current ?? undefined
+                authenticatedSessionRef.current ?? undefined,
+                requestedRoute || undefined
               );
             },
             2700
@@ -3548,6 +3688,114 @@ export default function LoginPortal({
       [onLoginSuccess]
     );
 
+  const startPostAuthCommandListener =
+    useCallback(
+      (userName: string) => {
+        const SpeechRecognition =
+          (window as any).SpeechRecognition ||
+          (window as any).webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+          beginPortalTransition(userName);
+          return;
+        }
+
+        let finished = false;
+        const rec = new SpeechRecognition();
+        postAuthRecognitionRef.current = rec;
+
+        rec.lang = 'id-ID';
+        // One utterance = one final command. Chrome can keep a continuous
+        // recognition session alive indefinitely after the microphone opens,
+        // which leaves the login portal stuck on LISTENING.
+        rec.interimResults = false;
+        rec.continuous = false;
+
+        const finish = (
+          requestedRoute?: string | null,
+          fallbackMessage?: string
+        ) => {
+          if (finished) return;
+          finished = true;
+
+          if (postAuthCommandTimerRef.current) {
+            clearTimeout(postAuthCommandTimerRef.current);
+            postAuthCommandTimerRef.current = null;
+          }
+
+          try { rec.abort(); } catch (e) {}
+          setIsListening(false);
+
+          if (
+            requestedRoute &&
+            authenticatedSessionCanAccess(requestedRoute)
+          ) {
+            pendingPostLoginRouteRef.current = requestedRoute;
+            setStatusMessage(
+              requestedRoute === 'executive_briefing'
+                ? 'Baik. Saya buka Executive Briefing JEC.'
+                : 'Baik. Saya buka dashboard yang diminta.'
+            );
+            beginPortalTransition(userName, requestedRoute);
+            return;
+          }
+
+          pendingPostLoginRouteRef.current = null;
+          setStatusMessage(
+            fallbackMessage ||
+              'Tidak ada perintah lanjutan. Membuka dashboard utama.'
+          );
+          beginPortalTransition(userName);
+        };
+
+        rec.onresult = (event: any) => {
+          const transcript = Array.from(event.results || [])
+            .map((result: any) => String(result?.[0]?.transcript || ''))
+            .join(' ');
+
+          const requestedRoute =
+            resolveRequestedPostLoginRoute(transcript);
+
+          if (requestedRoute) {
+            finish(requestedRoute);
+          }
+        };
+
+        rec.onerror = () => {
+          finish(null, 'Pengenalan suara berhenti. Membuka dashboard utama.');
+        };
+
+        rec.onend = () => {
+          if (!finished) finish();
+        };
+
+        setVoiceSessionActive(true);
+        setIsListening(true);
+        setPhase('verified');
+        setStatusMessage(
+          'Saya mendengarkan. Contoh: "Bagaimana kabar JEC hari ini?"'
+        );
+
+        SciFiAudio.playBeep(920, 'sine', 0.08, 0.03);
+
+        postAuthCommandTimerRef.current = setTimeout(
+          () => finish(),
+          7000
+        );
+
+        try {
+          rec.start();
+        } catch (e) {
+          finish();
+        }
+      },
+      [
+        authenticatedSessionCanAccess,
+        beginPortalTransition,
+        resolveRequestedPostLoginRoute,
+      ]
+    );
+
   /* =======================================================
      SUCCESS SEQUENCE
   ======================================================= */
@@ -3556,7 +3804,8 @@ export default function LoginPortal({
     useCallback(
       (
         userName: string,
-        waitForGreeting = true
+        waitForGreeting = true,
+        allowPostAuthVoiceCommand = false
       ) => {
         setAuthenticatedUser(
           userName
@@ -3575,19 +3824,55 @@ export default function LoginPortal({
             userName
           );
 
+        /*
+          Voice biometric login can keep one intent from the wake phrase,
+          e.g. "Hey Friday, bagaimana kabar JEC hari ini?". If no intent was
+          spoken yet, Friday opens a short follow-up listening window.
+        */
+        if (allowPostAuthVoiceCommand) {
+          const pendingRoute = pendingPostLoginRouteRef.current;
+
+          if (
+            pendingRoute &&
+            authenticatedSessionCanAccess(pendingRoute)
+          ) {
+            const routeGreeting =
+              pendingRoute === 'executive_briefing'
+                ? `Hai ${userName}. Saya tampilkan kondisi JEC hari ini.`
+                : `Hai ${userName}. Saya buka dashboard yang Anda minta.`;
+
+            setStatusMessage(routeGreeting);
+
+            speakText(routeGreeting, () => {
+              beginPortalTransition(userName, pendingRoute);
+            });
+
+            return;
+          }
+
+          pendingPostLoginRouteRef.current = null;
+
+          const commandPrompt =
+            `Hai ${userName}, apa yang bisa saya bantu?`;
+
+          setStatusMessage(commandPrompt);
+
+          speakText(commandPrompt, () => {
+            startPostAuthCommandListener(userName);
+          });
+
+          return;
+        }
+
         setStatusMessage(
           greeting
         );
 
         /*
-          Voice biometric login keeps the cinematic behavior:
-          wait until Friday finishes the greeting before opening the portal.
-
           Manual username/password login can pass waitForGreeting = false.
           In that mode the greeting still plays, but it no longer blocks
           the portal transition.
         */
-
         if (!waitForGreeting) {
           void speakText(
             greeting
@@ -3603,11 +3888,6 @@ export default function LoginPortal({
         speakText(
           greeting,
           () => {
-            /*
-              beri jeda sedikit
-              setelah Friday selesai bicara
-            */
-
             const timer =
               setTimeout(
                 () => {
@@ -3625,9 +3905,11 @@ export default function LoginPortal({
         );
       },
       [
+        authenticatedSessionCanAccess,
         beginPortalTransition,
         getGreeting,
         speakText,
+        startPostAuthCommandListener,
       ]
     );
 
@@ -3646,6 +3928,8 @@ export default function LoginPortal({
         }
 
         try {
+          setVoiceSessionActive(true);
+
           isProcessingRef.current =
             true;
 
@@ -3662,7 +3946,7 @@ export default function LoginPortal({
           );
 
           setStatusMessage(
-            'Capturing biometric voice signature...'
+            'Merekam pola suara biometrik...'
           );
 
           SciFiAudio.playBeep(
@@ -3744,7 +4028,7 @@ export default function LoginPortal({
               );
 
               setStatusMessage(
-                'Voice recording failed.'
+                'Perekaman suara gagal.'
               );
 
               SciFiAudio.failure();
@@ -3775,7 +4059,7 @@ export default function LoginPortal({
                 );
 
                 setStatusMessage(
-                  'No voice signal was captured.'
+                  'Tidak ada suara yang tertangkap.'
                 );
 
                 SciFiAudio.failure();
@@ -3817,7 +4101,7 @@ export default function LoginPortal({
               );
 
               setStatusMessage(
-                'Analyzing voice identity against CoreAnalytics profiles...'
+                'Mencocokkan identitas suara...'
               );
 
               try {
@@ -3845,6 +4129,16 @@ export default function LoginPortal({
                   );
                 }
 
+                // Non-secret diagnostics to distinguish threshold, margin and
+                // recording-quality failures during rollout/trial.
+                console.info('[CoreAnalytics VoiceAuth]', {
+                  decision: data.decision,
+                  best_score: data.best_score ?? null,
+                  second_best_score: data.second_best_score ?? null,
+                  score_margin: data.score_margin ?? null,
+                  threshold_used: data.threshold_used ?? null,
+                });
+
                 if (
                   res.ok &&
                   data.success &&
@@ -3864,7 +4158,9 @@ export default function LoginPortal({
                   handleAuthenticatedUser(
                     identity.display_name ||
                       identity.username ||
-                      'User'
+                      'User',
+                    true,
+                    true
                   );
 
                   return;
@@ -3883,13 +4179,13 @@ export default function LoginPortal({
                   'AMBIGUOUS'
                 ) {
                   setStatusMessage(
-                    'Multiple voice profiles are too similar. Identity could not be confirmed.'
+                    'Beberapa profil suara terlalu mirip. Identitas belum dapat dipastikan.'
                   );
 
                   SciFiAudio.failure();
 
                   speakText(
-                    'Voice identity could not be confirmed. Please try again.'
+                    'Identitas suara belum dapat dipastikan. Silakan coba lagi.'
                   );
 
                   return;
@@ -3901,13 +4197,13 @@ export default function LoginPortal({
                 ) {
                   setStatusMessage(
                     data.message ||
-                      'Voice quality was insufficient. Please try again.'
+                      'Kualitas suara kurang baik. Silakan coba lagi.'
                   );
 
                   SciFiAudio.failure();
 
                   speakText(
-                    'Voice quality was insufficient. Please try again.'
+                    'Kualitas suara kurang baik. Silakan coba lagi.'
                   );
 
                   return;
@@ -3918,13 +4214,13 @@ export default function LoginPortal({
                   'UNKNOWN'
                 ) {
                   setStatusMessage(
-                    'Voice identity not recognized.'
+                    'Suara belum dikenali.'
                   );
 
                   SciFiAudio.failure();
 
                   speakText(
-                    'Voice identity not recognized.'
+                    'Suara belum dikenali.'
                   );
 
                   return;
@@ -3932,7 +4228,7 @@ export default function LoginPortal({
 
                 setStatusMessage(
                   data.message ||
-                    'Voice authentication failed.'
+                    'Autentikasi suara gagal.'
                 );
 
                 SciFiAudio.failure();
@@ -3951,7 +4247,7 @@ export default function LoginPortal({
                 );
 
                 setStatusMessage(
-                  'Voice service is unavailable. You can use manual authentication.'
+                  'Layanan suara tidak tersedia. Silakan gunakan login manual.'
                 );
 
                 SciFiAudio.failure();
@@ -3974,7 +4270,7 @@ export default function LoginPortal({
           mediaRecorder.start();
 
           setStatusMessage(
-            'Speak naturally for four seconds...'
+            'Silakan bicara secara natural selama empat detik...'
           );
 
           const stopTimer =
@@ -4015,7 +4311,7 @@ export default function LoginPortal({
             false;
 
           setStatusMessage(
-            'Microphone access error.'
+            'Mikrofon tidak dapat diakses.'
           );
 
           SciFiAudio.failure();
@@ -4044,154 +4340,134 @@ export default function LoginPortal({
       }
 
       const SpeechRecognition =
-        (window as any)
-          .SpeechRecognition ||
-        (window as any)
-          .webkitSpeechRecognition;
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
 
-      if (
-        !SpeechRecognition
-      ) {
-        setStatusMessage(
-          'Speech Recognition API is not supported in this browser.'
-        );
-
+      if (!SpeechRecognition) {
+        setStatusMessage('Pengenalan suara tidak didukung oleh browser ini.');
         return;
       }
 
-      if (
-        !recognitionRef.current
-      ) {
-        recognitionRef.current =
-          new SpeechRecognition();
+      try { recognitionRef.current?.abort?.(); } catch (e) {}
 
-        recognitionRef.current.lang =
-          'en-US';
+      const rec = new SpeechRecognition();
+      recognitionRef.current = rec;
+      rec.lang = 'id-ID';
+      // Stabil di Chrome: tunggu satu kalimat final lalu tutup recognition.
+      // Ini tetap menerima kalimat penuh seperti
+      // "Hey Friday bagaimana kondisi JEC hari ini".
+      rec.interimResults = false;
+      rec.continuous = false;
 
-        recognitionRef.current.interimResults =
-          false;
+      let finished = false;
+      let receivedResult = false;
+      let watchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
-        recognitionRef.current.continuous =
-          false;
-      }
+      const clearWatchdog = () => {
+        if (!watchdogTimer) return;
+        clearTimeout(watchdogTimer);
+        watchdogTimer = null;
+      };
 
-      const rec =
-        recognitionRef.current;
+      const finishToBiometric = (requestedRoute?: string | null) => {
+        if (finished) return;
+        finished = true;
+        clearWatchdog();
 
-      setIsListening(
-        true
-      );
+        if (requestedRoute) {
+          pendingPostLoginRouteRef.current = requestedRoute;
+        }
 
-      setPhase(
-        'listening'
-      );
+        try { rec.abort(); } catch (e) {}
+        setIsListening(false);
+        setStatusMessage('Friday aktif. Memulai verifikasi suara...');
+        SciFiAudio.playBeep(1080, 'sine', 0.10, 0.035);
+        triggerVoiceBiometricAuthentication();
+      };
 
+      setVoiceSessionActive(true);
+      setIsListening(true);
+      setPhase('listening');
       setStatusMessage(
-        'Listening... Say "Hey Friday" to start secure voice login.'
+        'Saya mendengarkan. Ucapkan "Hey Friday" atau langsung tanyakan kondisi JEC.'
       );
+      SciFiAudio.playBeep(880, 'sine', 0.08, 0.035);
 
-      SciFiAudio.playBeep(
-        880,
-        'sine',
-        0.08,
-        0.035
-      );
+      rec.onresult = (event: any) => {
+        receivedResult = true;
+        clearWatchdog();
 
-      rec.onresult =
-        (
-          event: any
-        ) => {
-          const transcript =
-            event.results[0][0].transcript.toLowerCase();
+        const transcript = Array.from(event.results || [])
+          .map((result: any) => String(result?.[0]?.transcript || ''))
+          .join(' ');
+        const normalized = normalizeVoiceTranscript(transcript);
+        const requestedRoute = resolveRequestedPostLoginRoute(normalized);
 
-          if (
-            transcript.includes(
-              'friday'
-            ) ||
-            transcript.includes(
-              'login'
-            ) ||
-            transcript.includes(
-              'hey friday'
-            )
-          ) {
-            setIsListening(
-              false
-            );
+        console.info('[CoreAnalytics Login Voice] perintah:', normalized);
 
-            try {
-              rec.abort();
-            } catch (e) {}
+        // Jika pertanyaan JEC sudah diucapkan dalam kalimat yang sama dengan
+        // wake phrase, simpan intent agar setelah biometric langsung briefing.
+        if (requestedRoute) {
+          finishToBiometric(requestedRoute);
+          return;
+        }
 
-            setStatusMessage(
-              'Wake phrase accepted. Preparing biometric scan...'
-            );
+        const hasWakePhrase =
+          normalized.includes('friday') ||
+          normalized.includes('hey friday') ||
+          normalized.includes('hei friday') ||
+          normalized.includes('login');
 
-            SciFiAudio.playBeep(
-              1080,
-              'sine',
-              0.10,
-              0.035
-            );
+        if (hasWakePhrase) {
+          finishToBiometric();
+          return;
+        }
 
-            triggerVoiceBiometricAuthentication();
-          } else {
-            setIsListening(
-              false
-            );
+        finished = true;
+        setIsListening(false);
+        setPhase('idle');
+        setStatusMessage('Saya belum mendengar kata panggil Friday. Silakan coba lagi.');
+      };
 
-            setPhase(
-              'idle'
-            );
+      rec.onerror = (event: any) => {
+        if (finished) return;
+        clearWatchdog();
+        finished = true;
+        setIsListening(false);
+        setPhase('idle');
+        setStatusMessage(
+          event?.error === 'no-speech'
+            ? 'Tidak ada suara yang terdeteksi. Silakan coba lagi.'
+            : 'Pengenalan suara berhenti. Silakan coba lagi.'
+        );
+      };
 
-            setStatusMessage(
-              'Wake phrase not recognized. Try again.'
-            );
-          }
-        };
+      rec.onend = () => {
+        if (finished || receivedResult) return;
+        clearWatchdog();
+        finished = true;
+        setIsListening(false);
+        setPhase('idle');
+        setStatusMessage('Tidak ada perintah suara yang terdeteksi. Silakan coba lagi.');
+      };
 
-      rec.onerror =
-        () => {
-          setIsListening(
-            false
-          );
-
-          setPhase(
-            'idle'
-          );
-
-          setStatusMessage(
-            'Speech recognition error or stopped.'
-          );
-        };
-
-      rec.onend =
-        () => {
-          setIsListening(
-            false
-          );
-
-          setPhase(
-            (
-              current
-            ) =>
-              current ===
-              'listening'
-                ? 'idle'
-                : current
-          );
-        };
+      // Safety net: tidak boleh ada state LISTENING tanpa batas.
+      watchdogTimer = setTimeout(() => {
+        if (finished) return;
+        try { rec.abort(); } catch (e) {}
+        finished = true;
+        setIsListening(false);
+        setPhase('idle');
+        setStatusMessage('Waktu mendengarkan selesai. Silakan coba lagi.');
+      }, 8000);
 
       try {
         rec.start();
       } catch (e) {
-        setIsListening(
-          false
-        );
-
-        setPhase(
-          'idle'
-        );
+        clearWatchdog();
+        finished = true;
+        setIsListening(false);
+        setPhase('idle');
       }
     };
 
@@ -4200,33 +4476,30 @@ export default function LoginPortal({
   ======================================================= */
 
   useEffect(() => {
-    const handleGlobalVoiceCommand =
-      (
-        event: Event
-      ) => {
-        const customEvent =
-          event as CustomEvent<string>;
+    const handleGlobalVoiceCommand = (event: Event) => {
+      const cmd = String((event as CustomEvent<string>).detail || '');
+      const normalized = normalizeVoiceTranscript(cmd);
+      const requestedRoute = resolveRequestedPostLoginRoute(normalized);
 
-        const cmd =
-          customEvent.detail.toLowerCase();
+      if (requestedRoute) {
+        pendingPostLoginRouteRef.current = requestedRoute;
+      }
 
-        if (
-          cmd.includes(
-            'friday'
-          ) ||
-          cmd.includes(
-            'login'
-          )
-        ) {
-          if (
-            !isProcessingRef.current &&
-            !isAuthenticating &&
-            !transitionStartedRef.current
-          ) {
-            triggerVoiceBiometricAuthentication();
-          }
-        }
-      };
+      const hasWakePhrase =
+        normalized.includes('friday') ||
+        normalized.includes('hey friday') ||
+        normalized.includes('hei friday') ||
+        normalized.includes('login');
+
+      if (
+        (hasWakePhrase || requestedRoute) &&
+        !isProcessingRef.current &&
+        !isAuthenticating &&
+        !transitionStartedRef.current
+      ) {
+        triggerVoiceBiometricAuthentication();
+      }
+    };
 
     window.addEventListener(
       'coa-voice-command',
@@ -4242,6 +4515,7 @@ export default function LoginPortal({
   }, [
     triggerVoiceBiometricAuthentication,
     isAuthenticating,
+    resolveRequestedPostLoginRoute,
   ]);
 
   /* =======================================================
@@ -4433,7 +4707,7 @@ export default function LoginPortal({
     setResetConfirmPassword('');
     setShowResetPassword(false);
     setResendSeconds(0);
-    setStatusMessage('Manual credential authentication ready.');
+    setStatusMessage('Login manual siap digunakan.');
   }, []);
 
   const handlePasswordResetRequest = useCallback(
@@ -4523,7 +4797,7 @@ export default function LoginPortal({
         setResetNewPassword('');
         setResetConfirmPassword('');
         setManualPanel('forgot-reset');
-        setStatusMessage('Identity verified. Create a new secure password.');
+        setStatusMessage('Identitas terverifikasi. Buat kata sandi baru yang aman.');
         SciFiAudio.success();
       } catch (error) {
         console.error('Password reset verification error:', error);
@@ -4640,21 +4914,29 @@ export default function LoginPortal({
       'portal' ||
     phase === 'flash';
 
+  /* Mobile-only voice focus mode.
+     While voice authentication is active, the login HUD disappears so the
+     assistant core becomes the only focal point. A failed attempt returns
+     phase to idle, which automatically restores the login UI. */
+  const mobileVoiceFocus =
+    voiceSessionActive &&
+    (isListening || isAuthenticating || isVerified);
+
   const coreStatus =
     phase === 'portal'
-      ? 'ENTERING GATEWAY'
+      ? 'MEMBUKA PORTAL'
       : phase ===
         'charging'
-      ? 'PORTAL CHARGING'
+      ? 'MENYIAPKAN PORTAL'
       : isVerified
-      ? 'IDENTITY VERIFIED'
+      ? 'IDENTITAS TERVERIFIKASI'
       : isAuthenticating
-      ? 'BIOMETRIC ANALYSIS'
+      ? 'ANALISIS BIOMETRIK'
       : isListening
-      ? 'VOICE LISTENING'
+      ? 'MENDENGARKAN SUARA'
       : isSpeaking
-      ? 'FRIDAY ONLINE'
-      : 'NEURAL GATEWAY READY';
+      ? 'FRIDAY AKTIF'
+      : 'PORTAL SIAP';
 
   /* =======================================================
      RENDER
@@ -4662,11 +4944,15 @@ export default function LoginPortal({
 
   return (
     <div
-      className={`login-portal-root fixed inset-0 z-50 h-[100dvh] w-screen overflow-hidden font-mono text-sky-100 select-none ${
+      className={`login-portal-root login-phase-${phase} ${mobileVoiceFocus ? 'login-mobile-voice-focus' : ''} fixed inset-0 z-50 h-[100dvh] w-screen overflow-hidden font-mono text-sky-100 select-none ${
         isAurora
           ? 'login-aurora-mode bg-[#071b25]'
-          : isLight
+          : isJecTheme
+          ? `login-jec-mode ${isJecSkywave ? 'login-jec-skywave-mode' : 'login-jec-horizon-mode'} bg-[#b9d9ea]`
+          : isSolaris
           ? 'login-solaris-mode bg-[#eaf8ff]'
+          : isLight
+          ? 'bg-[#edf8fc]'
           : 'bg-[#010611]'
       }`}
     >
@@ -4686,6 +4972,22 @@ export default function LoginPortal({
           <div className="login-solaris-orbit login-solaris-orbit--a" />
           <div className="login-solaris-orbit login-solaris-orbit--b" />
           <div className="login-solaris-horizon" />
+        </div>
+      )}
+
+      {isJecTheme && (
+        <div
+          className={`login-jec-sky absolute inset-0 z-0 pointer-events-none ${
+            isJecSkywave ? 'login-jec-sky--animated' : 'login-jec-sky--static'
+          }`}
+          aria-hidden="true"
+        >
+          <div className="login-jec-sky__deep" />
+          <div className="login-jec-sky__mesh" />
+          <div className="login-jec-sky__wave login-jec-sky__wave--a" />
+          <div className="login-jec-sky__wave login-jec-sky__wave--b" />
+          <div className="login-jec-sky__wave login-jec-sky__wave--c" />
+          <div className="login-jec-sky__dots" />
         </div>
       )}
 
@@ -4715,7 +5017,7 @@ export default function LoginPortal({
           Solaris also avoids mounting a hidden space Canvas.
       =================================================== */}
 
-      {!isStaticTheme && !isSolaris && (
+      {!isStaticTheme && !isSolaris && !isJecTheme && (
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Canvas
             style={{ pointerEvents: 'none' }}
@@ -4745,7 +5047,7 @@ export default function LoginPortal({
       )}
 
       {/* STATIC PERFORMANCE SKY — zero WebGL / zero motion */}
-      {isStaticTheme && (
+      {isStaticTheme && !isJecTheme && (
         <div
           className={`login-static-sky ${
             isQuartz ? 'login-static-sky--quartz' : 'login-static-sky--obsidian'
@@ -4758,7 +5060,7 @@ export default function LoginPortal({
           CSS NEBULA
       =================================================== */}
 
-      {!isAurora && !isSolaris && !isStaticTheme && (
+      {!isAurora && !isSolaris && !isStaticTheme && !isJecTheme && (
         <div
           className="
             absolute
@@ -4776,8 +5078,12 @@ export default function LoginPortal({
         className={`absolute inset-0 z-[2] pointer-events-none ${
           isAurora
             ? 'bg-gradient-to-r from-[#06131d]/82 via-[#071923]/32 to-transparent'
-            : isLight
+            : isJecTheme
+            ? 'login-jec-sidewash'
+            : isSolaris
             ? 'login-solaris-sidewash'
+            : isLight
+            ? 'bg-gradient-to-r from-white/35 via-white/10 to-transparent'
             : 'bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08'
         }`}
       />
@@ -4815,6 +5121,7 @@ export default function LoginPortal({
 
       <header
         className={`
+          login-top-hud
           absolute
           left-4
           right-4
@@ -4897,7 +5204,7 @@ export default function LoginPortal({
         </div>
       </header>
 
-      <div className="absolute left-4 right-4 top-[62px] sm:left-6 sm:right-6 sm:top-[70px] z-20 h-px bg-gradient-to-r from-sky-400/30 via-sky-400/10 to-transparent md:left-10 md:right-10" />
+      <div className="login-hud-divider absolute left-4 right-4 top-[62px] sm:left-6 sm:right-6 sm:top-[70px] z-20 h-px bg-gradient-to-r from-sky-400/30 via-sky-400/10 to-transparent md:left-10 md:right-10" />
 
       {/* ===================================================
           MAIN
@@ -4969,7 +5276,7 @@ export default function LoginPortal({
 
             <div
               data-tour="login-hud"
-              className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} ${isLight ? 'login-hud-surface--solaris' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
+              className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} ${isSolaris ? 'login-hud-surface--solaris' : ''} ${isJecTheme ? 'login-hud-surface--jec' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
             >
               {/* Holographic rails instead of a large boxed frame */}
               <div className="pointer-events-none absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/65 to-transparent" />
@@ -4986,10 +5293,10 @@ export default function LoginPortal({
                   </div>
                   <div>
                     <div className="text-[13px] font-black tracking-[0.22em] text-sky-100">
-                      {isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : isQuartz ? 'QUARTZ COMMAND LOGIN' : isObsidian ? 'OBSIDIAN COMMAND LOGIN' : 'IDENTITY GATEWAY'}
+                      {isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : isJecSkywave ? 'JEC SKYWAVE GATEWAY' : isJecHorizon ? 'JEC HORIZON GATEWAY' : isQuartz ? 'QUARTZ COMMAND LOGIN' : isObsidian ? 'OBSIDIAN COMMAND LOGIN' : 'IDENTITY GATEWAY'}
                     </div>
                     <div className="mt-0.5 text-[10px] tracking-[0.22em] text-slate-600">
-                      {isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : isQuartz ? 'EXECUTIVE NODE // QUARTZ' : isObsidian ? 'EXECUTIVE NODE // OBSIDIAN' : 'BIOMETRIC NODE // 01'}
+                      {isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : isJecTheme ? 'JEC SECURE BLUE NETWORK // 01' : isQuartz ? 'EXECUTIVE NODE // QUARTZ' : isObsidian ? 'EXECUTIVE NODE // OBSIDIAN' : 'BIOMETRIC NODE // 01'}
                     </div>
                   </div>
                 </div>
@@ -5018,7 +5325,7 @@ export default function LoginPortal({
                     onClick={() => {
                       if (isAuthenticating || isVerified) return;
                       setLoginMode('voice');
-                      setStatusMessage('Voice authentication ready.');
+                      setStatusMessage('Login suara siap digunakan.');
                     }}
                     disabled={isAuthenticating || isVerified}
                     className={`h-8 rounded-md text-[11px] font-black tracking-[0.16em] transition-all ${
@@ -5036,7 +5343,7 @@ export default function LoginPortal({
                       if (isAuthenticating || isVerified) return;
                       setLoginMode('manual');
                       setManualPanel('login');
-                      setStatusMessage('Manual credential authentication ready.');
+                      setStatusMessage('Login manual siap digunakan.');
                     }}
                     disabled={isAuthenticating || isVerified}
                     className={`h-8 rounded-md text-[11px] font-black tracking-[0.16em] transition-all ${
@@ -5052,15 +5359,15 @@ export default function LoginPortal({
 
               {loginMode === 'voice' ? (
                 <>
-                  {/* VOICE IDENTITY DIRECTORY - original HUD preserved */}
+                  {/* IDENTITAS SUARA DIRECTORY - original HUD preserved */}
                   <div className="mt-3 px-2">
                     <div className="mb-1.5 flex items-center justify-between">
                       <span className="text-[11px] font-bold tracking-[0.18em] text-sky-500/80">
-                        VOICE IDENTITY
+                        IDENTITAS SUARA
                       </span>
 
                       <span className="text-[10px] tracking-[0.18em] text-emerald-500/65">
-                        CORE PROFILE
+                        PROFIL CORE
                       </span>
                     </div>
 
@@ -5069,11 +5376,11 @@ export default function LoginPortal({
 
                       <div className="min-w-0 flex-1 py-2">
                         <div className="truncate text-[11px] font-black tracking-[0.14em] text-sky-200">
-                          COREANALYTICS BIOMETRIC DIRECTORY
+                          DIREKTORI BIOMETRIK COREANALYTICS
                         </div>
 
                         <div className="mt-0.5 truncate text-[10px] tracking-[0.13em] text-slate-600">
-                          ACTIVE PROFILES // CENTROID MATCHING
+                          PROFIL AKTIF // PENCOCOKAN SUARA
                         </div>
                       </div>
 
@@ -5135,19 +5442,19 @@ export default function LoginPortal({
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-[12px] font-black tracking-[0.17em] text-sky-100">
                             {isVerified
-                              ? 'ACCESS VERIFIED'
+                              ? 'AKSES TERVERIFIKASI'
                               : isAuthenticating
-                              ? 'ANALYZING SIGNATURE'
+                              ? 'MENGANALISIS SUARA'
                               : isListening
-                              ? 'LISTENING FOR FRIDAY'
-                              : 'VOICE AUTHENTICATION'}
+                              ? 'MENDENGARKAN FRIDAY'
+                              : 'AUTENTIKASI SUARA'}
                           </div>
                           <div className="mt-0.5 truncate text-[10px] tracking-[0.14em] text-slate-600">
                             {isListening
-                              ? 'SAY "HEY FRIDAY"'
+                              ? 'UCAPKAN "HEY FRIDAY"'
                               : isAuthenticating
-                              ? 'NEURAL BIOMETRIC MATCH'
-                              : 'ACTIVATE SECURE GATEWAY'}
+                              ? 'PENCOCOKAN BIOMETRIK'
+                              : 'AKTIFKAN PORTAL AMAN'}
                           </div>
                         </div>
 
@@ -5544,7 +5851,7 @@ export default function LoginPortal({
         ================================================= */}
 
         <section
-          className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden"
+          className="login-core-layer pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden"
         >
           {/* FRAMELESS PORTAL BACKDROP */}
           <div
@@ -5559,13 +5866,15 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/90' : isLight ? 'login-solaris-portal-base' : 'bg-[#010611]'
+                isAurora ? 'bg-[#020b10]/90' : isJecTheme ? 'login-jec-portal-base' : isSolaris ? 'login-solaris-portal-base' : isLight ? 'bg-[#edf8fc]' : 'bg-[#010611]'
               }`}
             />
             <div
               className={`absolute inset-0 ${
                 isAurora
                   ? 'bg-[radial-gradient(circle_at_center,rgba(78,255,207,.16)_0%,rgba(54,207,231,.08)_30%,rgba(62,39,95,.10)_52%,rgba(2,11,16,.88)_82%,#020b10_100%)]'
+                  : isJecTheme
+                  ? 'login-jec-portal-radial'
                   : isSolaris
                   ? 'login-solaris-portal-radial'
                   : 'bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]'
@@ -5579,7 +5888,7 @@ export default function LoginPortal({
           <div
             className={`
               absolute inset-0 transition-opacity duration-500
-              ${isAurora ? 'aurora-portal-stage' : ''} ${isLight ? 'solaris-portal-stage' : ''}
+              ${isAurora ? 'aurora-portal-stage' : ''} ${isSolaris ? 'solaris-portal-stage' : ''} ${isJecTheme ? 'jec-portal-stage' : ''}
               ${
                 phase === 'charging' || phase === 'portal' || phase === 'flash'
                   ? 'opacity-100'
@@ -5589,13 +5898,15 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/88' : isLight ? 'login-solaris-portal-base' : 'bg-[#010611]'
+                isAurora ? 'bg-[#020b10]/88' : isJecTheme ? 'login-jec-portal-base' : isSolaris ? 'login-solaris-portal-base' : isLight ? 'bg-[#edf8fc]' : 'bg-[#010611]'
               }`}
             />
             <div
               className={`absolute inset-0 ${
                 isAurora
                   ? 'bg-[radial-gradient(circle_at_center,rgba(95,255,214,.18)_0%,rgba(66,221,239,.09)_26%,rgba(116,83,197,.10)_50%,rgba(3,15,21,.86)_75%,#020b10_100%)]'
+                  : isJecTheme
+                  ? 'login-jec-portal-radial login-jec-portal-radial--active'
                   : isSolaris
                   ? 'login-solaris-portal-radial login-solaris-portal-radial--active'
                   : 'bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]'
@@ -5614,8 +5925,8 @@ export default function LoginPortal({
               w-[190px]
               sm:h-[230px]
               sm:w-[230px]
-              ${isAurora || isSolaris ? 'lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]' : 'lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]'}
-              ${isAurora || isSolaris ? 'rounded-full blur-[78px] opacity-50' : 'rounded-full blur-[120px]'}
+              ${isAurora || isSolaris || isJecTheme ? 'lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]' : 'lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]'}
+              ${isAurora || isSolaris || isJecTheme ? 'rounded-full blur-[78px] opacity-55' : 'rounded-full blur-[120px]'}
               transition-colors
               duration-700
 
@@ -5698,9 +6009,32 @@ export default function LoginPortal({
             </div>
           )}
 
+          {/* JEC BRAND ORB
+              Both JEC themes use the same Friday identity.
+              Horizon is static; Skywave animates through theme CSS. */}
+          {isJecTheme && (
+            <div
+              className={`login-jec-orb-stage absolute inset-0 z-[4] flex items-center justify-center transition-all ${
+                phase === 'portal'
+                  ? 'duration-1000 scale-[3.05] opacity-100 translate-x-0'
+                  : phase === 'charging'
+                  ? 'duration-1000 scale-[1.38] opacity-100 translate-x-0'
+                  : phase === 'flash'
+                  ? 'duration-200 scale-[3.45] opacity-0 translate-x-0'
+                  : 'duration-700 scale-100 opacity-100 lg:translate-x-[23vw]'
+              }`}
+            >
+              <JecBrandOrb
+                phase={phase}
+                isListening={isListening}
+                isSpeaking={isSpeaking}
+              />
+            </div>
+          )}
+
           {/* STATIC PERFORMANCE CORE
               Pure CSS Holographic 2.5D: no Canvas, no orbit and no rotation. */}
-          {isStaticTheme && (
+          {isStaticTheme && !isJecTheme && (
             <div
               className={`pointer-events-none absolute inset-0 z-[3] flex items-center justify-center ${
                 phase === 'portal'
@@ -5724,7 +6058,7 @@ export default function LoginPortal({
           {/* CORE CANVAS
               Only Cosmic Black needs this central Three.js scene.
               Aurora and Solaris already use dedicated visual layers. */}
-          {!isAurora && !isSolaris && !isStaticTheme && (
+          {!isAurora && !isSolaris && !isStaticTheme && !isJecTheme && (
           <div
             className="pointer-events-none relative h-screen w-screen"
           >
@@ -5788,7 +6122,7 @@ export default function LoginPortal({
                 </div>
 
                 <div className="mt-1 text-[12px] font-black tracking-[0.22em] text-sky-50">
-                  {isAurora ? 'AURORA NEXUS' : isSolaris ? 'SOLARIS CORE' : 'AI CORE'}
+                  {isAurora ? 'AURORA NEXUS' : isSolaris ? 'SOLARIS CORE' : isJecTheme ? 'JEC FRIDAY CORE' : 'AI CORE'}
                 </div>
 
               </div>
@@ -8738,6 +9072,107 @@ export default function LoginPortal({
           .login-solaris-core-shell,
           .login-solaris-core-orbit {
             animation: none !important;
+          }
+        }
+
+        /* =================================================
+           MOBILE VOICE FOCUS — V1.0.2 POLISH
+           Mobile only: once voice access starts, remove the login HUD
+           and lift the assistant core above every UI layer. Returning to
+           phase=idle (failed / cancelled authentication) restores the form.
+           Desktop behavior is intentionally untouched.
+           ================================================= */
+        @media (max-width: 1023px) {
+          .login-mobile-voice-focus .login-top-hud,
+          .login-mobile-voice-focus .login-hud-divider,
+          .login-mobile-voice-focus .login-left-panel {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+          }
+
+          .login-mobile-voice-focus .login-top-hud {
+            transform: translateY(-18px) !important;
+          }
+
+          .login-mobile-voice-focus .login-left-panel {
+            transform: translateY(18px) scale(.985) !important;
+          }
+
+          .login-mobile-voice-focus .login-main-layout {
+            overflow: hidden !important;
+          }
+
+          .login-mobile-voice-focus .login-core-layer {
+            z-index: 25 !important;
+          }
+
+          /* Aurora is deliberately dimmed behind the form in normal mobile
+             mode. Restore full presence only while voice authentication is
+             the active focus. */
+          .login-mobile-voice-focus.login-phase-listening .login-aurora-orb-stage,
+          .login-mobile-voice-focus.login-phase-authenticating .login-aurora-orb-stage {
+            opacity: 1 !important;
+            transform: scale(.96) translateY(0) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-verified .login-aurora-orb-stage {
+            opacity: 1 !important;
+            transform: scale(1.05) translateY(0) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-charging .login-aurora-orb-stage {
+            opacity: 1 !important;
+            transform: scale(1.42) translateY(0) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-portal .login-aurora-orb-stage {
+            opacity: 1 !important;
+            transform: scale(3.15) translateY(0) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-flash .login-aurora-orb-stage {
+            opacity: 0 !important;
+            transform: scale(3.65) translateY(0) !important;
+          }
+
+          /* Solaris uses a CSS core. It is intentionally translucent behind
+             the login form; voice focus makes it the primary foreground visual. */
+          .login-mobile-voice-focus .login-solaris-core {
+            width: min(76vw, 360px) !important;
+            opacity: 1 !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-listening .login-solaris-core-stage,
+          .login-mobile-voice-focus.login-phase-authenticating .login-solaris-core-stage {
+            opacity: 1 !important;
+            transform: translateX(0) scale(1) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-verified .login-solaris-core-stage {
+            opacity: 1 !important;
+            transform: translateX(0) scale(1.05) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-charging .login-solaris-core-stage {
+            opacity: 1 !important;
+            transform: translateX(0) scale(1.40) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-portal .login-solaris-core-stage {
+            opacity: 1 !important;
+            transform: translateX(0) scale(3.10) !important;
+          }
+
+          .login-mobile-voice-focus.login-phase-flash .login-solaris-core-stage {
+            opacity: 0 !important;
+            transform: translateX(0) scale(3.60) !important;
+          }
+
+          /* Static themes and Cosmic Black only need the foreground layer
+             promotion. Their existing phase transitions remain unchanged. */
+          .login-mobile-voice-focus .login-static-core {
+            opacity: 1 !important;
           }
         }
 
