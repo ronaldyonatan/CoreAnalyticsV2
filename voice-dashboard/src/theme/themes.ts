@@ -1,22 +1,21 @@
-export type CoreThemeId =
-  | 'cosmic-black'
-  | 'aurora'
-  | 'solaris'
-  | 'obsidian'
-  | 'quartz'
-  | 'jec-horizon'
-  | 'jec-skywave';
+// Vite discovers theme styles automatically: add a CSS file and register metadata below.
+import.meta.glob('./themes/*.css', { eager: true });
 
 export type CoreThemeAppearance = 'dark' | 'light';
 export type CoreThemePerformance = 'immersive' | 'static';
+export type CoreSurfaceFamily = 'holographic' | 'luminous' | 'daylight' | 'clinical';
+export type CoreEnvironment = 'space' | 'curtains' | 'solar-wind' | 'technical-grid' | 'field';
 
 export interface CoreThemeDefinition {
-  id: CoreThemeId;
+  id: string;
   name: string;
   description: string;
   icon: string;
   appearance: CoreThemeAppearance;
   performance: CoreThemePerformance;
+  environment?: CoreEnvironment;
+  surfaceFamily?: CoreSurfaceFamily;
+  fullscreenTone?: 'theme' | 'dark-stage';
   three: {
     background: string;
     fog: string;
@@ -33,9 +32,11 @@ export interface CoreThemeDefinition {
 
 export const CORE_THEME_STORAGE_KEY = 'coreanalytics-theme';
 
-export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
+export const CORE_THEMES = {
   'cosmic-black': {
     id: 'cosmic-black',
+    surfaceFamily: 'holographic',
+    environment: 'space',
     name: 'Cosmic Black',
     description: 'Immersive deep-space command center with cyan neon and dark glass.',
     icon: '✦',
@@ -57,6 +58,8 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
 
   aurora: {
     id: 'aurora',
+    surfaceFamily: 'luminous',
+    environment: 'curtains',
     name: 'Aurora',
     description: 'Immersive luminous command center with cyan, teal, violet and magenta energy.',
     icon: '◈',
@@ -78,6 +81,8 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
 
   solaris: {
     id: 'solaris',
+    surfaceFamily: 'daylight',
+    environment: 'solar-wind',
     name: 'Solaris',
     description: 'Immersive bright azure command center with white-blue solar plasma and Core cyan.',
     icon: '☼',
@@ -99,6 +104,8 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
 
   obsidian: {
     id: 'obsidian',
+    surfaceFamily: 'holographic',
+    environment: 'technical-grid',
     name: 'Obsidian',
     description: 'Static dark command interface. Zero motion, no decorative WebGL, optimized for lower-power devices.',
     icon: '◆',
@@ -122,6 +129,8 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
 
   quartz: {
     id: 'quartz',
+    surfaceFamily: 'daylight',
+    environment: 'technical-grid',
     name: 'Quartz',
     description: 'Static light crystalline interface. Zero motion, no decorative WebGL, optimized for lower-power devices.',
     icon: '◇',
@@ -145,6 +154,9 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
 
   'jec-horizon': {
     id: 'jec-horizon',
+    surfaceFamily: 'clinical',
+    fullscreenTone: 'dark-stage',
+    environment: 'field',
     name: 'JEC Horizon',
     description: 'Static bright JEC blue command interface with clean clinical glass and brand-forward azure accents.',
     icon: '▰',
@@ -166,6 +178,9 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
 
   'jec-skywave': {
     id: 'jec-skywave',
+    surfaceFamily: 'clinical',
+    fullscreenTone: 'dark-stage',
+    environment: 'field',
     name: 'JEC Skywave',
     description: 'Immersive bright JEC blue atmosphere with animated sky-energy waves, luminous data grid and clinical glass.',
     icon: '≋',
@@ -185,13 +200,20 @@ export const CORE_THEMES: Record<CoreThemeId, CoreThemeDefinition> = {
     },
   },
 
-};
+} as const satisfies Record<string, CoreThemeDefinition>;
+
+export type CoreThemeId = keyof typeof CORE_THEMES;
+export const CORE_THEME_LIST = Object.values(CORE_THEMES);
 
 export const isCoreThemeId = (value: string | null): value is CoreThemeId =>
-  value === 'cosmic-black' ||
-  value === 'aurora' ||
-  value === 'solaris' ||
-  value === 'obsidian' ||
-  value === 'quartz' ||
-  value === 'jec-horizon' ||
-  value === 'jec-skywave';
+  value !== null && Object.prototype.hasOwnProperty.call(CORE_THEMES, value);
+
+export const getThemeEnvironment = (theme: CoreThemeDefinition): CoreEnvironment =>
+  theme.environment ?? (theme.performance === 'static' ? 'technical-grid' : 'space');
+
+export const getShellComposition = (theme: CoreThemeDefinition): 'layered' | 'opaque' =>
+  getThemeEnvironment(theme) === 'field' ? 'layered' : 'opaque';
+
+/** Design System material recipe; independent of the decorative renderer. */
+export const getSurfaceFamily = (theme: CoreThemeDefinition): CoreSurfaceFamily =>
+  theme.surfaceFamily ?? (theme.appearance === 'light' ? 'daylight' : 'holographic');

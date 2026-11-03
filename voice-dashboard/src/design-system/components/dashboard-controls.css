@@ -86,17 +86,15 @@
   color: var(--ds-restore-fg) !important;
   background: var(--ds-restore-bg) !important;
   border: 1px solid var(--ds-restore-border) !important;
-  box-shadow:
-    0 10px 28px rgba(0, 0, 0, .30),
-    inset 0 1px 0 rgba(255, 255, 255, .10) !important;
-  backdrop-filter: blur(12px) saturate(120%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+  box-shadow: var(--ds-restore-shadow) !important;
+  backdrop-filter: var(--ds-restore-filter) !important;
+  -webkit-backdrop-filter: var(--ds-restore-filter) !important;
 }
 
 .ds-dashboard-restore:hover,
 .ds-dashboard-restore:focus-visible {
   background: var(--ds-restore-hover-bg) !important;
-  border-color: rgba(188, 231, 249, .70) !important;
-  color: #fff !important;
+  border-color: var(--ds-restore-hover-border) !important;
+  color: var(--ds-restore-hover-fg) !important;
   outline: none !important;
 }

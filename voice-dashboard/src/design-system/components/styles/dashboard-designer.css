@@ -1,0 +1,52 @@
+/* Design System-owned dashboard-designer structure, states and motion. */
+.react-grid-item {
+    background: var(--dashboard-designer-react-grid-item-background-color);
+    border: 1px solid var(--dashboard-designer-react-grid-item-border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
+    box-shadow: 0 0 10px var(--dashboard-designer-react-grid-item-box-shadow-color);
+  }
+  .react-grid-item.react-grid-placeholder {
+    background: var(--dashboard-designer-react-grid-item-react-grid-placeholder-background-color) !important;
+    border-radius: 12px;
+    opacity: 0.5;
+  }
+  .react-grid-item:hover {
+    border-color: var(--dashboard-designer-react-grid-item-hover-border-color-color);
+    box-shadow: 0 0 15px var(--dashboard-designer-react-grid-item-hover-box-shadow-color);
+    background-color: var(--dashboard-designer-react-grid-item-hover-background-color-color);
+  }
+  .react-resizable-handle {
+    background-image: none;
+    cursor: se-resize;
+    width: 18px;
+    height: 18px;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    border-top: 2px solid var(--dashboard-designer-react-resizable-handle-border-top-color);
+    border-left: 2px solid var(--dashboard-designer-react-resizable-handle-border-left-color);
+    border-radius: 100% 0 0 0;
+    background: var(--dashboard-designer-react-resizable-handle-background-color);
+  }
+  .drag-handle {
+    cursor: grab;
+    background: var(--dashboard-designer-drag-handle-background-color);
+    border-bottom: 1px solid var(--dashboard-designer-drag-handle-border-bottom-color);
+    color: var(--dashboard-designer-drag-handle-color-color);
+    padding: 4px 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 28px;
+    position: relative;
+    z-index: 10;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+    background: var(--dashboard-designer-drag-handle-active-background-color);
+  }

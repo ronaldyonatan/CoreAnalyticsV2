@@ -1,0 +1,261 @@
+[
+  {
+    "file": "src/theme/theme.css",
+    "removedDeclarations": 1,
+    "removedEmptyRules": 1,
+    "removed": [
+      {
+        "line": 1928,
+        "selector": ":is([data-theme=\"solaris\"], [data-theme=\"quartz\"]) .daily-3d-shell button:not(:disabled)",
+        "property": "backdrop-filter",
+        "value": "blur(10px)",
+        "important": false,
+        "retainedLine": 2072
+      }
+    ]
+  },
+  {
+    "file": "src/theme/jec-brand-themes.css",
+    "removedDeclarations": 2,
+    "removedEmptyRules": 0,
+    "removed": [
+      {
+        "line": 2852,
+        "selector": "[data-theme=\"jec-skywave\"] .company-chart-stage",
+        "property": "background-size",
+        "value": "34px 34px, 34px 34px, auto",
+        "important": true,
+        "retainedLine": 3032
+      },
+      {
+        "line": 991,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .daily-themed-input, :is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .daily-tracking-root select, :is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .daily-tracking-root input",
+        "property": "color",
+        "value": "#073B59",
+        "important": true,
+        "retainedLine": 2467
+      }
+    ]
+  },
+  {
+    "file": "src/theme/jec-blue-field-v4.5.css",
+    "removedDeclarations": 0,
+    "removedEmptyRules": 0,
+    "removed": []
+  },
+  {
+    "file": "src/dashboards/financial/company-performance-theme.css",
+    "removedDeclarations": 26,
+    "removedEmptyRules": 1,
+    "removed": [
+      {
+        "line": 1571,
+        "selector": "[data-theme=\"jec-skywave\"] .company-chart-stage",
+        "property": "background-size",
+        "value": "34px 34px",
+        "important": true,
+        "retainedLine": 1935
+      },
+      {
+        "line": 1563,
+        "selector": "[data-theme=\"jec-skywave\"] .company-panel-header",
+        "property": "box-shadow",
+        "value": "none",
+        "important": true,
+        "retainedLine": 1924
+      },
+      {
+        "line": 1472,
+        "selector": ".company-performance-shell, .company-view-shell, .company-node-view, .company-panel-frame",
+        "property": "background-color",
+        "value": "transparent",
+        "important": true,
+        "retainedLine": 1654
+      },
+      {
+        "line": 1400,
+        "selector": "[data-theme=\"jec-skywave\"] .company-chart-stage",
+        "property": "background-size",
+        "value": "34px 34px",
+        "important": true,
+        "retainedLine": 1935
+      },
+      {
+        "line": 1333,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-restore",
+        "property": "opacity",
+        "value": "1",
+        "important": true,
+        "retainedLine": 1454
+      },
+      {
+        "line": 1328,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-restore",
+        "property": "padding",
+        "value": "0",
+        "important": true,
+        "retainedLine": 1453
+      },
+      {
+        "line": 1327,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-restore",
+        "property": "min-height",
+        "value": "36px",
+        "important": true,
+        "retainedLine": 1452
+      },
+      {
+        "line": 1326,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-restore",
+        "property": "min-width",
+        "value": "36px",
+        "important": true,
+        "retainedLine": 1451
+      },
+      {
+        "line": 1325,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-restore",
+        "property": "height",
+        "value": "36px",
+        "important": true,
+        "retainedLine": 1450
+      },
+      {
+        "line": 1324,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-restore",
+        "property": "width",
+        "value": "36px",
+        "important": true,
+        "retainedLine": 1449
+      },
+      {
+        "line": 1290,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "overflow",
+        "value": "hidden",
+        "important": true,
+        "retainedLine": 1431
+      },
+      {
+        "line": 1287,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "border-radius",
+        "value": "0",
+        "important": true,
+        "retainedLine": 1430
+      },
+      {
+        "line": 1286,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "border",
+        "value": "0",
+        "important": true,
+        "retainedLine": 1429
+      },
+      {
+        "line": 1285,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "padding",
+        "value": "0",
+        "important": true,
+        "retainedLine": 1428
+      },
+      {
+        "line": 1284,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "margin",
+        "value": "0",
+        "important": true,
+        "retainedLine": 1427
+      },
+      {
+        "line": 1281,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "min-height",
+        "value": "100dvh",
+        "important": true,
+        "retainedLine": 1426
+      },
+      {
+        "line": 1280,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "min-width",
+        "value": "100vw",
+        "important": true,
+        "retainedLine": 1425
+      },
+      {
+        "line": 1279,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "height",
+        "value": "100dvh",
+        "important": true,
+        "retainedLine": 1424
+      },
+      {
+        "line": 1278,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "width",
+        "value": "100vw",
+        "important": true,
+        "retainedLine": 1423
+      },
+      {
+        "line": 1276,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "inset",
+        "value": "0",
+        "important": true,
+        "retainedLine": 1422
+      },
+      {
+        "line": 1275,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-preview-fullscreen",
+        "property": "position",
+        "value": "fixed",
+        "important": true,
+        "retainedLine": 1421
+      },
+      {
+        "line": 1163,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-performance-fullscreen .company-panel-size-button--restore:hover",
+        "property": "color",
+        "value": "#FFFFFF",
+        "important": true,
+        "retainedLine": 1265
+      },
+      {
+        "line": 1156,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-performance-fullscreen .company-panel-size-button--restore",
+        "property": "opacity",
+        "value": "1",
+        "important": true,
+        "retainedLine": 1259
+      },
+      {
+        "line": 1141,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-performance-fullscreen .company-panel-size-button--restore",
+        "property": "display",
+        "value": "inline-flex",
+        "important": true,
+        "retainedLine": 1250
+      },
+      {
+        "line": 1140,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-performance-fullscreen .company-panel-size-button--restore",
+        "property": "z-index",
+        "value": "10050",
+        "important": true,
+        "retainedLine": 1243
+      },
+      {
+        "line": 1137,
+        "selector": ":is([data-theme=\"jec-horizon\"], [data-theme=\"jec-skywave\"]) .company-performance-fullscreen .company-panel-size-button--restore",
+        "property": "position",
+        "value": "fixed",
+        "important": true,
+        "retainedLine": 1240
+      }
+    ]
+  }
+]

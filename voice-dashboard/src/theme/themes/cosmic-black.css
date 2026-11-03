@@ -1,0 +1,202 @@
+/* cosmic-black: theme values only. Component structure belongs to design-system. */
+:where(:root),
+[data-theme="cosmic-black"] {
+  --core-bg: #000205;
+  --core-bg-secondary: #000511;
+  --core-surface: rgba(0, 8, 20, 0.24);
+  --core-surface-strong: rgba(0, 12, 27, 0.78);
+  --core-panel: rgba(0, 8, 20, 0.34);
+  --core-panel-hover: rgba(0, 36, 71, 0.48);
+  --core-text: #e6fbff;
+  --core-text-secondary: #94a3b8;
+  --core-text-muted: #64748b;
+  --core-primary: #00f2fe;
+  --core-primary-soft: #67e8f9;
+  --core-primary-strong: #00bfff;
+  --core-primary-rgb: 0, 242, 254;
+  --core-border: rgba(0, 242, 254, 0.30);
+  --core-border-strong: rgba(0, 242, 254, 0.60);
+  --core-glow: rgba(0, 242, 254, 0.22);
+  --core-frame-shadow: 0 0 30px rgba(0, 242, 254, 0.12);
+  --core-sidebar: rgba(0, 8, 20, 0.20);
+  --core-control: rgba(0, 20, 40, 0.44);
+  --core-control-hover: rgba(0, 242, 254, 0.14);
+  --core-purple-surface: rgba(59, 7, 100, 0.30);
+  --core-purple-border: rgba(192, 132, 252, 0.50);
+  --core-purple-text: #d8b4fe;
+  --core-danger-surface: rgba(69, 10, 10, 0.28);
+  --core-danger-border: rgba(248, 113, 113, 0.50);
+  --core-danger-text: #fb7185;
+  --core-success-surface: rgba(2, 44, 34, 0.34);
+  --core-success-border: rgba(52, 211, 153, 0.55);
+  --core-success-text: #6ee7b7;
+}
+[data-theme="cosmic-black"] {
+
+  /* Healthcare picker semantic values */
+  --clinic-daily-control-background-color: rgba(0, 20, 40, 0.44);
+  --clinic-daily-control-background-image: none;
+  --clinic-daily-control-border-top-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-control-border-right-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-control-border-bottom-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-control-border-left-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-control-color: rgb(230, 251, 255);
+  --clinic-daily-control-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 2px 4px 0px inset;
+  --clinic-daily-glyph-color: rgb(37, 135, 200);
+  --clinic-daily-popover-background-color: rgba(0, 12, 27, 0.78);
+  --clinic-daily-popover-background-image: none;
+  --clinic-daily-popover-border-top-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-popover-border-right-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-popover-border-bottom-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-popover-border-left-color: rgba(0, 242, 254, 0.6);
+  --clinic-daily-popover-color: rgb(230, 251, 255);
+  --clinic-daily-popover-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+  --clinic-daily-input-background-color: rgba(16, 47, 61, 0.92);
+  --clinic-daily-input-background-image: none;
+  --clinic-daily-input-border-top-color: rgba(0, 242, 254, 0.3);
+  --clinic-daily-input-border-right-color: rgba(0, 242, 254, 0.3);
+  --clinic-daily-input-border-bottom-color: rgba(0, 242, 254, 0.3);
+  --clinic-daily-input-border-left-color: rgba(0, 242, 254, 0.3);
+  --clinic-daily-input-color: rgb(230, 251, 255);
+  --clinic-daily-input-box-shadow: none;
+  --clinic-daily-reset-background-color: rgba(0, 0, 0, 0);
+  --clinic-standalone-daily-reset-color: oklch(0.789 0.154 211.53);
+  --clinic-daily-daily-reset-color: oklch(0.789 0.154 211.53);
+  --clinic-company-daily-reset-color: oklch(0.789 0.154 211.53);
+  --clinic-daily-reset-hover-background-color: oklab(0.599722 -0.0588695 -0.117657 / 0.2);
+  --clinic-standalone-daily-reset-hover-color: rgb(255, 255, 255);
+  --clinic-daily-daily-reset-hover-color: rgb(255, 255, 255);
+  --clinic-company-daily-reset-hover-color: rgb(255, 255, 255);
+  --clinic-daily-option-background-color: rgba(0, 0, 0, 0);
+  --clinic-standalone-daily-option-color: oklch(0.917 0.08 205.041);
+  --clinic-daily-option-box-shadow: none;
+  --clinic-daily-option-font-weight: 400;
+  --clinic-daily-daily-option-color: oklch(0.917 0.08 205.041);
+  --clinic-company-daily-option-color: oklch(0.917 0.08 205.041);
+  --clinic-daily-option-hover-background-color: oklab(0.599722 -0.0588695 -0.117657 / 0.2);
+  --clinic-standalone-daily-option-hover-color: rgb(255, 255, 255);
+  --clinic-daily-daily-option-hover-color: rgb(255, 255, 255);
+  --clinic-company-daily-option-hover-color: rgb(255, 255, 255);
+  --clinic-daily-option-selected-background-color: oklab(0.599722 -0.0588695 -0.117657 / 0.4);
+  --clinic-standalone-daily-option-selected-color: rgb(255, 255, 255);
+  --clinic-daily-option-selected-box-shadow: none;
+  --clinic-daily-option-selected-font-weight: 700;
+  --clinic-daily-daily-option-selected-color: rgb(255, 255, 255);
+  --clinic-company-daily-option-selected-color: rgb(255, 255, 255);
+  --clinic-standalone-company-label-color: oklch(0.865 0.127 207.078);
+  --clinic-daily-company-label-color: oklch(0.865 0.127 207.078);
+  --clinic-company-company-label-color: oklch(0.865 0.127 207.078);
+  --clinic-company-control-background-color: oklab(0.186698 -0.0188414 -0.0465098 / 0.9);
+  --clinic-company-control-background-image: none;
+  --clinic-company-control-border-top-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-border-right-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-border-bottom-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-border-left-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-color: rgb(165, 243, 252);
+  --clinic-company-control-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 242, 254, 0.15) 0px 0px 10px 0px;
+  --clinic-company-glyph-color: rgb(0, 242, 254);
+  --clinic-company-popover-background-color: oklab(0.109862 -0.012388 -0.022469 / 0.95);
+  --clinic-company-popover-background-image: none;
+  --clinic-company-popover-border-top-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-company-popover-border-right-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-company-popover-border-bottom-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-company-popover-border-left-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-standalone-company-popover-color: rgb(230, 251, 255);
+  --clinic-company-popover-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 242, 254, 0.25) 0px 8px 32px 0px;
+  --clinic-daily-company-popover-color: rgb(230, 251, 255);
+  --clinic-company-company-popover-color: rgb(230, 251, 255);
+  --clinic-company-reset-background-color: rgba(0, 0, 0, 0);
+  --clinic-company-reset-color: rgb(165, 243, 252);
+  --clinic-company-reset-selected-background-color: oklab(0.874386 -0.138588 -0.0537872 / 0.2);
+  --clinic-company-reset-selected-color: rgb(0, 242, 254);
+  --clinic-company-option-background-color: rgba(0, 0, 0, 0);
+  --clinic-company-option-color: rgb(165, 243, 252);
+  --clinic-company-option-font-weight: 400;
+  --clinic-company-option-hover-background-color: rgba(0, 0, 0, 0);
+  --clinic-company-option-selected-background-color: oklab(0.874386 -0.138588 -0.0537872 / 0.2);
+  --clinic-company-option-selected-color: rgb(0, 242, 254);
+  --clinic-company-option-selected-font-weight: 400;
+  --clinic-standalone-placeholder-color: rgb(100, 116, 139);
+  --clinic-daily-placeholder-color: rgb(100, 116, 139);
+  --clinic-company-placeholder-color: rgb(100, 116, 139);
+  --clinic-empty-color: var(--color-cyan-500);
+
+  /* Retain the established opaque mobile sticky-cell surfaces. */
+  --company-exsum-sticky-background: #001020;
+  --company-pnl-sticky-background: #001428;
+
+  /* Executive briefing semantic values */
+  --briefing-palette-page-bg: radial-gradient(circle at 50% -18%, rgba(0, 191, 255, 0.14), transparent 36%),
+    radial-gradient(circle at 12% 78%, rgba(0, 84, 160, 0.07), transparent 34%),
+    linear-gradient(180deg, #020916 0%, #000205 72%);
+  --briefing-palette-shell-bg: linear-gradient(180deg, rgba(0, 15, 31, 0.92), rgba(0, 5, 14, 0.98));
+  --briefing-palette-surface: rgba(2, 16, 30, 0.72);
+  --briefing-palette-surface-strong: rgba(3, 20, 37, 0.92);
+  --briefing-palette-surface-soft: rgba(0, 20, 40, 0.46);
+  --briefing-palette-text: #eafcff;
+  --briefing-palette-secondary: #a8c4d1;
+  --briefing-palette-muted: #6f8a99;
+  --briefing-palette-border: rgba(0, 242, 254, 0.20);
+  --briefing-palette-border-strong: rgba(0, 242, 254, 0.46);
+  --briefing-palette-accent: #00f2fe;
+  --briefing-palette-friday: #4edcff;
+  --briefing-palette-positive: #67e8b7;
+  --briefing-palette-negative: #ff8194;
+  --briefing-palette-card-highlight: rgba(255,255,255,0.045);
+  --briefing-palette-card-shadow: inset 0 1px 0 rgba(255,255,255,0.035),
+    inset 0 -1px 0 rgba(0,0,0,0.24),
+    0 14px 34px rgba(0,0,0,0.28),
+    0 0 26px rgba(0,242,254,0.035);
+  --briefing-palette-shell-shadow: 0 28px 80px rgba(0,0,0,0.42),
+    0 0 34px rgba(0,242,254,0.045);
+  --briefing-palette-chart-grid: rgba(133, 191, 216, 0.20);
+  --briefing-palette-chart-area: rgba(80, 219, 255, 0.12);
+  --briefing-palette-chart-line: #63e4ff;
+
+  /* dashboard-materials semantic values */
+  --dashboard-holographic-daily-comingsoon-ribbon-border-tint: rgba(251, 191, 36, .38);
+  --dashboard-holographic-daily-comingsoon-ribbon-background-color: rgba(39, 27, 5, .72);
+  --dashboard-holographic-daily-comingsoon-ribbon-background-color-2: rgba(92, 61, 6, .62);
+  --dashboard-holographic-daily-comingsoon-ribbon-background-color-3: rgba(39, 27, 5, .72);
+  --dashboard-holographic-daily-comingsoon-ribbon-shadow-color: rgba(251,191,36,.10);
+  --dashboard-holographic-daily-comingsoon-ribbon-shadow-color-2: rgba(255,244,190,.07);
+  --dashboard-holographic-daily-comingsoon-dot-background-color: #fcd34d;
+  --dashboard-holographic-daily-comingsoon-dot-shadow-color: rgba(252,211,77,.95);
+  --dashboard-holographic-daily-comingsoon-title-foreground: #fff7d6;
+  --dashboard-holographic-daily-comingsoon-subtitle-foreground: rgba(254,240,183,.72);
+  --dashboard-holographic-daily-comingsoon-footnote-foreground: rgba(255,247,214,.55);
+  --dashboard-holographic-daily-comingsoon-corner-border-tint: rgba(251,191,36,.52);
+  --dashboard-holographic-daily-comingsoon-pattern-background-image-color: rgba(251,191,36,.28);
+  --dashboard-holographic-daily-comingsoon-pattern-background-image-color-2: rgba(251,191,36,.28);
+  --dashboard-holographic-daily-comingsoon-global-tint-background-color: rgba(251,191,36,.018);
+  --dashboard-holographic-daily-comingsoon-global-ribbon-border-tint: rgba(251,191,36,.42);
+  --dashboard-holographic-daily-comingsoon-global-ribbon-background-color: rgba(31,22,5,.76);
+  --dashboard-holographic-daily-comingsoon-global-ribbon-background-color-2: rgba(83,56,7,.66);
+  --dashboard-holographic-daily-comingsoon-global-ribbon-background-color-3: rgba(31,22,5,.76);
+  --dashboard-holographic-daily-comingsoon-global-ribbon-shadow-color: rgba(251,191,36,.12);
+  --dashboard-holographic-daily-comingsoon-global-ribbon-shadow-color-2: rgba(255,244,190,.07);
+  --dashboard-holographic-daily-comingsoon-global-dot-background-color: #fcd34d;
+  --dashboard-holographic-daily-comingsoon-global-dot-shadow-color: rgba(252,211,77,.95);
+  --dashboard-holographic-daily-comingsoon-global-title-foreground: #fff7d6;
+  --dashboard-holographic-daily-comingsoon-global-divider-foreground: rgba(252,211,77,.58);
+  --dashboard-holographic-daily-comingsoon-global-subtitle-foreground: rgba(254,240,183,.76);
+  --dashboard-holographic-daily-comingsoon-global-footnote-foreground: rgba(255,247,214,.56);
+  --dashboard-holographic-daily-comingsoon-global-line-left-background-color: rgba(252,211,77,.45);
+  --dashboard-holographic-daily-comingsoon-global-line-left-background-color-2: rgba(252,211,77,.15);
+  --dashboard-holographic-daily-comingsoon-global-line-right-background-color: rgba(252,211,77,.15);
+  --dashboard-holographic-daily-comingsoon-global-line-right-background-color-2: rgba(252,211,77,.45);
+  --dashboard-holographic-immersive-daily-themed-card-button-title-view-full-screen-shadow-color: rgba(255,255,255,.025);
+  --dashboard-holographic-immersive-daily-themed-card-button-title-view-full-screen-hover-shadow-color: rgba(255,255,255,.045);
+
+  /* company-presentation semantic values */
+  --company-layout-holographic-immersive-company-page-title-root-not-company-page-title-foreground: #e6fbff;
+  --company-layout-holographic-immersive-company-page-title-root-not-company-page-title-text-shadow-color: rgba(0,242,254,.12);
+  --company-layout-holographic-company-page-header-background-color: rgba(1,78,120,.90);
+  --company-layout-holographic-company-page-header-background-color-2: rgba(0,24,48,.95);
+  --company-layout-holographic-company-page-header-background-color-3: rgba(1,78,120,.90);
+  --company-layout-holographic-company-page-title-background-color: #00f2fe;
+  --company-layout-holographic-company-page-title-background-color-2: #ffffff;
+  --company-layout-holographic-company-page-title-background-color-3: #00f2fe;
+  --company-layout-holographic-company-page-title-filter-color: rgba(0,242,254,.80);
+  --company-layout-holographic-immersive-company-panel-company-pnl-card-background-color: rgba(0,8,20,.56);
+}

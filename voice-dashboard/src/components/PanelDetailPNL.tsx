@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './CompanyMobileGrid.css';
 
 export interface PnLItem {
   Level: number | string;

@@ -1,0 +1,13 @@
+/* Shared settings typography and semantic action roles.
+   Existing utility-size selectors preserve the current component typography API. */
+
+.core-settings-popover {
+  width: 290px !important;
+  max-width: calc(100vw - 24px);
+}
+
+.core-settings-popover [class*="text-[7px]"] { font-size: 8px !important; }
+.core-settings-popover [class*="text-[8px]"] { font-size: 9px !important; }
+.core-settings-popover [class*="text-[9px]"] { font-size: 10px !important; }
+.core-settings-popover [class*="text-[10px]"] { font-size: 11px !important; }
+.core-settings-popover .ds-settings-voice-icon { color: var(--settings-voice-icon-text) !important; }

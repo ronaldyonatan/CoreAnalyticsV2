@@ -1,7 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
-import * as THREE from 'three';
 
 import LoginPortal from './LoginPortal';
 import type { AuthenticatedUser } from './LoginPortal';
@@ -9,6 +6,8 @@ import DashboardManager from './components/DashboardManager';
 import { useVoiceCommand } from './hooks/useVoiceCommand';
 import { ThemeProvider, useTheme } from './theme/ThemeContext';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import { DashboardEnvironment } from './design-system/DashboardEnvironment';
+import { getShellComposition, getSurfaceFamily } from './theme/themes';
 import MyAccount from './components/MyAccount';
 import VoiceCommandGuide from './components/VoiceCommandGuide';
 import {
@@ -212,11 +211,7 @@ function FuturisticMenuIcon({
   type?: MenuItem['icon'];
   active?: boolean;
 }) {
-  const common = `h-[18px] w-[18px] flex-shrink-0 transition-all duration-300 ${
-    active
-      ? 'text-cyan-100 drop-shadow-[0_0_7px_rgba(56,189,248,.9)]'
-      : 'text-sky-400/75 group-hover:text-cyan-200'
-  }`;
+  const common = `ds-menu-glyph h-[18px] w-[18px] flex-shrink-0 transition-all duration-300 ${active ? 'ds-menu-glyph--active' : ''}`;
 
   if (type === 'financial') {
     return (
@@ -345,60 +340,6 @@ class SciFiAudio {
 // Same visual language as Login Portal, slightly calmer.
 // =========================================================
 
-function CyberTunnelBackground() {
-  const { theme, isLight } = useTheme();
-  const pointsRef = useRef<THREE.Points>(null!);
-
-  const [sphere] = useState(() => {
-    const data = new Float32Array(1500 * 3);
-
-    for (let i = 0; i < 1500; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = 3 + Math.random() * 7;
-
-      data[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      data[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      data[i * 3 + 2] = r * Math.cos(phi);
-    }
-
-    return data;
-  });
-
-  useFrame((_, delta) => {
-    if (pointsRef.current) {
-      pointsRef.current.rotation.z -= delta * 0.12;
-    }
-  });
-
-  return (
-    <>
-      <color attach="background" args={[theme.three.background]} />
-      <fog attach="fog" args={[theme.three.fog, 2, 16]} />
-      <ambientLight intensity={theme.three.ambientIntensity} />
-
-      <Points
-        ref={pointsRef}
-        positions={sphere}
-        stride={3}
-        frustumCulled={false}
-      >
-        <PointMaterial
-          transparent
-          color={theme.three.star}
-          size={isLight ? 0.027 : 0.032}
-          sizeAttenuation
-          depthWrite={false}
-          opacity={isLight ? 0.36 : 0.72}
-          blending={THREE.AdditiveBlending}
-        />
-      </Points>
-    </>
-  );
-}
-
 // =========================================================
 // AUTH SESSION RESTORE
 // =========================================================
@@ -447,8 +388,7 @@ function readStoredAuthenticatedUser(): AuthenticatedUser | null {
 // =========================================================
 
 function AppContent() {
-  const { themeId, isAurora, isSolaris, isJecHorizon, isJecSkywave, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
-  const isJecTheme = isJecHorizon || isJecSkywave;
+  const { themeId, theme, isStaticTheme, isLight } = useTheme();
   const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(
     () => readStoredAuthenticatedUser()
   );
@@ -987,6 +927,9 @@ function AppContent() {
     return (
       <div
         data-active-theme={themeId}
+        data-surface-family={getSurfaceFamily(theme)}
+        data-performance={theme.performance}
+        data-shell-composition={getShellComposition(theme)}
         className="fixed inset-0 z-[999] flex h-screen w-screen flex-col overflow-y-auto p-4 font-mono select-none md:p-6"
         style={{ background: 'var(--core-bg)', color: 'var(--core-text)' }}
       >
@@ -1029,118 +972,6 @@ function AppContent() {
 
   return (
     <>
-      <style>{`
-        .text-hud-glow {
-          text-shadow:
-            0 0 8px rgba(59,188,255,.50),
-            0 0 18px rgba(37,99,235,.24);
-        }
-
-        .text-white-glow {
-          text-shadow: 0 0 8px rgba(255,255,255,.55);
-        }
-
-        @keyframes holoGlitchIn {
-          0% {
-            opacity: 0;
-            transform: scale(.99);
-            filter: blur(4px);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-            filter: blur(0);
-          }
-        }
-
-        @keyframes holoGlitchOut {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-            filter: blur(0);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(1.01);
-            filter: blur(4px);
-          }
-        }
-
-        .animate-glitch-in {
-          animation: holoGlitchIn .25s cubic-bezier(.25,.46,.45,.94) forwards;
-        }
-
-        .animate-glitch-out {
-          animation: holoGlitchOut .2s cubic-bezier(.55,.085,.68,.53) forwards;
-        }
-
-        .grid-panel-container > div > div {
-          background-color: var(--core-surface) !important;
-          backdrop-filter: blur(3px) !important;
-          -webkit-backdrop-filter: blur(3px) !important;
-          transition:
-            background-color .32s ease,
-            border-color .32s ease,
-            color .32s ease;
-        }
-
-        [data-theme="aurora"] .text-hud-glow {
-          text-shadow:
-            0 0 7px rgba(2,132,199,.20),
-            0 0 14px rgba(14,116,144,.10);
-        }
-
-        /*
-          FULLSCREEN STACKING GUARD
-          DailyTracking fullscreen is rendered inside the dashboard
-          content. When that layer exists, the dashboard content must
-          move above the global header/settings so the close button
-          always stays clickable.
-        */
-        .core-dashboard-frame:has(.daily-tracking-fullscreen) > .core-global-header {
-          z-index: 1 !important;
-          opacity: 0 !important;
-          pointer-events: none !important;
-          transform: translateY(-6px);
-        }
-
-        .core-dashboard-frame:has(.daily-tracking-fullscreen) > .core-dashboard-content {
-          z-index: 250 !important;
-        }
-
-        .core-dashboard-frame:has(.daily-tracking-fullscreen) .core-settings-layer {
-          z-index: 0 !important;
-          pointer-events: none !important;
-        }
-
-        .core-dashboard-frame .daily-tracking-fullscreen {
-          z-index: 9999 !important;
-        }
-
-        /*
-          COMPANY PERFORMANCE MAXIMIZED — integrated fullscreen.
-          Unlike v37.4, the panel is NOT position:fixed. This keeps all R3F
-          camera sizing/layout behavior inside its original dashboard flow.
-        */
-        .core-dashboard-frame:has(.company-performance-fullscreen) > .core-global-header {
-          display: none !important;
-        }
-
-        .core-dashboard-frame:has(.company-performance-fullscreen) > .core-dashboard-content {
-          z-index: 250 !important;
-        }
-
-        .core-dashboard-frame:has(.company-performance-fullscreen) .core-settings-layer {
-          display: none !important;
-        }
-
-        .core-global-header {
-          transition:
-            opacity .18s ease,
-            transform .18s ease;
-        }
-      `}</style>
-
       <MyAccount
         open={showMyAccount}
         user={authenticatedUser}
@@ -1165,96 +996,26 @@ function AppContent() {
 
       <div
         data-active-theme={themeId}
+        data-surface-family={getSurfaceFamily(theme)}
+        data-performance={theme.performance}
+        data-shell-composition={getShellComposition(theme)}
         data-theme-appearance={isLight ? 'light' : 'dark'}
         data-rendering-mode={isStaticTheme ? 'static-2.5d' : 'immersive-3d'}
         className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden p-1.5 font-mono select-none md:p-2"
         style={{
-          background: isJecTheme ? 'transparent' : 'var(--core-bg)',
+          background: 'var(--shell-bg)',
           color: 'var(--core-primary)',
         }}
       >
-        {/* IMMERSIVE SPACE BACKGROUND
-            Static Performance themes intentionally do not mount WebGL. */}
-        {!isStaticTheme && !isJecTheme && (
-          <div className="pointer-events-none absolute inset-0 z-0">
-            <Canvas camera={{ position: [0, 1, 5], fov: 50 }}>
-              <CyberTunnelBackground />
-            </Canvas>
-          </div>
-        )}
-
-        {/* STATIC PERFORMANCE BACKGROUND
-            Pure CSS technical depth: zero Canvas / zero requestAnimationFrame. */}
-        {isStaticTheme && !isJecTheme && (
-          <div
-            className="core-static-field"
-            data-static-theme={isObsidian ? 'obsidian' : isQuartz ? 'quartz' : undefined}
-            aria-hidden="true"
-          />
-        )}
-
-        {/* IMMERSIVE ATMOSPHERIC NEBULA */}
-        {!isStaticTheme && !isJecTheme && (
-          <div
-            className="pointer-events-none absolute inset-0 z-[1]"
-            style={{
-              background: isAurora
-                ? 'radial-gradient(ellipse at 78% 19%, rgba(139,92,246,.10) 0%, transparent 43%), radial-gradient(ellipse at 20% 72%, rgba(45,212,191,.09) 0%, transparent 38%)'
-                : isSolaris
-                ? 'radial-gradient(ellipse at 84% 9%, rgba(86,220,255,.22) 0%, transparent 38%), radial-gradient(ellipse at 18% 78%, rgba(49,140,255,.09) 0%, transparent 36%)'
-                : 'radial-gradient(ellipse at 80% 25%, rgba(0,140,255,.10) 0%, rgba(20,60,160,.035) 25%, transparent 48%), radial-gradient(ellipse at 20% 75%, rgba(0,115,255,.055) 0%, transparent 36%)',
-            }}
-          />
-        )}
-
-        {/* MOVING AURORA FIELD
-            Only rendered for the Aurora theme so Cosmic Black remains unchanged. */}
-        {isAurora && (
-          <div className="core-aurora-field" aria-hidden="true">
-            <div className="core-aurora-ribbon core-aurora-ribbon--cyan" />
-            <div className="core-aurora-ribbon core-aurora-ribbon--violet" />
-            <div className="core-aurora-ribbon core-aurora-ribbon--teal" />
-            <div className="core-aurora-stars" />
-          </div>
-        )}
-
-        {/* MOVING SOLARIS FIELD
-            Daylight solar environment. Cosmic Black and Aurora remain untouched. */}
-        {isSolaris && (
-          <div className="core-solaris-field" aria-hidden="true">
-            <div className="core-solaris-corona" />
-            <div className="core-solaris-sun" />
-            <div className="core-solaris-ring" />
-            <div className="core-solaris-ring core-solaris-ring--b" />
-            <div className="core-solaris-dust" />
-          </div>
-        )}
-
-        {/* JEC BRAND FIELD
-            Environment only. Styling lives in theme/jec-blue-field-v4.5.css. */}
-        {isJecTheme && (
-          <div
-            className={`core-jec-field ${isJecSkywave ? 'core-jec-field--skywave' : 'core-jec-field--horizon'}`}
-            aria-hidden="true"
-          >
-            <div className="core-jec-field__glow" />
-            <div className="core-jec-field__grid" />
-            <div className="core-jec-field__stars core-jec-field__stars--a" />
-            <div className="core-jec-field__stars core-jec-field__stars--b" />
-            <div className="core-jec-field__wave core-jec-field__wave--a" />
-            <div className="core-jec-field__wave core-jec-field__wave--b" />
-          </div>
-        )}
+        <DashboardEnvironment />
 
         {/* MAIN FRAME */}
         <div
           className="core-dashboard-frame relative z-10 flex h-full min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden rounded-xl border p-2 backdrop-blur-[3px] md:p-3"
           style={{
             borderColor: 'var(--core-border)',
-            background: isJecTheme ? 'rgba(255,255,255,.055)' : 'var(--core-surface)',
-            boxShadow: isJecTheme
-              ? 'inset 0 1px 0 rgba(255,255,255,.18), 0 18px 46px rgba(0,42,72,.14)'
-              : 'var(--core-frame-shadow)',
+            background: 'var(--shell-frame-bg)',
+            boxShadow: 'var(--shell-frame-shadow)',
           }}
         >
           {/* =================================================
@@ -1263,18 +1024,6 @@ function AppContent() {
           ================================================= */}
           <header
             className="core-global-header relative z-[60] mb-2 flex h-[58px] flex-shrink-0 items-center justify-between overflow-visible rounded-lg border px-2.5 backdrop-blur-md sm:h-[62px] sm:px-3 md:h-[66px] md:px-4"
-            style={{
-              borderColor: 'var(--core-border)',
-              background: isAurora
-                ? 'linear-gradient(105deg, rgba(14,43,55,.94), rgba(24,70,83,.90), rgba(25,56,76,.92))'
-                : isSolaris
-                ? 'linear-gradient(105deg, rgba(248,253,255,.97), rgba(235,248,255,.95), rgba(222,243,255,.95))'
-                : isQuartz
-                ? 'linear-gradient(105deg, #fbfeff, #eef9fc, #e5f3f7)'
-                : isObsidian
-                ? 'linear-gradient(105deg, #061521, #071827, #06131f)'
-                : 'var(--core-surface-strong)',
-            }}
           >
             <div className="flex min-w-0 items-center gap-2 sm:gap-3 md:gap-4">
               {/* Global navigation trigger: sits beside the logo and never consumes dashboard width. */}
@@ -1287,13 +1036,13 @@ function AppContent() {
                 }}
                 title={isSidebarExpanded ? 'Close navigation' : 'Open navigation'}
                 aria-label={isSidebarExpanded ? 'Close navigation' : 'Open navigation'}
-                className={`core-icon-button group relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
+                className={`core-icon-button core-icon-button--navigation group relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
                   isSidebarExpanded
-                    ? 'border-cyan-300/55 bg-cyan-500/12 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.15)]'
-                    : 'border-sky-500/25 bg-[#04111f]/70 text-sky-300 hover:border-cyan-300/50 hover:text-cyan-100'
+                    ? 'core-icon-button--active'
+                    : ''
                 }`}
               >
-                <span className="absolute inset-[4px] rounded-md border border-sky-400/10" />
+                <span className="ds-header-icon-frame absolute inset-[4px] rounded-md border" />
                 <svg
                   className="relative z-10 h-[21px] w-[21px] sm:h-[23px] sm:w-[23px]"
                   viewBox="0 0 24 24"
@@ -1305,21 +1054,21 @@ function AppContent() {
                   <path d="M4 12h16" strokeLinecap="round" />
                   <path d="M4 17h16" strokeLinecap="round" />
                 </svg>
-                <span className="absolute -bottom-px left-1/2 h-px w-5 -translate-x-1/2 bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent" />
+                <span className="ds-navigation-trigger-accent absolute -bottom-px left-1/2 h-px w-5 -translate-x-1/2" />
               </button>}
 
               <img
                 src={dashboardLogo}
                 alt="Core Analytics"
                 draggable={false}
-                className="core-brand-logo relative z-10 h-[42px] w-[175px] max-w-[58vw] object-contain object-left brightness-110 saturate-110 drop-shadow-[0_0_11px_rgba(56,189,248,.48)] sm:h-[48px] sm:w-[220px] md:h-[54px] md:w-[270px] lg:w-[300px]"
+                className="core-brand-logo relative z-10 h-[42px] w-[175px] max-w-[58vw] object-contain object-left sm:h-[48px] sm:w-[220px] md:h-[54px] md:w-[270px] lg:w-[300px]"
               />
             </div>
 
             <div ref={settingsMenuRef} className="core-settings-layer relative z-[70] flex items-center gap-2 overflow-visible">
               <div className="hidden items-center gap-2 md:flex">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-                <span className="text-[7px] font-bold tracking-[0.20em] text-emerald-300/75 uppercase">
+                <span className="ds-header-online-dot h-1.5 w-1.5 rounded-full" />
+                <span className="ds-header-online-label text-[7px] font-bold tracking-[0.20em] uppercase">
                   CORE ONLINE
                 </span>
               </div>
@@ -1336,11 +1085,11 @@ function AppContent() {
                 aria-expanded={showSettingsMenu}
                 className={`core-icon-button group relative flex h-10 w-10 items-center justify-center rounded-lg border backdrop-blur-md transition-all sm:h-11 sm:w-11 ${
                   showSettingsMenu || effectiveRoute === 'user_management' || effectiveRoute === 'group_management'
-                    ? 'border-cyan-300/55 bg-cyan-500/12 text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.16)]'
-                    : 'border-sky-500/25 bg-[#04111f]/70 text-sky-300 hover:border-cyan-300/50 hover:text-cyan-100'
+                    ? 'core-icon-button--active'
+                    : ''
                 }`}
               >
-                <span className="absolute inset-[4px] rounded-md border border-sky-400/10" />
+                <span className="ds-header-icon-frame absolute inset-[4px] rounded-md border" />
                 <svg
                   className={`relative z-10 h-[20px] w-[20px] transition-transform duration-300 ${
                     showSettingsMenu ? 'rotate-45' : 'group-hover:rotate-12'
@@ -1361,11 +1110,7 @@ function AppContent() {
                   style={{
                     borderColor: 'var(--core-border)',
                     background: 'color-mix(in srgb, var(--core-bg) 96%, var(--core-primary) 4%)',
-                    boxShadow: isAurora
-                      ? '0 20px 60px rgba(0,0,0,.36), 0 0 30px rgba(45,212,191,.10)'
-                      : isSolaris
-                      ? '0 20px 55px rgba(25,80,115,.15), 0 0 26px rgba(0,191,232,.08)'
-                      : '0 18px 60px rgba(0,0,0,.72), 0 0 34px rgba(0,183,255,.18)',
+                    boxShadow: 'var(--settings-shadow)',
                   }}
                 >
                   <div className="core-settings-intro mb-2.5 rounded-lg border border-sky-500/20 bg-[#061426]/70 px-3.5 py-3">
@@ -1445,7 +1190,7 @@ function AppContent() {
                     className="core-voice-guide-button group mb-2 flex w-full items-center gap-3 rounded-lg border border-sky-500/15 bg-[#061426]/55 px-3.5 py-3 text-left text-sky-200/85 transition-all hover:border-cyan-300/30 hover:bg-cyan-500/8 hover:text-cyan-50"
                     title="Open Voice Command Guide"
                   >
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-950/20 text-emerald-300">
+                    <span className="ds-settings-voice-icon flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-950/20">
                       <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                         <path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z" />
                         <path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4M8.5 21h7" />
@@ -1557,20 +1302,13 @@ function AppContent() {
                 type="button"
                 aria-label="Close navigation overlay"
                 onClick={() => setIsSidebarExpanded(false)}
-                className="absolute inset-0 z-30 cursor-default backdrop-blur-[1px]"
-                style={{
-                  background: isAurora
-                    ? 'rgba(5,24,33,.42)'
-                    : isSolaris
-                    ? 'rgba(35,103,145,.14)'
-                    : 'rgba(1,6,17,.35)',
-                }}
+                className="ds-navigation-overlay absolute inset-0 z-30 cursor-default"
               />
             )}
 
             {firstAuthorizedRoute && <aside
               data-tour="navigation-sidebar"
-              className={`z-40 flex flex-col justify-between overflow-hidden rounded-xl border p-2 backdrop-blur-xl transition-all duration-300 ease-out ${
+              className={`ds-navigation-rail z-40 flex flex-col justify-between overflow-hidden rounded-xl border p-2 backdrop-blur-xl transition-all duration-300 ease-out ${
                 isSidebarPinned
                   ? `relative flex-shrink-0 ${isSidebarExpanded ? 'w-56' : 'w-[58px]'}`
                   : `absolute bottom-0 left-0 top-0 w-[min(82vw,280px)] ${
@@ -1579,23 +1317,18 @@ function AppContent() {
                         : 'pointer-events-none -translate-x-[calc(100%+14px)] opacity-0'
                     }`
               }`}
-              style={{
-                borderColor: 'var(--core-border)',
-                background: 'var(--core-sidebar)',
-                boxShadow: '0 0 34px var(--core-glow)',
-              }}
             >
               <div className="flex min-h-0 w-full flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto">
                 {/* Drawer HUD header */}
-                <div className={`core-nav-drawer-header flex items-center rounded-lg border border-sky-500/20 bg-[#061426]/55 p-1.5 ${
+                <div className={`core-nav-drawer-header flex items-center rounded-lg border p-1.5 ${
                   isSidebarExpanded ? 'justify-between' : 'justify-center'
                 }`}>
                   {isSidebarExpanded && (
                     <div className="min-w-0 pl-1">
-                      <div className="text-[10px] font-black tracking-[0.18em] text-cyan-100 uppercase">
+                      <div className="text-[10px] font-black tracking-[0.18em] uppercase">
                         Navigation
                       </div>
-                      <div className="mt-0.5 text-[8px] tracking-[0.14em] text-slate-500 uppercase">
+                      <div className="mt-0.5 text-[8px] tracking-[0.14em] uppercase">
                         Core command rail
                       </div>
                     </div>
@@ -1611,10 +1344,10 @@ function AppContent() {
                         setIsSidebarExpanded(true);
                       }}
                       title={isSidebarPinned ? 'Unpin navigation' : 'Pin navigation'}
-                      className={`flex h-8 w-8 items-center justify-center rounded-md border transition-all ${
+                      className={`ds-nav-pin flex h-8 w-8 items-center justify-center rounded-md border transition-all ${
                         isSidebarPinned
-                          ? 'border-amber-300/45 bg-amber-950/25 text-amber-200 shadow-[0_0_10px_rgba(251,191,36,.08)]'
-                          : 'border-sky-400/25 bg-sky-950/20 text-sky-300 hover:border-cyan-300/55 hover:text-cyan-100'
+                          ? 'ds-nav-pin--active'
+                          : ''
                       }`}
                     >
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -1627,7 +1360,7 @@ function AppContent() {
                         type="button"
                         onClick={() => setIsSidebarExpanded(false)}
                         title="Close navigation"
-                        className="flex h-8 w-8 items-center justify-center rounded-md border border-sky-500/20 bg-[#020b16]/70 text-sky-400 transition-all hover:border-rose-300/35 hover:text-rose-300"
+                        className="ds-nav-close flex h-8 w-8 items-center justify-center rounded-md border transition-all"
                       >
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                           <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
@@ -1647,10 +1380,10 @@ function AppContent() {
                         <button
                           onClick={() => toggleGroup(group.id)}
                           title={group.label}
-                          className="core-nav-group-button group flex w-full items-center justify-between rounded-lg border border-sky-500/15 bg-[#061426]/35 p-2 text-xs font-bold text-sky-300 transition-all hover:border-sky-400/30 hover:bg-[#08203b]/55"
+                          className="core-nav-group-button group flex w-full items-center justify-between rounded-lg border p-2 text-xs font-bold transition-all"
                         >
                           <div className="flex min-w-0 items-center gap-2.5 overflow-hidden">
-                            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-sky-400/10 bg-sky-950/20">
+                            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border">
                               <FuturisticMenuIcon type={group.icon} />
                             </span>
                             {isSidebarExpanded && (
@@ -1660,7 +1393,7 @@ function AppContent() {
 
                           {isSidebarExpanded && (
                             <svg
-                              className={`h-3.5 w-3.5 text-sky-400/55 transition-transform ${
+                              className={`ds-nav-group-caret h-3.5 w-3.5 transition-transform ${
                                 isExpanded ? 'rotate-90' : ''
                               }`}
                               viewBox="0 0 24 24"
@@ -1690,15 +1423,11 @@ function AppContent() {
                                   }}
                                   className={`core-nav-child-button group flex w-full items-center gap-2.5 rounded-lg border p-1.5 text-xs transition-all ${
                                     isActive
-                                      ? 'core-nav-child-active border-cyan-300/40 bg-cyan-500/10 font-bold text-cyan-50 shadow-[0_0_12px_rgba(34,211,238,.10)]'
-                                      : 'border-transparent text-sky-400/70 hover:border-sky-500/15 hover:bg-[#071b31]/65 hover:text-sky-100'
+                                      ? 'core-nav-child-active font-bold'
+                                      : ''
                                   }`}
                                 >
-                                  <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border ${
-                                    isActive
-                                      ? 'border-cyan-300/25 bg-cyan-400/10'
-                                      : 'border-sky-500/10 bg-[#03101e]/55'
-                                  }`}>
+                                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border">
                                     <FuturisticMenuIcon type={child.icon} active={isActive} />
                                   </span>
                                   {isSidebarExpanded && <span className="truncate">{child.label}</span>}
@@ -1714,12 +1443,12 @@ function AppContent() {
               </div>
 
               {/* SIDEBAR FOOTER */}
-              <div className="mt-2 flex w-full flex-col gap-2 border-t border-sky-500/15 pt-2">
+              <div className="ds-navigation-footer mt-2 flex w-full flex-col gap-2 border-t pt-2">
                 <button
                   onClick={openMyAccount}
                   data-tour="my-account-sidebar"
                   title="My Account"
-                  className="core-my-account-sidebar flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-sky-500/25 bg-sky-950/14 p-2 text-xs font-bold whitespace-nowrap text-sky-300/85 shadow-[0_0_8px_rgba(56,189,248,.06)] transition-all hover:border-cyan-300/35 hover:bg-cyan-500/10 hover:text-cyan-100"
+                  className="core-my-account-sidebar flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border p-2 text-xs font-bold whitespace-nowrap transition-all"
                 >
                   <svg className="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
                     <circle cx="12" cy="8" r="3" />
@@ -1734,10 +1463,10 @@ function AppContent() {
                   data-tour="voice-activation-toggle"
                   onClick={toggleListening}
                   title={isListening ? 'Voice Active' : 'Voice Muted'}
-                  className={`flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border p-2 text-xs font-bold whitespace-nowrap backdrop-blur-[2px] transition-all ${
+                  className={`ds-nav-voice flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border p-2 text-xs font-bold whitespace-nowrap backdrop-blur-[2px] transition-all ${
                     isListening
-                      ? 'border-emerald-400/55 bg-emerald-950/25 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,.15)]'
-                      : 'border-rose-400/35 bg-rose-950/18 text-rose-400/85 shadow-[0_0_8px_rgba(244,63,94,.08)]'
+                      ? 'ds-nav-voice--on'
+                      : 'ds-nav-voice--off'
                   }`}
                 >
                   {isListening ? (
@@ -1761,7 +1490,7 @@ function AppContent() {
                   onClick={handleResetToLogin}
                   title="Logout"
                   aria-label="Logout"
-                  className="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border border-rose-500/30 bg-rose-950/14 p-2 font-bold whitespace-nowrap text-rose-400/80 shadow-[0_0_8px_rgba(244,63,94,.06)] transition-all hover:bg-rose-500/15 hover:text-rose-200"
+                  className="ds-nav-logout flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg border p-2 font-bold whitespace-nowrap transition-all"
                 >
                   <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />

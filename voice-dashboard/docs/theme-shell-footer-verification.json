@@ -1,0 +1,30 @@
+{
+  "cosmic-black": {
+    "states": 17,
+    "differences": []
+  },
+  "aurora": {
+    "states": 17,
+    "differences": []
+  },
+  "solaris": {
+    "states": 17,
+    "differences": []
+  },
+  "obsidian": {
+    "states": 17,
+    "differences": []
+  },
+  "quartz": {
+    "states": 17,
+    "differences": []
+  },
+  "jec-horizon": {
+    "states": 17,
+    "differences": []
+  },
+  "jec-skywave": {
+    "states": 17,
+    "differences": []
+  }
+}

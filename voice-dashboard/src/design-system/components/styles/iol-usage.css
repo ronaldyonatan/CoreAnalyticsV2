@@ -1,0 +1,63 @@
+/* Design System-owned iol-usage structure, states and motion. */
+.iol-usage-shell,
+        .iol-fullscreen-shell {
+          color: var(--core-text);
+        }
+
+        .iol-usage-shell [class*="bg-gradient-to-r"],
+        .iol-fullscreen-shell [class*="bg-gradient-to-r"] {
+          background: var(--core-surface-strong) !important;
+        }
+
+        .iol-usage-shell [class*="bg-[#"],
+        .iol-fullscreen-shell [class*="bg-[#"] {
+          background: var(--core-panel) !important;
+        }
+
+        .iol-usage-shell [class*="bg-cyan-"],
+        .iol-usage-shell [class*="bg-sky-"],
+        .iol-fullscreen-shell [class*="bg-cyan-"],
+        .iol-fullscreen-shell [class*="bg-sky-"] {
+          background: var(--core-control) !important;
+        }
+
+        .iol-usage-shell [class*="border-cyan-"],
+        .iol-usage-shell [class*="border-sky-"],
+        .iol-fullscreen-shell [class*="border-cyan-"],
+        .iol-fullscreen-shell [class*="border-sky-"] {
+          border-color: var(--core-border) !important;
+        }
+
+        .iol-usage-shell [class*="text-white"],
+        .iol-fullscreen-shell [class*="text-white"] {
+          color: var(--core-text) !important;
+        }
+
+        .iol-usage-shell [class*="text-cyan-"],
+        .iol-fullscreen-shell [class*="text-cyan-"] {
+          color: var(--core-primary-strong) !important;
+        }
+
+        .iol-usage-shell [class*="text-sky-"],
+        .iol-fullscreen-shell [class*="text-sky-"] {
+          color: var(--core-text-secondary) !important;
+        }
+
+        .iol-usage-shell [class*="text-slate-"],
+        .iol-fullscreen-shell [class*="text-slate-"] {
+          color: var(--core-text-muted) !important;
+        }
+
+        .iol-usage-shell .iol-matrix-shell,
+        .iol-fullscreen-shell .iol-matrix-shell {
+          border-color: var(--core-border) !important;
+          background: var(--core-panel) !important;
+          box-shadow: var(--core-frame-shadow);
+        }
+
+        [data-appearance="light"] .iol-usage-shell,
+        [data-theme-appearance="light"] .iol-usage-shell,
+        [data-appearance="light"] .iol-fullscreen-shell,
+        [data-theme-appearance="light"] .iol-fullscreen-shell {
+          text-shadow: none !important;
+        }

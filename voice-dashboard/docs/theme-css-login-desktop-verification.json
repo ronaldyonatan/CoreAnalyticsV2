@@ -1,0 +1,37 @@
+{
+  "cosmic-black": {
+    "nodes": 66,
+    "firstPaintTheme": "cosmic-black",
+    "differences": []
+  },
+  "aurora": {
+    "nodes": 66,
+    "firstPaintTheme": "aurora",
+    "differences": []
+  },
+  "solaris": {
+    "nodes": 66,
+    "firstPaintTheme": "solaris",
+    "differences": []
+  },
+  "obsidian": {
+    "nodes": 66,
+    "firstPaintTheme": "obsidian",
+    "differences": []
+  },
+  "quartz": {
+    "nodes": 66,
+    "firstPaintTheme": "quartz",
+    "differences": []
+  },
+  "jec-horizon": {
+    "nodes": 86,
+    "firstPaintTheme": "jec-horizon",
+    "differences": []
+  },
+  "jec-skywave": {
+    "nodes": 86,
+    "firstPaintTheme": "jec-skywave",
+    "differences": []
+  }
+}

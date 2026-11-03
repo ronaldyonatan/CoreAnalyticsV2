@@ -1,0 +1,18 @@
+/* Design System-owned demography-card structure, states and motion. */
+@keyframes demographyAgeModeScan {
+              0% { left: -5%; opacity: 0; transform: scaleY(.78); }
+              7% { opacity: 1; }
+              90% { opacity: .96; }
+              100% { left: 101%; opacity: 0; transform: scaleY(1); }
+            }
+            @keyframes demographyAgeModeReveal {
+              0% { clip-path: inset(0 100% 0 0); }
+              100% { clip-path: inset(0 0 0 0); }
+            }
+            .demography-age-mode-scan {
+              animation: demographyAgeModeScan 1.08s cubic-bezier(.22,.61,.36,1) both;
+            }
+            .demography-age-mode-new-layer {
+              animation: demographyAgeModeReveal 1.08s cubic-bezier(.22,.61,.36,1) both;
+              will-change: clip-path;
+            }

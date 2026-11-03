@@ -1,0 +1,12 @@
+[
+  {
+    "key": "login-gateway",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "historical-shell",
+    "declarationEquivalence": true,
+    "static": true
+  }
+]

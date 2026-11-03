@@ -1,3 +1,4 @@
+import { ComponentStyles } from './design-system/ComponentStyles';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float as DreiFloat, MeshWobbleMaterial as DreiWobble, Sphere as DreiSphere, Points, PointMaterial } from '@react-three/drei';
@@ -659,36 +660,7 @@ const processVoiceCommand = useCallback((rawText: string) => {
 
   return (
     <>
-      <style>{`
-        .ironman-visor-perspective { perspective: 1200px; perspective-origin: center center; overflow: hidden; }
-        .ironman-visor-curve {
-          transform-style: preserve-3d;
-          transform: rotateX(12deg) rotateY(0deg) translateZ(-40px) scale(0.95);
-          border-radius: 120px / 60px;
-          background: rgba(2, 6, 23, 0.92);
-          box-shadow: inset 0 0 100px rgba(0, 242, 254, 0.2), 0 40px 90px rgba(0, 0, 0, 0.8), 0 0 50px rgba(0, 242, 254, 0.3);
-          backdrop-filter: blur(12px);
-        }          
-        .hud-vignette { background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.85) 95%); }
-        .hud-scanlines { background: linear-gradient(to bottom, transparent 50%, rgba(0, 242, 254, 0.04) 51%); background-size: 100% 4px; }
-        .text-hud-glow { text-shadow: 0 0 10px rgba(0, 242, 254, 0.7), 0 0 20px rgba(0, 242, 254, 0.4); }
-        .text-white-glow { text-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
-        @keyframes holoGlitchIn {
-          0% { opacity: 0; transform: scale(0.8) translateZ(-150px) rotateX(-12deg); filter: blur(15px); }
-          40% { opacity: 0.6; transform: scale(1.04) translateZ(10px) rotateX(6deg); filter: blur(3px); }
-          100% { opacity: 1; transform: scale(0.97) translateZ(-60px) rotateX(8deg); filter: blur(0px); }
-        }
-        @keyframes holoGlitchOut {
-          0% { opacity: 1; transform: scale(0.97) translateZ(-60px) rotateX(8deg); filter: blur(0px); }
-          100% { opacity: 0; transform: scale(1.1) translateZ(90px) rotateX(18deg); filter: blur(12px); }
-        }
-        .animate-glitch-in { animation: holoGlitchIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        .animate-glitch-out { animation: holoGlitchOut 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
-        .animate-slide-in-right { animation: slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-slide-in-left { animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      `}</style>
+      <ComponentStyles name="historical-shell" />
 
       <div className="w-screen h-screen bg-[#000205] text-cyan-400 flex flex-col items-center justify-center font-mono select-none relative overflow-x-auto m-0 p-0" onClick={() => window.speechSynthesis?.resume()}>
         <div className="absolute inset-0 z-0 pointer-events-none">

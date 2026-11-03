@@ -1,0 +1,18 @@
+{
+  "theme": "crystal-green-material-qa",
+  "changesRequired": [
+    "theme CSS definition",
+    "registry metadata"
+  ],
+  "surfaceFamily": "clinical",
+  "environment": "technical-grid",
+  "performance": "static",
+  "checks": {
+    "statesRendered": true,
+    "settingsSurface": true,
+    "settingsText": true,
+    "introSurface": true
+  },
+  "temporaryThemeRemoved": true,
+  "scope": "Migrated Settings/shell consumers only; this does not assert full application pluggability."
+}

@@ -1,0 +1,7 @@
+/* Design System-owned material-summary structure, states and motion. */
+@keyframes materialScanBand {
+          0% { transform:translateY(-18px);opacity:.15; }
+          50% { opacity:.55; }
+          100% { transform:translateY(18px);opacity:.15; }
+        }
+        .material-holo-band { animation:materialScanBand .55s linear infinite alternate; }

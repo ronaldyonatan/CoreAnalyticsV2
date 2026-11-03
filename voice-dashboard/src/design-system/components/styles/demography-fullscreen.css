@@ -1,0 +1,56 @@
+/* Design System-owned demography-fullscreen structure, states and motion. */
+@keyframes demographyFilterIn {
+              from {
+                opacity: 0;
+                transform: translateY(-5px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+
+            .demography-filter-panel {
+              animation: demographyFilterIn .2s ease-out both;
+            }
+
+            @keyframes demography3dLabelSwap {
+              0% {
+                opacity: 0;
+                transform: scale(.88);
+                filter: blur(4px);
+              }
+              55% {
+                opacity: .72;
+                transform: scale(1.035);
+                filter: blur(0);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+              }
+            }
+
+            .demography-3d-label-swap {
+              animation: demography3dLabelSwap .34s cubic-bezier(.22,.61,.36,1) both;
+            }
+
+            @keyframes demographyPeriodScan {
+              0% {
+                top: 8%;
+                opacity: 0;
+                transform: scaleX(.72);
+              }
+              12% { opacity: .95; }
+              82% { opacity: .75; }
+              100% {
+                top: 92%;
+                opacity: 0;
+                transform: scaleX(1);
+              }
+            }
+
+            .demography-period-scan {
+              animation: demographyPeriodScan 1.05s cubic-bezier(.22,.61,.36,1) infinite;
+            }

@@ -10,7 +10,6 @@ import PanelExsumMaterial from '../../components/PanelExsumMaterial';
 import PanelDetailPNL, { type PnLItem, type PnLClosingInfo } from '../../components/PanelDetailPNL';
 import DailyFilterHealthcare from '../../components/PanelFilterHealthcare';
 import { useVoiceCommandCompanyPerformance } from '../../voiceCommand/CompanyperformanceVC';
-import './company-performance-theme.css';
 
 interface TrenPendapatanItem { month: string; revenue: string; revenue_2025?: string; revenue_2026?: string; month_name?: string; }
 interface ExsumRevenueItem { 'UNIT BISNIS': string; [key: string]: any; }

@@ -1,0 +1,9 @@
+/* Design System-owned revenue-summary structure, states and motion. */
+@keyframes revenueExsumScanBand {
+          0% { transform: translateY(-18px); opacity: .15; }
+          50% { opacity: .55; }
+          100% { transform: translateY(18px); opacity: .15; }
+        }
+        .revenue-exsum-holo-band {
+          animation: revenueExsumScanBand .55s linear infinite alternate;
+        }

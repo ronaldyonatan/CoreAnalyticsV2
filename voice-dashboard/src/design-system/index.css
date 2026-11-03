@@ -1,8 +1,36 @@
-/* CoreAnalytics shared Design System entry point.
-   Keep this import LAST after legacy theme files during migration. */
+/* Design System stylesheet entry. Material recipes precede shared controls;
+   page composition and vendor geometry retain their approved cascade order.
+   ComponentStyles owns conditionally mounted motion/scene sheets. */
 
+@import './base.css';
+@import './components/dashboard-materials.css';
+@import './components/brand-surfaces.css';
+
+@import './components/environment.css';
+@import './components/layered-shell.css';
 @import './tokens/core-tokens.css';
-@import './tokens/semantic-tokens.css';
+@import './tokens/defaults.css';
+@import './tokens/contract.css';
+@import './components/shell.css';
+@import './components/header.css';
+@import './components/settings-menu.css';
+@import './components/settings-materials.css';
+@import './components/sidebar.css';
+@import './components/controls.css';
+@import './components/clinic-picker.css';
+@import './components/management-materials.css';
+@import './components/management.css';
+@import './components/login-portal.css';
+@import './components/theme-switcher.css';
 @import './components/dashboard-card.css';
 @import './components/dashboard-header.css';
 @import './components/dashboard-controls.css';
+@import './components/daily-tracking.css';
+@import './components/voice-registration.css';
+@import './components/company-mobile-grid.css';
+@import './components/account.css';
+@import './components/login-tour.css';
+@import './components/dashboard-tour.css';
+@import 'react-grid-layout/css/styles.css';
+@import './components/executive-briefing.css';
+@import './components/company-presentation.css';

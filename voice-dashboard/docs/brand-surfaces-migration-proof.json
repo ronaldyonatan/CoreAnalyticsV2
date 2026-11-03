@@ -1,0 +1,9 @@
+{
+  "declarations": 474,
+  "colorSubstitutionEquivalent": true,
+  "deadSelectorsRemoved": 0,
+  "themeValues": {
+    "jec-skywave": 360,
+    "jec-horizon": 208
+  }
+}

@@ -1,0 +1,1487 @@
+/* Shared dashboard materials recipes.
+   Structure and capability gates belong to the Design System; theme files
+   supply semantic color values. Rule order preserves the approved cascade. */
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root {
+  --company-bg: var(--dashboard-daylight-company-theme-root-company-bg-color);
+  --company-surface: var(--dashboard-daylight-company-theme-root-company-surface-color);
+  --company-surface-strong: var(--dashboard-daylight-company-theme-root-company-surface-strong-color);
+  --company-surface-soft: var(--dashboard-daylight-company-theme-root-company-surface-soft-color);
+  --company-chart: var(--dashboard-daylight-company-theme-root-company-chart-color);
+  --company-text: var(--dashboard-daylight-company-theme-root-company-text-color);
+  --company-muted: var(--dashboard-daylight-company-theme-root-company-muted-color);
+  --company-primary: var(--dashboard-daylight-company-theme-root-company-primary-color);
+  --company-primary-soft: var(--dashboard-daylight-company-theme-root-company-primary-soft-color);
+  --company-primary-strong: var(--dashboard-daylight-company-theme-root-company-primary-strong-color);
+  --company-border: var(--dashboard-daylight-company-theme-root-company-border-color);
+  --company-border-strong: var(--dashboard-daylight-company-theme-root-company-border-strong-color);
+  --company-target: var(--dashboard-daylight-company-theme-root-company-target-color);
+  --company-positive: var(--dashboard-daylight-company-theme-root-company-positive-color);
+  --company-negative: var(--dashboard-daylight-company-theme-root-company-negative-color);
+  --company-shadow: 0 12px 28px var(--dashboard-daylight-company-theme-root-company-shadow-color), inset 0 1px 0 var(--dashboard-daylight-company-theme-root-company-shadow-color-2);
+  color: var(--company-text) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-performance-shell {
+  background:
+    linear-gradient(var(--dashboard-daylight-company-performance-shell-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-daylight-company-performance-shell-background-color-2) 1px, transparent 1px),
+    radial-gradient(ellipse at 82% -12%, var(--dashboard-daylight-company-performance-shell-background-color-3), transparent 32%),
+    linear-gradient(145deg, var(--dashboard-daylight-company-performance-shell-background-color-4), var(--dashboard-daylight-company-performance-shell-background-color-5)) !important;
+  background-size: 42px 42px, 42px 42px, auto, auto !important;
+  border: 1px solid var(--dashboard-daylight-company-performance-shell-border-color) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-performance-shell-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-control-bar,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-node-header {
+  background:
+    radial-gradient(ellipse at 88% 0%, var(--dashboard-daylight-company-control-bar-company-node-header-background-color), transparent 34%),
+    linear-gradient(110deg, var(--dashboard-daylight-company-control-bar-company-node-header-background-color-2), var(--dashboard-daylight-company-control-bar-company-node-header-background-color-3)) !important;
+  border-color: var(--dashboard-daylight-company-control-bar-company-node-header-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-control-bar-company-node-header-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel-frame,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-view-shell,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-view-shell--compare {
+  background: linear-gradient(145deg, var(--dashboard-daylight-company-panel-frame-company-view-shell-company-view-shell-compare-background-color), var(--dashboard-daylight-company-panel-frame-company-view-shell-company-view-shell-compare-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-company-panel-frame-company-view-shell-company-view-shell-compare-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-panel-frame-company-view-shell-company-view-shell-compare-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel {
+  background:
+    radial-gradient(ellipse at 92% -8%, var(--dashboard-daylight-company-panel-background-color), transparent 34%),
+    radial-gradient(ellipse at 8% 108%, var(--dashboard-daylight-company-panel-background-color-2), transparent 34%),
+    linear-gradient(145deg, var(--dashboard-daylight-company-panel-background-color-3), var(--dashboard-daylight-company-panel-background-color-4)) !important;
+  border-color: var(--dashboard-daylight-company-panel-border-tint) !important;
+  color: var(--company-text) !important;
+  box-shadow: var(--company-shadow) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel-header {
+  border-color: var(--dashboard-daylight-company-panel-header-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-title,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-text {
+  color: var(--dashboard-daylight-company-title-company-text-foreground) !important;
+  text-shadow: none !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-muted,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel-footer {
+  color: var(--company-muted) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-accent {
+  color: var(--company-primary-strong) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-status-dot {
+  background: var(--dashboard-daylight-company-status-dot-background-color) !important;
+  box-shadow: 0 0 8px var(--dashboard-daylight-company-status-dot-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-control-surface,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-control-pill,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tabs,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-select {
+  background: var(--dashboard-daylight-company-control-surface-company-control-pill-company-tabs-company-select-background-color) !important;
+  border-color: var(--dashboard-daylight-company-control-surface-company-control-pill-company-tabs-company-select-border-tint) !important;
+  color: var(--dashboard-daylight-company-control-surface-company-control-pill-company-tabs-company-select-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-control-surface-company-control-pill-company-tabs-company-select-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-control-pill:hover {
+  background: var(--dashboard-daylight-company-control-pill-hover-background-color) !important;
+  border-color: var(--dashboard-daylight-company-control-pill-hover-border-tint) !important;
+  color: var(--dashboard-daylight-company-control-pill-hover-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tab-active {
+  background: linear-gradient(135deg, var(--dashboard-daylight-company-tab-active-background-color), var(--dashboard-daylight-company-tab-active-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-company-tab-active-border-tint) !important;
+  color: var(--dashboard-daylight-company-tab-active-foreground) !important;
+  box-shadow: 0 4px 12px var(--dashboard-daylight-company-tab-active-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tab-idle {
+  color: var(--dashboard-daylight-company-tab-idle-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tab-idle:hover {
+  background: var(--dashboard-daylight-company-tab-idle-hover-background-color) !important;
+  color: var(--dashboard-daylight-company-tab-idle-hover-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-icon-button {
+  background: var(--dashboard-daylight-company-icon-button-background-color) !important;
+  border: 1px solid var(--dashboard-daylight-company-icon-button-border-color) !important;
+  color: var(--dashboard-daylight-company-icon-button-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-icon-button:hover {
+  background: var(--dashboard-daylight-company-icon-button-hover-background-color) !important;
+  color: var(--dashboard-daylight-company-icon-button-hover-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-chart-stage {
+  background:
+    linear-gradient(var(--dashboard-daylight-company-chart-stage-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-daylight-company-chart-stage-background-color-2) 1px, transparent 1px),
+    radial-gradient(ellipse at 78% 0%, var(--dashboard-daylight-company-chart-stage-background-color-3), transparent 36%),
+    linear-gradient(180deg, var(--dashboard-daylight-company-chart-stage-background-color-4), var(--dashboard-daylight-company-chart-stage-background-color-5)) !important;
+  background-size: 34px 34px, 34px 34px, auto, auto !important;
+  border-color: var(--dashboard-daylight-company-chart-stage-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-chart-stage-shadow-color), inset 0 -16px 34px var(--dashboard-daylight-company-chart-stage-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-axis {
+  background: var(--dashboard-daylight-company-axis-background-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-quarter-label {
+  background: var(--dashboard-daylight-company-quarter-label-background-color) !important;
+  border: 1px solid var(--dashboard-daylight-company-quarter-label-border-color) !important;
+  color: var(--dashboard-daylight-company-quarter-label-foreground) !important;
+  box-shadow: 0 2px 7px var(--dashboard-daylight-company-quarter-label-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-bar-previous {
+  background: linear-gradient(to top, var(--dashboard-daylight-company-bar-previous-background-color), var(--dashboard-daylight-company-bar-previous-background-color-2)) !important;
+  box-shadow: 0 5px 13px var(--dashboard-daylight-company-bar-previous-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-bar-current {
+  background: linear-gradient(to top, var(--dashboard-daylight-company-bar-current-background-color), var(--dashboard-daylight-company-bar-current-background-color-2)) !important;
+  box-shadow: 0 5px 14px var(--dashboard-daylight-company-bar-current-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel--radiant {
+  background:
+    radial-gradient(circle at 50% 48%, var(--dashboard-daylight-company-panel-radiant-background-color), transparent 38%),
+    linear-gradient(145deg, var(--dashboard-daylight-company-panel-radiant-background-color-2), var(--dashboard-daylight-company-panel-radiant-background-color-3)) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-ring-track {
+  color: var(--dashboard-daylight-company-ring-track-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-ring-previous {
+  color: var(--dashboard-daylight-company-ring-previous-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-ring-current {
+  color: var(--dashboard-daylight-company-ring-current-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-legend-row {
+  background: var(--dashboard-daylight-company-legend-row-background-color) !important;
+  border-color: var(--dashboard-daylight-company-legend-row-border-tint) !important;
+  color: var(--dashboard-daylight-company-legend-row-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-legend-row-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-legend-row:hover {
+  background: var(--dashboard-daylight-company-legend-row-hover-background-color) !important;
+  border-color: var(--dashboard-daylight-company-legend-row-hover-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-legend-row--active {
+  background: linear-gradient(90deg, var(--dashboard-daylight-company-legend-row-active-background-color), var(--dashboard-daylight-company-legend-row-active-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-company-legend-row-active-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel div[class*="bg-[#001020]/60"] {
+  background: var(--dashboard-daylight-company-panel-div-class-bg-001020-60-background-color) !important;
+  border-color: var(--dashboard-daylight-company-panel-div-class-bg-001020-60-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-panel-div-class-bg-001020-60-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel div[class*="bg-[#00f2fe]/20"] {
+  background: var(--dashboard-daylight-company-panel-div-class-bg-00f2fe-20-background-color) !important;
+  border-color: var(--dashboard-daylight-company-panel-div-class-bg-00f2fe-20-border-tint) !important;
+  box-shadow: 0 5px 13px var(--dashboard-daylight-company-panel-div-class-bg-00f2fe-20-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-table-head,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-table-head th {
+  background: var(--dashboard-daylight-company-table-head-company-table-head-th-background-color) !important;
+  border-color: var(--dashboard-daylight-company-table-head-company-table-head-th-border-tint) !important;
+  color: var(--dashboard-daylight-company-table-head-company-table-head-th-foreground) !important;
+  box-shadow: 0 4px 12px var(--dashboard-daylight-company-table-head-company-table-head-th-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-table-body {
+  color: var(--dashboard-daylight-company-table-body-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-table-body tr,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-table-body td {
+  border-color: var(--dashboard-daylight-company-table-body-tr-company-table-body-td-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-table-row:hover {
+  background: var(--dashboard-daylight-company-table-row-hover-background-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel-footer {
+  border-color: var(--dashboard-daylight-company-panel-footer-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tooltip {
+  background: var(--dashboard-daylight-company-tooltip-background-color) !important;
+  border-color: var(--dashboard-daylight-company-tooltip-border-tint) !important;
+  color: var(--dashboard-daylight-company-tooltip-foreground) !important;
+  box-shadow: 0 12px 28px var(--dashboard-daylight-company-tooltip-shadow-color), 0 0 16px var(--dashboard-daylight-company-tooltip-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tooltip-title {
+  color: var(--dashboard-daylight-company-tooltip-title-foreground) !important;
+  border-color: var(--dashboard-daylight-company-tooltip-title-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-chart-stage span[class*="bg-black"] {
+  background: var(--dashboard-daylight-company-chart-stage-span-class-bg-black-background-color) !important;
+  color: var(--dashboard-daylight-company-chart-stage-span-class-bg-black-foreground) !important;
+  border-color: var(--dashboard-daylight-company-chart-stage-span-class-bg-black-border-tint) !important;
+  text-shadow: none !important;
+  box-shadow: 0 8px 20px var(--dashboard-daylight-company-chart-stage-span-class-bg-black-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root .text-cyan-100,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root .text-cyan-200,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root .text-cyan-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root .text-cyan-400 {
+  color: var(--dashboard-daylight-company-theme-root-text-cyan-100-company-theme-root-text-cyan-200-company-theme-root-text-cyan-300-company-theme-root-text-cyan-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root .text-white:not(.company-tab-active) {
+  color: var(--dashboard-daylight-company-theme-root-text-white-not-company-tab-active-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root select,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root input,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-theme-root button {
+  color-scheme: light;
+}
+
+[data-surface-family="luminous"] body,
+[data-surface-family="luminous"] #root {
+  background:
+    radial-gradient(ellipse at 18% 6%, var(--dashboard-luminous-body-root-background-color), transparent 35%),
+    radial-gradient(ellipse at 78% 9%, var(--dashboard-luminous-body-root-background-color-2), transparent 37%),
+    linear-gradient(145deg, var(--dashboard-luminous-body-root-background-color-3) 0%, var(--dashboard-luminous-body-root-background-color-4) 48%, var(--dashboard-luminous-body-root-background-color-5) 100%);
+}
+
+[data-surface-family="luminous"] .core-dashboard-frame {
+  border-color: var(--dashboard-luminous-core-dashboard-frame-border-tint);
+  box-shadow:
+    0 22px 58px var(--dashboard-luminous-core-dashboard-frame-shadow-color),
+    0 0 38px var(--dashboard-luminous-core-dashboard-frame-shadow-color-2),
+    inset 0 1px 0 var(--dashboard-luminous-core-dashboard-frame-shadow-color-3);
+}
+
+.daily-themed-card {
+  background: var(--core-panel);
+  border-color: var(--core-border);
+  color: var(--core-text);
+}
+
+.daily-themed-fullscreen {
+  background: var(--core-bg-secondary);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.daily-themed-fullscreen-header {
+  border-color: var(--core-border);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--core-primary) 10%, var(--core-surface-strong)),
+      var(--core-surface-strong),
+      color-mix(in srgb, var(--dashboard-base-daily-themed-fullscreen-header-background-color) 9%, var(--core-surface-strong))
+    );
+}
+
+.daily-themed-title {
+  color: var(--core-primary-soft) !important;
+}
+
+.daily-themed-text {
+  color: var(--core-text) !important;
+}
+
+.daily-themed-muted {
+  color: var(--core-text-secondary) !important;
+}
+
+.daily-themed-accent {
+  color: var(--core-primary) !important;
+}
+
+.daily-themed-border {
+  border-color: var(--core-border) !important;
+}
+
+.daily-themed-inset {
+  background: var(--core-control) !important;
+  border-color: var(--core-border) !important;
+  color: var(--core-text);
+}
+
+.daily-themed-control {
+  background: var(--core-control);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.daily-themed-popover {
+  background: var(--core-surface-strong);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.daily-themed-input {
+  background: var(--dashboard-base-daily-themed-input-background-color);
+  border-color: var(--core-border);
+  color: var(--core-text);
+}
+
+.daily-themed-input::placeholder {
+  color: var(--core-text-muted);
+}
+
+.daily-themed-icon-button {
+  color: var(--core-primary);
+}
+
+.daily-themed-icon-button:hover {
+  background: var(--core-control-hover);
+  color: var(--core-text);
+}
+
+[data-surface-family="luminous"] .daily-themed-card {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 10% -5%, var(--dashboard-luminous-daily-themed-card-background-color), transparent 34%),
+    radial-gradient(ellipse at 94% 2%, var(--dashboard-luminous-daily-themed-card-background-color-2), transparent 32%),
+    linear-gradient(145deg, var(--dashboard-luminous-daily-themed-card-background-color-3), var(--dashboard-luminous-daily-themed-card-background-color-4)) !important;
+  border-color: var(--dashboard-luminous-daily-themed-card-border-tint) !important;
+  box-shadow:
+    0 13px 30px var(--dashboard-luminous-daily-themed-card-shadow-color),
+    0 0 20px var(--dashboard-luminous-daily-themed-card-shadow-color-2),
+    inset 0 1px 0 var(--dashboard-luminous-daily-themed-card-shadow-color-3) !important;
+}
+
+[data-surface-family="luminous"] .daily-themed-card::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+  left: 7%;
+  right: 34%;
+  top: 0;
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--dashboard-luminous-daily-themed-card-before-background-color),
+      var(--dashboard-luminous-daily-themed-card-before-background-color-2),
+      transparent
+    );
+  box-shadow: 0 0 12px var(--dashboard-luminous-daily-themed-card-before-shadow-color);
+}
+
+[data-surface-family="luminous"] .daily-themed-inset {
+  background:
+    linear-gradient(180deg, var(--dashboard-luminous-daily-themed-inset-background-color), var(--dashboard-luminous-daily-themed-inset-background-color-2)) !important;
+  color: var(--dashboard-luminous-daily-themed-inset-foreground) !important;
+}
+
+[data-surface-family="luminous"] .daily-themed-popover {
+  background:
+    radial-gradient(circle at 92% 5%, var(--dashboard-luminous-daily-themed-popover-background-color), transparent 34%),
+    linear-gradient(160deg, var(--dashboard-luminous-daily-themed-popover-background-color-2), var(--dashboard-luminous-daily-themed-popover-background-color-3)) !important;
+  box-shadow:
+    0 24px 58px var(--dashboard-luminous-daily-themed-popover-shadow-color),
+    0 0 28px var(--dashboard-luminous-daily-themed-popover-shadow-color-2) !important;
+}
+
+[data-surface-family="luminous"] .daily-themed-fullscreen,
+[data-surface-family="luminous"] .daily-tracking-fullscreen {
+  background:
+    linear-gradient(var(--dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-2) 1px, transparent 1px),
+    radial-gradient(ellipse at 15% 10%, var(--dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-3), transparent 32%),
+    radial-gradient(ellipse at 84% 5%, var(--dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-4), transparent 34%),
+    linear-gradient(145deg, var(--dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-5), var(--dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-6)) !important;
+  background-size: 48px 48px, 48px 48px, auto, auto, auto !important;
+}
+
+[data-surface-family="luminous"] .daily-themed-fullscreen-header,
+[data-surface-family="luminous"] .daily-tracking-fullscreen-header {
+  background:
+    linear-gradient(100deg, var(--dashboard-luminous-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color), var(--dashboard-luminous-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color-2), var(--dashboard-luminous-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color-3)) !important;
+}
+
+[data-surface-family="luminous"] .grid-panel-container > div > div {
+  background:
+    linear-gradient(145deg, var(--dashboard-luminous-grid-panel-container-div-div-background-color), var(--dashboard-luminous-grid-panel-container-div-div-background-color-2)) !important;
+  border-color: var(--dashboard-luminous-grid-panel-container-div-div-border-tint) !important;
+  color: var(--core-text) !important;
+  box-shadow:
+    inset 0 1px 0 var(--dashboard-luminous-grid-panel-container-div-div-shadow-color),
+    0 10px 28px var(--dashboard-luminous-grid-panel-container-div-div-shadow-color-2) !important;
+}
+
+[data-surface-family="luminous"] .text-hud-glow {
+  color: var(--dashboard-luminous-text-hud-glow-foreground) !important;
+  text-shadow:
+    0 0 8px var(--dashboard-luminous-text-hud-glow-text-shadow-color),
+    0 0 18px var(--dashboard-luminous-text-hud-glow-text-shadow-color-2) !important;
+}
+
+[data-surface-family="luminous"] .daily-tracking-summary-chip {
+  background: var(--dashboard-luminous-daily-tracking-summary-chip-background-color);
+  border-color: var(--dashboard-luminous-daily-tracking-summary-chip-border-tint);
+  color: var(--dashboard-luminous-daily-tracking-summary-chip-foreground);
+}
+
+[data-surface-family="luminous"] select,
+[data-surface-family="luminous"] input,
+[data-surface-family="luminous"] button {
+  color-scheme: dark;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) body,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) #root {
+  background:
+    radial-gradient(ellipse at 82% 4%, var(--dashboard-daylight-body-root-background-color), transparent 30%),
+    radial-gradient(ellipse at 12% 76%, var(--dashboard-daylight-body-root-background-color-2), transparent 35%),
+    linear-gradient(145deg, var(--dashboard-daylight-body-root-background-color-3) 0%, var(--dashboard-daylight-body-root-background-color-4) 44%, var(--dashboard-daylight-body-root-background-color-5) 100%);
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .core-dashboard-frame {
+  border-color: var(--dashboard-daylight-core-dashboard-frame-border-tint);
+  box-shadow:
+    0 22px 58px var(--dashboard-daylight-core-dashboard-frame-shadow-color),
+    0 0 36px var(--dashboard-daylight-core-dashboard-frame-shadow-color-2),
+    inset 0 1px 0 var(--dashboard-daylight-core-dashboard-frame-shadow-color-3);
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .text-hud-glow {
+  color: var(--dashboard-daylight-text-hud-glow-foreground) !important;
+  text-shadow:
+    0 0 10px var(--dashboard-daylight-text-hud-glow-text-shadow-color),
+    0 2px 12px var(--dashboard-daylight-text-hud-glow-text-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card {
+  position: relative;
+  border-color: var(--dashboard-daylight-daily-themed-card-border-tint) !important;
+  box-shadow:
+    0 13px 28px var(--dashboard-daylight-daily-themed-card-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-daily-themed-card-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-fullscreen,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-tracking-fullscreen {
+  background:
+    linear-gradient(var(--dashboard-daylight-daily-themed-fullscreen-daily-tracking-fullscreen-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-daylight-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-2) 1px, transparent 1px),
+    radial-gradient(ellipse at 86% 0%, var(--dashboard-daylight-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-3), transparent 31%),
+    linear-gradient(145deg, var(--dashboard-daylight-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-4), var(--dashboard-daylight-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-5)) !important;
+  background-size: 48px 48px, 48px 48px, auto, auto !important;
+  color: var(--dashboard-daylight-daily-themed-fullscreen-daily-tracking-fullscreen-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-fullscreen-header,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-tracking-fullscreen-header {
+  background:
+    linear-gradient(100deg, var(--dashboard-daylight-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color), var(--dashboard-daylight-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color-2), var(--dashboard-daylight-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color-3)) !important;
+  border-color: var(--dashboard-daylight-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-input,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) select,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) input {
+  background: var(--dashboard-daylight-daily-themed-input-select-input-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-themed-input-select-input-border-tint) !important;
+  color: var(--dashboard-daylight-daily-themed-input-select-input-foreground) !important;
+  color-scheme: light;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .grid-panel-container > div > div {
+  background:
+    linear-gradient(145deg, var(--dashboard-daylight-grid-panel-container-div-div-background-color), var(--dashboard-daylight-grid-panel-container-div-div-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-grid-panel-container-div-div-border-tint) !important;
+  color: var(--dashboard-daylight-grid-panel-container-div-div-foreground) !important;
+  box-shadow:
+    0 10px 26px var(--dashboard-daylight-grid-panel-container-div-div-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-grid-panel-container-div-div-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap > div > div:first-child {
+  min-width: 270px !important;
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  background:
+    linear-gradient(135deg, var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-background-color), var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-border-tint) !important;
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-foreground) !important;
+  box-shadow:
+    0 5px 14px var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap > div > div:first-child:hover {
+  background: linear-gradient(135deg, var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-hover-background-color), var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-hover-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-hover-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap > div > div:first-child svg {
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-first-child-svg-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap > div > div:nth-child(2) {
+  background: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-nth-child-2-background-color) !important;
+  border-color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-nth-child-2-border-tint) !important;
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-nth-child-2-foreground) !important;
+  box-shadow: 0 18px 38px var(--dashboard-daylight-company-healthcare-filter-wrap-div-div-nth-child-2-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap input {
+  background: var(--dashboard-daylight-company-healthcare-filter-wrap-input-background-color) !important;
+  border-color: var(--dashboard-daylight-company-healthcare-filter-wrap-input-border-tint) !important;
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-input-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap input::placeholder {
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-input-placeholder-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap div[class*="text-cyan"] {
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-class-text-cyan-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap div[class*="bg-[#2587C8]/40"] {
+  background: var(--dashboard-daylight-company-healthcare-filter-wrap-div-class-bg-2587c8-40-background-color) !important;
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-class-bg-2587c8-40-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-filter-wrap div[class*="hover:bg-[#2587C8]/20"]:hover {
+  background: var(--dashboard-daylight-company-healthcare-filter-wrap-div-class-hover-bg-2587c8-20-hover-background-color) !important;
+  color: var(--dashboard-daylight-company-healthcare-filter-wrap-div-class-hover-bg-2587c8-20-hover-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-refresh {
+  min-height: 30px;
+  color: var(--dashboard-daylight-company-healthcare-refresh-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-healthcare-error {
+  border-color: var(--dashboard-daylight-company-healthcare-error-border-tint) !important;
+  background: var(--dashboard-daylight-company-healthcare-error-background-color) !important;
+  color: var(--dashboard-daylight-company-healthcare-error-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card {
+  background:
+    radial-gradient(ellipse at 88% -10%, var(--dashboard-daylight-company-pnl-card-background-color), transparent 32%),
+    linear-gradient(145deg, var(--dashboard-daylight-company-pnl-card-background-color-2), var(--dashboard-daylight-company-pnl-card-background-color-3)) !important;
+  border-color: var(--dashboard-daylight-company-pnl-card-border-tint) !important;
+  color: var(--dashboard-daylight-company-pnl-card-foreground) !important;
+  box-shadow:
+    0 12px 28px var(--dashboard-daylight-company-pnl-card-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-company-pnl-card-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-scroll {
+  background:
+    linear-gradient(var(--dashboard-daylight-company-pnl-scroll-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-daylight-company-pnl-scroll-background-color-2) 1px, transparent 1px),
+    var(--dashboard-daylight-company-pnl-scroll-background-color-3) !important;
+  background-size: 32px 32px, 32px 32px, auto !important;
+  border-color: var(--dashboard-daylight-company-pnl-scroll-border-tint) !important;
+  color: var(--dashboard-daylight-company-pnl-scroll-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-scroll .company-table-head,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-scroll .company-table-head th {
+  background: var(--dashboard-daylight-company-pnl-scroll-company-table-head-company-pnl-scroll-company-table-head-th-background-color) !important;
+  color: var(--dashboard-daylight-company-pnl-scroll-company-table-head-company-pnl-scroll-company-table-head-th-foreground) !important;
+  border-color: var(--dashboard-daylight-company-pnl-scroll-company-table-head-company-pnl-scroll-company-table-head-th-border-tint) !important;
+  box-shadow: 0 5px 12px var(--dashboard-daylight-company-pnl-scroll-company-table-head-company-pnl-scroll-company-table-head-th-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-scroll .company-table-body {
+  color: var(--dashboard-daylight-company-pnl-scroll-company-table-body-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-row {
+  background: var(--dashboard-daylight-company-pnl-row-background-color) !important;
+  color: var(--dashboard-daylight-company-pnl-row-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-row:nth-child(even) {
+  background: var(--dashboard-daylight-company-pnl-row-nth-child-even-background-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-row:hover {
+  background: var(--dashboard-daylight-company-pnl-row-hover-background-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-row td {
+  color: var(--dashboard-daylight-company-pnl-row-td-foreground) !important;
+  border-color: var(--dashboard-daylight-company-pnl-row-td-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-group,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-group td {
+  background: linear-gradient(90deg, var(--dashboard-daylight-company-pnl-group-company-pnl-group-td-background-color), var(--dashboard-daylight-company-pnl-group-company-pnl-group-td-background-color-2)) !important;
+  color: var(--dashboard-daylight-company-pnl-group-company-pnl-group-td-foreground) !important;
+  border-color: var(--dashboard-daylight-company-pnl-group-company-pnl-group-td-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-section,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-section td {
+  background: linear-gradient(90deg, var(--dashboard-daylight-company-pnl-section-company-pnl-section-td-background-color), var(--dashboard-daylight-company-pnl-section-company-pnl-section-td-background-color-2)) !important;
+  color: var(--dashboard-daylight-company-pnl-section-company-pnl-section-td-foreground) !important;
+  border-color: var(--dashboard-daylight-company-pnl-section-company-pnl-section-td-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-total,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-total td {
+  background: linear-gradient(90deg, var(--dashboard-daylight-company-pnl-total-company-pnl-total-td-background-color), var(--dashboard-daylight-company-pnl-total-company-pnl-total-td-background-color-2)) !important;
+  color: var(--dashboard-daylight-company-pnl-total-company-pnl-total-td-foreground) !important;
+  border-color: var(--dashboard-daylight-company-pnl-total-company-pnl-total-td-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-major,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-major td {
+  background: linear-gradient(90deg, var(--dashboard-daylight-company-pnl-major-company-pnl-major-td-background-color), var(--dashboard-daylight-company-pnl-major-company-pnl-major-td-background-color-2)) !important;
+  color: var(--dashboard-daylight-company-pnl-major-company-pnl-major-td-foreground) !important;
+  border-color: var(--dashboard-daylight-company-pnl-major-company-pnl-major-td-border-tint) !important;
+  box-shadow: inset 3px 0 0 var(--dashboard-daylight-company-pnl-major-company-pnl-major-td-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-slate-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-cyan-100,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-cyan-200,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-cyan-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-cyan-400 {
+  color: var(--dashboard-daylight-company-pnl-card-text-slate-300-company-pnl-card-text-cyan-100-company-pnl-card-text-cyan-200-company-pnl-card-text-cyan-300-company-pnl-card-text-cyan-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-emerald-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-emerald-400 {
+  color: var(--dashboard-daylight-company-pnl-card-text-emerald-300-company-pnl-card-text-emerald-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-rose-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-rose-400 {
+  color: var(--dashboard-daylight-company-pnl-card-text-rose-300-company-pnl-card-text-rose-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-amber-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card .text-amber-400 {
+  color: var(--dashboard-daylight-company-pnl-card-text-amber-300-company-pnl-card-text-amber-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tooltip--warning,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-tooltip--warning > div:first-child {
+  background: var(--dashboard-daylight-company-tooltip-warning-company-tooltip-warning-div-first-child-background-color) !important;
+  color: var(--dashboard-daylight-company-tooltip-warning-company-tooltip-warning-div-first-child-foreground) !important;
+  border-color: var(--dashboard-daylight-company-tooltip-warning-company-tooltip-warning-div-first-child-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 140;
+  border-radius: inherit;
+  border: 1px solid var(--dashboard-daylight-company-3d-shell-after-border-color);
+  box-shadow:
+    inset 0 0 46px var(--dashboard-daylight-company-3d-shell-after-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-company-3d-shell-after-shadow-color-2);
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell .company-title {
+  color: var(--dashboard-daylight-company-3d-shell-company-title-foreground) !important;
+  text-shadow: 0 0 12px var(--dashboard-daylight-company-3d-shell-company-title-text-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell .company-muted {
+  color: var(--dashboard-daylight-company-3d-shell-company-muted-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell .company-tab-idle {
+  color: var(--dashboard-daylight-company-3d-shell-company-tab-idle-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell .company-tab-active {
+  background: linear-gradient(135deg, var(--dashboard-daylight-company-3d-shell-company-tab-active-background-color), var(--dashboard-daylight-company-3d-shell-company-tab-active-background-color-2)) !important;
+  color: var(--dashboard-daylight-company-3d-shell-company-tab-active-foreground) !important;
+  box-shadow: 0 0 14px var(--dashboard-daylight-company-3d-shell-company-tab-active-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-compare-toggle {
+  min-width: 42px;
+  justify-content: center;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-compare-toggle--idle {
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-compare-toggle-idle-shadow-color), 0 5px 12px var(--dashboard-daylight-company-compare-toggle-idle-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell [class*="bg-[#00111d]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell [class*="bg-[#001019]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell [class*="bg-[#001428]"] {
+  box-shadow: 0 14px 30px var(--dashboard-daylight-company-3d-shell-class-bg-00111d-company-3d-shell-class-bg-001019-company-3d-shell-class-bg-001428-shadow-color), inset 0 1px 0 var(--dashboard-daylight-company-3d-shell-class-bg-00111d-company-3d-shell-class-bg-001019-company-3d-shell-class-bg-001428-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-compare-toggle--active {
+  background: linear-gradient(135deg, var(--dashboard-daylight-company-compare-toggle-active-background-color) 0%, var(--dashboard-daylight-company-compare-toggle-active-background-color-2) 34%, var(--dashboard-daylight-company-compare-toggle-active-background-color-3) 66%, var(--dashboard-daylight-company-compare-toggle-active-background-color-4) 100%) !important;
+  border-color: var(--dashboard-daylight-company-compare-toggle-active-border-tint) !important;
+  color: var(--dashboard-daylight-company-compare-toggle-active-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-company-compare-toggle-active-shadow-color), 0 8px 20px var(--dashboard-daylight-company-compare-toggle-active-shadow-color-2) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-compare-toggle--idle {
+  background: linear-gradient(135deg, var(--dashboard-daylight-company-compare-toggle-idle-background-color), var(--dashboard-daylight-company-compare-toggle-idle-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-company-compare-toggle-idle-border-tint) !important;
+  color: var(--dashboard-daylight-company-compare-toggle-idle-foreground) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell {
+  background:
+    radial-gradient(circle at 72% 14%, var(--dashboard-daylight-company-3d-shell-background-color), transparent 34%),
+    linear-gradient(145deg, var(--dashboard-daylight-company-3d-shell-background-color-2), var(--dashboard-daylight-company-3d-shell-background-color-3)) !important;
+  border-color: var(--dashboard-daylight-company-3d-shell-border-tint) !important;
+  box-shadow: 0 20px 48px var(--dashboard-daylight-company-3d-shell-shadow-color), 0 0 28px var(--dashboard-daylight-company-3d-shell-shadow-color-2), inset 0 1px 0 var(--dashboard-daylight-company-3d-shell-shadow-color-3) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell [class*="bg-[#00111d]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell [class*="bg-[#001019]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell [class*="bg-[#001428]"] {
+  background: var(--dashboard-daylight-company-3d-shell-class-bg-00111d-company-3d-shell-class-bg-001019-company-3d-shell-class-bg-001428-background-color) !important;
+  border-color: var(--dashboard-daylight-company-3d-shell-class-bg-00111d-company-3d-shell-class-bg-001019-company-3d-shell-class-bg-001428-border-tint) !important;
+  color: var(--dashboard-daylight-company-3d-shell-class-bg-00111d-company-3d-shell-class-bg-001019-company-3d-shell-class-bg-001428-foreground) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell .company-select,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-3d-shell .company-tabs {
+  background: var(--dashboard-daylight-company-3d-shell-company-select-company-3d-shell-company-tabs-background-color) !important;
+  border-color: var(--dashboard-daylight-company-3d-shell-company-select-company-3d-shell-company-tabs-border-tint) !important;
+  color: var(--dashboard-daylight-company-3d-shell-company-select-company-3d-shell-company-tabs-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-page-header,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-page-header {
+  background:
+    radial-gradient(ellipse at 88% -20%, var(--dashboard-daylight-daily-page-header-company-page-header-background-color), transparent 38%),
+    linear-gradient(105deg, var(--dashboard-daylight-daily-page-header-company-page-header-background-color-2), var(--dashboard-daylight-daily-page-header-company-page-header-background-color-3) 48%, var(--dashboard-daylight-daily-page-header-company-page-header-background-color-4)) !important;
+  border-color: var(--dashboard-daylight-daily-page-header-company-page-header-border-tint) !important;
+  box-shadow:
+    inset 4px 0 0 var(--dashboard-daylight-daily-page-header-company-page-header-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-daily-page-header-company-page-header-shadow-color-2),
+    0 9px 24px var(--dashboard-daylight-daily-page-header-company-page-header-shadow-color-3) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-page-title,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-page-title {
+  background: linear-gradient(90deg, var(--dashboard-daylight-daily-page-title-company-page-title-background-color) 0%, var(--dashboard-daylight-daily-page-title-company-page-title-background-color-2) 48%, var(--dashboard-daylight-daily-page-title-company-page-title-background-color-3) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: var(--dashboard-daylight-daily-page-title-company-page-title-foreground) !important;
+  text-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-page-status-dot,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-page-status-dot {
+  background: var(--dashboard-daylight-daily-page-status-dot-company-page-status-dot-background-color) !important;
+  box-shadow: 0 0 10px var(--dashboard-daylight-daily-page-status-dot-company-page-status-dot-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-period-control {
+  background: linear-gradient(135deg, var(--dashboard-daylight-daily-period-control-background-color), var(--dashboard-daylight-daily-period-control-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-daily-period-control-border-tint) !important;
+  color: var(--dashboard-daylight-daily-period-control-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-daily-period-control-shadow-color), 0 4px 12px var(--dashboard-daylight-daily-period-control-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-period-control input {
+  color: var(--dashboard-daylight-daily-period-control-input-foreground) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-page-controls {
+  color: var(--dashboard-daylight-company-page-controls-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-compare-side-label {
+  color: var(--dashboard-daylight-company-compare-side-label-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-badge {
+  border-color: var(--dashboard-daylight-daily-comingsoon-badge-border-tint) !important;
+  background: var(--dashboard-daylight-daily-comingsoon-badge-background-color) !important;
+  box-shadow:
+    0 5px 16px var(--dashboard-daylight-daily-comingsoon-badge-shadow-color),
+    inset 0 1px 0 var(--dashboard-daylight-daily-comingsoon-badge-shadow-color-2) !important;
+  backdrop-filter: blur(6px);
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-badge-ping,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-badge-dot,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-dot {
+  background: var(--dashboard-daylight-daily-comingsoon-badge-ping-daily-comingsoon-badge-dot-daily-comingsoon-dot-background-color) !important;
+  box-shadow: 0 0 10px var(--dashboard-daylight-daily-comingsoon-badge-ping-daily-comingsoon-badge-dot-daily-comingsoon-dot-shadow-color) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-badge-text,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-title {
+  color: var(--dashboard-daylight-daily-comingsoon-badge-text-daily-comingsoon-title-foreground) !important;
+  text-shadow: 0 1px 8px var(--dashboard-daylight-daily-comingsoon-badge-text-daily-comingsoon-title-text-shadow-color);
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-watermark {
+  color: var(--dashboard-daylight-daily-comingsoon-watermark-foreground) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-tint {
+  background: linear-gradient(to top, var(--dashboard-daylight-daily-comingsoon-tint-background-color), transparent) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-pattern {
+  background-image: repeating-linear-gradient(-24deg, var(--dashboard-daylight-daily-comingsoon-pattern-background-image-color) 0px, var(--dashboard-daylight-daily-comingsoon-pattern-background-image-color-2) 1px, transparent 1px, transparent 15px) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-corner {
+  border-color: var(--dashboard-daylight-daily-comingsoon-corner-border-tint) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-ribbon {
+  border-color: var(--dashboard-daylight-daily-comingsoon-ribbon-border-tint) !important;
+  background:
+    linear-gradient(
+      90deg,
+      var(--dashboard-daylight-daily-comingsoon-ribbon-background-color),
+      var(--dashboard-daylight-daily-comingsoon-ribbon-background-color-2),
+      var(--dashboard-daylight-daily-comingsoon-ribbon-background-color-3)
+    ) !important;
+  box-shadow:
+    0 10px 26px var(--dashboard-daylight-daily-comingsoon-ribbon-shadow-color),
+    0 0 24px var(--dashboard-daylight-daily-comingsoon-ribbon-shadow-color-2),
+    inset 0 1px 0 var(--dashboard-daylight-daily-comingsoon-ribbon-shadow-color-3) !important;
+  backdrop-filter: blur(4px);
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-subtitle {
+  color: var(--dashboard-daylight-daily-comingsoon-subtitle-foreground) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-footnote {
+  color: var(--dashboard-daylight-daily-comingsoon-footnote-foreground) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-preview {
+  border-color: var(--dashboard-daylight-daily-comingsoon-preview-border-tint) !important;
+  background: var(--dashboard-daylight-daily-comingsoon-preview-background-color) !important;
+  color: var(--dashboard-daylight-daily-comingsoon-preview-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-daily-comingsoon-preview-shadow-color);
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .utilization-comingsoon-sweep {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dashboard-daylight-utilization-comingsoon-sweep-background-color),
+    var(--dashboard-daylight-utilization-comingsoon-sweep-background-color-2),
+    var(--dashboard-daylight-utilization-comingsoon-sweep-background-color-3),
+    transparent
+  ) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-revday-badge {
+  color: var(--dashboard-daylight-daily-revday-badge-foreground) !important;
+  background: linear-gradient(135deg, var(--dashboard-daylight-daily-revday-badge-background-color), var(--dashboard-daylight-daily-revday-badge-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-daily-revday-badge-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-daily-revday-badge-shadow-color), 0 5px 16px var(--dashboard-daylight-daily-revday-badge-shadow-color-2) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-revday-badge .daily-revday-ytd {
+  color: var(--dashboard-daylight-daily-revday-badge-daily-revday-ytd-foreground) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-revday-badge .daily-revday-current {
+  color: var(--dashboard-daylight-daily-revday-badge-daily-revday-current-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-tint {
+  background: var(--dashboard-daylight-daily-comingsoon-global-tint-background-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-ribbon {
+  border-color: var(--dashboard-daylight-daily-comingsoon-global-ribbon-border-tint) !important;
+  background:
+    linear-gradient(
+      90deg,
+      var(--dashboard-daylight-daily-comingsoon-global-ribbon-background-color),
+      var(--dashboard-daylight-daily-comingsoon-global-ribbon-background-color-2),
+      var(--dashboard-daylight-daily-comingsoon-global-ribbon-background-color-3)
+    ) !important;
+  box-shadow:
+    0 10px 28px var(--dashboard-daylight-daily-comingsoon-global-ribbon-shadow-color),
+    0 0 26px var(--dashboard-daylight-daily-comingsoon-global-ribbon-shadow-color-2),
+    inset 0 1px 0 var(--dashboard-daylight-daily-comingsoon-global-ribbon-shadow-color-3) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-ribbon span,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-ribbon div {
+  color: var(--dashboard-daylight-daily-comingsoon-global-ribbon-span-daily-comingsoon-global-ribbon-div-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-ribbon > div:last-child {
+  color: var(--dashboard-daylight-daily-comingsoon-global-ribbon-div-last-child-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-ribbon span[class*="bg-gradient"] {
+  color: transparent !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card {
+  color: var(--dashboard-daylight-daily-themed-card-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-cyan-100"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-cyan-200"] {
+  color: var(--dashboard-daylight-daily-themed-card-class-text-cyan-100-daily-themed-card-class-text-cyan-200-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-cyan-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-cyan-400"] {
+  color: var(--dashboard-daylight-daily-themed-card-class-text-cyan-300-daily-themed-card-class-text-cyan-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-slate-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-slate-400"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-slate-500"] {
+  color: var(--dashboard-daylight-daily-themed-card-class-text-slate-300-daily-themed-card-class-text-slate-400-daily-themed-card-class-text-slate-500-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="text-white"] {
+  color: var(--dashboard-daylight-daily-themed-card-class-text-white-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="bg-[#001428]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="bg-[#031222]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="bg-[#031426]"] {
+  background: linear-gradient(145deg, var(--dashboard-daylight-daily-themed-card-class-bg-001428-daily-themed-card-class-bg-031222-daily-themed-card-class-bg-031426-background-color), var(--dashboard-daylight-daily-themed-card-class-bg-001428-daily-themed-card-class-bg-031222-daily-themed-card-class-bg-031426-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-daily-themed-card-class-bg-001428-daily-themed-card-class-bg-031222-daily-themed-card-class-bg-031426-border-tint) !important;
+  color: var(--dashboard-daylight-daily-themed-card-class-bg-001428-daily-themed-card-class-bg-031222-daily-themed-card-class-bg-031426-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-daily-themed-card-class-bg-001428-daily-themed-card-class-bg-031222-daily-themed-card-class-bg-031426-shadow-color), 0 4px 14px var(--dashboard-daylight-daily-themed-card-class-bg-001428-daily-themed-card-class-bg-031222-daily-themed-card-class-bg-031426-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card [class*="border-[#2587C8]"] {
+  border-color: var(--dashboard-daylight-daily-themed-card-class-border-2587c8-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-400"] {
+  color: var(--dashboard-daylight-daily-3d-shell-class-text-cyan-300-daily-3d-shell-class-text-cyan-400-foreground) !important;
+  text-shadow: none !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-sky-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-sky-400"] {
+  color: var(--dashboard-daylight-daily-3d-shell-class-text-sky-300-daily-3d-shell-class-text-sky-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#03111f]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#031421]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#041426]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#02101d]"] {
+  background: var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-border-tint) !important;
+  color: var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-foreground) !important;
+  box-shadow: 0 7px 18px var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-cyan-950"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-sky-950"] {
+  background: var(--dashboard-daylight-daily-3d-shell-class-bg-cyan-950-daily-3d-shell-class-bg-sky-950-background-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell button {
+  text-shadow: none !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap > div > div:first-child {
+  min-width: 270px !important;
+  min-height: 30px !important;
+  padding: 6px 10px !important;
+  background: linear-gradient(135deg, var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-background-color), var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-border-tint) !important;
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-foreground) !important;
+  box-shadow: 0 5px 14px var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-shadow-color), inset 0 1px 0 var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap > div > div:first-child:hover {
+  background: linear-gradient(135deg, var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-hover-background-color), var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-hover-background-color-2)) !important;
+  border-color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-hover-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap > div > div:first-child svg {
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-first-child-svg-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap > div > div:nth-child(2) {
+  background: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-nth-child-2-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-nth-child-2-border-tint) !important;
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-nth-child-2-foreground) !important;
+  box-shadow: 0 18px 38px var(--dashboard-daylight-daily-healthcare-filter-wrap-div-div-nth-child-2-shadow-color) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap input {
+  background: var(--dashboard-daylight-daily-healthcare-filter-wrap-input-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-healthcare-filter-wrap-input-border-tint) !important;
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-input-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap input::placeholder {
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-input-placeholder-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap div[class*="text-cyan"] {
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-class-text-cyan-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap div[class*="bg-[#2587C8]/40"] {
+  background: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-class-bg-2587c8-40-background-color) !important;
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-class-bg-2587c8-40-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-healthcare-filter-wrap div[class*="hover:bg-[#2587C8]/20"]:hover {
+  background: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-class-hover-bg-2587c8-20-hover-background-color) !important;
+  color: var(--dashboard-daylight-daily-healthcare-filter-wrap-div-class-hover-bg-2587c8-20-hover-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell {
+  background: var(--dashboard-daylight-daily-3d-shell-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-3d-shell-border-tint) !important;
+  color: var(--dashboard-daylight-daily-3d-shell-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--dashboard-daylight-daily-3d-shell-shadow-color), 0 18px 42px var(--dashboard-daylight-daily-3d-shell-shadow-color-2) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell > div:first-child {
+  background: linear-gradient(100deg, var(--dashboard-daylight-daily-3d-shell-div-first-child-background-color), var(--dashboard-daylight-daily-3d-shell-div-first-child-background-color-2), var(--dashboard-daylight-daily-3d-shell-div-first-child-background-color-3)) !important;
+  border-color: var(--dashboard-daylight-daily-3d-shell-div-first-child-border-tint) !important;
+  color: var(--dashboard-daylight-daily-3d-shell-div-first-child-foreground) !important;
+  box-shadow: 0 10px 30px var(--dashboard-daylight-daily-3d-shell-div-first-child-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-50"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-100"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-200"] {
+  color: var(--dashboard-daylight-daily-3d-shell-class-text-cyan-50-daily-3d-shell-class-text-cyan-100-daily-3d-shell-class-text-cyan-200-foreground) !important;
+  text-shadow: 0 1px 4px var(--dashboard-daylight-daily-3d-shell-class-text-cyan-50-daily-3d-shell-class-text-cyan-100-daily-3d-shell-class-text-cyan-200-text-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-cyan-400"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-sky-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-sky-400"] {
+  color: var(--dashboard-daylight-daily-3d-shell-class-text-cyan-300-daily-3d-shell-class-text-cyan-400-daily-3d-shell-class-text-sky-300-daily-3d-shell-class-text-sky-400-foreground) !important;
+  text-shadow: 0 1px 4px var(--dashboard-daylight-daily-3d-shell-class-text-cyan-300-daily-3d-shell-class-text-cyan-400-daily-3d-shell-class-text-sky-300-daily-3d-shell-class-text-sky-400-text-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-slate-300"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-slate-400"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-slate-500"] {
+  color: var(--dashboard-daylight-daily-3d-shell-class-text-slate-300-daily-3d-shell-class-text-slate-400-daily-3d-shell-class-text-slate-500-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="text-white"] {
+  color: var(--dashboard-daylight-daily-3d-shell-class-text-white-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#03111f]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#031421]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#041426]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-[#02101d]"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-cyan-950"],
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="bg-sky-950"] {
+  background: var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-daily-3d-shell-class-bg-cyan-950-daily-3d-shell-class-bg-sky-950-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-daily-3d-shell-class-bg-cyan-950-daily-3d-shell-class-bg-sky-950-border-tint) !important;
+  color: var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-daily-3d-shell-class-bg-cyan-950-daily-3d-shell-class-bg-sky-950-foreground) !important;
+  box-shadow: 0 7px 18px var(--dashboard-daylight-daily-3d-shell-class-bg-03111f-daily-3d-shell-class-bg-031421-daily-3d-shell-class-bg-041426-daily-3d-shell-class-bg-02101d-daily-3d-shell-class-bg-cyan-950-daily-3d-shell-class-bg-sky-950-shadow-color) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell .daily-revenue-filter-panel,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell .weekly-filter-panel,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell .per-channel-filter-panel {
+  background: var(--dashboard-daylight-daily-3d-shell-daily-revenue-filter-panel-daily-3d-shell-weekly-filter-panel-daily-3d-shell-per-channel-filter-panel-background-color) !important;
+  border-color: var(--dashboard-daylight-daily-3d-shell-daily-revenue-filter-panel-daily-3d-shell-weekly-filter-panel-daily-3d-shell-per-channel-filter-panel-border-tint) !important;
+  color: var(--dashboard-daylight-daily-3d-shell-daily-revenue-filter-panel-daily-3d-shell-weekly-filter-panel-daily-3d-shell-per-channel-filter-panel-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell [class*="border-cyan-"] {
+  border-color: var(--dashboard-daylight-daily-3d-shell-class-border-cyan-border-tint) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell button:not(:disabled) {
+  backdrop-filter: blur(10px);
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-3d-shell canvas {
+  filter: saturate(1.03) contrast(1.02) !important;
+}
+
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-ribbon {
+  border-color: var(--dashboard-holographic-daily-comingsoon-ribbon-border-tint) !important;
+  background: linear-gradient(90deg,
+    var(--dashboard-holographic-daily-comingsoon-ribbon-background-color),
+    var(--dashboard-holographic-daily-comingsoon-ribbon-background-color-2),
+    var(--dashboard-holographic-daily-comingsoon-ribbon-background-color-3)) !important;
+  box-shadow: 0 0 24px var(--dashboard-holographic-daily-comingsoon-ribbon-shadow-color), inset 0 1px 0 var(--dashboard-holographic-daily-comingsoon-ribbon-shadow-color-2) !important;
+}
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-dot {
+  background: var(--dashboard-holographic-daily-comingsoon-dot-background-color) !important;
+  box-shadow: 0 0 9px var(--dashboard-holographic-daily-comingsoon-dot-shadow-color) !important;
+}
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-title { color: var(--dashboard-holographic-daily-comingsoon-title-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-subtitle { color: var(--dashboard-holographic-daily-comingsoon-subtitle-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-footnote { color: var(--dashboard-holographic-daily-comingsoon-footnote-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-corner { border-color: var(--dashboard-holographic-daily-comingsoon-corner-border-tint) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-pattern {
+  background-image: repeating-linear-gradient(-24deg, var(--dashboard-holographic-daily-comingsoon-pattern-background-image-color) 0px, var(--dashboard-holographic-daily-comingsoon-pattern-background-image-color-2) 1px, transparent 1px, transparent 15px) !important;
+}
+
+[data-surface-family="luminous"] .daily-comingsoon-ribbon {
+  border-color: var(--dashboard-luminous-daily-comingsoon-ribbon-border-tint) !important;
+  background: linear-gradient(90deg,
+    var(--dashboard-luminous-daily-comingsoon-ribbon-background-color),
+    var(--dashboard-luminous-daily-comingsoon-ribbon-background-color-2),
+    var(--dashboard-luminous-daily-comingsoon-ribbon-background-color-3)) !important;
+  box-shadow: 0 0 24px var(--dashboard-luminous-daily-comingsoon-ribbon-shadow-color), 0 0 28px var(--dashboard-luminous-daily-comingsoon-ribbon-shadow-color-2), inset 0 1px 0 var(--dashboard-luminous-daily-comingsoon-ribbon-shadow-color-3) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-dot {
+  background: var(--dashboard-luminous-daily-comingsoon-dot-background-color) !important;
+  box-shadow: 0 0 10px var(--dashboard-luminous-daily-comingsoon-dot-shadow-color) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-title { color: var(--dashboard-luminous-daily-comingsoon-title-foreground) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-subtitle { color: var(--dashboard-luminous-daily-comingsoon-subtitle-foreground) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-footnote { color: var(--dashboard-luminous-daily-comingsoon-footnote-foreground) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-corner { border-color: var(--dashboard-luminous-daily-comingsoon-corner-border-tint) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-pattern {
+  background-image: repeating-linear-gradient(-24deg, var(--dashboard-luminous-daily-comingsoon-pattern-background-image-color) 0px, var(--dashboard-luminous-daily-comingsoon-pattern-background-image-color-2) 1px, transparent 1px, transparent 15px) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-ribbon--ol,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-ribbon--util {
+  border-color: var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-border-tint) !important;
+  background: linear-gradient(90deg,
+    var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-background-color),
+    var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-background-color-2),
+    var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-background-color-3)) !important;
+  box-shadow: 0 10px 26px var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-shadow-color), 0 0 24px var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-shadow-color-2), inset 0 1px 0 var(--dashboard-daylight-daily-comingsoon-ribbon-ol-daily-comingsoon-ribbon-util-shadow-color-3) !important;
+}
+
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-tint {
+  background: var(--dashboard-holographic-daily-comingsoon-global-tint-background-color) !important;
+}
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-ribbon {
+  border-color: var(--dashboard-holographic-daily-comingsoon-global-ribbon-border-tint) !important;
+  background: linear-gradient(90deg,
+    var(--dashboard-holographic-daily-comingsoon-global-ribbon-background-color),
+    var(--dashboard-holographic-daily-comingsoon-global-ribbon-background-color-2),
+    var(--dashboard-holographic-daily-comingsoon-global-ribbon-background-color-3)) !important;
+  box-shadow: 0 0 24px var(--dashboard-holographic-daily-comingsoon-global-ribbon-shadow-color), inset 0 1px 0 var(--dashboard-holographic-daily-comingsoon-global-ribbon-shadow-color-2) !important;
+}
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-dot {
+  background: var(--dashboard-holographic-daily-comingsoon-global-dot-background-color) !important;
+  box-shadow: 0 0 10px var(--dashboard-holographic-daily-comingsoon-global-dot-shadow-color) !important;
+}
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-title { color: var(--dashboard-holographic-daily-comingsoon-global-title-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-divider { color: var(--dashboard-holographic-daily-comingsoon-global-divider-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-subtitle { color: var(--dashboard-holographic-daily-comingsoon-global-subtitle-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-footnote { color: var(--dashboard-holographic-daily-comingsoon-global-footnote-foreground) !important; }
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-line--left {
+  background: linear-gradient(90deg, transparent, var(--dashboard-holographic-daily-comingsoon-global-line-left-background-color), var(--dashboard-holographic-daily-comingsoon-global-line-left-background-color-2)) !important;
+}
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .daily-comingsoon-global-line--right {
+  background: linear-gradient(90deg, var(--dashboard-holographic-daily-comingsoon-global-line-right-background-color), var(--dashboard-holographic-daily-comingsoon-global-line-right-background-color-2), transparent) !important;
+}
+
+[data-surface-family="luminous"] .daily-comingsoon-global-tint {
+  background: linear-gradient(90deg, var(--dashboard-luminous-daily-comingsoon-global-tint-background-color), var(--dashboard-luminous-daily-comingsoon-global-tint-background-color-2)) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-global-ribbon {
+  border-color: var(--dashboard-luminous-daily-comingsoon-global-ribbon-border-tint) !important;
+  background: linear-gradient(90deg,
+    var(--dashboard-luminous-daily-comingsoon-global-ribbon-background-color),
+    var(--dashboard-luminous-daily-comingsoon-global-ribbon-background-color-2),
+    var(--dashboard-luminous-daily-comingsoon-global-ribbon-background-color-3)) !important;
+  box-shadow:
+    0 0 25px var(--dashboard-luminous-daily-comingsoon-global-ribbon-shadow-color),
+    0 0 30px var(--dashboard-luminous-daily-comingsoon-global-ribbon-shadow-color-2),
+    inset 0 1px 0 var(--dashboard-luminous-daily-comingsoon-global-ribbon-shadow-color-3) !important;
+  backdrop-filter: blur(4px) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-global-dot {
+  background: var(--dashboard-luminous-daily-comingsoon-global-dot-background-color) !important;
+  box-shadow: 0 0 10px var(--dashboard-luminous-daily-comingsoon-global-dot-shadow-color), 0 0 18px var(--dashboard-luminous-daily-comingsoon-global-dot-shadow-color-2) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-global-title {
+  color: var(--dashboard-luminous-daily-comingsoon-global-title-foreground) !important;
+  text-shadow: 0 0 10px var(--dashboard-luminous-daily-comingsoon-global-title-text-shadow-color) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-global-divider { color: var(--dashboard-luminous-daily-comingsoon-global-divider-foreground) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-global-subtitle { color: var(--dashboard-luminous-daily-comingsoon-global-subtitle-foreground) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-global-footnote { color: var(--dashboard-luminous-daily-comingsoon-global-footnote-foreground) !important; }
+[data-surface-family="luminous"] .daily-comingsoon-global-line--left {
+  background: linear-gradient(90deg, transparent, var(--dashboard-luminous-daily-comingsoon-global-line-left-background-color), var(--dashboard-luminous-daily-comingsoon-global-line-left-background-color-2)) !important;
+}
+[data-surface-family="luminous"] .daily-comingsoon-global-line--right {
+  background: linear-gradient(90deg, var(--dashboard-luminous-daily-comingsoon-global-line-right-background-color), var(--dashboard-luminous-daily-comingsoon-global-line-right-background-color-2), transparent) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-dot {
+  background: var(--dashboard-daylight-daily-comingsoon-global-dot-background-color) !important;
+  box-shadow: 0 0 10px var(--dashboard-daylight-daily-comingsoon-global-dot-shadow-color) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-title { color: var(--dashboard-daylight-daily-comingsoon-global-title-foreground) !important; }
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-divider { color: var(--dashboard-daylight-daily-comingsoon-global-divider-foreground) !important; }
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-subtitle { color: var(--dashboard-daylight-daily-comingsoon-global-subtitle-foreground) !important; }
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-footnote { color: var(--dashboard-daylight-daily-comingsoon-global-footnote-foreground) !important; }
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-line--left {
+  background: linear-gradient(90deg, transparent, var(--dashboard-daylight-daily-comingsoon-global-line-left-background-color), var(--dashboard-daylight-daily-comingsoon-global-line-left-background-color-2)) !important;
+}
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-comingsoon-global-line--right {
+  background: linear-gradient(90deg, var(--dashboard-daylight-daily-comingsoon-global-line-right-background-color), var(--dashboard-daylight-daily-comingsoon-global-line-right-background-color-2), transparent) !important;
+}
+
+[data-surface-family="luminous"] .core-dashboard-frame {
+  background:
+    linear-gradient(var(--dashboard-luminous-core-dashboard-frame-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-luminous-core-dashboard-frame-background-color-2) 1px, transparent 1px),
+    linear-gradient(145deg, var(--dashboard-luminous-core-dashboard-frame-background-color-3), var(--dashboard-luminous-core-dashboard-frame-background-color-4)) !important;
+  background-size: 50px 50px, 50px 50px, auto !important;
+  backdrop-filter: blur(7px) saturate(1.10) !important;
+}
+
+[data-surface-family="luminous"] .daily-themed-card,
+[data-surface-family="luminous"] .company-panel,
+[data-surface-family="luminous"] .company-panel-frame,
+[data-surface-family="luminous"] .company-view-shell {
+  background: linear-gradient(145deg, var(--dashboard-luminous-daily-themed-card-company-panel-company-panel-frame-company-view-shell-background-color), var(--dashboard-luminous-daily-themed-card-company-panel-company-panel-frame-company-view-shell-background-color-2)) !important;
+  backdrop-filter: blur(10px) saturate(1.08) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .core-dashboard-frame {
+  background:
+    linear-gradient(var(--dashboard-daylight-core-dashboard-frame-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-daylight-core-dashboard-frame-background-color-2) 1px, transparent 1px),
+    linear-gradient(145deg, var(--dashboard-daylight-core-dashboard-frame-background-color-3), var(--dashboard-daylight-core-dashboard-frame-background-color-4)) !important;
+  background-size: 48px 48px, 48px 48px, auto !important;
+  backdrop-filter: blur(7px) saturate(1.08) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel-frame,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-view-shell,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-view-shell--compare {
+  background:
+    radial-gradient(ellipse at 92% -6%, var(--dashboard-daylight-daily-themed-card-company-panel-company-panel-frame-company-view-shell-company-view-shell-compare-background-color), transparent 34%),
+    linear-gradient(145deg, var(--dashboard-daylight-daily-themed-card-company-panel-company-panel-frame-company-view-shell-company-view-shell-compare-background-color-2), var(--dashboard-daylight-daily-themed-card-company-panel-company-panel-frame-company-view-shell-company-view-shell-compare-background-color-3)) !important;
+  backdrop-filter: blur(10px) saturate(1.06) !important;
+}
+
+[data-performance="static"] *,
+[data-performance="static"] *::before,
+[data-performance="static"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+  will-change: auto !important;
+}
+
+[data-performance="static"] * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+[data-surface-family="holographic"]:where([data-performance="static"]) .core-dashboard-frame {
+  background-color: var(--dashboard-holographic-static-core-dashboard-frame-background-tint) !important;
+}
+
+[data-surface-family="daylight"]:where([data-performance="static"]) .core-dashboard-frame {
+  background-color: var(--dashboard-daylight-static-core-dashboard-frame-background-tint) !important;
+}
+
+.login-static-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.login-static-sky--obsidian {
+  background:
+    linear-gradient(var(--dashboard-base-login-static-sky-obsidian-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-base-login-static-sky-obsidian-background-color-2) 1px, transparent 1px),
+    radial-gradient(circle at 74% 44%, var(--dashboard-base-login-static-sky-obsidian-background-color-3), transparent 24%),
+    linear-gradient(140deg, var(--dashboard-base-login-static-sky-obsidian-background-color-4), var(--dashboard-base-login-static-sky-obsidian-background-color-5) 58%, var(--dashboard-base-login-static-sky-obsidian-background-color-6));
+  background-size: 44px 44px, 44px 44px, auto, auto;
+}
+
+.login-static-sky--quartz {
+  background:
+    linear-gradient(var(--dashboard-base-login-static-sky-quartz-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dashboard-base-login-static-sky-quartz-background-color-2) 1px, transparent 1px),
+    radial-gradient(circle at 74% 44%, var(--dashboard-base-login-static-sky-quartz-background-color-3), transparent 25%),
+    linear-gradient(140deg, var(--dashboard-base-login-static-sky-quartz-background-color-4), var(--dashboard-base-login-static-sky-quartz-background-color-5) 58%, var(--dashboard-base-login-static-sky-quartz-background-color-6));
+  background-size: 44px 44px, 44px 44px, auto, auto;
+}
+
+.login-static-core {
+  position: relative;
+  width: clamp(190px, 25vw, 360px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.login-static-core::before,
+.login-static-core::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.login-static-core::before {
+  inset: 2%;
+  border: 1px solid var(--core-border-strong);
+  box-shadow:
+    inset 0 0 0 14px color-mix(in srgb, var(--core-primary) 3%, transparent),
+    inset 0 0 0 34px color-mix(in srgb, var(--core-primary) 2%, transparent);
+}
+
+.login-static-core::after {
+  inset: 20%;
+  border: 1px solid var(--core-border);
+  background:
+    radial-gradient(circle at 36% 28%, var(--dashboard-base-login-static-core-after-background-color), transparent 22%),
+    radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--core-primary) 20%, transparent), transparent 60%);
+}
+
+.login-static-core__diamond {
+  width: 42%;
+  aspect-ratio: 1;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  border: 1px solid var(--core-border-strong);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--core-primary) 14%, var(--core-panel)),
+      color-mix(in srgb, var(--core-bg) 84%, var(--core-primary)));
+  box-shadow:
+    inset 0 0 0 9px color-mix(in srgb, var(--core-primary) 3%, transparent),
+    0 12px 24px var(--dashboard-base-login-static-core__diamond-shadow-color);
+}
+
+.login-static-core__diamond::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 45%, transparent);
+}
+
+.login-static-core__caption {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .22em;
+  color: var(--core-primary-strong);
+  text-transform: uppercase;
+}
+
+[data-surface-family="daylight"]:where([data-performance="static"]) .text-hud-glow {
+  text-shadow: 0 0 7px var(--dashboard-daylight-static-text-hud-glow-text-shadow-color);
+}
+
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .daily-themed-card .group-hover\:opacity-100 {
+  opacity: 1 !important;
+}
+
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .daily-themed-card button[title="View Full Screen"] {
+  color: var(--core-primary-soft) !important;
+  background: color-mix(in srgb, var(--core-primary) 8%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 24%, transparent) !important;
+  border-radius: 0.375rem;
+  box-shadow:
+    inset 0 1px 0 var(--dashboard-holographic-immersive-daily-themed-card-button-title-view-full-screen-shadow-color),
+    0 0 10px color-mix(in srgb, var(--core-primary) 10%, transparent);
+}
+
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .daily-themed-card button[title="View Full Screen"] svg {
+  color: var(--core-primary-soft) !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--core-primary) 30%, transparent));
+}
+
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .daily-themed-card button[title="View Full Screen"]:hover {
+  color: var(--core-text) !important;
+  background: var(--core-control-hover) !important;
+  border-color: var(--core-border-strong) !important;
+  box-shadow:
+    inset 0 1px 0 var(--dashboard-holographic-immersive-daily-themed-card-button-title-view-full-screen-hover-shadow-color),
+    0 0 14px var(--core-glow) !important;
+}
+
+.daily-themed-card button[title="View Full Screen"],
+.daily-themed-card button[aria-label="View Full Screen"],
+.daily-themed-card button[title*="Full Screen"] {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 7px !important;
+  opacity: .50 !important;
+  visibility: visible !important;
+  transition: opacity .16s ease, background-color .16s ease, border-color .16s ease !important;
+}
+
+.daily-themed-card button[title="View Full Screen"] svg,
+.daily-themed-card button[aria-label="View Full Screen"] svg,
+.daily-themed-card button[title*="Full Screen"] svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.daily-themed-card button[title="View Full Screen"]:hover,
+.daily-themed-card button[aria-label="View Full Screen"]:hover,
+.daily-themed-card button[title*="Full Screen"]:hover,
+.daily-themed-card:focus-within button[title="View Full Screen"] {
+  opacity: 1 !important;
+}
+
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .daily-themed-card button[title="View Full Screen"] {
+  opacity: .50 !important;
+}
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .daily-themed-card button[title="View Full Screen"]:hover {
+  opacity: 1 !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .daily-themed-card {
+  background:
+    radial-gradient(ellipse at 92% -6%, var(--dashboard-daylight-daily-themed-card-background-color), transparent 34%),
+    linear-gradient(145deg, var(--dashboard-daylight-daily-themed-card-background-color-2), var(--dashboard-daylight-daily-themed-card-background-color-3)) !important;
+  backdrop-filter: blur(7px) saturate(1.05) !important;
+  -webkit-backdrop-filter: blur(7px) saturate(1.05) !important;
+}

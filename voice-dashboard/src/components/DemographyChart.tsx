@@ -1,3 +1,4 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
@@ -1671,63 +1672,7 @@ export default function DemographyChart({
             </div>
           )}
 
-          <style>{`
-            @keyframes demographyFilterIn {
-              from {
-                opacity: 0;
-                transform: translateY(-5px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-
-            .demography-filter-panel {
-              animation: demographyFilterIn .2s ease-out both;
-            }
-
-            @keyframes demography3dLabelSwap {
-              0% {
-                opacity: 0;
-                transform: scale(.88);
-                filter: blur(4px);
-              }
-              55% {
-                opacity: .72;
-                transform: scale(1.035);
-                filter: blur(0);
-              }
-              100% {
-                opacity: 1;
-                transform: scale(1);
-                filter: blur(0);
-              }
-            }
-
-            .demography-3d-label-swap {
-              animation: demography3dLabelSwap .34s cubic-bezier(.22,.61,.36,1) both;
-            }
-
-            @keyframes demographyPeriodScan {
-              0% {
-                top: 8%;
-                opacity: 0;
-                transform: scaleX(.72);
-              }
-              12% { opacity: .95; }
-              82% { opacity: .75; }
-              100% {
-                top: 92%;
-                opacity: 0;
-                transform: scaleX(1);
-              }
-            }
-
-            .demography-period-scan {
-              animation: demographyPeriodScan 1.05s cubic-bezier(.22,.61,.36,1) infinite;
-            }
-          `}</style>
+          <ComponentStyles name="demography-fullscreen" />
         </div>
       </div>
     );
@@ -1832,25 +1777,7 @@ export default function DemographyChart({
               <div className="absolute left-1/2 top-1/2 h-[88%] w-12 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-sky-300/12 to-transparent blur-md" />
             </div>
           )}
-          <style>{`
-            @keyframes demographyAgeModeScan {
-              0% { left: -5%; opacity: 0; transform: scaleY(.78); }
-              7% { opacity: 1; }
-              90% { opacity: .96; }
-              100% { left: 101%; opacity: 0; transform: scaleY(1); }
-            }
-            @keyframes demographyAgeModeReveal {
-              0% { clip-path: inset(0 100% 0 0); }
-              100% { clip-path: inset(0 0 0 0); }
-            }
-            .demography-age-mode-scan {
-              animation: demographyAgeModeScan 1.08s cubic-bezier(.22,.61,.36,1) both;
-            }
-            .demography-age-mode-new-layer {
-              animation: demographyAgeModeReveal 1.08s cubic-bezier(.22,.61,.36,1) both;
-              will-change: clip-path;
-            }
-          `}</style>
+          <ComponentStyles name="demography-card" />
           <div className="flex items-start justify-between gap-3 pb-1">
             <div>
               <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-cyan-400">Dist by age</span>

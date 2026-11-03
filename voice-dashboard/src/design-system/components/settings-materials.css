@@ -1,0 +1,207 @@
+/* Settings menu material recipes.
+   Theme definitions provide values; these shared recipes preserve the existing
+   component specificity, interaction states and shorthand ordering. */
+
+
+[data-surface-family="daylight"] .core-settings-intro {
+  color: var(--settings-intro-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover {
+  border-color: var(--settings-popover-border-color) !important;
+  box-shadow:
+    var(--settings-popover-box-shadow) !important;
+}
+[data-surface-family="daylight"] .core-settings-popover {
+  color: var(--settings-popover-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-intro {
+  background: var(--settings-intro-background) !important;
+  border-color: var(--settings-intro-border-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-intro > div:first-child {
+  color: var(--settings-intro-title-color) !important;
+  text-shadow: var(--settings-intro-title-text-shadow) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-intro > div:last-child {
+  color: var(--settings-intro-description-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover [class*="text-slate-500"] {
+  color: var(--settings-label-muted-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover [class*="text-slate-600"] {
+  color: var(--settings-label-subtle-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > div:nth-child(2) {
+  background: var(--settings-preferences-background) !important;
+  border-color: var(--settings-preferences-border-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > div:nth-child(2) > div:first-child {
+  color: var(--settings-preferences-label-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover .core-control {
+  background: var(--settings-control-background) !important;
+  border-color: var(--settings-control-border-color) !important;
+  color: var(--settings-control-color) !important;
+  box-shadow: var(--settings-control-box-shadow) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button {
+  background: var(--settings-action-background) !important;
+  border-color: var(--settings-action-border-color) !important;
+  color: var(--settings-action-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button:hover {
+  background: var(--settings-action-hover-background) !important;
+  border-color: var(--settings-action-hover-border-color) !important;
+  color: var(--settings-action-hover-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button[class*="bg-cyan-500/10"] {
+  background: var(--settings-action-active-background) !important;
+  border-color: var(--settings-action-active-border-color) !important;
+  color: var(--settings-action-active-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button > span:first-child {
+  background: var(--settings-action-icon-background) !important;
+  border-color: var(--settings-action-icon-border-color) !important;
+  color: var(--settings-action-icon-color) !important;
+  box-shadow: var(--settings-action-icon-box-shadow) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button > span:last-child > span:first-child {
+  color: var(--settings-action-title-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button > span:last-child > span:last-child {
+  color: var(--settings-action-description-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button[class*="bg-cyan-500/10"] > span:last-child > span:first-child {
+  color: var(--settings-action-active-title-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > button[class*="bg-cyan-500/10"] > span:last-child > span:last-child {
+  color: var(--settings-action-active-description-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > div:last-child {
+  border-color: var(--settings-footer-border-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > div:last-child > span:first-child {
+  color: var(--settings-footer-label-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover > div:last-child > span:last-child {
+  color: var(--settings-footer-status-color) !important;
+}
+
+[data-surface-family="daylight"] .core-settings-popover {
+  background:
+    var(--settings-popover-background) !important;
+  backdrop-filter: var(--settings-popover-backdrop-filter) !important;
+}
+
+[data-surface-family="luminous"] .core-settings-popover {
+  background:
+    var(--settings-popover-background) !important;
+  backdrop-filter: var(--settings-popover-backdrop-filter) !important;
+}
+[data-surface-family="holographic"]:where([data-performance="static"]) .core-settings-popover {
+  background-color: var(--settings-popover-static-background-color) !important;
+}
+
+[data-surface-family="daylight"]:where([data-performance="static"]) .core-settings-popover {
+  background-color: var(--settings-popover-static-background-color) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-popover {
+  background: var(--settings-popover-background) !important;
+  border-color: var(--settings-popover-border-color) !important;
+  color: var(--settings-popover-color) !important;
+  box-shadow: var(--settings-popover-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-intro {
+  background: var(--settings-intro-background) !important;
+  border-color: var(--settings-intro-border-color) !important;
+  color: var(--settings-intro-color) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-intro * {
+  color: var(--settings-intro-content-color) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-popover button {
+  text-shadow: var(--settings-button-text-shadow) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-popover select {
+  text-shadow: var(--settings-select-text-shadow) !important;
+}
+
+[data-surface-family="clinical"] .core-my-account-button {
+  background: var(--settings-account-action-background) !important;
+  border-color: var(--settings-account-action-border-color) !important;
+  color: var(--settings-account-action-color) !important;
+  box-shadow: var(--settings-account-action-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .core-guided-tour-button {
+  background: var(--settings-tour-action-background) !important;
+  border-color: var(--settings-tour-action-border-color) !important;
+  color: var(--settings-tour-action-color) !important;
+  box-shadow: var(--settings-tour-action-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .core-voice-guide-button {
+  background: var(--settings-voice-action-background) !important;
+  border-color: var(--settings-voice-action-border-color) !important;
+  color: var(--settings-voice-action-color) !important;
+  box-shadow: var(--settings-voice-action-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-popover button > span:last-child > span:first-child {
+  color: var(--settings-button-title-color) !important;
+}
+
+[data-surface-family="clinical"] .core-settings-popover button > span:last-child > span:last-child {
+  color: var(--settings-button-description-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .core-settings-popover {
+  background: var(--settings-popover-immersive-background) !important;
+  border-color: var(--settings-popover-immersive-border-color) !important;
+  color: var(--settings-popover-immersive-color) !important;
+  backdrop-filter: var(--settings-popover-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--settings-popover-immersive-webkit-backdrop-filter) !important;
+  box-shadow:
+    var(--settings-popover-immersive-box-shadow) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .core-settings-popover button {
+  background: var(--settings-button-immersive-background) !important;
+  border-color: var(--settings-button-immersive-border-color) !important;
+  color: var(--settings-button-immersive-color) !important;
+  box-shadow: var(--settings-button-immersive-box-shadow) !important;
+  backdrop-filter: var(--settings-button-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--settings-button-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .core-settings-popover select {
+  background: var(--settings-select-immersive-background) !important;
+  border-color: var(--settings-select-immersive-border-color) !important;
+  color: var(--settings-select-immersive-color) !important;
+  box-shadow: var(--settings-select-immersive-box-shadow) !important;
+  backdrop-filter: var(--settings-select-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--settings-select-immersive-webkit-backdrop-filter) !important;
+}

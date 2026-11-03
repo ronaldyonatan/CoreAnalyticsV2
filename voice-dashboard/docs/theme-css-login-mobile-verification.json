@@ -1,0 +1,30 @@
+{
+  "cosmic-black": {
+    "nodes": 66,
+    "differences": []
+  },
+  "aurora": {
+    "nodes": 66,
+    "differences": []
+  },
+  "solaris": {
+    "nodes": 66,
+    "differences": []
+  },
+  "obsidian": {
+    "nodes": 66,
+    "differences": []
+  },
+  "quartz": {
+    "nodes": 66,
+    "differences": []
+  },
+  "jec-horizon": {
+    "nodes": 86,
+    "differences": []
+  },
+  "jec-skywave": {
+    "nodes": 86,
+    "differences": []
+  }
+}

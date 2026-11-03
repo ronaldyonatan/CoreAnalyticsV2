@@ -1,3 +1,4 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React from 'react';
 import MonthlyRevenueChart from './MonthlyRevenueChart';
 import WeeklyRevenueChart from './WeeklyRevenueChart';
@@ -257,24 +258,7 @@ export default function DailyLowerWidgets({
         </div>
       </div>
 
-      <style>{`
-        @keyframes utilizationComingSoonSweep {
-          0% { transform: translateX(0%); opacity: 0; }
-          12% { opacity: 0.85; }
-          72% { opacity: 0.85; }
-          100% { transform: translateX(430%); opacity: 0; }
-        }
-
-        .utilization-comingsoon-sweep {
-          animation: utilizationComingSoonSweep 5.5s linear infinite;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .utilization-comingsoon-sweep {
-            animation: none;
-          }
-        }
-      `}</style>
+      <ComponentStyles name="utilization" />
     </>
   );
 }

@@ -7,7 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "theme:audit": "node scripts/audit-theme-ownership.mjs",
+    "theme:audit:strict": "node scripts/audit-theme-ownership.mjs --strict",
+    "theme:verify-css": "node scripts/verify-theme-css.mjs",
+    "theme:verify-shell": "node scripts/verify-shell-runtime.mjs",
+    "theme:verify-pointer": "node scripts/verify-shell-pointer.mjs",
+    "theme:verify-clinic": "node scripts/verify-clinic-picker.mjs",
+    "theme:audit:css": "node scripts/audit-theme-ownership.mjs --css-only --strict",
+    "theme:verify-assets": "node scripts/verify-component-styles.mjs",
+    "theme:verify-login": "node scripts/verify-login-surfaces.mjs"
   },
   "dependencies": {
     "@nivo/bar": "^0.99.0",

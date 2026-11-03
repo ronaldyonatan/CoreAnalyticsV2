@@ -1,9 +1,9 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useTheme } from '../theme/ThemeContext';
-import './CompanyMobileGrid.css';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Sector } from 'recharts';
 
 interface PanelExsumMaterialProps {
@@ -995,14 +995,7 @@ function MaterialExsumFullscreen({
 
   return (
     <div className="company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#2587C8]/40 bg-[#020916]">
-      <style>{`
-        @keyframes materialScanBand {
-          0% { transform:translateY(-18px);opacity:.15; }
-          50% { opacity:.55; }
-          100% { transform:translateY(18px);opacity:.15; }
-        }
-        .material-holo-band { animation:materialScanBand .55s linear infinite alternate; }
-      `}</style>
+      <ComponentStyles name="material-summary" />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[110] h-[74px] border-b border-cyan-300/10 bg-[#001019]/82 px-5 backdrop-blur-xl">
         <div className="flex h-full items-center justify-between gap-4">

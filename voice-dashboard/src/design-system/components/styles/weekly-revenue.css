@@ -1,0 +1,15 @@
+/* Design System-owned weekly-revenue structure, states and motion. */
+@keyframes weeklyFilterIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .weekly-filter-panel {
+            animation: weeklyFilterIn .2s ease-out both;
+          }
+
+          @keyframes weeklyPeriodScan {
+            0% { transform: translateY(-120px); opacity: 0; }
+            25% { opacity: .9; }
+            75% { opacity: .9; }
+            100% { transform: translateY(120px); opacity: 0; }
+          }

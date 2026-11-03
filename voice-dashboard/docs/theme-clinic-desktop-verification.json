@@ -1,0 +1,71 @@
+{
+  "pointer": {
+    "hover": true,
+    "coarse": false
+  },
+  "results": {
+    "cosmic-black": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(230, 251, 255)",
+        "daily": "rgb(230, 251, 255)",
+        "company": "rgb(230, 251, 255)"
+      }
+    },
+    "aurora": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(238, 252, 255)",
+        "daily": "rgb(238, 252, 255)",
+        "company": "rgb(238, 252, 255)"
+      }
+    },
+    "solaris": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(11, 39, 64)",
+        "daily": "rgb(11, 39, 64)",
+        "company": "rgb(11, 39, 64)"
+      }
+    },
+    "obsidian": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(232, 251, 255)",
+        "daily": "rgb(232, 251, 255)",
+        "company": "rgb(232, 251, 255)"
+      }
+    },
+    "quartz": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(20, 56, 74)",
+        "daily": "rgb(20, 56, 74)",
+        "company": "rgb(20, 56, 74)"
+      }
+    },
+    "jec-horizon": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(7, 59, 89)",
+        "daily": "rgb(7, 59, 89)",
+        "company": "rgb(7, 59, 89)"
+      }
+    },
+    "jec-skywave": {
+      "comparisons": 27,
+      "differences": [],
+      "emptyColors": {
+        "standalone": "rgb(7, 59, 89)",
+        "daily": "rgb(7, 59, 89)",
+        "company": "rgb(7, 59, 89)"
+      }
+    }
+  }
+}

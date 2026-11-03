@@ -1,0 +1,249 @@
+/* Shared healthcare picker surfaces and states. Themes supply values only.
+   Context roles preserve the established Daily and Company surface treatments. */
+
+.ds-clinic-daily-control,
+.daily-tracking-root .ds-clinic-daily-control,
+.company-theme-root .ds-clinic-daily-control {
+  background-color: var(--clinic-daily-control-background-color) !important;
+  background-image: var(--clinic-daily-control-background-image) !important;
+  border-top-color: var(--clinic-daily-control-border-top-color) !important;
+  border-right-color: var(--clinic-daily-control-border-right-color) !important;
+  border-bottom-color: var(--clinic-daily-control-border-bottom-color) !important;
+  border-left-color: var(--clinic-daily-control-border-left-color) !important;
+  color: var(--clinic-daily-control-color) !important;
+  box-shadow: var(--clinic-daily-control-box-shadow) !important;
+}
+
+.ds-clinic-daily-glyph,
+.daily-tracking-root .ds-clinic-daily-glyph,
+.company-theme-root .ds-clinic-daily-glyph {
+  color: var(--clinic-daily-glyph-color) !important;
+}
+
+.ds-clinic-daily-popover,
+.daily-tracking-root .ds-clinic-daily-popover,
+.company-theme-root .ds-clinic-daily-popover {
+  background-color: var(--clinic-daily-popover-background-color) !important;
+  background-image: var(--clinic-daily-popover-background-image) !important;
+  border-top-color: var(--clinic-daily-popover-border-top-color) !important;
+  border-right-color: var(--clinic-daily-popover-border-right-color) !important;
+  border-bottom-color: var(--clinic-daily-popover-border-bottom-color) !important;
+  border-left-color: var(--clinic-daily-popover-border-left-color) !important;
+  color: var(--clinic-daily-popover-color) !important;
+  box-shadow: var(--clinic-daily-popover-box-shadow) !important;
+}
+
+.ds-clinic-daily-input,
+.daily-tracking-root .ds-clinic-daily-input,
+.company-theme-root .ds-clinic-daily-input {
+  background-color: var(--clinic-daily-input-background-color) !important;
+  background-image: var(--clinic-daily-input-background-image) !important;
+  border-top-color: var(--clinic-daily-input-border-top-color) !important;
+  border-right-color: var(--clinic-daily-input-border-right-color) !important;
+  border-bottom-color: var(--clinic-daily-input-border-bottom-color) !important;
+  border-left-color: var(--clinic-daily-input-border-left-color) !important;
+  color: var(--clinic-daily-input-color) !important;
+  box-shadow: var(--clinic-daily-input-box-shadow) !important;
+}
+
+.ds-clinic-daily-reset {
+  background-color: var(--clinic-daily-reset-background-color) !important;
+  color: var(--clinic-standalone-daily-reset-color) !important;
+}
+
+.daily-tracking-root .ds-clinic-daily-reset {
+  background-color: var(--clinic-daily-reset-background-color) !important;
+  color: var(--clinic-daily-daily-reset-color) !important;
+}
+
+.company-theme-root .ds-clinic-daily-reset {
+  background-color: var(--clinic-daily-reset-background-color) !important;
+  color: var(--clinic-company-daily-reset-color) !important;
+}
+@media (hover: hover) {
+.ds-clinic-daily-reset:hover {
+  background-color: var(--clinic-daily-reset-hover-background-color) !important;
+  color: var(--clinic-standalone-daily-reset-hover-color) !important;
+}
+}
+@media (hover: hover) {
+.daily-tracking-root .ds-clinic-daily-reset:hover {
+  background-color: var(--clinic-daily-reset-hover-background-color) !important;
+  color: var(--clinic-daily-daily-reset-hover-color) !important;
+}
+}
+@media (hover: hover) {
+.company-theme-root .ds-clinic-daily-reset:hover {
+  background-color: var(--clinic-daily-reset-hover-background-color) !important;
+  color: var(--clinic-company-daily-reset-hover-color) !important;
+}
+}
+
+.ds-clinic-daily-option {
+  background-color: var(--clinic-daily-option-background-color) !important;
+  color: var(--clinic-standalone-daily-option-color) !important;
+  box-shadow: var(--clinic-daily-option-box-shadow) !important;
+  font-weight: var(--clinic-daily-option-font-weight) !important;
+}
+
+.daily-tracking-root .ds-clinic-daily-option {
+  background-color: var(--clinic-daily-option-background-color) !important;
+  color: var(--clinic-daily-daily-option-color) !important;
+  box-shadow: var(--clinic-daily-option-box-shadow) !important;
+  font-weight: var(--clinic-daily-option-font-weight) !important;
+}
+
+.company-theme-root .ds-clinic-daily-option {
+  background-color: var(--clinic-daily-option-background-color) !important;
+  color: var(--clinic-company-daily-option-color) !important;
+  box-shadow: var(--clinic-daily-option-box-shadow) !important;
+  font-weight: var(--clinic-daily-option-font-weight) !important;
+}
+@media (hover: hover) {
+.ds-clinic-daily-option:not(.ds-clinic-daily-option--selected):hover {
+  background-color: var(--clinic-daily-option-hover-background-color) !important;
+  color: var(--clinic-standalone-daily-option-hover-color) !important;
+}
+}
+@media (hover: hover) {
+.daily-tracking-root .ds-clinic-daily-option:not(.ds-clinic-daily-option--selected):hover {
+  background-color: var(--clinic-daily-option-hover-background-color) !important;
+  color: var(--clinic-daily-daily-option-hover-color) !important;
+}
+}
+@media (hover: hover) {
+.company-theme-root .ds-clinic-daily-option:not(.ds-clinic-daily-option--selected):hover {
+  background-color: var(--clinic-daily-option-hover-background-color) !important;
+  color: var(--clinic-company-daily-option-hover-color) !important;
+}
+}
+
+.ds-clinic-daily-option--selected {
+  background-color: var(--clinic-daily-option-selected-background-color) !important;
+  color: var(--clinic-standalone-daily-option-selected-color) !important;
+  box-shadow: var(--clinic-daily-option-selected-box-shadow) !important;
+  font-weight: var(--clinic-daily-option-selected-font-weight) !important;
+}
+
+.daily-tracking-root .ds-clinic-daily-option--selected {
+  background-color: var(--clinic-daily-option-selected-background-color) !important;
+  color: var(--clinic-daily-daily-option-selected-color) !important;
+  box-shadow: var(--clinic-daily-option-selected-box-shadow) !important;
+  font-weight: var(--clinic-daily-option-selected-font-weight) !important;
+}
+
+.company-theme-root .ds-clinic-daily-option--selected {
+  background-color: var(--clinic-daily-option-selected-background-color) !important;
+  color: var(--clinic-company-daily-option-selected-color) !important;
+  box-shadow: var(--clinic-daily-option-selected-box-shadow) !important;
+  font-weight: var(--clinic-daily-option-selected-font-weight) !important;
+}
+
+.ds-clinic-company-label {
+  color: var(--clinic-standalone-company-label-color) !important;
+}
+
+.daily-tracking-root .ds-clinic-company-label {
+  color: var(--clinic-daily-company-label-color) !important;
+}
+
+.company-theme-root .ds-clinic-company-label {
+  color: var(--clinic-company-company-label-color) !important;
+}
+
+.ds-clinic-company-control,
+.daily-tracking-root .ds-clinic-company-control,
+.company-theme-root .ds-clinic-company-control {
+  background-color: var(--clinic-company-control-background-color) !important;
+  background-image: var(--clinic-company-control-background-image) !important;
+  border-top-color: var(--clinic-company-control-border-top-color) !important;
+  border-right-color: var(--clinic-company-control-border-right-color) !important;
+  border-bottom-color: var(--clinic-company-control-border-bottom-color) !important;
+  border-left-color: var(--clinic-company-control-border-left-color) !important;
+  color: var(--clinic-company-control-color) !important;
+  box-shadow: var(--clinic-company-control-box-shadow) !important;
+}
+
+.ds-clinic-company-glyph,
+.daily-tracking-root .ds-clinic-company-glyph,
+.company-theme-root .ds-clinic-company-glyph {
+  color: var(--clinic-company-glyph-color) !important;
+}
+
+.ds-clinic-company-popover {
+  background-color: var(--clinic-company-popover-background-color) !important;
+  background-image: var(--clinic-company-popover-background-image) !important;
+  border-top-color: var(--clinic-company-popover-border-top-color) !important;
+  border-right-color: var(--clinic-company-popover-border-right-color) !important;
+  border-bottom-color: var(--clinic-company-popover-border-bottom-color) !important;
+  border-left-color: var(--clinic-company-popover-border-left-color) !important;
+  color: var(--clinic-standalone-company-popover-color) !important;
+  box-shadow: var(--clinic-company-popover-box-shadow) !important;
+}
+
+.daily-tracking-root .ds-clinic-company-popover {
+  background-color: var(--clinic-company-popover-background-color) !important;
+  background-image: var(--clinic-company-popover-background-image) !important;
+  border-top-color: var(--clinic-company-popover-border-top-color) !important;
+  border-right-color: var(--clinic-company-popover-border-right-color) !important;
+  border-bottom-color: var(--clinic-company-popover-border-bottom-color) !important;
+  border-left-color: var(--clinic-company-popover-border-left-color) !important;
+  color: var(--clinic-daily-company-popover-color) !important;
+  box-shadow: var(--clinic-company-popover-box-shadow) !important;
+}
+
+.company-theme-root .ds-clinic-company-popover {
+  background-color: var(--clinic-company-popover-background-color) !important;
+  background-image: var(--clinic-company-popover-background-image) !important;
+  border-top-color: var(--clinic-company-popover-border-top-color) !important;
+  border-right-color: var(--clinic-company-popover-border-right-color) !important;
+  border-bottom-color: var(--clinic-company-popover-border-bottom-color) !important;
+  border-left-color: var(--clinic-company-popover-border-left-color) !important;
+  color: var(--clinic-company-company-popover-color) !important;
+  box-shadow: var(--clinic-company-popover-box-shadow) !important;
+}
+
+.ds-clinic-company-reset,
+.daily-tracking-root .ds-clinic-company-reset,
+.company-theme-root .ds-clinic-company-reset {
+  background-color: var(--clinic-company-reset-background-color) !important;
+  color: var(--clinic-company-reset-color) !important;
+}
+
+.ds-clinic-company-reset--selected,
+.daily-tracking-root .ds-clinic-company-reset--selected,
+.company-theme-root .ds-clinic-company-reset--selected {
+  background-color: var(--clinic-company-reset-selected-background-color) !important;
+  color: var(--clinic-company-reset-selected-color) !important;
+}
+
+.ds-clinic-company-option,
+.daily-tracking-root .ds-clinic-company-option,
+.company-theme-root .ds-clinic-company-option {
+  background-color: var(--clinic-company-option-background-color) !important;
+  color: var(--clinic-company-option-color) !important;
+  font-weight: var(--clinic-company-option-font-weight) !important;
+}
+@media (hover: hover) {
+.ds-clinic-company-option:not(.ds-clinic-company-option--selected):hover,
+.daily-tracking-root .ds-clinic-company-option:not(.ds-clinic-company-option--selected):hover,
+.company-theme-root .ds-clinic-company-option:not(.ds-clinic-company-option--selected):hover {
+  background-color: var(--clinic-company-option-hover-background-color) !important;
+}
+}
+
+.ds-clinic-company-option--selected,
+.daily-tracking-root .ds-clinic-company-option--selected,
+.company-theme-root .ds-clinic-company-option--selected {
+  background-color: var(--clinic-company-option-selected-background-color) !important;
+  color: var(--clinic-company-option-selected-color) !important;
+  font-weight: var(--clinic-company-option-selected-font-weight) !important;
+}
+
+.ds-clinic-daily-input::placeholder { color: var(--clinic-standalone-placeholder-color) !important; }
+
+.daily-tracking-root .ds-clinic-daily-input::placeholder { color: var(--clinic-daily-placeholder-color) !important; }
+
+.company-theme-root .ds-clinic-daily-input::placeholder { color: var(--clinic-company-placeholder-color) !important; }
+
+.ds-clinic-empty { color: var(--clinic-empty-color); }

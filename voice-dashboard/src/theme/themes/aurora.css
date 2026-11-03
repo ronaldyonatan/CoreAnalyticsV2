@@ -1,0 +1,480 @@
+/* aurora: theme values only. Component structure belongs to design-system. */
+[data-theme="aurora"] {
+  --core-bg: #102f3d;
+  --core-bg-secondary: #153946;
+  --core-surface: rgba(10, 39, 52, .36);
+  --core-surface-strong: rgba(13, 46, 60, .70);
+  --core-panel: rgba(14, 52, 66, .56);
+  --core-panel-hover: rgba(22, 73, 88, .70);
+  --core-text: #eefcff;
+  --core-text-secondary: #b3d7df;
+  --core-text-muted: #7baab5;
+  --core-primary: #59e8f5;
+  --core-primary-soft: #7deeff;
+  --core-primary-strong: #23d4e9;
+  --core-primary-rgb: 89, 232, 245;
+  --core-border: rgba(89, 232, 245, 0.27);
+  --core-border-strong: rgba(89, 232, 245, 0.54);
+  --core-glow: rgba(45, 212, 191, 0.20);
+  --core-frame-shadow: 0 22px 60px rgba(1, 15, 22, 0.28),
+    0 0 36px rgba(45, 212, 191, 0.07),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  --core-sidebar: rgba(10, 39, 52, .58);
+  --core-control: rgba(23, 73, 89, .58);
+  --core-control-hover: rgba(35, 100, 116, .72);
+  --core-purple-surface: rgba(57, 42, 89, 0.70);
+  --core-purple-border: rgba(167, 139, 250, 0.48);
+  --core-purple-text: #d8ccff;
+  --core-danger-surface: rgba(89, 31, 52, 0.62);
+  --core-danger-border: rgba(251, 113, 133, 0.48);
+  --core-danger-text: #ff9ab0;
+  --core-success-surface: rgba(20, 78, 64, 0.62);
+  --core-success-border: rgba(52, 211, 153, 0.50);
+  --core-success-text: #78f2c3;
+  --settings-shadow: 0 20px 60px rgba(0,0,0,.36), 0 0 30px rgba(45,212,191,.10);
+  --navigation-overlay-bg: rgba(5,24,33,.42);
+  --shell-nebula-bg: radial-gradient(ellipse at 78% 19%, rgba(139,92,246,.10) 0%, transparent 43%), radial-gradient(ellipse at 20% 72%, rgba(45,212,191,.09) 0%, transparent 38%);
+  --environment-curtains-opacity: 1;
+  --environment-curtains-transition: opacity .5s ease;
+  --environment-curtain-border-radius: 50%;
+  --environment-curtain-filter: blur(42px);
+  --environment-curtain-primary-bg: linear-gradient(
+    95deg,
+    transparent 0%,
+    rgba(34,211,238,.08) 12%,
+    rgba(45,212,191,.58) 40%,
+    rgba(125,238,255,.42) 64%,
+    rgba(59,130,246,.16) 78%,
+    transparent 100%
+  );
+  --environment-curtain-primary-animation: dsCurtainCyan 18s ease-in-out infinite alternate;
+  --environment-curtain-secondary-bg: linear-gradient(
+    92deg,
+    transparent 0%,
+    rgba(139,92,246,.14) 16%,
+    rgba(129,92,246,.52) 46%,
+    rgba(236,72,153,.26) 70%,
+    transparent 100%
+  );
+  --environment-curtain-secondary-animation: dsCurtainViolet 24s ease-in-out infinite alternate;
+  --environment-curtain-tertiary-bg: linear-gradient(
+    96deg,
+    transparent 0%,
+    rgba(16,185,129,.16) 16%,
+    rgba(45,212,191,.48) 48%,
+    rgba(34,211,238,.22) 74%,
+    transparent 100%
+  );
+  --environment-curtain-tertiary-animation: dsCurtainTeal 21s ease-in-out infinite alternate;
+  --environment-curtain-stars-opacity: .50;
+  --environment-curtain-stars-bg-image: radial-gradient(circle at 12px 18px, rgba(211,251,255,.75) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 73px 54px, rgba(125,238,255,.68) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 31px 82px, rgba(216,204,255,.62) 0 1px, transparent 1.5px);
+  --environment-curtain-stars-bg-size: 111px 111px, 157px 157px, 199px 199px;
+  --environment-curtain-stars-animation: dsCurtainStars 34s linear infinite;
+  --environment-curtains-filter: saturate(1.22) contrast(1.05);
+  --environment-curtain-stars-filter: drop-shadow(0 0 4px rgba(125,238,255,.35));
+  --environment-curtains-before-opacity: .56;
+  --environment-curtains-before-bg: repeating-linear-gradient(
+      94deg,
+      transparent 0 6%,
+      rgba(89,232,245,.08) 7% 8.2%,
+      transparent 9.2% 15%,
+      rgba(167,139,250,.075) 16% 17.2%,
+      transparent 18.4% 24%
+    );
+  --environment-curtains-before-filter: blur(12px);
+  --environment-curtains-before-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
+  --environment-curtains-before-animation: dsCurtainCurtainDrift 13s ease-in-out infinite alternate;
+  --environment-curtains-after-opacity: .62;
+  --environment-curtains-after-border-radius: 50%;
+  --environment-curtains-after-bg: linear-gradient(
+    90deg,
+    transparent,
+    rgba(45,212,191,.08),
+    rgba(89,232,245,.26),
+    rgba(167,139,250,.19),
+    rgba(59,130,246,.10),
+    transparent
+  );
+  --environment-curtains-after-filter: blur(24px);
+  --environment-curtains-after-animation: dsCurtainVeilSweep 10s ease-in-out infinite alternate;
+  --header-bg: linear-gradient(105deg, rgba(10,39,52,.72), rgba(24,70,83,.62), rgba(43,45,78,.58));
+  --header-underlay: transparent;
+  --header-border: rgba(89,232,245,.30);
+  --header-shadow: 0 10px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.045);
+  --header-filter: blur(12px) saturate(1.12);
+
+  /* Settings and Management Center semantic values */
+  --management-custom-surface-background-color: color-mix(in srgb, var(--core-control) 84%, transparent);
+  --management-contained-page-header-background-color: unset;
+  --management-contained-metric-card-background-color: unset;
+  --management-contained-toolbar-background-color: unset;
+  --management-contained-table-shell-background-color: unset;
+  --management-contained-table-head-background-color: unset;
+  --management-contained-table-footer-background-color: unset;
+  --management-contained-input-background-color: unset;
+  --management-contained-drawer-background-color: unset;
+  --management-contained-modal-background-color: unset;
+  --management-contained-floating-surface-background-color: unset;
+  --management-overlay-background: rgba(3, 22, 31, .55);
+  --management-root-background: radial-gradient(circle at 14% 2%, rgba(89,232,245,.11), transparent 29%),
+    radial-gradient(circle at 86% 18%, rgba(167,139,250,.09), transparent 31%),
+    var(--core-bg);
+  --management-page-header-background: linear-gradient(110deg,
+      rgba(17,52,66,.94),
+      rgba(26,72,83,.90) 62%,
+      rgba(58,47,83,.78));
+  --management-page-header-box-shadow: 0 12px 32px rgba(1,15,22,.22),
+    inset 3px 0 0 #59e8f5,
+    inset 0 -1px 0 rgba(125,238,255,.10);
+  --management-metric-card-background: linear-gradient(145deg, rgba(14,52,66,.68), rgba(26,69,81,.52));
+  --management-toolbar-background: linear-gradient(145deg, rgba(14,52,66,.68), rgba(26,69,81,.52));
+  --management-table-shell-background: linear-gradient(145deg, rgba(14,52,66,.68), rgba(26,69,81,.52));
+  --management-drawer-background: linear-gradient(145deg, rgba(14,52,66,.68), rgba(26,69,81,.52));
+  --management-modal-background: linear-gradient(145deg, rgba(14,52,66,.68), rgba(26,69,81,.52));
+  --management-floating-surface-background: linear-gradient(145deg, rgba(14,52,66,.68), rgba(26,69,81,.52));
+  --management-table-head-background: rgba(27,73,86,.82);
+  --management-table-footer-background: rgba(27,73,86,.82);
+  --management-input-background: rgba(27,73,86,.82);
+  --management-metric-card-backdrop-filter: blur(10px) saturate(1.08);
+  --management-toolbar-backdrop-filter: blur(10px) saturate(1.08);
+  --management-table-shell-backdrop-filter: blur(10px) saturate(1.08);
+  --management-drawer-backdrop-filter: blur(10px) saturate(1.08);
+  --management-modal-backdrop-filter: blur(10px) saturate(1.08);
+  --management-floating-surface-backdrop-filter: blur(10px) saturate(1.08);
+  --settings-popover-background: radial-gradient(circle at 82% 0%, rgba(167,139,250,.12), transparent 36%),
+    linear-gradient(145deg, rgba(12,41,53,.78), rgba(24,70,83,.68));
+  --settings-popover-backdrop-filter: blur(16px) saturate(1.12);
+
+  /* Healthcare picker semantic values */
+  --clinic-daily-control-background-color: rgba(23, 73, 89, 0.58);
+  --clinic-daily-control-background-image: none;
+  --clinic-daily-control-border-top-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-control-border-right-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-control-border-bottom-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-control-border-left-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-control-color: rgb(238, 252, 255);
+  --clinic-daily-control-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 2px 4px 0px inset;
+  --clinic-daily-glyph-color: rgb(37, 135, 200);
+  --clinic-daily-popover-background-color: rgba(0, 0, 0, 0);
+  --clinic-daily-popover-background-image: radial-gradient(circle at 92% 5%, rgba(139, 92, 246, 0.11), rgba(0, 0, 0, 0) 34%), linear-gradient(160deg, rgba(13, 42, 55, 0.98), rgba(20, 58, 71, 0.97));
+  --clinic-daily-popover-border-top-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-popover-border-right-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-popover-border-bottom-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-popover-border-left-color: rgba(89, 232, 245, 0.54);
+  --clinic-daily-popover-color: rgb(238, 252, 255);
+  --clinic-daily-popover-box-shadow: rgba(0, 0, 0, 0.34) 0px 24px 58px 0px, rgba(45, 212, 191, 0.07) 0px 0px 28px 0px;
+  --clinic-daily-input-background-color: rgba(16, 47, 61, 0.92);
+  --clinic-daily-input-background-image: none;
+  --clinic-daily-input-border-top-color: rgba(89, 232, 245, 0.27);
+  --clinic-daily-input-border-right-color: rgba(89, 232, 245, 0.27);
+  --clinic-daily-input-border-bottom-color: rgba(89, 232, 245, 0.27);
+  --clinic-daily-input-border-left-color: rgba(89, 232, 245, 0.27);
+  --clinic-daily-input-color: rgb(238, 252, 255);
+  --clinic-daily-input-box-shadow: none;
+  --clinic-daily-reset-background-color: rgba(0, 0, 0, 0);
+  --clinic-standalone-daily-reset-color: oklch(0.789 0.154 211.53);
+  --clinic-daily-daily-reset-color: oklch(0.789 0.154 211.53);
+  --clinic-company-daily-reset-color: oklch(0.789 0.154 211.53);
+  --clinic-daily-reset-hover-background-color: oklab(0.599722 -0.0588695 -0.117657 / 0.2);
+  --clinic-standalone-daily-reset-hover-color: rgb(255, 255, 255);
+  --clinic-daily-daily-reset-hover-color: rgb(255, 255, 255);
+  --clinic-company-daily-reset-hover-color: rgb(255, 255, 255);
+  --clinic-daily-option-background-color: rgba(0, 0, 0, 0);
+  --clinic-standalone-daily-option-color: oklch(0.917 0.08 205.041);
+  --clinic-daily-option-box-shadow: none;
+  --clinic-daily-option-font-weight: 400;
+  --clinic-daily-daily-option-color: oklch(0.917 0.08 205.041);
+  --clinic-company-daily-option-color: oklch(0.917 0.08 205.041);
+  --clinic-daily-option-hover-background-color: oklab(0.599722 -0.0588695 -0.117657 / 0.2);
+  --clinic-standalone-daily-option-hover-color: rgb(255, 255, 255);
+  --clinic-daily-daily-option-hover-color: rgb(255, 255, 255);
+  --clinic-company-daily-option-hover-color: rgb(255, 255, 255);
+  --clinic-daily-option-selected-background-color: oklab(0.599722 -0.0588695 -0.117657 / 0.4);
+  --clinic-standalone-daily-option-selected-color: rgb(255, 255, 255);
+  --clinic-daily-option-selected-box-shadow: none;
+  --clinic-daily-option-selected-font-weight: 700;
+  --clinic-daily-daily-option-selected-color: rgb(255, 255, 255);
+  --clinic-company-daily-option-selected-color: rgb(255, 255, 255);
+  --clinic-standalone-company-label-color: oklch(0.865 0.127 207.078);
+  --clinic-daily-company-label-color: oklch(0.865 0.127 207.078);
+  --clinic-company-company-label-color: oklch(0.865 0.127 207.078);
+  --clinic-company-control-background-color: oklab(0.186698 -0.0188414 -0.0465098 / 0.9);
+  --clinic-company-control-background-image: none;
+  --clinic-company-control-border-top-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-border-right-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-border-bottom-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-border-left-color: oklab(0.874386 -0.138588 -0.0537872 / 0.5);
+  --clinic-company-control-color: rgb(165, 243, 252);
+  --clinic-company-control-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 242, 254, 0.15) 0px 0px 10px 0px;
+  --clinic-company-glyph-color: rgb(0, 242, 254);
+  --clinic-company-popover-background-color: oklab(0.109862 -0.012388 -0.022469 / 0.95);
+  --clinic-company-popover-background-image: none;
+  --clinic-company-popover-border-top-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-company-popover-border-right-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-company-popover-border-bottom-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-company-popover-border-left-color: oklab(0.874386 -0.138588 -0.0537872 / 0.6);
+  --clinic-standalone-company-popover-color: rgb(238, 252, 255);
+  --clinic-company-popover-box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 242, 254, 0.25) 0px 8px 32px 0px;
+  --clinic-daily-company-popover-color: rgb(238, 252, 255);
+  --clinic-company-company-popover-color: rgb(238, 252, 255);
+  --clinic-company-reset-background-color: rgba(0, 0, 0, 0);
+  --clinic-company-reset-color: rgb(165, 243, 252);
+  --clinic-company-reset-selected-background-color: oklab(0.874386 -0.138588 -0.0537872 / 0.2);
+  --clinic-company-reset-selected-color: rgb(0, 242, 254);
+  --clinic-company-option-background-color: rgba(0, 0, 0, 0);
+  --clinic-company-option-color: rgb(165, 243, 252);
+  --clinic-company-option-font-weight: 400;
+  --clinic-company-option-hover-background-color: rgba(0, 0, 0, 0);
+  --clinic-company-option-selected-background-color: oklab(0.874386 -0.138588 -0.0537872 / 0.2);
+  --clinic-company-option-selected-color: rgb(0, 242, 254);
+  --clinic-company-option-selected-font-weight: 400;
+  --clinic-standalone-placeholder-color: rgb(123, 170, 181);
+  --clinic-daily-placeholder-color: rgb(123, 170, 181);
+  --clinic-company-placeholder-color: rgb(123, 170, 181);
+  --clinic-empty-color: var(--color-cyan-500);
+
+  /* Voice registration semantic values */
+  --voice-registration-background: radial-gradient(circle at 22% 8%, rgba(89, 232, 245, .14), transparent 30%),
+    radial-gradient(circle at 82% 18%, rgba(167, 139, 250, .12), transparent 34%),
+    var(--core-bg);
+  --voice-registration-primary-text: #06252d;
+  --voice-registration-primary-background: linear-gradient(135deg, #79eff6, #43d7df 52%, #8b7cf6);
+
+  /* Retain the established opaque mobile sticky-cell surfaces. */
+  --company-exsum-sticky-background: #001020;
+  --company-pnl-sticky-background: #001428;
+
+  /* Account semantic values */
+  --account-accent: #5eead4;
+  --account-accent-2: #a78bfa;
+  --account-accent-soft: rgba(45, 212, 191, .13);
+  --account-input: rgba(4, 27, 35, .72);
+
+  /* Login guided tour values */
+  --login-tour-shade-background: rgba(3, 24, 35, 0.68);
+
+  /* PostLogin guided tour values */
+  --dashboard-tour-shade-background: rgba(3, 23, 35, 0.68);
+
+  /* Executive briefing semantic values */
+  --briefing-palette-page-bg: radial-gradient(circle at 16% -8%, rgba(45, 212, 191, 0.20), transparent 34%),
+    radial-gradient(circle at 86% 10%, rgba(139, 92, 246, 0.13), transparent 32%),
+    linear-gradient(180deg, #123643 0%, #0a222d 72%);
+  --briefing-palette-shell-bg: linear-gradient(150deg, rgba(16, 50, 64, 0.92), rgba(11, 34, 45, 0.97));
+  --briefing-palette-surface: rgba(21, 63, 77, 0.76);
+  --briefing-palette-surface-strong: rgba(20, 62, 76, 0.92);
+  --briefing-palette-surface-soft: rgba(27, 76, 91, 0.60);
+  --briefing-palette-text: #eefcff;
+  --briefing-palette-secondary: #c5e4ea;
+  --briefing-palette-muted: #86b4be;
+  --briefing-palette-border: rgba(89, 232, 245, 0.22);
+  --briefing-palette-border-strong: rgba(89, 232, 245, 0.46);
+  --briefing-palette-accent: #59e8f5;
+  --briefing-palette-friday: #72e8ff;
+  --briefing-palette-positive: #7af0c2;
+  --briefing-palette-negative: #ff9bad;
+  --briefing-palette-card-highlight: rgba(255,255,255,0.065);
+  --briefing-palette-card-shadow: inset 0 1px 0 rgba(255,255,255,0.055),
+    inset 0 -1px 0 rgba(0,0,0,0.16),
+    0 16px 36px rgba(3, 20, 27, 0.22),
+    0 0 28px rgba(45,212,191,0.055);
+  --briefing-palette-shell-shadow: 0 24px 66px rgba(1,15,22,0.28),
+    0 0 38px rgba(45,212,191,0.055);
+  --briefing-palette-chart-grid: rgba(172, 225, 233, 0.22);
+  --briefing-palette-chart-area: rgba(89, 232, 245, 0.14);
+  --briefing-palette-chart-line: #7deeff;
+
+  /* dashboard-materials semantic values */
+  --dashboard-luminous-body-root-background-color: rgba(45,212,191,.12);
+  --dashboard-luminous-body-root-background-color-2: rgba(139,92,246,.10);
+  --dashboard-luminous-body-root-background-color-3: #0e2936;
+  --dashboard-luminous-body-root-background-color-4: #153c49;
+  --dashboard-luminous-body-root-background-color-5: #173f4e;
+  --dashboard-luminous-core-dashboard-frame-border-tint: rgba(89,232,245,.30);
+  --dashboard-luminous-core-dashboard-frame-shadow-color: rgba(0,0,0,.26);
+  --dashboard-luminous-core-dashboard-frame-shadow-color-2: rgba(45,212,191,.07);
+  --dashboard-luminous-core-dashboard-frame-shadow-color-3: rgba(255,255,255,.045);
+  --dashboard-luminous-daily-themed-card-background-color: rgba(45,212,191,.10);
+  --dashboard-luminous-daily-themed-card-background-color-2: rgba(139,92,246,.07);
+  --dashboard-luminous-daily-themed-card-background-color-3: rgba(18,56,69,.92);
+  --dashboard-luminous-daily-themed-card-background-color-4: rgba(25,72,85,.85);
+  --dashboard-luminous-daily-themed-card-border-tint: rgba(89,232,245,.24);
+  --dashboard-luminous-daily-themed-card-shadow-color: rgba(0,0,0,.18);
+  --dashboard-luminous-daily-themed-card-shadow-color-2: rgba(45,212,191,.045);
+  --dashboard-luminous-daily-themed-card-shadow-color-3: rgba(255,255,255,.04);
+  --dashboard-luminous-daily-themed-card-before-background-color: rgba(89,232,245,.76);
+  --dashboard-luminous-daily-themed-card-before-background-color-2: rgba(139,92,246,.34);
+  --dashboard-luminous-daily-themed-card-before-shadow-color: rgba(45,212,191,.14);
+  --dashboard-luminous-daily-themed-inset-background-color: rgba(17,50,64,.80);
+  --dashboard-luminous-daily-themed-inset-background-color-2: rgba(22,63,77,.76);
+  --dashboard-luminous-daily-themed-inset-foreground: #e9fbff;
+  --dashboard-luminous-daily-themed-popover-background-color: rgba(139,92,246,.11);
+  --dashboard-luminous-daily-themed-popover-background-color-2: rgba(13,42,55,.98);
+  --dashboard-luminous-daily-themed-popover-background-color-3: rgba(20,58,71,.97);
+  --dashboard-luminous-daily-themed-popover-shadow-color: rgba(0,0,0,.34);
+  --dashboard-luminous-daily-themed-popover-shadow-color-2: rgba(45,212,191,.07);
+  --dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color: rgba(125,238,255,.030);
+  --dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-2: rgba(125,238,255,.030);
+  --dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-3: rgba(45,212,191,.12);
+  --dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-4: rgba(139,92,246,.10);
+  --dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-5: #102f3d;
+  --dashboard-luminous-daily-themed-fullscreen-daily-tracking-fullscreen-background-color-6: #183f4d;
+  --dashboard-luminous-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color: rgba(15,48,62,.95);
+  --dashboard-luminous-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color-2: rgba(24,69,82,.95);
+  --dashboard-luminous-daily-themed-fullscreen-header-daily-tracking-fullscreen-header-background-color-3: rgba(37,48,79,.92);
+  --dashboard-luminous-grid-panel-container-div-div-background-color: rgba(18,56,69,.90);
+  --dashboard-luminous-grid-panel-container-div-div-background-color-2: rgba(23,67,80,.84);
+  --dashboard-luminous-grid-panel-container-div-div-border-tint: rgba(89,232,245,.22);
+  --dashboard-luminous-grid-panel-container-div-div-shadow-color: rgba(255,255,255,.035);
+  --dashboard-luminous-grid-panel-container-div-div-shadow-color-2: rgba(0,0,0,.15);
+  --dashboard-luminous-text-hud-glow-foreground: #effdff;
+  --dashboard-luminous-text-hud-glow-text-shadow-color: rgba(89,232,245,.20);
+  --dashboard-luminous-text-hud-glow-text-shadow-color-2: rgba(45,212,191,.08);
+  --dashboard-luminous-daily-tracking-summary-chip-background-color: rgba(22,64,78,.80);
+  --dashboard-luminous-daily-tracking-summary-chip-border-tint: rgba(89,232,245,.22);
+  --dashboard-luminous-daily-tracking-summary-chip-foreground: #b8dae1;
+  --dashboard-luminous-daily-comingsoon-ribbon-border-tint: rgba(94,234,212,.38);
+  --dashboard-luminous-daily-comingsoon-ribbon-background-color: rgba(8, 55, 67, .72);
+  --dashboard-luminous-daily-comingsoon-ribbon-background-color-2: rgba(13, 110, 116, .58);
+  --dashboard-luminous-daily-comingsoon-ribbon-background-color-3: rgba(76, 49, 126, .58);
+  --dashboard-luminous-daily-comingsoon-ribbon-shadow-color: rgba(45,212,191,.13);
+  --dashboard-luminous-daily-comingsoon-ribbon-shadow-color-2: rgba(139,92,246,.08);
+  --dashboard-luminous-daily-comingsoon-ribbon-shadow-color-3: rgba(255,255,255,.08);
+  --dashboard-luminous-daily-comingsoon-dot-background-color: #99f6e4;
+  --dashboard-luminous-daily-comingsoon-dot-shadow-color: rgba(94,234,212,.90);
+  --dashboard-luminous-daily-comingsoon-title-foreground: #f0fdfa;
+  --dashboard-luminous-daily-comingsoon-subtitle-foreground: rgba(204,251,241,.82);
+  --dashboard-luminous-daily-comingsoon-footnote-foreground: rgba(224,242,254,.62);
+  --dashboard-luminous-daily-comingsoon-corner-border-tint: rgba(94,234,212,.50);
+  --dashboard-luminous-daily-comingsoon-pattern-background-image-color: rgba(45,212,191,.20);
+  --dashboard-luminous-daily-comingsoon-pattern-background-image-color-2: rgba(45,212,191,.20);
+  --dashboard-luminous-daily-comingsoon-global-tint-background-color: rgba(45,212,191,.018);
+  --dashboard-luminous-daily-comingsoon-global-tint-background-color-2: rgba(139,92,246,.020);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-border-tint: rgba(94,234,212,.38);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-background-color: rgba(7,48,60,.74);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-background-color-2: rgba(10,102,111,.60);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-background-color-3: rgba(69,46,116,.60);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-shadow-color: rgba(45,212,191,.14);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-shadow-color-2: rgba(139,92,246,.09);
+  --dashboard-luminous-daily-comingsoon-global-ribbon-shadow-color-3: rgba(255,255,255,.08);
+  --dashboard-luminous-daily-comingsoon-global-dot-background-color: #99f6e4;
+  --dashboard-luminous-daily-comingsoon-global-dot-shadow-color: rgba(94,234,212,.92);
+  --dashboard-luminous-daily-comingsoon-global-dot-shadow-color-2: rgba(139,92,246,.20);
+  --dashboard-luminous-daily-comingsoon-global-title-foreground: #f0fdfa;
+  --dashboard-luminous-daily-comingsoon-global-title-text-shadow-color: rgba(45,212,191,.25);
+  --dashboard-luminous-daily-comingsoon-global-divider-foreground: rgba(167,139,250,.72);
+  --dashboard-luminous-daily-comingsoon-global-subtitle-foreground: rgba(204,251,241,.84);
+  --dashboard-luminous-daily-comingsoon-global-footnote-foreground: rgba(224,242,254,.64);
+  --dashboard-luminous-daily-comingsoon-global-line-left-background-color: rgba(94,234,212,.42);
+  --dashboard-luminous-daily-comingsoon-global-line-left-background-color-2: rgba(167,139,250,.18);
+  --dashboard-luminous-daily-comingsoon-global-line-right-background-color: rgba(167,139,250,.18);
+  --dashboard-luminous-daily-comingsoon-global-line-right-background-color-2: rgba(94,234,212,.42);
+  --dashboard-luminous-core-dashboard-frame-background-color: rgba(89,232,245,.022);
+  --dashboard-luminous-core-dashboard-frame-background-color-2: rgba(89,232,245,.022);
+  --dashboard-luminous-core-dashboard-frame-background-color-3: rgba(10,39,52,.42);
+  --dashboard-luminous-core-dashboard-frame-background-color-4: rgba(18,57,70,.30);
+  --dashboard-luminous-daily-themed-card-company-panel-company-panel-frame-company-view-shell-background-color: rgba(14,52,66,.68);
+  --dashboard-luminous-daily-themed-card-company-panel-company-panel-frame-company-view-shell-background-color-2: rgba(26,69,81,.52);
+
+  /* company-presentation semantic values */
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color: rgba(45,212,191,.10);
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color-2: rgba(139,92,246,.08);
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color-3: rgba(12,43,55,.88);
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color-4: rgba(21,62,75,.82);
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-soft-color: rgba(24,67,81,.72);
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-table-head-color: rgba(17,52,66,.98);
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-1-color: #59e8f5;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-2-color: #2dd4bf;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-3-color: #7deeff;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-4-color: #60a5fa;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-5-color: #818cf8;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-6-color: #a78bfa;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-7-color: #c084fc;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-8-color: #f0abfc;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-9-color: #5eead4;
+  --company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-10-color: #bae6fd;
+  --company-layout-luminous-company-performance-shell-background-color: rgba(45,212,191,.10);
+  --company-layout-luminous-company-performance-shell-background-color-2: rgba(139,92,246,.08);
+  --company-layout-luminous-company-performance-shell-background-color-3: rgba(11,39,51,.76);
+  --company-layout-luminous-company-performance-shell-background-color-4: rgba(18,57,70,.67);
+  --company-layout-luminous-company-performance-shell-border-color: rgba(89,232,245,.16);
+  --company-layout-luminous-company-performance-shell-shadow-color: rgba(255,255,255,.035);
+  --company-layout-luminous-company-performance-shell-shadow-color-2: rgba(0,0,0,.13);
+  --company-layout-luminous-company-control-bar-background-color: rgba(20,61,75,.82);
+  --company-layout-luminous-company-control-bar-background-color-2: rgba(25,69,82,.72);
+  --company-layout-luminous-company-control-bar-background-color-3: rgba(53,42,82,.56);
+  --company-layout-luminous-company-control-bar-border-tint: rgba(89,232,245,.27);
+  --company-layout-luminous-company-control-bar-shadow-color: rgba(255,255,255,.04);
+  --company-layout-luminous-company-control-bar-shadow-color-2: rgba(0,0,0,.12);
+  --company-layout-luminous-company-view-shell-background-color: rgba(125,238,255,.018);
+  --company-layout-luminous-company-view-shell-background-color-2: rgba(125,238,255,.018);
+  --company-layout-luminous-company-view-shell-background-color-3: rgba(11,42,54,.68);
+  --company-layout-luminous-company-view-shell-background-color-4: rgba(20,59,72,.58);
+  --company-layout-luminous-company-view-shell-border-tint: rgba(89,232,245,.22);
+  --company-layout-luminous-company-view-shell-shadow-color: rgba(255,255,255,.03);
+  --company-layout-luminous-company-view-shell-shadow-color-2: rgba(45,212,191,.025);
+  --company-layout-luminous-company-view-shell-compare-background-color: rgba(167,139,250,.11);
+  --company-layout-luminous-company-view-shell-compare-background-color-2: rgba(29,43,64,.70);
+  --company-layout-luminous-company-view-shell-compare-background-color-3: rgba(46,43,72,.62);
+  --company-layout-luminous-company-view-shell-compare-border-tint: rgba(167,139,250,.30);
+  --company-layout-luminous-company-node-header-background-color: rgba(34,211,238,.12);
+  --company-layout-luminous-company-node-header-background-color-2: rgba(45,212,191,.07);
+  --company-layout-luminous-company-node-header-background-color-3: rgba(139,92,246,.08);
+  --company-layout-luminous-company-node-header-border-tint: rgba(89,232,245,.24);
+  --company-layout-luminous-company-panel-frame-background-color: rgba(13,43,55,.32);
+  --company-layout-luminous-company-panel-frame-border-tint: rgba(89,232,245,.13);
+  --company-layout-luminous-company-panel-company-pnl-card-border-tint: rgba(89,232,245,.25);
+  --company-layout-luminous-company-panel-company-pnl-card-shadow-color: rgba(0,0,0,.16);
+  --company-layout-luminous-company-panel-company-pnl-card-shadow-color-2: rgba(45,212,191,.035);
+  --company-layout-luminous-company-panel-company-pnl-card-shadow-color-3: rgba(255,255,255,.04);
+  --company-layout-luminous-company-panel-radiant-border-tint: rgba(89,232,245,.32);
+  --company-layout-luminous-company-control-surface-company-tabs-company-select-company-control-pill-company-icon-button-background-color: rgba(24,72,87,.78);
+  --company-layout-luminous-company-control-surface-company-tabs-company-select-company-control-pill-company-icon-button-border-tint: rgba(89,232,245,.24);
+  --company-layout-luminous-company-control-surface-company-tabs-company-select-company-control-pill-company-icon-button-foreground: #bceff5;
+  --company-layout-luminous-company-tab-active-background-color: #59e8f5;
+  --company-layout-luminous-company-tab-active-background-color-2: #2dd4bf;
+  --company-layout-luminous-company-tab-active-foreground: #06232b;
+  --company-layout-luminous-company-tooltip-background-color: rgba(12,39,51,.97);
+  --company-layout-luminous-company-tooltip-background-color-2: rgba(27,58,75,.96);
+  --company-layout-luminous-company-tooltip-border-tint: rgba(89,232,245,.40);
+  --company-layout-luminous-company-table-head-company-table-head-th-background-color: rgba(20,61,75,.98);
+  --company-layout-luminous-company-table-head-company-table-head-th-background-color-2: rgba(33,62,83,.98);
+  --company-layout-luminous-company-table-head-company-table-head-th-foreground: #aef4fa;
+  --company-layout-luminous-company-legend-row-background-color: rgba(27,75,89,.56);
+  --company-layout-luminous-company-legend-row-border-tint: rgba(89,232,245,.17);
+  --company-layout-luminous-company-legend-row-hover-background-color: rgba(38,89,103,.70);
+  --company-layout-luminous-company-chart-stage-background-color: rgba(125,238,255,.018);
+  --company-layout-luminous-company-chart-stage-background-color-2: rgba(125,238,255,.018);
+  --company-layout-luminous-company-chart-stage-background-color-3: rgba(45,212,191,.07);
+  --company-layout-luminous-company-chart-stage-background-color-4: rgba(6,31,42,.56);
+  --company-layout-luminous-company-chart-stage-border-tint: rgba(89,232,245,.20);
+  --company-layout-luminous-company-pnl-scroll-background-color: rgba(8,35,47,.65);
+  --company-layout-luminous-company-pnl-scroll-border-tint: rgba(89,232,245,.18);
+  --company-layout-luminous-company-pnl-group-background-color: rgba(19,77,89,.88);
+  --company-layout-luminous-company-pnl-group-background-color-2: rgba(38,61,91,.82);
+  --company-layout-luminous-company-pnl-group-border-tint: rgba(89,232,245,.26);
+  --company-layout-luminous-company-pnl-group-foreground: #8ff4f3;
+  --company-layout-luminous-company-pnl-group-td-foreground: #8ff4f3;
+  --company-layout-luminous-company-pnl-section-background-color: rgba(24,71,85,.90);
+  --company-layout-luminous-company-pnl-section-background-color-2: rgba(52,53,91,.80);
+  --company-layout-luminous-company-pnl-section-border-tint: rgba(125,238,255,.27);
+  --company-layout-luminous-company-pnl-section-foreground: #bdf7fb;
+  --company-layout-luminous-company-pnl-major-background-color: rgba(20,92,103,.94);
+  --company-layout-luminous-company-pnl-major-background-color-2: rgba(52,69,110,.92);
+  --company-layout-luminous-company-pnl-major-background-color-3: rgba(72,57,111,.88);
+  --company-layout-luminous-company-pnl-major-border-tint: rgba(125,238,255,.42);
+  --company-layout-luminous-company-pnl-total-background-color: rgba(21,67,82,.90);
+  --company-layout-luminous-company-pnl-total-background-color-2: rgba(54,54,88,.78);
+  --company-layout-luminous-company-pnl-total-border-tint: rgba(89,232,245,.32);
+  --company-layout-luminous-company-pnl-row-nth-child-even-background-color: rgba(16,52,65,.32);
+  --company-layout-luminous-company-pnl-row-hover-background-color: rgba(45,212,191,.08);
+  --company-layout-luminous-company-panel-footer-foreground: #8bbdc7;
+  --company-layout-luminous-company-panel-footer-border-tint: rgba(89,232,245,.13);
+  --company-layout-luminous-company-page-title-background-color: #5eead4;
+  --company-layout-luminous-company-page-title-background-color-2: #ffffff;
+  --company-layout-luminous-company-page-title-background-color-3: #5eead4;
+  --company-layout-luminous-company-panel-company-pnl-card-background-color: rgba(14,48,61,.57);
+  --company-layout-luminous-company-panel-company-pnl-card-background-color-2: rgba(21,62,76,.48);
+}

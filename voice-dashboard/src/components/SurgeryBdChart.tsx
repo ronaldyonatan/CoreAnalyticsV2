@@ -1,3 +1,4 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, Line as DreiLine, OrbitControls } from '@react-three/drei';
@@ -1449,29 +1450,7 @@ export default function SurgeryBdChart({
           )}
         </div>
 
-        <style>{`
-          @keyframes surgeryFilterIn {
-            from {
-              opacity: 0;
-              transform: translateY(-5px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          .surgery-filter-panel {
-            animation: surgeryFilterIn .2s ease-out both;
-          }
-
-          @keyframes surgeryPeriodScan {
-            0% { transform: translateY(-180px); opacity: 0; }
-            20% { opacity: .9; }
-            80% { opacity: .9; }
-            100% { transform: translateY(180px); opacity: 0; }
-          }
-        `}</style>
+        <ComponentStyles name="surgery" />
       </div>
     );
   }

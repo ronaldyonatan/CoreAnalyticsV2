@@ -1,0 +1,12 @@
+{
+  "declarations": 501,
+  "colorSubstitutionEquivalent": true,
+  "deadSelectorsRemoved": 46,
+  "themeValues": {
+    "solaris": 435,
+    "quartz": 437,
+    "aurora": 90,
+    "cosmic-black": 33,
+    "obsidian": 32
+  }
+}

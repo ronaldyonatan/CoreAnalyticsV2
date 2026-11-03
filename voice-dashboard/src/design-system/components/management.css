@@ -1,0 +1,80 @@
+/* Shared component rules. Theme values are supplied through the semantic contract. */
+
+
+.management-themed-root {
+  background:
+    radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--core-primary) 7%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--core-purple-text) 5%, transparent), transparent 28%),
+    color-mix(in srgb, var(--core-bg) 96%, transparent);
+  color: var(--core-text) !important;
+}
+
+.management-page-header {
+  background:
+    linear-gradient(110deg,
+      color-mix(in srgb, var(--core-surface-strong) 94%, transparent),
+      color-mix(in srgb, var(--core-primary) 5%, var(--core-surface-strong))) !important;
+  border-color: var(--core-border) !important;
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--core-primary) 7%, transparent);
+}
+
+.management-metric-card,
+.management-toolbar,
+.management-table-shell,
+.management-drawer,
+.management-modal,
+.management-floating-surface {
+  background: var(--core-surface-strong) !important;
+  border-color: var(--core-border) !important;
+  color: var(--core-text) !important;
+  box-shadow: var(--core-frame-shadow);
+}
+
+.management-metric-card {
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--core-primary) 4%, var(--core-panel)),
+      var(--core-panel)) !important;
+}
+
+.management-toolbar {
+  background:
+    linear-gradient(120deg,
+      color-mix(in srgb, var(--core-primary) 4%, var(--core-surface)),
+      var(--core-surface)) !important;
+}
+
+.management-table-head,
+.management-table-footer {
+  background: color-mix(in srgb, var(--core-control) 82%, transparent) !important;
+  border-color: var(--core-border) !important;
+}
+
+.management-input {
+  background: var(--core-control) !important;
+  border-color: var(--core-border) !important;
+  color: var(--core-text) !important;
+  box-shadow: var(--management-input-shadow);
+}
+
+.management-input::placeholder {
+  color: var(--core-text-muted) !important;
+}
+
+.management-input:focus {
+  border-color: var(--core-border-strong) !important;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--core-primary) 9%, transparent),
+    0 0 16px var(--core-glow) !important;
+}
+
+.management-overlay {
+  background: var(--management-overlay-bg) !important;
+  backdrop-filter: blur(5px);
+}
+.management-floating-surface {
+  background: var(--core-surface-strong) !important;
+  border-color: var(--core-border) !important;
+  color: var(--core-text) !important;
+  box-shadow: var(--core-frame-shadow) !important;
+}

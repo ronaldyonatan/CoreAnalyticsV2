@@ -1,9 +1,9 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useTheme } from '../theme/ThemeContext';
-import './CompanyMobileGrid.css';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Sector } from 'recharts';
 
 interface PanelExsumRevenueProps {
@@ -979,16 +979,7 @@ function RevenueExsumFullscreen({
 
   return (
     <div className="company-3d-shell relative h-full w-full overflow-hidden rounded-2xl border border-[#2587C8]/40 bg-[#020916]">
-      <style>{`
-        @keyframes revenueExsumScanBand {
-          0% { transform: translateY(-18px); opacity: .15; }
-          50% { opacity: .55; }
-          100% { transform: translateY(18px); opacity: .15; }
-        }
-        .revenue-exsum-holo-band {
-          animation: revenueExsumScanBand .55s linear infinite alternate;
-        }
-      `}</style>
+      <ComponentStyles name="revenue-summary" />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[100] flex items-start justify-between p-4 pr-14">
         <div>

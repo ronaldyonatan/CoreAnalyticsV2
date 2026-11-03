@@ -18,7 +18,6 @@ import { ProfitabilityScene } from "./ProfitabilityScene";
 import { BalanceSheetScene } from "./BalanceSheetScene";
 import { ExecutiveSummaryScene } from "./ExecutiveSummaryScene";
 
-import "./executive-briefing.css";
 
 function SceneRenderer({
   scene,

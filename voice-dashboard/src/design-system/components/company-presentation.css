@@ -1,0 +1,1619 @@
+/* Shared company presentation recipes.
+   Structure and capability gates belong to the Design System; theme files
+   supply semantic color values. Rule order preserves the approved cascade. */
+
+@import './company-performance.css';
+
+[data-surface-family="luminous"] .company-theme-root,
+[data-surface-family="luminous"] .company-panel,
+[data-surface-family="luminous"] .company-pnl-card,
+[data-surface-family="luminous"] .company-panel-frame,
+[data-surface-family="luminous"] .company-view-shell {
+  --company-panel-bg:
+    radial-gradient(ellipse at 12% 0%, var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color), transparent 34%),
+    radial-gradient(ellipse at 94% 10%, var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color-2), transparent 34%),
+    linear-gradient(145deg, var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color-3), var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-bg-color-4));
+  --company-panel-soft: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-panel-soft-color);
+  --company-table-head: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-table-head-color);
+
+  --company-chart-1: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-1-color);
+  --company-chart-2: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-2-color);
+  --company-chart-3: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-3-color);
+  --company-chart-4: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-4-color);
+  --company-chart-5: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-5-color);
+  --company-chart-6: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-6-color);
+  --company-chart-7: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-7-color);
+  --company-chart-8: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-8-color);
+  --company-chart-9: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-9-color);
+  --company-chart-10: var(--company-layout-luminous-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-chart-10-color);
+}
+
+[data-surface-family="luminous"] .company-performance-shell {
+  background:
+    radial-gradient(ellipse at 12% -8%, var(--company-layout-luminous-company-performance-shell-background-color), transparent 36%),
+    radial-gradient(ellipse at 88% 2%, var(--company-layout-luminous-company-performance-shell-background-color-2), transparent 38%),
+    linear-gradient(145deg, var(--company-layout-luminous-company-performance-shell-background-color-3), var(--company-layout-luminous-company-performance-shell-background-color-4)) !important;
+  border: 1px solid var(--company-layout-luminous-company-performance-shell-border-color);
+  box-shadow:
+    inset 0 1px 0 var(--company-layout-luminous-company-performance-shell-shadow-color),
+    0 16px 44px var(--company-layout-luminous-company-performance-shell-shadow-color-2);
+}
+
+[data-surface-family="luminous"] .company-control-bar {
+  background:
+    linear-gradient(90deg, var(--company-layout-luminous-company-control-bar-background-color), var(--company-layout-luminous-company-control-bar-background-color-2), var(--company-layout-luminous-company-control-bar-background-color-3)) !important;
+  border-color: var(--company-layout-luminous-company-control-bar-border-tint) !important;
+  box-shadow:
+    inset 0 1px 0 var(--company-layout-luminous-company-control-bar-shadow-color),
+    0 6px 22px var(--company-layout-luminous-company-control-bar-shadow-color-2);
+}
+
+[data-surface-family="luminous"] .company-view-shell {
+  background:
+    linear-gradient(var(--company-layout-luminous-company-view-shell-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--company-layout-luminous-company-view-shell-background-color-2) 1px, transparent 1px),
+    linear-gradient(150deg, var(--company-layout-luminous-company-view-shell-background-color-3), var(--company-layout-luminous-company-view-shell-background-color-4)) !important;
+  background-size: 42px 42px, 42px 42px, auto !important;
+  border-color: var(--company-layout-luminous-company-view-shell-border-tint) !important;
+  box-shadow:
+    inset 0 1px 0 var(--company-layout-luminous-company-view-shell-shadow-color),
+    inset 0 0 36px var(--company-layout-luminous-company-view-shell-shadow-color-2) !important;
+}
+
+[data-surface-family="luminous"] .company-view-shell--compare {
+  background:
+    radial-gradient(ellipse at 95% 0%, var(--company-layout-luminous-company-view-shell-compare-background-color), transparent 34%),
+    linear-gradient(150deg, var(--company-layout-luminous-company-view-shell-compare-background-color-2), var(--company-layout-luminous-company-view-shell-compare-background-color-3)) !important;
+  border-color: var(--company-layout-luminous-company-view-shell-compare-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-node-header {
+  background:
+    linear-gradient(90deg, var(--company-layout-luminous-company-node-header-background-color), var(--company-layout-luminous-company-node-header-background-color-2), var(--company-layout-luminous-company-node-header-background-color-3)) !important;
+  border-color: var(--company-layout-luminous-company-node-header-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-panel-frame {
+  background: var(--company-layout-luminous-company-panel-frame-background-color) !important;
+  border-color: var(--company-layout-luminous-company-panel-frame-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-panel,
+[data-surface-family="luminous"] .company-pnl-card {
+  border-color: var(--company-layout-luminous-company-panel-company-pnl-card-border-tint) !important;
+  box-shadow:
+    0 14px 34px var(--company-layout-luminous-company-panel-company-pnl-card-shadow-color),
+    0 0 24px var(--company-layout-luminous-company-panel-company-pnl-card-shadow-color-2),
+    inset 0 1px 0 var(--company-layout-luminous-company-panel-company-pnl-card-shadow-color-3) !important;
+}
+
+[data-surface-family="luminous"] .company-panel--radiant {
+  border-color: var(--company-layout-luminous-company-panel-radiant-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-control-surface,
+[data-surface-family="luminous"] .company-tabs,
+[data-surface-family="luminous"] .company-select,
+[data-surface-family="luminous"] .company-control-pill,
+[data-surface-family="luminous"] .company-icon-button {
+  background: var(--company-layout-luminous-company-control-surface-company-tabs-company-select-company-control-pill-company-icon-button-background-color) !important;
+  border-color: var(--company-layout-luminous-company-control-surface-company-tabs-company-select-company-control-pill-company-icon-button-border-tint) !important;
+  color: var(--company-layout-luminous-company-control-surface-company-tabs-company-select-company-control-pill-company-icon-button-foreground) !important;
+}
+
+[data-surface-family="luminous"] .company-tab-active {
+  background: linear-gradient(135deg, var(--company-layout-luminous-company-tab-active-background-color), var(--company-layout-luminous-company-tab-active-background-color-2)) !important;
+  color: var(--company-layout-luminous-company-tab-active-foreground) !important;
+}
+
+[data-surface-family="luminous"] .company-tooltip {
+  background:
+    linear-gradient(145deg, var(--company-layout-luminous-company-tooltip-background-color), var(--company-layout-luminous-company-tooltip-background-color-2)) !important;
+  border-color: var(--company-layout-luminous-company-tooltip-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-table-head,
+[data-surface-family="luminous"] .company-table-head th {
+  background:
+    linear-gradient(90deg, var(--company-layout-luminous-company-table-head-company-table-head-th-background-color), var(--company-layout-luminous-company-table-head-company-table-head-th-background-color-2)) !important;
+  color: var(--company-layout-luminous-company-table-head-company-table-head-th-foreground) !important;
+}
+
+[data-surface-family="luminous"] .company-legend-row {
+  background: var(--company-layout-luminous-company-legend-row-background-color) !important;
+  border-color: var(--company-layout-luminous-company-legend-row-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-legend-row:hover {
+  background: var(--company-layout-luminous-company-legend-row-hover-background-color) !important;
+}
+
+[data-surface-family="luminous"] .company-chart-stage {
+  background:
+    linear-gradient(var(--company-layout-luminous-company-chart-stage-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--company-layout-luminous-company-chart-stage-background-color-2) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 100%, var(--company-layout-luminous-company-chart-stage-background-color-3), transparent 54%),
+    var(--company-layout-luminous-company-chart-stage-background-color-4) !important;
+  background-size: 34px 34px, 34px 34px, auto, auto !important;
+  border-color: var(--company-layout-luminous-company-chart-stage-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-scroll {
+  background: var(--company-layout-luminous-company-pnl-scroll-background-color) !important;
+  border-color: var(--company-layout-luminous-company-pnl-scroll-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-group {
+  background: linear-gradient(90deg, var(--company-layout-luminous-company-pnl-group-background-color), var(--company-layout-luminous-company-pnl-group-background-color-2)) !important;
+  border-color: var(--company-layout-luminous-company-pnl-group-border-tint) !important;
+  color: var(--company-layout-luminous-company-pnl-group-foreground) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-group td {
+  background: transparent !important;
+  color: var(--company-layout-luminous-company-pnl-group-td-foreground) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-section {
+  background: linear-gradient(90deg, var(--company-layout-luminous-company-pnl-section-background-color), var(--company-layout-luminous-company-pnl-section-background-color-2)) !important;
+  border-color: var(--company-layout-luminous-company-pnl-section-border-tint) !important;
+  color: var(--company-layout-luminous-company-pnl-section-foreground) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-major {
+  background:
+    linear-gradient(90deg, var(--company-layout-luminous-company-pnl-major-background-color), var(--company-layout-luminous-company-pnl-major-background-color-2), var(--company-layout-luminous-company-pnl-major-background-color-3)) !important;
+  border-color: var(--company-layout-luminous-company-pnl-major-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-total {
+  background:
+    linear-gradient(90deg, var(--company-layout-luminous-company-pnl-total-background-color), var(--company-layout-luminous-company-pnl-total-background-color-2)) !important;
+  border-color: var(--company-layout-luminous-company-pnl-total-border-tint) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-row:nth-child(even) {
+  background: var(--company-layout-luminous-company-pnl-row-nth-child-even-background-color) !important;
+}
+
+[data-surface-family="luminous"] .company-pnl-row:hover {
+  background: var(--company-layout-luminous-company-pnl-row-hover-background-color) !important;
+}
+
+[data-surface-family="luminous"] .company-panel-footer {
+  color: var(--company-layout-luminous-company-panel-footer-foreground) !important;
+  border-color: var(--company-layout-luminous-company-panel-footer-border-tint) !important;
+}
+
+.company-mobile-filter-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  
+  .company-performance-shell {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding: .4rem !important;
+  }
+
+  
+  .company-page-header {
+    position: relative !important;
+    top: auto !important;
+    z-index: 80 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: .45rem .55rem !important;
+    margin-bottom: .45rem !important;
+    padding: .55rem .65rem !important;
+  }
+
+  .company-page-title-row {
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 32px;
+    gap: .55rem !important;
+  }
+
+  .company-page-title {
+    overflow: hidden;
+    font-size: .88rem !important;
+    line-height: 1.15 !important;
+    letter-spacing: .09em !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .company-mobile-filter-toggle {
+    display: flex;
+    width: auto !important;
+    min-width: 104px;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    padding: .42rem .62rem;
+    border: 1px solid var(--company-border);
+    border-radius: .65rem;
+    background: var(--company-control);
+    color: var(--company-primary-soft);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+  }
+
+  .company-page-controls {
+    display: none !important;
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .company-page-controls.company-page-controls--mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: .42rem !important;
+    padding-top: .15rem;
+  }
+
+  .company-page-controls > div,
+.company-page-controls > .company-control-surface {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .company-healthcare-filter-wrap {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .company-healthcare-filter-wrap > *,
+.company-healthcare-filter-wrap button,
+.company-healthcare-filter-wrap [role="button"],
+.company-healthcare-filter-wrap select {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  .company-healthcare-refresh {
+    width: 38px !important;
+    min-width: 38px !important;
+  }
+
+  
+  .company-view-shell,
+.company-node-view {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .company-view-shell {
+    padding: .35rem !important;
+  }
+
+  .company-node-view {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .company-main-scroll {
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 1 1 0% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding-right: .2rem !important;
+    padding-bottom: 1rem !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+  }
+
+  .company-node-header {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    min-height: 32px;
+    gap: .45rem;
+    padding: .35rem .55rem !important;
+  }
+
+  .company-node-header > span:first-child {
+    font-size: 10px !important;
+    line-height: 1.2;
+  }
+
+  .company-node-header > span:last-child {
+    font-size: 8px !important;
+    text-align: right;
+  }
+
+  
+  .company-top-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    gap: .65rem !important;
+  }
+
+  .company-top-grid > * {
+    width: 100% !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    flex: 0 0 390px !important;
+  }
+
+  .company-panel-frame {
+    padding: .2rem !important;
+  }
+
+  .company-panel {
+    min-height: 0 !important;
+  }
+
+  .company-panel-header {
+    margin-bottom: .3rem !important;
+    padding-bottom: .3rem !important;
+  }
+
+  .company-panel-header h3,
+.company-panel-header h4 {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    letter-spacing: .06em !important;
+  }
+
+  
+  .company-panel--revenue,
+.company-panel--radiant {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: .6rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .company-chart-stage {
+    min-height: 0 !important;
+    gap: .55rem !important;
+    padding: 1.4rem .35rem .45rem !important;
+    border-radius: .8rem !important;
+  }
+
+  .company-chart-stage .w-10 {
+    width: 1.55rem !important;
+  }
+
+  
+  .company-pnl-section {
+    height: 520px !important;
+    min-height: 520px !important;
+    flex: 0 0 520px !important;
+    padding-bottom: .5rem !important;
+  }
+
+  .company-pnl-card {
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: .55rem !important;
+  }
+
+  .company-panel table,
+.company-pnl-card table {
+    width: max-content !important;
+    min-width: 760px !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  .company-panel table th,
+.company-panel table td,
+.company-pnl-card table th,
+.company-pnl-card table td {
+    font-size: 11px !important;
+    padding-top: .45rem !important;
+    padding-bottom: .45rem !important;
+  }
+
+  .company-pnl-scroll {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .company-pnl-card table {
+    min-width: 820px !important;
+  }
+
+  .company-panel-header button,
+.company-pnl-card button {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 420px) {
+  .company-page-title {
+    font-size: .82rem !important;
+    letter-spacing: .075em !important;
+  }
+
+  .company-mobile-filter-toggle {
+    min-width: 96px;
+    padding-inline: .5rem;
+  }
+
+  .company-top-grid > * {
+    height: 370px !important;
+    min-height: 370px !important;
+    flex-basis: 370px !important;
+  }
+
+  .company-pnl-section {
+    height: 500px !important;
+    min-height: 500px !important;
+    flex-basis: 500px !important;
+  }
+}
+
+.company-panel-frame--maximized {
+  overflow: visible !important;
+}
+
+.company-panel-frame--maximized .company-panel-size-button--restore {
+  position: absolute !important;
+  top: .75rem !important;
+  right: .75rem !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  width: 2.35rem !important;
+  height: 2.35rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--company-layout-base-company-panel-frame-maximized-company-panel-size-button-restore-border-color) !important;
+  background: var(--company-layout-base-company-panel-frame-maximized-company-panel-size-button-restore-background-color) !important;
+  color: var(--company-layout-base-company-panel-frame-maximized-company-panel-size-button-restore-foreground) !important;
+  box-shadow: 0 0 20px var(--company-layout-base-company-panel-frame-maximized-company-panel-size-button-restore-shadow-color), 0 8px 24px var(--company-layout-base-company-panel-frame-maximized-company-panel-size-button-restore-shadow-color-2) !important;
+  backdrop-filter: blur(12px);
+}
+
+.company-panel-frame--maximized .company-panel-size-button--restore svg {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+@media (max-width: 767px) {
+  .company-panel-frame--maximized .company-panel-size-button--restore {
+    top: .5rem !important;
+    right: .5rem !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+.company-performance-fullscreen > .company-page-header {
+  display: none !important;
+}
+
+.company-performance-fullscreen .company-node-header {
+  display: none !important;
+}
+
+.company-performance-fullscreen,
+.company-performance-fullscreen > .flex-1,
+.company-performance-fullscreen .company-view-shell,
+.company-performance-fullscreen .company-node-view {
+  min-height: 0 !important;
+}
+
+.company-performance-fullscreen .company-view-shell {
+  height: 100% !important;
+  padding: 0 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+.company-performance-fullscreen .company-node-view {
+  height: 100% !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+}
+
+.company-performance-fullscreen .company-main-scroll {
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.company-performance-fullscreen .company-top-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  gap: 0 !important;
+}
+
+.company-performance-fullscreen .company-top-grid > .company-panel-frame--maximized {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0% !important;
+  margin: 0 !important;
+  padding: .3rem !important;
+  overflow: hidden !important;
+  border-radius: .8rem !important;
+}
+
+.company-performance-fullscreen .company-panel-frame--maximized > .company-panel {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.company-performance-fullscreen .company-pnl-section {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  padding: 0 !important;
+}
+
+.company-performance-fullscreen .company-pnl-card {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.company-performance-fullscreen .company-panel-size-button--restore {
+  position: absolute !important;
+  top: .65rem !important;
+  right: .65rem !important;
+  z-index: 9999 !important;
+}
+
+@media (max-width: 767px) {
+  .company-performance-fullscreen {
+    padding: .15rem !important;
+    border-radius: .75rem !important;
+  }
+
+  .company-performance-fullscreen .company-panel-frame--maximized {
+    height: 100% !important;
+    min-height: 0 !important;
+    flex-basis: auto !important;
+    padding: .2rem !important;
+  }
+
+  .company-performance-fullscreen .company-panel-size-button--restore {
+    top: .45rem !important;
+    right: .45rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-auto-rows: 470px !important;
+    align-items: stretch !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid > .company-panel-frame {
+    height: 470px !important;
+    min-height: 470px !important;
+    max-height: none !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid > .company-panel-frame > .company-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-main-scroll {
+    overflow-y: auto !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid {
+    grid-auto-rows: 510px !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen) .company-top-grid > .company-panel-frame {
+    height: 510px !important;
+    min-height: 510px !important;
+  }
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .company-performance-shell:not(.company-performance-fullscreen)
+  .company-top-grid.company-top-grid--three {
+    display: grid !important;
+    flex-direction: initial !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: 1fr !important;
+    gap: 8px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    align-items: stretch !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen)
+  .company-top-grid.company-top-grid--three
+  > .company-panel-frame {
+    width: auto !important;
+    height: 76vh !important;
+    min-height: 300px !important;
+    max-height: none !important;
+  }
+
+  .company-performance-shell:not(.company-performance-fullscreen)
+  .company-top-grid.company-top-grid--three
+  > .company-panel-frame
+  > .company-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .bg-emerald-950\/40,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .bg-emerald-950\/40 {
+  background: var(--company-layout-clinical-daylight-company-pnl-card-bg-emerald-950-40-company-pnl-card-bg-emerald-950-40-background-color) !important;
+  border-color: var(--company-layout-clinical-daylight-company-pnl-card-bg-emerald-950-40-company-pnl-card-bg-emerald-950-40-border-tint) !important;
+  color: var(--company-layout-clinical-daylight-company-pnl-card-bg-emerald-950-40-company-pnl-card-bg-emerald-950-40-foreground) !important;
+  box-shadow:
+    inset 3px 0 0 var(--company-layout-clinical-daylight-company-pnl-card-bg-emerald-950-40-company-pnl-card-bg-emerald-950-40-shadow-color),
+    0 0 0 1px var(--company-layout-clinical-daylight-company-pnl-card-bg-emerald-950-40-company-pnl-card-bg-emerald-950-40-shadow-color-2) !important;
+  font-weight: 800 !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .bg-rose-950\/40,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .bg-rose-950\/40 {
+  background: var(--company-layout-clinical-daylight-company-pnl-card-bg-rose-950-40-company-pnl-card-bg-rose-950-40-background-color) !important;
+  border-color: var(--company-layout-clinical-daylight-company-pnl-card-bg-rose-950-40-company-pnl-card-bg-rose-950-40-border-tint) !important;
+  color: var(--company-layout-clinical-daylight-company-pnl-card-bg-rose-950-40-company-pnl-card-bg-rose-950-40-foreground) !important;
+  box-shadow:
+    inset 3px 0 0 var(--company-layout-clinical-daylight-company-pnl-card-bg-rose-950-40-company-pnl-card-bg-rose-950-40-shadow-color),
+    0 0 0 1px var(--company-layout-clinical-daylight-company-pnl-card-bg-rose-950-40-company-pnl-card-bg-rose-950-40-shadow-color-2) !important;
+  font-weight: 800 !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-emerald-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-emerald-400,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-emerald-300,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-emerald-400 {
+  color: var(--company-layout-clinical-daylight-company-pnl-card-text-emerald-300-company-pnl-card-text-emerald-400-company-pnl-card-text-emerald-300-company-pnl-card-text-emerald-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-rose-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-rose-400,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-rose-300,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-rose-400 {
+  color: var(--company-layout-clinical-daylight-company-pnl-card-text-rose-300-company-pnl-card-text-rose-400-company-pnl-card-text-rose-300-company-pnl-card-text-rose-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-amber-300,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-amber-400,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-amber-300,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-amber-400 {
+  color: var(--company-layout-clinical-daylight-company-pnl-card-text-amber-300-company-pnl-card-text-amber-400-company-pnl-card-text-amber-300-company-pnl-card-text-amber-400-foreground) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .text-slate-400.opacity-70,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .text-slate-400.opacity-70 {
+  color: var(--company-layout-clinical-daylight-company-pnl-card-text-slate-400-opacity-70-company-pnl-card-text-slate-400-opacity-70-foreground) !important;
+  opacity: .62 !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .bg-emerald-950\/40,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card .bg-rose-950\/40,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .bg-emerald-950\/40,
+[data-surface-family="daylight"]:where([data-performance="static"]) .company-pnl-card .bg-rose-950\/40 {
+  border-radius: .3rem !important;
+  padding-left: .3rem !important;
+  padding-right: .3rem !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-pnl-card,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel-frame,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-view-shell,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-node-view {
+  --company-primary: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-primary-color);
+  --company-primary-soft: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-primary-soft-color);
+  --company-text: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-text-color);
+  --company-muted: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-muted-color);
+  --company-border: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-border-color);
+  --company-border-strong: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-border-strong-color);
+  --company-control: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-control-color);
+  --company-control-hover: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-control-hover-color);
+  --company-panel-bg: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-panel-bg-color);
+  --company-panel-soft: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-panel-soft-color);
+  --company-table-head: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-table-head-color);
+  --company-target: var(--company-layout-clinical-company-theme-root-company-panel-company-pnl-card-company-panel-frame-company-view-shell-company-node-view-company-target-color);
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-performance-shell {
+  background: transparent !important;
+  border-color: var(--company-layout-clinical-company-performance-shell-border-tint) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-page-header {
+  background: linear-gradient(100deg, var(--company-layout-clinical-company-page-header-background-color), var(--company-layout-clinical-company-page-header-background-color-2), var(--company-layout-clinical-company-page-header-background-color-3)) !important;
+  border-color: var(--company-layout-clinical-company-page-header-border-tint) !important;
+  color: var(--company-layout-clinical-company-page-header-foreground) !important;
+  box-shadow:
+    0 8px 20px var(--company-layout-clinical-company-page-header-shadow-color),
+    inset 0 1px 0 var(--company-layout-clinical-company-page-header-shadow-color-2) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-page-title,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-title {
+  color: var(--company-layout-clinical-company-page-title-company-title-foreground) !important;
+  text-shadow: 0 1px 7px var(--company-layout-clinical-company-page-title-company-title-text-shadow-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel-frame,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-view-shell {
+  background: var(--company-layout-clinical-immersive-company-panel-frame-company-view-shell-background-color) !important;
+  border-color: var(--company-layout-clinical-immersive-company-panel-frame-company-view-shell-border-tint) !important;
+  box-shadow:
+    0 10px 24px var(--company-layout-clinical-immersive-company-panel-frame-company-view-shell-shadow-color),
+    inset 0 1px 0 var(--company-layout-clinical-immersive-company-panel-frame-company-view-shell-shadow-color-2) !important;
+  backdrop-filter: blur(9px) saturate(116%) !important;
+  -webkit-backdrop-filter: blur(9px) saturate(116%) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-node-view {
+  background:
+    linear-gradient(180deg, var(--company-layout-clinical-immersive-company-panel-company-pnl-card-company-node-view-background-color), var(--company-layout-clinical-immersive-company-panel-company-pnl-card-company-node-view-background-color-2)) !important;
+  border-color: var(--company-layout-clinical-immersive-company-panel-company-pnl-card-company-node-view-border-tint) !important;
+  color: var(--company-layout-clinical-immersive-company-panel-company-pnl-card-company-node-view-foreground) !important;
+  box-shadow:
+    0 12px 28px var(--company-layout-clinical-immersive-company-panel-company-pnl-card-company-node-view-shadow-color),
+    inset 0 1px 0 var(--company-layout-clinical-immersive-company-panel-company-pnl-card-company-node-view-shadow-color-2) !important;
+  backdrop-filter: blur(11px) saturate(118%) !important;
+  -webkit-backdrop-filter: blur(11px) saturate(118%) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-panel-frame,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-view-shell {
+  background: var(--company-layout-clinical-static-company-panel-frame-company-view-shell-background-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-panel,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-pnl-card,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-node-view {
+  background: var(--company-layout-clinical-static-company-panel-company-pnl-card-company-node-view-background-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-chart-stage {
+  background:
+    linear-gradient(var(--company-layout-clinical-company-chart-stage-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--company-layout-clinical-company-chart-stage-background-color-2) 1px, transparent 1px),
+    var(--company-layout-clinical-company-chart-stage-background-color-3) !important;
+  background-size: 34px 34px !important;
+  border-color: var(--company-layout-clinical-company-chart-stage-border-tint) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-legend-row {
+  background: var(--company-layout-clinical-company-legend-row-background-color) !important;
+  border-color: var(--company-layout-clinical-company-legend-row-border-tint) !important;
+  color: var(--company-layout-clinical-company-legend-row-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--company-layout-clinical-company-legend-row-shadow-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-legend-row:hover {
+  background: var(--company-layout-clinical-company-legend-row-hover-background-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-legend-row--active {
+  background: linear-gradient(90deg, var(--company-layout-clinical-company-legend-row-active-background-color), var(--company-layout-clinical-company-legend-row-active-background-color-2)) !important;
+  border-color: var(--company-layout-clinical-company-legend-row-active-border-tint) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel div[class*="bg-[#001020]/60"] {
+  background: var(--company-layout-clinical-company-panel-div-class-bg-001020-60-background-color) !important;
+  border-color: var(--company-layout-clinical-company-panel-div-class-bg-001020-60-border-tint) !important;
+  color: var(--company-layout-clinical-company-panel-div-class-bg-001020-60-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--company-layout-clinical-company-panel-div-class-bg-001020-60-shadow-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel div[class*="bg-[#00f2fe]/20"] {
+  background: linear-gradient(90deg, var(--company-layout-clinical-company-panel-div-class-bg-00f2fe-20-background-color), var(--company-layout-clinical-company-panel-div-class-bg-00f2fe-20-background-color-2)) !important;
+  border-color: var(--company-layout-clinical-company-panel-div-class-bg-00f2fe-20-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--company-layout-clinical-company-panel-div-class-bg-00f2fe-20-shadow-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel div[class*="bg-[#001020]/60"] *,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel div[class*="bg-[#00f2fe]/20"] * {
+  color: var(--company-layout-clinical-company-panel-div-class-bg-001020-60-company-panel-div-class-bg-00f2fe-20-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-table-head,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-table-head th {
+  background: var(--company-layout-clinical-company-table-head-company-table-head-th-background-color) !important;
+  color: var(--company-layout-clinical-company-table-head-company-table-head-th-foreground) !important;
+  border-color: var(--company-layout-clinical-company-table-head-company-table-head-th-border-tint) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-cyan-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-sky-"] {
+  color: var(--company-layout-clinical-company-theme-root-class-text-cyan-company-theme-root-class-text-sky-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-page-header [class*="text-cyan-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-page-header [class*="text-sky-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-page-header [class*="text-white"] {
+  color: var(--company-layout-clinical-company-page-header-class-text-cyan-company-page-header-class-text-sky-company-page-header-class-text-white-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-emerald-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-green-"] {
+  color: var(--company-layout-clinical-company-theme-root-class-text-emerald-company-theme-root-class-text-green-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-rose-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-red-"] {
+  color: var(--company-layout-clinical-company-theme-root-class-text-rose-company-theme-root-class-text-red-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-amber-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-theme-root [class*="text-yellow-"] {
+  color: var(--company-layout-clinical-company-theme-root-class-text-amber-company-theme-root-class-text-yellow-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-node-header {
+  background: linear-gradient(90deg, var(--company-layout-clinical-company-node-header-background-color), var(--company-layout-clinical-company-node-header-background-color-2)) !important;
+  border-color: var(--company-layout-clinical-company-node-header-border-tint) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-node-header > .company-title {
+  color: var(--company-layout-clinical-company-node-header-company-title-foreground) !important;
+  text-shadow: none !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-node-header > .company-muted {
+  color: var(--company-layout-clinical-company-node-header-company-muted-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-icon-button,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-healthcare-refresh {
+  background: linear-gradient(145deg, var(--company-layout-clinical-company-icon-button-company-healthcare-refresh-background-color), var(--company-layout-clinical-company-icon-button-company-healthcare-refresh-background-color-2)) !important;
+  border: 1px solid var(--company-layout-clinical-company-icon-button-company-healthcare-refresh-border-color) !important;
+  color: var(--company-layout-clinical-company-icon-button-company-healthcare-refresh-foreground) !important;
+  box-shadow: 0 5px 14px var(--company-layout-clinical-company-icon-button-company-healthcare-refresh-shadow-color), inset 0 1px 0 var(--company-layout-clinical-company-icon-button-company-healthcare-refresh-shadow-color-2) !important;
+  opacity: 1 !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-icon-button:hover,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-healthcare-refresh:hover {
+  background: linear-gradient(145deg, var(--company-layout-clinical-company-icon-button-hover-company-healthcare-refresh-hover-background-color), var(--company-layout-clinical-company-icon-button-hover-company-healthcare-refresh-hover-background-color-2)) !important;
+  color: var(--company-layout-clinical-company-icon-button-hover-company-healthcare-refresh-hover-foreground) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-icon-button svg,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-healthcare-refresh svg {
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-compare-toggle--idle {
+  background: var(--company-layout-clinical-company-compare-toggle-idle-background-color) !important;
+  border-color: var(--company-layout-clinical-company-compare-toggle-idle-border-tint) !important;
+  color: var(--company-layout-clinical-company-compare-toggle-idle-foreground) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-compare-toggle--active {
+  background: var(--company-layout-clinical-company-compare-toggle-active-background-color) !important;
+  border-color: var(--company-layout-clinical-company-compare-toggle-active-border-tint) !important;
+  color: var(--company-layout-clinical-company-compare-toggle-active-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-3d-shell .company-title {
+  color: var(--company-layout-clinical-company-3d-shell-company-title-foreground) !important;
+  text-shadow: 0 1px 8px var(--company-layout-clinical-company-3d-shell-company-title-text-shadow-color) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-3d-shell .company-muted {
+  color: var(--company-layout-clinical-company-3d-shell-company-muted-foreground) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-3d-shell .company-select {
+  background: var(--company-layout-clinical-company-3d-shell-company-select-background-color) !important;
+  color: var(--company-layout-clinical-company-3d-shell-company-select-foreground) !important;
+  border-color: var(--company-layout-clinical-company-3d-shell-company-select-border-tint) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-3d-shell .company-tabs {
+  border-color: var(--company-layout-clinical-company-3d-shell-company-tabs-border-tint) !important;
+  background: var(--company-layout-clinical-company-3d-shell-company-tabs-background-color) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-3d-shell .company-tab-idle {
+  color: var(--company-layout-clinical-company-3d-shell-company-tab-idle-foreground) !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-3d-shell .company-tab-active {
+  background: var(--company-layout-clinical-company-3d-shell-company-tab-active-background-color) !important;
+  color: var(--company-layout-clinical-company-3d-shell-company-tab-active-foreground) !important;
+  box-shadow: 0 0 14px var(--company-layout-clinical-company-3d-shell-company-tab-active-shadow-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-fullscreen-close {
+  background: linear-gradient(145deg, var(--company-layout-clinical-company-fullscreen-close-background-color), var(--company-layout-clinical-company-fullscreen-close-background-color-2)) !important;
+  border: 1px solid var(--company-layout-clinical-company-fullscreen-close-border-color) !important;
+  color: var(--company-layout-clinical-company-fullscreen-close-foreground) !important;
+  box-shadow: 0 6px 18px var(--company-layout-clinical-company-fullscreen-close-shadow-color), 0 0 0 1px var(--company-layout-clinical-company-fullscreen-close-shadow-color-2) inset !important;
+}
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-fullscreen-close:hover {
+  background: linear-gradient(145deg, var(--company-layout-clinical-company-fullscreen-close-hover-background-color), var(--company-layout-clinical-company-fullscreen-close-hover-background-color-2)) !important;
+  transform: scale(1.04);
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-shell.company-performance-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-width: 100vw !important;
+  min-height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--company-layout-clinical-company-performance-shell-company-performance-fullscreen-background-color) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-view-shell,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-node-view,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-main-scroll,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-top-grid,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-panel-frame--maximized {
+  border-radius: 0 !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-panel-frame--maximized > .company-panel {
+  border-radius: 0 !important;
+  border: 0 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button {
+  border: 1px solid var(--company-layout-clinical-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-border-color) !important;
+  color: var(--company-layout-clinical-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button:hover {
+  background: var(--company-layout-clinical-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-hover-background-color) !important;
+  border-color: var(--company-layout-clinical-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-hover-border-tint) !important;
+  color: var(--company-layout-clinical-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-hover-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-panel-size-button--restore {
+  backdrop-filter: blur(14px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(120%) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-panel-size-button--restore:hover {
+  transform: none !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell * {
+  --company-text: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-company-performance-fullscreen-company-3d-shell-company-text-color);
+  --company-muted: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-company-performance-fullscreen-company-3d-shell-company-muted-color);
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell [class*="text-white"] {
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-class-text-white-foreground) !important;
+  -webkit-text-fill-color: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-class-text-white-webkit-text-fill-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell [class*="text-cyan-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell [class*="text-sky-"] {
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-class-text-cyan-company-performance-fullscreen-company-3d-shell-class-text-sky-foreground) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell [class*="text-slate-"] {
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-class-text-slate-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-3d-shell {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--company-layout-clinical-company-performance-fullscreen-company-3d-shell-background-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-tabs {
+  background: var(--company-layout-clinical-company-performance-fullscreen-company-tabs-background-color) !important;
+  border-color: var(--company-layout-clinical-company-performance-fullscreen-company-tabs-border-tint) !important;
+  box-shadow: inset 0 1px 0 var(--company-layout-clinical-company-performance-fullscreen-company-tabs-shadow-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-tab-active {
+  background: var(--company-layout-clinical-company-performance-fullscreen-company-tab-active-background-color) !important;
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-tab-active-foreground) !important;
+  box-shadow: inset 0 1px 0 var(--company-layout-clinical-company-performance-fullscreen-company-tab-active-shadow-color) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-tab-idle {
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-tab-idle-foreground) !important;
+}
+
+html[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-node-header .company-title,
+html[data-surface-family="clinical"]:where([data-performance="static"]) .company-node-header .company-title {
+  color: var(--company-layout-clinical-html-company-node-header-company-title-html-company-node-header-company-title-foreground) !important;
+  -webkit-text-fill-color: var(--company-layout-clinical-html-company-node-header-company-title-html-company-node-header-company-title-webkit-text-fill-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-panel-size-button--restore {
+  position: fixed !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 10050 !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9px !important;
+  border: 1px solid var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-border-color) !important;
+  background: var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-background-color) !important;
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-foreground) !important;
+  box-shadow: 0 8px 22px var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-shadow-color), inset 0 1px 0 var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-shadow-color-2) !important;
+  overflow: hidden !important;
+  opacity: 1 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-fullscreen .company-panel-size-button--restore:hover {
+  background: var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-hover-background-color) !important;
+  color: var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-hover-foreground) !important;
+  border-color: var(--company-layout-clinical-company-performance-fullscreen-company-panel-size-button-restore-hover-border-tint) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen {
+  z-index: 10000 !important;
+  max-width: none !important;
+  max-height: none !important;
+  background: var(--company-layout-clinical-company-preview-fullscreen-background-color) !important;
+  color: var(--company-layout-clinical-company-preview-fullscreen-foreground) !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen-body,
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen-body > * {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen [class*="text-white"] {
+  color: var(--company-layout-clinical-company-preview-fullscreen-class-text-white-foreground) !important;
+  -webkit-text-fill-color: var(--company-layout-clinical-company-preview-fullscreen-class-text-white-webkit-text-fill-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen [class*="text-cyan-"],
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen [class*="text-sky-"] {
+  color: var(--company-layout-clinical-company-preview-fullscreen-class-text-cyan-company-preview-fullscreen-class-text-sky-foreground) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen [class*="text-slate-"] {
+  color: var(--company-layout-clinical-company-preview-fullscreen-class-text-slate-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-restore {
+  border-radius: 9px !important;
+  background: var(--company-layout-clinical-company-preview-restore-background-color) !important;
+  border: 1px solid var(--company-layout-clinical-company-preview-restore-border-color) !important;
+  color: var(--company-layout-clinical-company-preview-restore-foreground) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-restore:hover {
+  background: var(--company-layout-clinical-company-preview-restore-hover-background-color) !important;
+  border-color: var(--company-layout-clinical-company-preview-restore-hover-border-tint) !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-panel-size-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: var(--company-layout-clinical-company-panel-size-button-background-color) !important;
+  border: 1px solid var(--company-layout-clinical-company-panel-size-button-border-color) !important;
+  color: var(--company-layout-clinical-company-panel-size-button-foreground) !important;
+  box-shadow:
+    0 4px 12px var(--company-layout-clinical-company-panel-size-button-shadow-color),
+    inset 0 1px 0 var(--company-layout-clinical-company-panel-size-button-shadow-color-2) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-performance-shell {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-view-shell,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-node-view,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel-frame {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-node-header {
+  border-color: var(--company-layout-clinical-immersive-company-node-header-border-tint) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-view-shell,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-node-view,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-panel-frame {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-width: 100vw !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-fullscreen-body {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-preview-restore {
+  position: fixed !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 2147483000 !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.company-view-shell,
+.company-node-view,
+.company-panel-frame {
+  box-shadow: none !important;
+}
+
+.company-node-header {
+  background: color-mix(in srgb, var(--company-control) 38%, transparent) !important;
+  backdrop-filter: blur(6px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(110%) !important;
+}
+
+.company-panel,
+.company-pnl-card {
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--company-panel-bg) 74%, transparent),
+      color-mix(in srgb, var(--company-panel-bg) 56%, transparent)
+    ) !important;
+}
+
+.company-page-header {
+  border-radius: .75rem !important;
+}
+
+.company-page-title-row {
+  min-width: 0 !important;
+}
+
+.company-page-title {
+  color: var(--core-text, var(--company-layout-base-company-page-title-foreground)) !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+[data-surface-family="holographic"]:where([data-performance="immersive"]) .company-page-title,
+:root:not([data-appearance]) .company-page-title {
+  color: var(--company-layout-holographic-immersive-company-page-title-root-not-company-page-title-foreground) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: 0 0 12px var(--company-layout-holographic-immersive-company-page-title-root-not-company-page-title-text-shadow-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-performance-shell,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-view-shell,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-node-view,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel-frame {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-node-header {
+  background: var(--company-layout-clinical-immersive-company-node-header-background-color) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--company-layout-clinical-immersive-company-node-header-border-bottom-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(7px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(7px) saturate(110%) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card {
+  border: 1px solid var(--company-layout-clinical-immersive-company-panel-company-pnl-card-border-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-chart-stage {
+  box-shadow: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-legend-row,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-control-surface,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-tabs,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-select {
+  box-shadow: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-performance-shell,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-view-shell,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-node-view,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-panel-frame {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-panel,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-pnl-card {
+  backdrop-filter: blur(6px) saturate(108%) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(108%) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-performance-shell,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-view-shell,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-node-view,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel-frame {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="luminous"], [data-surface-family="holographic"]:where([data-performance="static"]), [data-surface-family="holographic"]:where([data-performance="immersive"])) .company-view-shell,
+:is([data-surface-family="luminous"], [data-surface-family="holographic"]:where([data-performance="static"]), [data-surface-family="holographic"]:where([data-performance="immersive"])) .company-node-view,
+:is([data-surface-family="luminous"], [data-surface-family="holographic"]:where([data-performance="static"]), [data-surface-family="holographic"]:where([data-performance="immersive"])) .company-panel-frame {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.company-performance-shell,
+.company-view-shell,
+.company-node-view,
+.company-panel-frame {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.company-performance-shell,
+.company-view-shell,
+.company-node-view {
+  border-radius: 0 !important;
+}
+
+.company-node-header {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .company-page-header {
+  background: linear-gradient(
+    90deg,
+    var(--company-layout-holographic-company-page-header-background-color),
+    var(--company-layout-holographic-company-page-header-background-color-2),
+    var(--company-layout-holographic-company-page-header-background-color-3)
+  ) !important;
+  border-color: var(--core-border-strong) !important;
+  box-shadow: 0 0 20px var(--core-glow) !important;
+}
+
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"])) .company-page-title {
+  background: linear-gradient(90deg, var(--company-layout-holographic-company-page-title-background-color), var(--company-layout-holographic-company-page-title-background-color-2), var(--company-layout-holographic-company-page-title-background-color-3)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 12px var(--company-layout-holographic-company-page-title-filter-color)) !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+[data-surface-family="luminous"] .company-page-title {
+  background: linear-gradient(
+    90deg,
+    var(--core-primary, var(--company-layout-luminous-company-page-title-background-color)),
+    var(--company-layout-luminous-company-page-title-background-color-2),
+    var(--core-primary, var(--company-layout-luminous-company-page-title-background-color-3))
+  ) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 10px var(--core-glow)) !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-page-title {
+  background: linear-gradient(90deg, var(--company-layout-daylight-company-page-title-background-color) 0%, var(--company-layout-daylight-company-page-title-background-color-2) 48%, var(--company-layout-daylight-company-page-title-background-color-3) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: var(--company-layout-daylight-company-page-title-foreground) !important;
+  text-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) .company-page-title {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: var(--company-layout-clinical-company-page-title-webkit-text-fill-foreground) !important;
+  color: var(--company-layout-clinical-company-page-title-foreground) !important;
+  text-shadow: 0 1px 7px var(--company-layout-clinical-company-page-title-text-shadow-color) !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.company-panel,
+.company-pnl-card {
+  backdrop-filter: blur(7px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(7px) saturate(110%) !important;
+}
+
+:is([data-surface-family="holographic"]:where([data-performance="immersive"])) .company-panel,
+:is([data-surface-family="holographic"]:where([data-performance="immersive"])) .company-pnl-card {
+  background: var(--company-layout-holographic-immersive-company-panel-company-pnl-card-background-color) !important;
+}
+
+[data-surface-family="holographic"]:where([data-performance="static"]) .company-panel,
+[data-surface-family="holographic"]:where([data-performance="static"]) .company-pnl-card {
+  background: var(--company-layout-holographic-static-company-panel-company-pnl-card-background-color) !important;
+}
+
+[data-surface-family="luminous"] .company-panel,
+[data-surface-family="luminous"] .company-pnl-card {
+  background: linear-gradient(
+    150deg,
+    var(--company-layout-luminous-company-panel-company-pnl-card-background-color),
+    var(--company-layout-luminous-company-panel-company-pnl-card-background-color-2)
+  ) !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-panel,
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"])) .company-pnl-card {
+  background: var(--company-layout-daylight-company-panel-company-pnl-card-background-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-panel,
+[data-surface-family="clinical"]:where([data-performance="static"]) .company-pnl-card {
+  background: var(--company-layout-clinical-static-company-panel-company-pnl-card-background-color) !important;
+}
+
+:is([data-surface-family="holographic"]:where([data-performance="immersive"]), [data-surface-family="holographic"]:where([data-performance="static"]), [data-surface-family="luminous"], [data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"])) :is(.company-performance-shell, .company-view-shell, .company-node-view, .company-panel-frame) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.company-performance-fullscreen .company-view-shell,
+.company-performance-fullscreen .company-node-view,
+.company-performance-fullscreen .company-panel-frame {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  opacity: .72 !important;
+  visibility: visible !important;
+}
+
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button svg {
+  width: 14px !important;
+  height: 14px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  stroke: currentColor !important;
+}
+
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button:hover {
+  background: var(--company-layout-base-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-hover-background-color) !important;
+  background-color: var(--company-layout-base-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-hover-background-tint) !important;
+  border-color: var(--company-layout-base-company-performance-shell-not-company-performance-fullscreen-company-panel-size-button-hover-border-tint) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+:is([data-surface-family="clinical"]:where([data-performance="static"]), [data-surface-family="clinical"]:where([data-performance="immersive"]))
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:is([data-surface-family="daylight"]:where([data-performance="immersive"]), [data-surface-family="daylight"]:where([data-performance="static"]))
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card {
+  background:
+    linear-gradient(
+      180deg,
+      var(--company-layout-clinical-immersive-company-panel-company-pnl-card-background-color),
+      var(--company-layout-clinical-immersive-company-panel-company-pnl-card-background-color-2)
+    ) !important;
+
+  border-color: var(--company-layout-clinical-immersive-company-panel-company-pnl-card-border-tint) !important;
+
+  box-shadow:
+    0 10px 24px var(--company-layout-clinical-immersive-company-panel-company-pnl-card-shadow-color),
+    inset 0 1px 0 var(--company-layout-clinical-immersive-company-panel-company-pnl-card-shadow-color-2) !important;
+
+  backdrop-filter: blur(10px) saturate(118%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(118%) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-panel-header {
+  background: var(--company-layout-clinical-immersive-company-panel-header-background-color) !important;
+  border-bottom-color: var(--company-layout-clinical-immersive-company-panel-header-border-bottom-tint) !important;
+  box-shadow: none !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-chart-stage {
+  background:
+    linear-gradient(var(--company-layout-clinical-immersive-company-chart-stage-background-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--company-layout-clinical-immersive-company-chart-stage-background-color-2) 1px, transparent 1px),
+    var(--company-layout-clinical-immersive-company-chart-stage-background-color-3) !important;
+
+  background-size: 34px 34px !important;
+  border-color: var(--company-layout-clinical-immersive-company-chart-stage-border-tint) !important;
+
+  backdrop-filter: blur(6px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(110%) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-legend-row,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-control-surface,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-tabs,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-select {
+  background: var(--company-layout-clinical-immersive-company-legend-row-company-control-surface-company-tabs-company-select-background-color) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"])
+.company-performance-shell:not(.company-performance-fullscreen)
+.company-panel-size-button {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

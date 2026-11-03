@@ -1,0 +1,86 @@
+[
+  {
+    "key": "utilization",
+    "file": "components/DailyLowerWidgets.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/utilization.css"
+  },
+  {
+    "key": "daily-revenue",
+    "file": "components/DailyRevenueChart.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/daily-revenue.css"
+  },
+  {
+    "key": "dashboard-designer",
+    "file": "components/DashboardManager.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/dashboard-designer.css"
+  },
+  {
+    "key": "demography-fullscreen",
+    "file": "components/DemographyChart.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/demography-fullscreen.css"
+  },
+  {
+    "key": "demography-card",
+    "file": "components/DemographyChart.tsx",
+    "block": 1,
+    "asset": "design-system/components/styles/demography-card.css"
+  },
+  {
+    "key": "iol-usage",
+    "file": "components/IOLUsage.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/iol-usage.css"
+  },
+  {
+    "key": "doctor-fee",
+    "file": "components/PanelExsumDoctorFee.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/doctor-fee.css"
+  },
+  {
+    "key": "material-summary",
+    "file": "components/PanelExsumMaterial.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/material-summary.css"
+  },
+  {
+    "key": "revenue-summary",
+    "file": "components/PanelExsumRevenue.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/revenue-summary.css"
+  },
+  {
+    "key": "channel-revenue",
+    "file": "components/PerChannel3DChart.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/channel-revenue.css"
+  },
+  {
+    "key": "surgery",
+    "file": "components/SurgeryBdChart.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/surgery.css"
+  },
+  {
+    "key": "weekly-revenue",
+    "file": "components/WeeklyRevenueChart.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/weekly-revenue.css"
+  },
+  {
+    "key": "login-gateway",
+    "file": "LoginPortal.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/login-gateway.css"
+  },
+  {
+    "key": "historical-shell",
+    "file": "Applama.tsx",
+    "block": 0,
+    "asset": "design-system/components/styles/historical-shell.css"
+  }
+]

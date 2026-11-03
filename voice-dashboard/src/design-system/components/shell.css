@@ -1,0 +1,133 @@
+/* Shared component rules. Theme values are supplied through the semantic contract. */
+
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: var(--core-bg);
+  color: var(--core-text);
+}
+
+body {
+  transition:
+    background-color 420ms ease,
+    color 320ms ease;
+}
+
+.core-app-shell {
+  background: var(--core-bg);
+  color: var(--core-primary);
+}
+
+.core-main-frame,
+.core-dashboard-frame {
+  background: var(--core-surface);
+  border-color: var(--core-border);
+  box-shadow: var(--core-frame-shadow);
+}
+
+/* Shell motion, text effects and fullscreen stacking guards. */
+.text-hud-glow {
+  text-shadow:
+    var(--hud-text-shadow);
+}
+
+.text-white-glow {
+  text-shadow: var(--white-text-shadow);
+}
+
+@keyframes holoGlitchIn {
+  0% {
+    opacity: 0;
+    transform: scale(.99);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes holoGlitchOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.01);
+    filter: blur(4px);
+  }
+}
+
+.animate-glitch-in {
+  animation: holoGlitchIn .25s cubic-bezier(.25,.46,.45,.94) forwards;
+}
+
+.animate-glitch-out {
+  animation: holoGlitchOut .2s cubic-bezier(.55,.085,.68,.53) forwards;
+}
+
+.grid-panel-container > div > div {
+  background-color: var(--core-surface) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  transition:
+    background-color .32s ease,
+    border-color .32s ease,
+    color .32s ease;
+}
+
+
+/*
+  FULLSCREEN STACKING GUARD
+  DailyTracking fullscreen is rendered inside the dashboard
+  content. When that layer exists, the dashboard content must
+  move above the global header/settings so the close button
+  always stays clickable.
+*/
+.core-dashboard-frame:has(.daily-tracking-fullscreen) > .core-global-header {
+  z-index: 1 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-6px);
+}
+
+.core-dashboard-frame:has(.daily-tracking-fullscreen) > .core-dashboard-content {
+  z-index: 250 !important;
+}
+
+.core-dashboard-frame:has(.daily-tracking-fullscreen) .core-settings-layer {
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+.core-dashboard-frame .daily-tracking-fullscreen {
+  z-index: 9999 !important;
+}
+
+/*
+  COMPANY PERFORMANCE MAXIMIZED — integrated fullscreen.
+  Unlike v37.4, the panel is NOT position:fixed. This keeps all R3F
+  camera sizing/layout behavior inside its original dashboard flow.
+*/
+.core-dashboard-frame:has(.company-performance-fullscreen) > .core-global-header {
+  display: none !important;
+}
+
+.core-dashboard-frame:has(.company-performance-fullscreen) > .core-dashboard-content {
+  z-index: 250 !important;
+}
+
+.core-dashboard-frame:has(.company-performance-fullscreen) .core-settings-layer {
+  display: none !important;
+}
+
+.core-global-header {
+  transition:
+    opacity .18s ease,
+    transform .18s ease;
+}

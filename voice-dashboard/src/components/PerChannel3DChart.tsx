@@ -1,3 +1,4 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Text } from '@react-three/drei';
@@ -2077,25 +2078,7 @@ export default function PerChannel3DChart({
         )}
       </div>
 
-      <style>{`
-        @keyframes perChannelFilterIn {
-          from { opacity: 0; transform: translateY(-5px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .per-channel-filter-panel {
-          animation: perChannelFilterIn .2s ease-out both;
-        }
-
-        @keyframes perChannelPeriodScan {
-          0% { top: 6%; opacity: 0; }
-          12% { opacity: 1; }
-          88% { opacity: .85; }
-          100% { top: 94%; opacity: 0; }
-        }
-        .per-channel-period-scan {
-          animation: perChannelPeriodScan 1.05s linear infinite;
-        }
-      `}</style>
+      <ComponentStyles name="channel-revenue" />
     </div>
   );
 }

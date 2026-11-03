@@ -1,9 +1,9 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 // src/components/DashboardManager.tsx
 
 import React from 'react';
 // @ts-ignore
 import { Responsive, WidthProvider } from 'react-grid-layout/legacy';
-import 'react-grid-layout/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -82,59 +82,7 @@ for (const path in panelModules) {
 }
 
 // --- GAYA CSS KUSTOM ---
-const gridCustomStyles = `
-  .react-grid-item {
-    background: #000814;
-    border: 1px solid #00f2fe60;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
-    box-shadow: 0 0 10px rgba(0, 242, 254, 0.1);
-  }
-  .react-grid-item.react-grid-placeholder {
-    background: rgba(0, 242, 254, 0.2) !important;
-    border-radius: 12px;
-    opacity: 0.5;
-  }
-  .react-grid-item:hover {
-    border-color: #00f2fe;
-    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
-    background-color: #000c1f;
-  }
-  .react-resizable-handle {
-    background-image: none;
-    cursor: se-resize;
-    width: 18px;
-    height: 18px;
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    border-top: 2px solid #00f2fe60;
-    border-left: 2px solid #00f2fe60;
-    border-radius: 100% 0 0 0;
-    background: #001428;
-  }
-  .drag-handle {
-    cursor: grab;
-    background: #001428;
-    border-bottom: 1px solid #00f2fe60;
-    color: #00f2fe;
-    padding: 4px 10px;
-    font-size: 10px;
-    text-transform: uppercase;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 28px;
-    position: relative;
-    z-index: 10;
-  }
-  .drag-handle:active {
-    cursor: grabbing;
-    background: #001a36;
-  }
-`;
+
 
 export default function DashboardManager({ dashboardItems, setDashboardItems, onLaunchPresentation, onBack }: DashboardManagerProps) {
   const cols = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
@@ -197,7 +145,7 @@ export default function DashboardManager({ dashboardItems, setDashboardItems, on
 
   return (
     <>
-      <style>{gridCustomStyles}</style>
+      <ComponentStyles name="dashboard-designer" />
       
       <div className="w-screen h-screen bg-[#000205] text-cyan-400 p-3 font-mono select-none overflow-hidden fixed inset-0 z-50 flex flex-col">
         

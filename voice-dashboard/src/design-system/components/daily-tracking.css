@@ -1,0 +1,162 @@
+/* Daily Tracking structure; palette and fullscreen capabilities are theme values. */
+.daily-tracking-summary-chip {
+  border-color: var(--core-border);
+  background: var(--core-control);
+  color: var(--core-text-secondary);
+}
+
+.daily-kpi-preview-chip {
+  border-color: var(--daily-preview-border);
+  background: var(--daily-preview-bg);
+  color: var(--daily-preview-text);
+}
+
+.daily-tracking-fullscreen-header {
+  border-color: var(--core-border-strong);
+}
+
+@keyframes dailyFilterPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-filter-panel-in {
+  animation: dailyFilterPanelIn .22s ease-out both;
+}
+
+/* Responsive wrapper for the custom healthcare combo.
+   This prevents fixed/min widths inside PanelFilterHealthcare
+   from pushing the control outside the mobile viewport. */
+.daily-healthcare-filter-wrap {
+  position: relative;
+  z-index: 250;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.daily-healthcare-filter-wrap [role="listbox"],
+.daily-healthcare-filter-wrap [role="menu"],
+.daily-healthcare-filter-wrap .absolute {
+  z-index: 300 !important;
+}
+
+.daily-healthcare-filter-wrap > * {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.daily-healthcare-filter-wrap button,
+.daily-healthcare-filter-wrap select,
+.daily-healthcare-filter-wrap input {
+  max-width: 100% !important;
+}
+
+@media (max-width: 639px) {
+  .daily-healthcare-filter-wrap {
+    width: 100%;
+  }
+
+  .daily-healthcare-filter-wrap > * {
+    width: 100% !important;
+  }
+}
+
+.daily-tracking-fullscreen-body > .daily-tracking-expanded-chart {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0%;
+}
+
+.daily-tracking-fullscreen-body .daily-tracking-expanded-chart > * {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0%;
+}
+
+.daily-tracking-fullscreen-body .daily-tracking-expanded-chart > * > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+.daily-tracking-fullscreen-body .recharts-responsive-container {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 0%;
+}
+
+.daily-tracking-fullscreen-body .recharts-wrapper {
+  max-width: 100%;
+}
+
+.daily-tracking-fullscreen-body .daily-tracking-channel-panel {
+  min-height: 0;
+  height: 100%;
+}
+
+.daily-tracking-fullscreen-body .daily-tracking-channel-panel .recharts-responsive-container {
+  min-height: 220px !important;
+}
+
+@media (min-width: 768px) {
+  .daily-tracking-fullscreen-body .daily-tracking-channel-panel .recharts-responsive-container {
+    min-height: 0 !important;
+  }
+}
+
+
+/* JEC fullscreen is a true dark viewport stage.
+   Override the normal JEC light-card typography only here. */
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen {
+  padding: 0 !important;
+  background: var(--fullscreen-stage-bg) !important;
+  color: var(--fullscreen-stage-text) !important;
+}
+
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen-body {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--fullscreen-stage-bg) !important;
+  box-shadow: none !important;
+}
+
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen .daily-3d-shell {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--fullscreen-stage-bg) !important;
+  color: var(--fullscreen-stage-text) !important;
+}
+
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen [class*="text-white"] {
+  color: var(--fullscreen-stage-white) !important;
+  -webkit-text-fill-color: var(--fullscreen-stage-white) !important;
+}
+
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen [class*="text-cyan-"],
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen [class*="text-sky-"] {
+  color: var(--fullscreen-stage-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen [class*="text-slate-"] {
+  color: var(--fullscreen-stage-muted) !important;
+}
+
+[data-fullscreen-tone="dark-stage"] .daily-tracking-fullscreen button[title="Close fullscreen"] {
+  background: var(--fullscreen-stage-control-bg) !important;
+  border-color: var(--fullscreen-stage-control-border) !important;
+  color: var(--fullscreen-stage-white) !important;
+  box-shadow: var(--fullscreen-stage-control-shadow) !important;
+}

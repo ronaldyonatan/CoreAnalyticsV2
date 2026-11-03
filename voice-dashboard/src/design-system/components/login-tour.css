@@ -1,0 +1,503 @@
+/* Guided tour layout, responsive composition and interaction states. */
+.login-tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.login-tour-shade {
+  position: fixed;
+  z-index: 1;
+  background: var(--login-tour-shade-background);
+  backdrop-filter: var(--login-tour-shade-backdrop-filter);
+  -webkit-backdrop-filter: var(--login-tour-shade-webkit-backdrop-filter);
+  pointer-events: auto;
+}
+
+.login-tour-shade--full {
+  inset: 0;
+}
+
+.login-tour-focus {
+  position: fixed;
+  z-index: 2;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 86%, white 14%);
+  border-radius: 14px;
+  background: transparent;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--core-primary) 18%, transparent),
+    0 0 22px color-mix(in srgb, var(--core-primary) 38%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--core-primary) 8%, transparent);
+  pointer-events: auto;
+  animation: loginTourFocusPulse 2.2s ease-in-out infinite;
+}
+
+.login-tour-focus__scan {
+  position: absolute;
+  inset-block: 0;
+  width: 28%;
+  left: -34%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--core-primary) 18%, transparent),
+    color-mix(in srgb, var(--core-primary) 44%, white 8%),
+    transparent
+  );
+  filter: blur(1px);
+  animation: loginTourScan 2.8s ease-in-out infinite;
+}
+
+.login-tour-corner {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-color: color-mix(in srgb, var(--core-primary) 88%, white 12%);
+}
+
+.login-tour-corner--tl { left: 4px; top: 4px; border-left: 2px solid; border-top: 2px solid; }
+.login-tour-corner--tr { right: 4px; top: 4px; border-right: 2px solid; border-top: 2px solid; }
+.login-tour-corner--bl { left: 4px; bottom: 4px; border-left: 2px solid; border-bottom: 2px solid; }
+.login-tour-corner--br { right: 4px; bottom: 4px; border-right: 2px solid; border-bottom: 2px solid; }
+
+.login-tour-card {
+  position: fixed;
+  z-index: 4;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 36%, var(--core-border));
+  border-radius: 16px;
+  padding: 18px;
+  color: var(--core-text);
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--core-surface-strong) 94%, transparent),
+      color-mix(in srgb, var(--core-surface) 88%, transparent));
+  box-shadow:
+    var(--login-tour-card-box-shadow);
+  backdrop-filter: blur(22px) saturate(1.16);
+  -webkit-backdrop-filter: blur(22px) saturate(1.16);
+  pointer-events: auto;
+  animation: loginTourCardIn 0.26s ease-out;
+}
+
+.login-tour-card__rail {
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--core-primary), transparent);
+  box-shadow: 0 0 12px var(--core-glow);
+}
+
+.login-tour-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--core-primary-strong);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.login-tour-card h2 {
+  margin: 12px 0 0;
+  color: var(--core-text);
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.login-tour-card p {
+  margin: 10px 0 0;
+  color: var(--core-text-secondary);
+  font-size: 11px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+}
+
+.login-tour-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 18%, var(--core-border));
+  border-radius: 9px;
+  color: var(--core-text-secondary);
+  background: color-mix(in srgb, var(--core-primary) 6%, transparent);
+  font-size: 9px;
+  line-height: 1.65;
+  letter-spacing: 0.055em;
+}
+
+.login-tour-tip > span:first-child {
+  flex: 0 0 auto;
+  color: var(--core-primary);
+  text-shadow: 0 0 8px var(--core-glow);
+}
+
+.login-tour-progress {
+  display: flex;
+  gap: 5px;
+  margin-top: 15px;
+}
+
+.login-tour-progress span {
+  height: 3px;
+  flex: 1;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--core-text-secondary) 18%, transparent);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-tour-progress span.is-done {
+  background: color-mix(in srgb, var(--core-primary) 45%, transparent);
+}
+
+.login-tour-progress span.is-active {
+  background: var(--core-primary);
+  box-shadow: 0 0 8px var(--core-glow);
+}
+
+.login-tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.login-tour-nav {
+  display: flex;
+  gap: 7px;
+}
+
+.login-tour-actions button,
+.login-tour-replay {
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.login-tour-actions button:not(:disabled):hover,
+.login-tour-replay:hover {
+  transform: translateY(-1px);
+}
+
+.login-tour-skip {
+  border: 0;
+  padding: 8px 4px;
+  color: var(--core-text-secondary);
+  background: transparent;
+}
+
+.login-tour-skip:hover {
+  color: var(--core-text);
+}
+
+.login-tour-secondary,
+.login-tour-primary {
+  min-height: 34px;
+  border: 1px solid var(--core-border);
+  padding: 0 12px;
+}
+
+.login-tour-secondary {
+  color: var(--core-text-secondary);
+  background: color-mix(in srgb, var(--core-surface-strong) 72%, transparent);
+}
+
+.login-tour-secondary:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.login-tour-primary {
+  border-color: var(--login-tour-primary-border-color);
+  color: var(--login-tour-primary-color);
+  background: var(--login-tour-primary-background);
+  box-shadow: var(--login-tour-primary-box-shadow);
+}
+
+.login-tour-replay {
+  position: fixed;
+  z-index: 999990;
+  right: 18px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 28%, var(--core-border));
+  padding: 0 11px;
+  color: var(--core-primary-strong);
+  background: color-mix(in srgb, var(--core-surface-strong) 74%, transparent);
+  box-shadow: var(--login-tour-replay-box-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.login-tour-replay__pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--core-primary);
+  box-shadow: 0 0 9px var(--core-glow);
+  animation: loginTourReplayPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes loginTourFocusPulse {
+  0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--core-primary) 14%, transparent), 0 0 20px color-mix(in srgb, var(--core-primary) 32%, transparent), inset 0 0 18px color-mix(in srgb, var(--core-primary) 6%, transparent); }
+  50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--core-primary) 24%, transparent), 0 0 34px color-mix(in srgb, var(--core-primary) 48%, transparent), inset 0 0 26px color-mix(in srgb, var(--core-primary) 10%, transparent); }
+}
+
+@keyframes loginTourScan {
+  0% { left: -34%; opacity: 0; }
+  16% { opacity: 0.9; }
+  72% { opacity: 0.72; }
+  100% { left: 112%; opacity: 0; }
+}
+
+@keyframes loginTourCardIn {
+  from { opacity: 0; transform: translateY(8px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes loginTourReplayPulse {
+  0%, 100% { opacity: .55; transform: scale(.86); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+@media (max-width: 640px) {
+  .login-tour-card {
+    padding: 15px;
+  }
+
+  .login-tour-card h2 {
+    font-size: 16px;
+  }
+
+  .login-tour-card p {
+    font-size: 10px;
+  }
+
+  .login-tour-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .login-tour-nav {
+    width: 100%;
+  }
+
+  .login-tour-nav button {
+    flex: 1;
+  }
+
+  .login-tour-skip {
+    order: 2;
+  }
+
+  .login-tour-replay {
+    right: 10px;
+    bottom: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-tour-focus,
+  .login-tour-focus__scan,
+  .login-tour-replay__pulse,
+  .login-tour-card {
+    animation: none !important;
+  }
+}
+
+/* v1.2: keep the guide readable without covering the highlighted control. */
+.login-tour-card {
+  max-height: calc(100vh - 28px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.login-tour-card::-webkit-scrollbar {
+  width: 5px;
+}
+
+.login-tour-card::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--core-primary) 28%, transparent);
+}
+
+/* =========================================================
+   v1.3 / v33 — SPOTLIGHT NARRATION CONTROL
+   ========================================================= */
+.login-tour-card__tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.login-tour-audio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 25px;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 24%, var(--core-border));
+  border-radius: 999px;
+  padding: 0 8px;
+  color: var(--core-text-secondary);
+  background: color-mix(in srgb, var(--core-surface-strong) 72%, transparent);
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.login-tour-audio.is-on {
+  border-color: var(--login-tour-audio-is-on-border-color);
+  color: var(--login-tour-audio-is-on-color);
+  background: var(--login-tour-audio-is-on-background);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--core-primary) 10%, transparent);
+}
+
+.login-tour-audio:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--core-primary) 72%, var(--core-border));
+  color: var(--core-text);
+}
+
+.login-tour-audio:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+@media (max-width: 640px) {
+  .login-tour-card__topline {
+    align-items: flex-start;
+  }
+
+  .login-tour-card__tools {
+    gap: 6px;
+  }
+
+  .login-tour-audio {
+    min-height: 23px;
+    padding: 0 6px;
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   v34 — SPOTLIGHT LANGUAGE SELECTOR
+   ========================================================= */
+.login-tour-language-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 25px;
+  border: 1px solid color-mix(in srgb, var(--core-primary) 24%, var(--core-border));
+  border-radius: 999px;
+  padding: 0 6px 0 7px;
+  color: var(--core-text-secondary);
+  background: color-mix(in srgb, var(--core-surface-strong) 72%, transparent);
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+
+.login-tour-language-wrap:hover,
+.login-tour-language-wrap:focus-within {
+  border-color: color-mix(in srgb, var(--core-primary) 62%, var(--core-border));
+  color: var(--core-text);
+}
+
+.login-tour-language {
+  max-width: 92px;
+  border: 0;
+  outline: 0;
+  color: inherit;
+  background: transparent;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  cursor: pointer;
+}
+
+.login-tour-language option {
+  color: var(--login-tour-language-option-color);
+  background: var(--login-tour-language-option-background);
+}
+
+@media (max-width: 640px) {
+  .login-tour-card__tools {
+    flex-wrap: wrap;
+  }
+
+  .login-tour-language-wrap {
+    min-height: 23px;
+    padding-inline: 6px;
+  }
+
+  .login-tour-language {
+    max-width: 78px;
+    font-size: 7px;
+  }
+}
+
+
+
+/* v37 — adaptive mobile spotlight */
+.login-tour-tip-toggle { display: none; }
+@media (max-width: 767px) {
+  .login-tour-card {
+    width: auto !important; max-width: none !important;
+    max-height: min(29dvh, 220px);
+    padding: 9px 10px 8px; border-radius: 12px;
+    overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  }
+  .login-tour-card__topline { gap: 5px; font-size: 7.5px; letter-spacing: .09em; }
+  .login-tour-card__topline > span:first-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .login-tour-card__tools { gap:4px; }
+  .login-tour-card__tools > span:last-child { font-size:7.5px; white-space:nowrap; }
+  .login-tour-language-wrap { min-height:23px !important; padding:0 4px !important; gap:1px !important; }
+  .login-tour-language { width:28px; font-size:7.5px !important; padding:0 !important; }
+  .login-tour-audio { width:25px; min-width:25px; min-height:23px; padding:0 !important; justify-content:center; border-radius:7px; }
+  .login-tour-audio > span:last-child { display:none; }
+  .login-tour-card h2 { margin-top:5px; font-size:13px; line-height:1.18; }
+  .login-tour-card p { display:-webkit-box; margin-top:3px; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; font-size:9.5px; line-height:1.35; }
+  .login-tour-tip { display:none; }
+  .login-tour-tip.is-mobile-open { display:flex; margin-top:4px; padding:5px 6px; font-size:8px; line-height:1.3; }
+  .login-tour-tip-toggle { display:flex; width:100%; align-items:center; justify-content:space-between; margin-top:3px; border:0; padding:2px 1px; color:var(--core-primary); background:transparent; font:inherit; font-size:7.5px; font-weight:900; letter-spacing:.10em; }
+  .login-tour-progress { gap:3px; margin-top:4px; }
+  .login-tour-progress span { height:2px; }
+  .login-tour-actions { flex-direction:row !important; align-items:center !important; justify-content:space-between; gap:5px; margin-top:5px; }
+  .login-tour-skip { padding:4px 1px !important; font-size:7.5px !important; letter-spacing:.05em !important; }
+  .login-tour-nav { gap:4px; margin-left:auto; }
+  .login-tour-secondary, .login-tour-primary { min-height:28px !important; padding:0 8px !important; font-size:7.5px !important; letter-spacing:.05em !important; }
+  .login-tour-shade { backdrop-filter:var(--login-tour-shade-mobile-backdrop-filter); -webkit-backdrop-filter:var(--login-tour-shade-mobile-webkit-backdrop-filter); }
+  .login-tour-focus { border-radius:9px; box-shadow:0 0 16px var(--core-glow); }
+}
+@media (max-width:380px) {
+  .login-tour-card { max-height:min(31dvh,205px); padding-inline:8px; }
+  .login-tour-card h2 { font-size:12px; }
+  .login-tour-card p { font-size:9px; }
+}
+@media (max-width:767px){.login-tour-replay{right:8px!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;min-height:29px!important;padding:0 8px!important;font-size:8px!important;}}
+.login-tour-audio.is-on:hover:not(:disabled) {
+  border-color: var(--login-tour-audio-is-on-hover-border-color);
+  color: var(--login-tour-audio-is-on-hover-color);
+}

@@ -1,0 +1,19 @@
+/* Layered canvas capability. No theme identity is required by these consumers. */
+
+html[data-shell-composition="layered"] body,
+html[data-shell-composition="layered"] #root {
+  overflow-x: hidden !important;
+}
+
+:where([data-active-theme])[data-shell-composition="layered"] {
+  background: var(--layered-shell-bg) !important;
+}
+
+:where([data-active-theme])[data-shell-composition="layered"] .core-dashboard-frame {
+  position: relative;
+  z-index: 10;
+  background: var(--layered-frame-bg) !important;
+  border-color: var(--layered-frame-border-color) !important;
+  box-shadow:
+    var(--layered-frame-box-shadow) !important;
+}

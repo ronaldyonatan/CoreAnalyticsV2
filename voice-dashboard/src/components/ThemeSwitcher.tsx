@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CORE_THEMES } from '../theme/themes';
+import { CORE_THEMES, CORE_THEME_LIST } from '../theme/themes';
 import type { CoreThemeId } from '../theme/themes';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -8,18 +8,12 @@ interface ThemeSwitcherProps {
   align?: 'left' | 'right';
 }
 
-const IMMERSIVE_THEMES: CoreThemeId[] = [
-  'cosmic-black',
-  'aurora',
-  'solaris',
-  'jec-skywave',
-];
-
-const STATIC_THEMES: CoreThemeId[] = [
-  'obsidian',
-  'quartz',
-  'jec-horizon',
-];
+const IMMERSIVE_THEMES = CORE_THEME_LIST
+  .filter((theme) => theme.performance === 'immersive')
+  .map((theme) => theme.id);
+const STATIC_THEMES = CORE_THEME_LIST
+  .filter((theme) => theme.performance === 'static')
+  .map((theme) => theme.id);
 
 export default function ThemeSwitcher({
   compact = false,
@@ -66,65 +60,6 @@ export default function ThemeSwitcher({
             boxShadow: active ? '0 0 9px var(--core-glow)' : 'none',
           }}
         />
-      </button>
-    );
-  };
-
-  const renderInlineOption = (id: CoreThemeId) => {
-    const item = CORE_THEMES[id];
-    const active = item.id === themeId;
-    const isStatic = item.performance === 'static';
-
-    return (
-      <button
-        key={id}
-        type="button"
-        onClick={() => setTheme(id)}
-        title={item.description}
-        aria-label={`Use ${item.name} theme`}
-        aria-pressed={active}
-        className={`core-theme-option core-theme-option--${id} flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left ${
-          active ? 'core-theme-option-active' : ''
-        }`}
-        style={{
-          borderColor: active ? 'var(--core-border-strong)' : 'var(--core-border)',
-          background: active
-            ? 'color-mix(in srgb, var(--core-primary) 13%, var(--core-panel))'
-            : 'var(--core-control)',
-          boxShadow: active ? '0 0 14px var(--core-glow)' : 'none',
-        }}
-      >
-        <span className="core-theme-option-icon flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-[14px]"
-          style={{ borderColor: 'var(--core-border)', background: 'var(--core-panel)' }}
-        >
-          {item.icon}
-        </span>
-
-        <span className="min-w-0 flex-1">
-          <span className="core-theme-option-name block text-[10px] font-black uppercase tracking-[0.08em]"
-            style={{ color: active ? 'var(--core-primary-strong)' : 'var(--core-text)' }}
-          >
-            {item.name}
-          </span>
-          <span className="mt-0.5 block text-[7px] font-bold uppercase tracking-[0.10em]"
-            style={{ color: 'var(--core-text-muted)' }}
-          >
-            {isStatic ? 'Static · Zero Motion' : 'Immersive'}
-          </span>
-        </span>
-
-        <span
-          className="flex h-5 min-w-[38px] items-center justify-center rounded-md border px-1.5 text-[6px] font-black uppercase tracking-[0.08em]"
-          style={{
-            borderColor: active ? 'var(--core-primary)' : 'var(--core-border)',
-            color: active ? 'var(--core-primary-strong)' : 'var(--core-text-muted)',
-            background: active
-              ? 'color-mix(in srgb, var(--core-primary) 12%, transparent)'
-              : 'transparent',
-          }}
-        >
-          {active ? 'Active' : 'Select'}
-        </span>
       </button>
     );
   };

@@ -1,0 +1,15 @@
+{
+  "changesRequired": [
+    "one theme CSS file",
+    "registry metadata only"
+  ],
+  "checks": {
+    "registered": true,
+    "capability": true,
+    "semanticPrimary": true,
+    "mountedStylesheetColor": true,
+    "themeChooserRegistry": true
+  },
+  "temporaryThemeRemoved": true,
+  "scope": "CSS value activation, mounted Login stylesheet and registry-based ThemeSwitcher; not all procedural chart palettes."
+}

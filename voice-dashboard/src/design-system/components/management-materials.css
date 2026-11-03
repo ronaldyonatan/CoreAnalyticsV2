@@ -1,0 +1,582 @@
+/* Management Center material recipes.
+   Theme definitions provide values; these shared recipes preserve the existing
+   component specificity, interaction states and shorthand ordering. */
+
+
+.management-themed-root [class*="text-cyan-50"] {
+  color: var(--core-text) !important;
+}
+
+.management-themed-root [class*="text-cyan-100"] {
+  color: var(--core-text) !important;
+}
+
+.management-themed-root [class*="text-cyan-200"] {
+  color: var(--core-primary-strong) !important;
+}
+
+.management-themed-root [class*="text-cyan-300"] {
+  color: var(--core-primary-strong) !important;
+}
+
+.management-themed-root [class*="text-cyan-400"] {
+  color: var(--core-primary-strong) !important;
+}
+
+.management-themed-root [class*="text-slate-200"] {
+  color: var(--core-text) !important;
+}
+
+.management-themed-root [class*="text-slate-300"] {
+  color: var(--core-text) !important;
+}
+
+.management-themed-root [class*="text-slate-400"] {
+  color: var(--core-text-secondary) !important;
+}
+
+.management-themed-root [class*="text-slate-500"] {
+  color: var(--core-text-secondary) !important;
+}
+
+.management-themed-root [class*="text-slate-600"] {
+  color: var(--core-text-muted) !important;
+}
+
+.management-themed-root [class*="text-slate-700"] {
+  color: var(--core-text-muted) !important;
+}
+
+.management-themed-root [class*="border-cyan-"] {
+  border-color: var(--core-border) !important;
+}
+
+.management-themed-root [class*="border-sky-"] {
+  border-color: var(--core-border) !important;
+}
+
+.management-themed-root [class*="border-slate-"] {
+  border-color: var(--core-border) !important;
+}
+
+.management-themed-root [class*="bg-cyan-950"] {
+  background-color: color-mix(in srgb, var(--core-primary) 10%, var(--core-surface)) !important;
+}
+
+.management-themed-root [class*="bg-cyan-500"] {
+  background-color: color-mix(in srgb, var(--core-primary) 10%, var(--core-surface)) !important;
+}
+
+.management-themed-root [class*="bg-slate-900"] {
+  background-color: var(--core-control) !important;
+}
+
+.management-themed-root [class*="bg-violet-950"] {
+  background-color: var(--core-purple-surface) !important;
+}
+
+.management-themed-root [class*="border-violet-"] {
+  border-color: var(--core-purple-border) !important;
+}
+
+.management-themed-root [class*="text-violet-"] {
+  color: var(--core-purple-text) !important;
+}
+[data-surface-family="luminous"] .management-themed-root [class*="bg-[#"] {
+  background-color: var(--management-custom-surface-background-color) !important;
+}
+[data-surface-family="daylight"] .management-themed-root [class*="bg-[#"] {
+  background-color: var(--management-custom-surface-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-page-header {
+  background-color: var(--management-contained-page-header-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-page-header {
+  background-color: var(--management-contained-page-header-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-metric-card {
+  background-color: var(--management-contained-metric-card-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-metric-card {
+  background-color: var(--management-contained-metric-card-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-toolbar {
+  background-color: var(--management-contained-toolbar-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-toolbar {
+  background-color: var(--management-contained-toolbar-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-table-shell {
+  background-color: var(--management-contained-table-shell-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-table-shell {
+  background-color: var(--management-contained-table-shell-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-table-head {
+  background-color: var(--management-contained-table-head-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-table-head {
+  background-color: var(--management-contained-table-head-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-table-footer {
+  background-color: var(--management-contained-table-footer-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-table-footer {
+  background-color: var(--management-contained-table-footer-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-input {
+  background-color: var(--management-contained-input-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-input {
+  background-color: var(--management-contained-input-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-drawer {
+  background-color: var(--management-contained-drawer-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-drawer {
+  background-color: var(--management-contained-drawer-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-modal {
+  background-color: var(--management-contained-modal-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-modal {
+  background-color: var(--management-contained-modal-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root .management-floating-surface {
+  background-color: var(--management-contained-floating-surface-background-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root .management-floating-surface {
+  background-color: var(--management-contained-floating-surface-background-color) !important;
+}
+
+[data-surface-family="luminous"] .management-overlay {
+  background: var(--management-overlay-background) !important;
+}
+
+[data-surface-family="daylight"] .management-overlay {
+  background: var(--management-overlay-background) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root {
+  background:
+    var(--management-root-background);
+}
+
+[data-surface-family="daylight"] .management-page-header {
+  background:
+    var(--management-page-header-background) !important;
+  box-shadow:
+    var(--management-page-header-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-metric-card {
+  box-shadow:
+    var(--management-metric-card-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-toolbar {
+  box-shadow:
+    var(--management-toolbar-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-table-shell {
+  box-shadow:
+    var(--management-table-shell-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-drawer {
+  box-shadow:
+    var(--management-drawer-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-modal {
+  box-shadow:
+    var(--management-modal-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-floating-surface {
+  box-shadow:
+    var(--management-floating-surface-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-table-head {
+  background: var(--management-table-head-background) !important;
+}
+
+[data-surface-family="daylight"] .management-table-footer {
+  background: var(--management-table-footer-background) !important;
+}
+
+[data-surface-family="daylight"] .management-input {
+  background: var(--management-input-background) !important;
+  color: var(--management-input-color) !important;
+}
+
+[data-surface-family="daylight"] .management-themed-root button[class*="bg-cyan-500"] {
+  background: var(--management-primary-action-background) !important;
+  border-color: var(--management-primary-action-border-color) !important;
+  color: var(--management-primary-action-color) !important;
+  box-shadow: var(--management-primary-action-box-shadow);
+}
+
+[data-surface-family="daylight"] .management-themed-root button[class*="bg-cyan-950"] {
+  background: var(--management-secondary-action-background) !important;
+  color: var(--management-secondary-action-color) !important;
+}
+
+[data-surface-family="luminous"] .management-themed-root {
+  background:
+    var(--management-root-background);
+}
+
+[data-surface-family="luminous"] .management-page-header {
+  background:
+    var(--management-page-header-background) !important;
+  box-shadow:
+    var(--management-page-header-box-shadow);
+}
+
+[data-surface-family="luminous"] .management-table-head {
+  background: var(--management-table-head-background) !important;
+}
+
+[data-surface-family="luminous"] .management-table-footer {
+  background: var(--management-table-footer-background) !important;
+}
+
+[data-surface-family="luminous"] .management-input {
+  background: var(--management-input-background) !important;
+}
+
+.management-floating-surface [class*="text-slate"] {
+  color: var(--core-text-secondary) !important;
+}
+
+.management-floating-surface [class*="text-cyan"] {
+  color: var(--core-primary-strong) !important;
+}
+
+.management-themed-root [class*="text-[9px]"] { font-size: 10px !important; }
+.management-themed-root [class*="text-[10px]"] { font-size: 11px !important; }
+.management-themed-root [class*="text-[11px]"] { font-size: 12px !important; }
+.management-themed-root [class*="text-[12px]"] { font-size: 13px !important; }
+
+[data-surface-family="luminous"] .management-metric-card {
+  background: var(--management-metric-card-background) !important;
+  backdrop-filter: var(--management-metric-card-backdrop-filter) !important;
+}
+
+[data-surface-family="luminous"] .management-toolbar {
+  background: var(--management-toolbar-background) !important;
+  backdrop-filter: var(--management-toolbar-backdrop-filter) !important;
+}
+
+[data-surface-family="luminous"] .management-table-shell {
+  background: var(--management-table-shell-background) !important;
+  backdrop-filter: var(--management-table-shell-backdrop-filter) !important;
+}
+
+[data-surface-family="luminous"] .management-drawer {
+  background: var(--management-drawer-background) !important;
+  backdrop-filter: var(--management-drawer-backdrop-filter) !important;
+}
+
+[data-surface-family="luminous"] .management-modal {
+  background: var(--management-modal-background) !important;
+  backdrop-filter: var(--management-modal-backdrop-filter) !important;
+}
+
+[data-surface-family="luminous"] .management-floating-surface {
+  background: var(--management-floating-surface-background) !important;
+  backdrop-filter: var(--management-floating-surface-backdrop-filter) !important;
+}
+
+[data-surface-family="daylight"] .management-metric-card {
+  background:
+    var(--management-metric-card-background) !important;
+  backdrop-filter: var(--management-metric-card-backdrop-filter) !important;
+}
+
+[data-surface-family="daylight"] .management-toolbar {
+  background:
+    var(--management-toolbar-background) !important;
+  backdrop-filter: var(--management-toolbar-backdrop-filter) !important;
+}
+
+[data-surface-family="daylight"] .management-table-shell {
+  background:
+    var(--management-table-shell-background) !important;
+  backdrop-filter: var(--management-table-shell-backdrop-filter) !important;
+}
+
+[data-surface-family="daylight"] .management-drawer {
+  background:
+    var(--management-drawer-background) !important;
+  backdrop-filter: var(--management-drawer-backdrop-filter) !important;
+}
+
+[data-surface-family="daylight"] .management-modal {
+  background:
+    var(--management-modal-background) !important;
+  backdrop-filter: var(--management-modal-backdrop-filter) !important;
+}
+
+[data-surface-family="daylight"] .management-floating-surface {
+  background:
+    var(--management-floating-surface-background) !important;
+  backdrop-filter: var(--management-floating-surface-backdrop-filter) !important;
+}
+
+[data-surface-family="clinical"] .management-themed-root {
+  color: var(--management-root-color) !important;
+}
+
+[data-surface-family="clinical"] .management-page-header {
+  background: var(--management-page-header-background) !important;
+  border-color: var(--management-page-header-border-color) !important;
+  color: var(--management-page-header-color) !important;
+}
+
+[data-surface-family="clinical"] .management-page-header * {
+  color: var(--management-page-header-content-color) !important;
+}
+
+[data-surface-family="clinical"] .management-metric-card {
+  background: var(--management-metric-card-background) !important;
+  border-color: var(--management-metric-card-border-color) !important;
+  color: var(--management-metric-card-color) !important;
+  box-shadow: var(--management-metric-card-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .management-toolbar {
+  background: var(--management-toolbar-background) !important;
+  border-color: var(--management-toolbar-border-color) !important;
+  color: var(--management-toolbar-color) !important;
+  box-shadow: var(--management-toolbar-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .management-table-shell {
+  background: var(--management-table-shell-background) !important;
+  border-color: var(--management-table-shell-border-color) !important;
+  color: var(--management-table-shell-color) !important;
+  box-shadow: var(--management-table-shell-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .management-drawer {
+  background: var(--management-drawer-background) !important;
+  border-color: var(--management-drawer-border-color) !important;
+  color: var(--management-drawer-color) !important;
+  box-shadow: var(--management-drawer-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .management-modal {
+  background: var(--management-modal-background) !important;
+  border-color: var(--management-modal-border-color) !important;
+  color: var(--management-modal-color) !important;
+  box-shadow: var(--management-modal-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .management-floating-surface {
+  background: var(--management-floating-surface-background) !important;
+  border-color: var(--management-floating-surface-border-color) !important;
+  color: var(--management-floating-surface-color) !important;
+  box-shadow: var(--management-floating-surface-box-shadow) !important;
+}
+
+[data-surface-family="clinical"] .management-input {
+  background: var(--management-input-background) !important;
+  border-color: var(--management-input-border-color) !important;
+  color: var(--management-input-color) !important;
+}
+[data-surface-family="clinical"] :is(.management-metric-card) {
+  backdrop-filter: var(--management-metric-card-backdrop-filter);
+  -webkit-backdrop-filter: var(--management-metric-card-webkit-backdrop-filter);
+}
+[data-surface-family="clinical"] :is(.management-toolbar) {
+  backdrop-filter: var(--management-toolbar-backdrop-filter);
+  -webkit-backdrop-filter: var(--management-toolbar-webkit-backdrop-filter);
+}
+[data-surface-family="clinical"] :is(.management-table-shell) {
+  backdrop-filter: var(--management-table-shell-backdrop-filter);
+  -webkit-backdrop-filter: var(--management-table-shell-webkit-backdrop-filter);
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) :is(.management-metric-card) {
+  background: var(--management-metric-card-immersive-background) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) :is(.management-toolbar) {
+  background: var(--management-toolbar-immersive-background) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) :is(.management-table-shell) {
+  background: var(--management-table-shell-immersive-background) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) :is(.management-metric-card) {
+  background: var(--management-metric-card-static-background) !important;
+  backdrop-filter: var(--management-metric-card-static-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-metric-card-static-webkit-backdrop-filter) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) :is(.management-toolbar) {
+  background: var(--management-toolbar-static-background) !important;
+  backdrop-filter: var(--management-toolbar-static-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-toolbar-static-webkit-backdrop-filter) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="static"]) :is(.management-table-shell) {
+  background: var(--management-table-shell-static-background) !important;
+  backdrop-filter: var(--management-table-shell-static-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-table-shell-static-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"] :is(.management-table-shell) {
+  max-width: var(--management-table-shell-max-width) !important;
+  overflow-x: var(--management-table-shell-overflow-x) !important;
+  overscroll-behavior-x: var(--management-table-shell-overscroll-behavior-x);
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-themed-root [class*="text-white"] {
+  color: var(--management-contrast-label-immersive-color) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-themed-root {
+  background: var(--management-root-immersive-background) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-page-header {
+  background:
+    var(--management-page-header-immersive-background) !important;
+  border-color: var(--management-page-header-immersive-border-color) !important;
+  color: var(--management-page-header-immersive-color) !important;
+  box-shadow:
+    var(--management-page-header-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-page-header-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-page-header-immersive-webkit-backdrop-filter) !important;
+}
+
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-page-header * {
+  color: var(--management-page-header-content-immersive-color) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-metric-card {
+  background:
+    var(--management-metric-card-immersive-background) !important;
+  border-color: var(--management-metric-card-immersive-border-color) !important;
+  color: var(--management-metric-card-immersive-color) !important;
+  box-shadow:
+    var(--management-metric-card-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-metric-card-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-metric-card-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-toolbar {
+  background:
+    var(--management-toolbar-immersive-background) !important;
+  border-color: var(--management-toolbar-immersive-border-color) !important;
+  color: var(--management-toolbar-immersive-color) !important;
+  box-shadow:
+    var(--management-toolbar-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-toolbar-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-toolbar-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-table-shell {
+  background:
+    var(--management-table-shell-immersive-background) !important;
+  border-color: var(--management-table-shell-immersive-border-color) !important;
+  color: var(--management-table-shell-immersive-color) !important;
+  box-shadow:
+    var(--management-table-shell-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-table-shell-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-table-shell-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-drawer {
+  background:
+    var(--management-drawer-immersive-background) !important;
+  border-color: var(--management-drawer-immersive-border-color) !important;
+  color: var(--management-drawer-immersive-color) !important;
+  box-shadow:
+    var(--management-drawer-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-drawer-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-drawer-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-modal {
+  background:
+    var(--management-modal-immersive-background) !important;
+  border-color: var(--management-modal-immersive-border-color) !important;
+  color: var(--management-modal-immersive-color) !important;
+  box-shadow:
+    var(--management-modal-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-modal-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-modal-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-floating-surface {
+  background:
+    var(--management-floating-surface-immersive-background) !important;
+  border-color: var(--management-floating-surface-immersive-border-color) !important;
+  color: var(--management-floating-surface-immersive-color) !important;
+  box-shadow:
+    var(--management-floating-surface-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-floating-surface-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-floating-surface-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-themed-root [class*="text-cyan-"] {
+  color: var(--management-accent-label-immersive-color) !important;
+  text-shadow: var(--management-accent-label-immersive-text-shadow) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-themed-root [class*="text-sky-"] {
+  color: var(--management-secondary-accent-label-immersive-color) !important;
+  text-shadow: var(--management-secondary-accent-label-immersive-text-shadow) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-page-header [class*="text-cyan-"] {
+  color: var(--management-header-accent-label-immersive-color) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-page-header [class*="text-sky-"] {
+  color: var(--management-header-secondary-label-immersive-color) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-page-header [class*="text-white"] {
+  color: var(--management-header-contrast-label-immersive-color) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .management-input {
+  background: var(--management-input-immersive-background) !important;
+  border-color: var(--management-input-immersive-border-color) !important;
+  color: var(--management-input-immersive-color) !important;
+  box-shadow: var(--management-input-immersive-box-shadow) !important;
+  backdrop-filter: var(--management-input-immersive-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-input-immersive-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"] .management-themed-root {
+  background: var(--management-root-background) !important;
+}
+[data-surface-family="clinical"] .user-management-root .management-stage {
+  background: var(--management-user-stage-background) !important;
+  border-color: var(--management-user-stage-border-color) !important;
+  box-shadow: var(--management-user-stage-box-shadow) !important;
+  backdrop-filter: var(--management-user-stage-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--management-user-stage-webkit-backdrop-filter) !important;
+}
+[data-surface-family="clinical"] .user-management-root .management-page-header {
+  background: var(--management-user-header-background) !important;
+  color: var(--management-user-header-color) !important;
+  border-color: var(--management-user-header-border-color) !important;
+  box-shadow: var(--management-user-header-box-shadow) !important;
+}
+[data-surface-family="clinical"] .user-management-root .management-page-header [class*="text-cyan-"] {
+  color: var(--management-user-header-accent-label-color) !important;
+}
+[data-surface-family="clinical"] .user-management-root .management-page-header [class*="text-slate-"] {
+  color: var(--management-user-header-muted-label-color) !important;
+}

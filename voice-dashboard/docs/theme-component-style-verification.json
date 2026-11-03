@@ -1,0 +1,72 @@
+[
+  {
+    "key": "utilization",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "daily-revenue",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "dashboard-designer",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "demography-fullscreen",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "demography-card",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "iol-usage",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "doctor-fee",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "material-summary",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "revenue-summary",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "channel-revenue",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "surgery",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "weekly-revenue",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "login-gateway",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  },
+  {
+    "key": "historical-shell",
+    "declarationEquivalence": true,
+    "mountedConsumer": true
+  }
+]

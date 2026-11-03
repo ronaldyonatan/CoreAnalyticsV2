@@ -1,0 +1,72 @@
+/* Application header. Keep utility geometry and shell fullscreen guards intact. */
+.core-global-header {
+  background: var(--header-bg) !important;
+  background-color: var(--header-underlay) !important;
+  border: 1px solid var(--header-border) !important;
+  border-bottom: var(--header-border-bottom) !important;
+  box-shadow: var(--header-shadow) !important;
+  backdrop-filter: var(--header-filter) !important;
+  -webkit-backdrop-filter: var(--header-filter) !important;
+  z-index: 60 !important;
+}
+
+/* No pseudo-element is generated unless the theme enables this accent. */
+.core-global-header::after {
+  content: var(--header-accent-content);
+  position: absolute;
+  left: 1.5%;
+  right: 1.5%;
+  bottom: -3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--header-accent-bg);
+  background-size: 220% 100%;
+  opacity: var(--header-accent-opacity);
+  animation: var(--header-accent-animation) !important;
+}
+
+@keyframes dsHeaderAccentSweep {
+  from { background-position: 0% 0%; }
+  to { background-position: 220% 0%; }
+}
+
+/* State is expressed by a modifier, while colors remain theme values. */
+.core-icon-button {
+  --_header-active-shadow: var(--header-settings-active-shadow);
+  background: var(--header-icon-bg) !important;
+  border-color: var(--header-icon-border) !important;
+  color: var(--header-icon-text) !important;
+}
+.core-icon-button--navigation { --_header-active-shadow: var(--header-navigation-active-shadow); }
+.core-icon-button--active {
+  background: var(--header-icon-active-bg) !important;
+  border-color: var(--header-icon-active-border) !important;
+  color: var(--header-icon-active-text) !important;
+  box-shadow: var(--_header-active-shadow);
+}
+.core-icon-button:not(.core-icon-button--active):hover {
+  background: var(--_header-icon-hover-bg) !important;
+  border-color: var(--_header-icon-hover-border) !important;
+  color: var(--_header-icon-hover-text) !important;
+}
+.core-icon-button--active:hover {
+  background: var(--_header-icon-active-hover-bg) !important;
+  border-color: var(--_header-icon-active-hover-border) !important;
+  color: var(--_header-icon-active-hover-text) !important;
+}
+.ds-header-icon-frame { border-color: var(--header-icon-frame-border); }
+.ds-navigation-trigger-accent { background-image: var(--header-trigger-accent); }
+
+.core-brand-logo { filter: var(--header-logo-filter) !important; }
+.core-settings-layer { z-index: 70 !important; }
+.ds-header-online-dot {
+  background: var(--header-online-dot-bg);
+  box-shadow: var(--header-online-dot-shadow);
+}
+.ds-header-online-label {
+  color: var(--header-online-text) !important;
+  text-shadow: var(--header-online-text-shadow) !important;
+}
+
+/* Static capability wins over an optional accent supplied by a future theme. */
+html[data-performance="static"] .core-global-header::after { animation: none !important; }

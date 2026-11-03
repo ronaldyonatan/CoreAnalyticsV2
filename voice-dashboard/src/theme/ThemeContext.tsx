@@ -1,17 +1,18 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useLayoutEffect, useMemo, useState } from 'react';
 import {
   CORE_THEMES,
+  CORE_THEME_LIST,
   CORE_THEME_STORAGE_KEY,
   isCoreThemeId,
+  getShellComposition,
+  getSurfaceFamily,
 } from './themes';
 import type {
   CoreThemeDefinition,
   CoreThemeId,
   CoreThemePerformance,
 } from './themes';
-import './theme.css';
-import './jec-brand-themes.css';
-import './jec-blue-field-v4.5.css';
+// The Design System entry owns stylesheet ordering.
 import '../design-system/index.css';
 
 interface ThemeContextValue {
@@ -21,6 +22,8 @@ interface ThemeContextValue {
   toggleTheme: () => void;
 
   isLight: boolean;
+  // TODO(theme-migration): Compatibility flags for existing procedural WebGL /
+  // login skins. New component styling must consume semantic CSS values.
   isAurora: boolean;
   isSolaris: boolean;
   isJecHorizon: boolean;
@@ -34,15 +37,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const THEME_CYCLE: CoreThemeId[] = [
-  'cosmic-black',
-  'aurora',
-  'solaris',
-  'obsidian',
-  'quartz',
-  'jec-horizon',
-  'jec-skywave',
-];
+const THEME_CYCLE = CORE_THEME_LIST.map((theme) => theme.id);
 
 const getInitialTheme = (): CoreThemeId => {
   if (typeof window === 'undefined') return 'cosmic-black';
@@ -60,13 +55,17 @@ const getInitialTheme = (): CoreThemeId => {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeId, setThemeId] = useState<CoreThemeId>(getInitialTheme);
 
-  useEffect(() => {
+  // Activate root values before paint so component recipes never see a stale palette.
+  useLayoutEffect(() => {
     const theme = CORE_THEMES[themeId];
     const root = document.documentElement;
 
     root.dataset.theme = themeId;
     root.dataset.performance = theme.performance;
     root.dataset.appearance = theme.appearance;
+    root.dataset.surfaceFamily = getSurfaceFamily(theme);
+    root.dataset.shellComposition = getShellComposition(theme);
+    root.dataset.fullscreenTone = 'fullscreenTone' in theme ? theme.fullscreenTone : 'theme';
 
     document.documentElement.style.colorScheme =
       theme.appearance === 'light' ? 'light' : 'dark';

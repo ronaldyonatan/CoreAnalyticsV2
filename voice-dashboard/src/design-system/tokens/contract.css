@@ -1,0 +1,96 @@
+/* =========================================================
+   COREANALYTICS DESIGN SYSTEM — SEMANTIC TOKENS
+   Map shared components to the existing CoreAnalytics theme
+   variables. No page-specific selector belongs here.
+
+   Public palette contract (defined by themes/<id>.css):
+   --core-bg / --core-bg-secondary: application canvas
+   --core-surface / --core-surface-strong: card / opaque overlay
+   --core-panel / --core-panel-hover: inset panel states
+   --core-control / --core-control-hover: form and action states
+   --core-text / --core-text-secondary / --core-text-muted: content hierarchy
+   --core-primary / --core-primary-soft / --core-primary-strong / --core-primary-rgb
+   --core-border / --core-border-strong: outline hierarchy
+   --core-glow / --core-frame-shadow: depth and emphasis
+   --core-sidebar: navigation surface
+   --core-{purple,danger,success}-{surface,border,text}: semantic states
+
+   Capability extensions and baseline values are in defaults.css:
+   --shell-*, --settings-shadow, --navigation-overlay-bg
+   --header-*: header surface/border/filter/accent/logo/icon/online roles
+   --nav-*: rail/intro/menu/icon states, pin/close/account/voice/logout
+   --settings-voice-icon-text: semantic settings action icon
+   --*-touch-hover-*: explicit touch-hover roles; defaults retain base surfaces.
+   Private --_* aliases select effective pointer values and are not theme API.
+   --environment-*: field/curtain/solar/grid renderer values
+   --layered-*: transparent shell composition surfaces
+   --daily-*, --fullscreen-stage-*: page and fullscreen-stage capabilities
+   --login-top-*, --login-status-*, --theme-menu-shadow
+   --chart-*, --management-*, --ds-restore-*
+   Geometry/motion primitives are in core-tokens.css (--ds-radius-*, etc.).
+   --ui-* and --ds-* are existing consumer aliases, kept to avoid API churn.
+   Metadata owns appearance/performance; CSS owns all visual values.
+   ========================================================= */
+
+:root {
+  --ds-text: var(--core-text, #e6fbff);
+  --ds-text-secondary: var(--core-text-secondary, #94a3b8);
+  --ds-text-muted: var(--core-text-muted, #64748b);
+
+  --ds-primary: var(--core-primary, #00f2fe);
+  --ds-primary-soft: var(--core-primary-soft, #67e8f9);
+  --ds-primary-strong: var(--core-primary-strong, #00bfff);
+
+  --ds-surface: var(--core-surface, rgba(0, 8, 20, .24));
+  --ds-surface-strong: var(--core-surface-strong, rgba(0, 12, 27, .78));
+  --ds-panel: var(--core-panel, rgba(0, 8, 20, .34));
+  --ds-control: var(--core-control, rgba(0, 20, 40, .44));
+  --ds-control-hover: var(--core-control-hover, rgba(0, 242, 254, .14));
+
+  --ds-border: var(--core-border, rgba(0, 242, 254, .30));
+  --ds-border-strong: var(--core-border-strong, rgba(0, 242, 254, .60));
+  --ds-glow: var(--core-glow, rgba(0, 242, 254, .22));
+
+  --ds-expand-fg: var(--ds-primary-soft);
+  --ds-expand-border: var(--ds-border);
+  --ds-expand-hover-fg: var(--ds-text);
+  --ds-expand-hover-bg: color-mix(in srgb, var(--ds-primary) 10%, transparent);
+}
+
+/* Bright themes use a dark blue control glyph on light surfaces. */
+html[data-appearance="light"] {
+  --ds-expand-fg: var(--core-primary-strong, #014e78);
+  --ds-expand-border: color-mix(in srgb, var(--core-primary-strong, #014e78) 22%, transparent);
+  --ds-expand-hover-fg: var(--core-primary-strong, #014e78);
+  --ds-expand-hover-bg: color-mix(in srgb, var(--core-primary, #2587c8) 10%, transparent);
+}
+
+/* Dark themes keep the luminous control language. */
+html[data-appearance="dark"] {
+  --ds-expand-fg: var(--core-primary-soft, #67e8f9);
+  --ds-expand-border: var(--core-border, rgba(0, 242, 254, .30));
+  --ds-expand-hover-fg: var(--core-text, #e6fbff);
+}
+
+/* Material consumers read --settings-* / --management-* values from defaults.css.
+   surfaceFamily selects a reusable component recipe independently of environment
+   and performance. These recipes contain no theme IDs. New themes may use any
+   recipe and override individual roles in their own definition.
+
+   --clinic-* covers picker control, list, selected/idle, hover, focus and
+   placeholder surfaces. Context overrides distinguish Daily and Company pages.
+   --voice-registration-* covers enrollment surfaces and status/action colors.
+   Geometry and recording/authentication behavior remain application-owned. */
+
+/* --account-* owns account surfaces, alerts and recorder values.
+   --login-tour-* / --dashboard-tour-* own guided overlay and control states.
+   Separate on+hover and narrow-screen filter values preserve the established
+   interaction cascade; consumers never select a theme by name. */
+
+/* Application stylesheet ownership is centralized in index.css.
+   --dashboard-*, --brand-*, --company-layout-* describe shared treatment colors.
+   --briefing-palette-* supplies Executive Briefing values; --ebi-* aliases stay
+   local to .ebi5-page so generic positive/negative hooks retain their scope.
+   --document-* supplies document typography/reset values.
+   ComponentStyles mounts static, Design System-owned scene/motion assets at
+   their original conditional positions; their colors use defaults.css roles. */

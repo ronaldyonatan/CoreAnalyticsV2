@@ -1,0 +1,14 @@
+{
+  "declarations": 401,
+  "colorSubstitutionEquivalent": true,
+  "deadSelectorsRemoved": 1,
+  "themeValues": {
+    "aurora": 98,
+    "solaris": 19,
+    "jec-horizon": 157,
+    "jec-skywave": 180,
+    "quartz": 19,
+    "cosmic-black": 10,
+    "obsidian": 8
+  }
+}

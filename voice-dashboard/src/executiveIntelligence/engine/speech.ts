@@ -3,6 +3,8 @@ export interface FridaySpeechOptions {
   rate?: number;
   pitch?: number;
   volume?: number;
+  cancelExisting?: boolean;
+  onStart?: () => void;
 }
 
 function getSpeechSynthesis(): SpeechSynthesis | null {
@@ -84,7 +86,7 @@ export async function speakFriday(
     return;
   }
 
-  synth.cancel();
+  if (options.cancelExisting ?? true) synth.cancel();
 
   // Chrome can leave speechSynthesis paused after SpeechRecognition / route
   // transitions. Explicitly resume before the first Executive Briefing scene.
@@ -114,6 +116,7 @@ export async function speakFriday(
       resolve();
     };
 
+    utterance.onstart = () => options.onStart?.();
     utterance.onend = finish;
 
     // Do not break the whole presentation when a browser voice fails.

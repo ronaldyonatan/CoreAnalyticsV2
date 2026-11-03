@@ -1,3 +1,4 @@
+import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Line as DreiLine, Html } from '@react-three/drei';
@@ -616,22 +617,7 @@ export default function WeeklyRevenueChart({
           )}
         </div>
 
-        <style>{`
-          @keyframes weeklyFilterIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .weekly-filter-panel {
-            animation: weeklyFilterIn .2s ease-out both;
-          }
-
-          @keyframes weeklyPeriodScan {
-            0% { transform: translateY(-120px); opacity: 0; }
-            25% { opacity: .9; }
-            75% { opacity: .9; }
-            100% { transform: translateY(120px); opacity: 0; }
-          }
-        `}</style>
+        <ComponentStyles name="weekly-revenue" />
       </div>
     );
   }

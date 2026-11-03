@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import './MyAccount.css';
 
 const API_BASE =
   import.meta.env.VITE_VOICE_API_URL ||

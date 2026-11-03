@@ -1,0 +1,15 @@
+{
+  "theme": "crystal-green-shell-qa",
+  "build": "pass",
+  "changedInputs": [
+    "theme CSS",
+    "registry metadata"
+  ],
+  "statesRendered": 9,
+  "headerBackground": "rgb(22, 64, 42)",
+  "headerBorder": "rgb(55, 201, 135)",
+  "groupBackground": "rgb(22, 64, 42)",
+  "groupText": "rgb(181, 240, 192)",
+  "activeBackground": "rgb(34, 91, 59)",
+  "temporaryThemeRemoved": true
+}

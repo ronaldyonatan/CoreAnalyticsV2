@@ -1,0 +1,41 @@
+/* Shared component rules. Theme values are supplied through the semantic contract. */
+
+
+.core-control {
+  background: var(--core-control);
+  border-color: var(--core-border);
+  color: var(--core-primary);
+  box-shadow: 0 0 12px var(--core-glow);
+}
+
+.core-control:hover {
+  background: var(--core-control-hover);
+  border-color: var(--core-border-strong);
+  color: var(--core-text);
+}
+
+.core-divider {
+  border-color: var(--core-border);
+}
+
+.core-empty-text {
+  color: var(--core-text-secondary);
+}
+
+.core-designer-control {
+  background: var(--core-purple-surface);
+  border-color: var(--core-purple-border);
+  color: var(--core-purple-text);
+}
+
+.core-danger-control {
+  background: var(--core-danger-surface);
+  border-color: var(--core-danger-border);
+  color: var(--core-danger-text);
+}
+
+.core-success-control {
+  background: var(--core-success-surface);
+  border-color: var(--core-success-border);
+  color: var(--core-success-text);
+}

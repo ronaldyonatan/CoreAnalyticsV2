@@ -1,0 +1,62 @@
+[
+  {
+    "key": "utilization",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "daily-revenue",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "dashboard-designer",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "demography-fullscreen",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "demography-card",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "iol-usage",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "doctor-fee",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "material-summary",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "revenue-summary",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "channel-revenue",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "surgery",
+    "declarationEquivalence": true,
+    "static": true
+  },
+  {
+    "key": "weekly-revenue",
+    "declarationEquivalence": true,
+    "static": true
+  }
+]

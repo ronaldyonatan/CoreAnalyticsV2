@@ -1,0 +1,29 @@
+/* Design System-owned historical-shell structure, states and motion. */
+.ironman-visor-perspective { perspective: 1200px; perspective-origin: center center; overflow: hidden; }
+        .ironman-visor-curve {
+          transform-style: preserve-3d;
+          transform: rotateX(12deg) rotateY(0deg) translateZ(-40px) scale(0.95);
+          border-radius: 120px / 60px;
+          background: var(--historical-shell-ironman-visor-curve-background-color);
+          box-shadow: inset 0 0 100px var(--historical-shell-ironman-visor-curve-box-shadow-color), 0 40px 90px var(--historical-shell-ironman-visor-curve-box-shadow-color-2), 0 0 50px var(--historical-shell-ironman-visor-curve-box-shadow-color-3);
+          backdrop-filter: blur(12px);
+        }          
+        .hud-vignette { background: radial-gradient(ellipse at center, transparent 35%, var(--historical-shell-hud-vignette-background-color) 95%); }
+        .hud-scanlines { background: linear-gradient(to bottom, transparent 50%, var(--historical-shell-hud-scanlines-background-color) 51%); background-size: 100% 4px; }
+        .text-hud-glow { text-shadow: 0 0 10px var(--historical-shell-text-hud-glow-text-shadow-color), 0 0 20px var(--historical-shell-text-hud-glow-text-shadow-color-2); }
+        .text-white-glow { text-shadow: 0 0 8px var(--historical-shell-text-white-glow-text-shadow-color); }
+        @keyframes holoGlitchIn {
+          0% { opacity: 0; transform: scale(0.8) translateZ(-150px) rotateX(-12deg); filter: blur(15px); }
+          40% { opacity: 0.6; transform: scale(1.04) translateZ(10px) rotateX(6deg); filter: blur(3px); }
+          100% { opacity: 1; transform: scale(0.97) translateZ(-60px) rotateX(8deg); filter: blur(0px); }
+        }
+        @keyframes holoGlitchOut {
+          0% { opacity: 1; transform: scale(0.97) translateZ(-60px) rotateX(8deg); filter: blur(0px); }
+          100% { opacity: 0; transform: scale(1.1) translateZ(90px) rotateX(18deg); filter: blur(12px); }
+        }
+        .animate-glitch-in { animation: holoGlitchIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        .animate-glitch-out { animation: holoGlitchOut 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-slide-in-right { animation: slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-slide-in-left { animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }

@@ -1,0 +1,7 @@
+/* Design System-owned doctor-fee structure, states and motion. */
+@keyframes doctorfeeScanBand {
+          0% { transform:translateY(-18px);opacity:.15; }
+          50% { opacity:.55; }
+          100% { transform:translateY(18px);opacity:.15; }
+        }
+        .doctorfee-holo-band { animation:doctorfeeScanBand .55s linear infinite alternate; }

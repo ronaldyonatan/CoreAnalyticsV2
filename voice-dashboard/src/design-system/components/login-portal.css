@@ -1,0 +1,49 @@
+/* Shared component rules. Theme values are supplied through the semantic contract. */
+
+.ds-login-top-control {
+  background: var(--login-top-surface);
+  border-color: var(--login-top-border);
+  color: var(--login-top-text);
+  box-shadow: var(--login-top-shadow);
+  -webkit-backdrop-filter: var(--login-top-filter);
+  backdrop-filter: var(--login-top-filter);
+}
+
+.ds-login-top-label {
+  color: var(--login-top-muted);
+  text-shadow: none;
+}
+
+.ds-login-status-online {
+  color: var(--login-status-online);
+}
+
+.ds-login-status-dot {
+  background: var(--login-status-dot);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--login-status-dot) 72%, transparent);
+}
+[data-performance="static"] .ds-login-top-control,
+[data-performance="static"] .ds-theme-menu {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-theme] body .login-top-hud .ds-login-top-control {
+  background: var(--login-top-surface) !important;
+  background-color: transparent !important;
+  border-color: var(--login-top-border) !important;
+  color: var(--login-top-text) !important;
+  box-shadow: var(--login-top-shadow) !important;
+}
+
+html[data-theme] body .login-top-hud .ds-login-top-label {
+  color: var(--login-top-muted) !important;
+}
+
+html[data-theme] body .login-top-hud .ds-login-status-online {
+  color: var(--login-status-online) !important;
+}
+
+html[data-theme] body .login-top-hud .ds-login-status-dot {
+  background: var(--login-status-dot) !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--login-status-dot) 72%, transparent) !important;
+}

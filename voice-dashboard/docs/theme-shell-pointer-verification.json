@@ -1,0 +1,51 @@
+{
+  "cosmic-black": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  },
+  "aurora": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  },
+  "solaris": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  },
+  "obsidian": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  },
+  "quartz": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  },
+  "jec-horizon": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  },
+  "jec-skywave": {
+    "hoverNone": true,
+    "pointerCoarse": true,
+    "viewport": 390,
+    "invariants": 10,
+    "passed": true
+  }
+}

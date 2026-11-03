@@ -5,7 +5,6 @@ import DailyRevenueChart from '../../components/DailyRevenueChart';
 import DemographyChart from '../../components/DemographyChart';
 import DailyLowerWidgets from '../../components/DailyLowerWidgets';
 import DailyFilterHealthcare from '../../components/PanelFilterHealthcare';
-import { useTheme } from '../../theme/ThemeContext';
 import {
   DAILY_TRACKING_VOICE_COMMANDS,
   containsVoicePhrase,
@@ -96,8 +95,6 @@ export default function DailyTracking({
   healthcareList = [],
   onHealthcareChange,
 }: DailyTrackingProps) {
-  const { isLight, isJecHorizon, isJecSkywave } = useTheme();
-  const isJecTheme = isJecHorizon || isJecSkywave;
 
   const [selectedId, setSelectedId] = useState<string>(selectedHealthcareId);
   const [selectedDate, setSelectedDate] = useState<string>('2026-10');
@@ -1083,14 +1080,8 @@ export default function DailyTracking({
         className="daily-page-header relative z-[200] flex flex-shrink-0 flex-col gap-2 overflow-visible rounded-xl border px-3 py-3 backdrop-blur-md sm:px-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-2.5"
         style={{
           borderColor: 'var(--core-border-strong)',
-          background: isJecTheme
-            ? 'linear-gradient(100deg, rgba(1,78,120,.96), rgba(20,125,182,.93), rgba(37,135,200,.90))'
-            : isLight
-              ? 'linear-gradient(90deg, rgba(194,222,234,.96), rgba(222,238,245,.96), rgba(206,226,239,.94))'
-              : 'linear-gradient(90deg, rgba(1,78,120,.90), rgba(0,24,48,.95), rgba(1,78,120,.90))',
-          boxShadow: isJecTheme
-            ? '0 8px 20px rgba(1,78,120,.14)'
-            : '0 0 20px var(--core-glow)',
+          background: 'var(--daily-header-bg)',
+          boxShadow: 'var(--daily-header-shadow)',
         }}
       >
         {/* Title row */}
@@ -1102,25 +1093,16 @@ export default function DailyTracking({
             </div>
 
             <span
-              className={`daily-page-title min-w-0 text-lg font-extrabold uppercase tracking-[0.16em] sm:text-xl sm:tracking-widest ${
-                isJecTheme ? 'text-white' : 'animate-pulse bg-clip-text text-transparent'
-              }`}
-              style={
-                isJecTheme
-                  ? {
-                      color: '#FFFFFF',
-                      textShadow: '0 1px 7px rgba(0,48,76,.26)',
-                      WebkitTextFillColor: '#FFFFFF',
-                    }
-                  : {
-                      backgroundImage: isLight
-                        ? 'linear-gradient(90deg, #075985, #0a2635, #087f9d)'
-                        : 'linear-gradient(90deg, #00f2fe, #ffffff, #00f2fe)',
-                      filter: isLight
-                        ? 'drop-shadow(0 0 7px rgba(2,132,199,.18))'
-                        : 'drop-shadow(0 0 12px rgba(0,242,254,.80))',
-                    }
-              }
+              className="daily-page-title min-w-0 text-lg font-extrabold uppercase tracking-[0.16em] sm:text-xl sm:tracking-widest"
+              style={{
+                color: 'var(--daily-title-color)',
+                backgroundClip: 'var(--daily-title-clip)',
+                backgroundImage: 'var(--daily-title-image)',
+                textShadow: 'var(--daily-title-shadow)',
+                WebkitTextFillColor: 'var(--daily-title-fill)',
+                filter: 'var(--daily-title-filter)',
+                animation: 'var(--daily-title-animation)',
+              }}
             >
               DAILY TRACKING
             </span>
@@ -1207,8 +1189,8 @@ export default function DailyTracking({
               onChange={(e) => setSelectedDate(e.target.value)}
               className="w-full min-w-0 cursor-pointer bg-transparent text-xs font-bold tracking-wide focus:outline-none"
               style={{
-                color: isLight ? '#0a2635' : 'var(--core-text)',
-                colorScheme: isLight ? 'light' : 'dark',
+                color: 'var(--daily-period-text)',
+                colorScheme: 'inherit',
               }}
             />
           </div>
@@ -1300,8 +1282,8 @@ export default function DailyTracking({
         <div
           className="daily-tracking-fullscreen fixed inset-0 z-[9999] isolate flex flex-col overflow-hidden p-2 animate-fadeIn md:p-3"
           style={{
-            background: isJecTheme ? '#020916' : 'var(--core-bg)',
-            color: isJecTheme ? '#EAF8FF' : 'var(--core-text)',
+            background: 'var(--daily-fullscreen-bg)',
+            color: 'var(--daily-fullscreen-text)',
           }}
         >
           {expandedCard !== 'daily-revenue' &&
@@ -1316,9 +1298,7 @@ export default function DailyTracking({
                     className="text-base font-extrabold uppercase tracking-wider"
                     style={{
                       color: 'var(--core-primary)',
-                      filter: isLight
-                        ? 'drop-shadow(0 0 6px rgba(2,132,199,.14))'
-                        : 'drop-shadow(0 0 8px rgba(0,242,254,.60))',
+                      filter: 'var(--daily-fullscreen-title-filter)',
                     }}
                   >
                     FULL-SCREEN VIEW:{' '}
@@ -1333,9 +1313,9 @@ export default function DailyTracking({
           <div
             className="daily-tracking-fullscreen-body relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border"
             style={{
-              borderColor: isJecTheme ? 'rgba(37,135,200,.34)' : 'var(--core-border-strong)',
-              background: isJecTheme ? '#020916' : 'var(--core-panel)',
-              boxShadow: isJecTheme ? 'none' : '0 0 30px var(--core-glow)',
+              borderColor: 'var(--daily-fullscreen-body-border)',
+              background: 'var(--daily-fullscreen-body-bg)',
+              boxShadow: 'var(--daily-fullscreen-body-shadow)',
             }}
           >
             {renderExpandedContent()}
@@ -1345,175 +1325,7 @@ export default function DailyTracking({
         document.body,
       )}
 
-      <style>{`
-        .daily-tracking-summary-chip {
-          border-color: var(--core-border);
-          background: var(--core-control);
-          color: var(--core-text-secondary);
-        }
 
-        .daily-kpi-preview-chip {
-          border-color: ${isLight ? 'rgba(49,140,255,.28)' : 'rgba(252,211,77,.20)'};
-          background: ${isLight ? 'rgba(235,248,255,.82)' : 'rgba(23,18,5,.55)'};
-          color: ${isLight ? 'rgba(29,78,216,.76)' : 'rgba(253,230,138,.60)'};
-        }
-
-        .daily-tracking-fullscreen-header {
-          border-color: var(--core-border-strong);
-        }
-
-        [data-theme="cosmic-light"] .daily-healthcare-filter-wrap button,
-        [data-theme="cosmic-light"] .daily-healthcare-filter-wrap select,
-        [data-theme="cosmic-light"] .daily-healthcare-filter-wrap input {
-          color: var(--core-text) !important;
-        }
-
-        @keyframes dailyFilterPanelIn {
-          from {
-            opacity: 0;
-            transform: translateY(-6px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-filter-panel-in {
-          animation: dailyFilterPanelIn .22s ease-out both;
-        }
-
-        /* Responsive wrapper for the custom healthcare combo.
-           This prevents fixed/min widths inside PanelFilterHealthcare
-           from pushing the control outside the mobile viewport. */
-        .daily-healthcare-filter-wrap {
-          position: relative;
-          z-index: 250;
-          overflow: visible;
-          isolation: isolate;
-        }
-
-        .daily-healthcare-filter-wrap [role="listbox"],
-        .daily-healthcare-filter-wrap [role="menu"],
-        .daily-healthcare-filter-wrap .absolute {
-          z-index: 300 !important;
-        }
-
-        .daily-healthcare-filter-wrap > * {
-          width: 100% !important;
-          min-width: 0 !important;
-          max-width: 100% !important;
-        }
-
-        .daily-healthcare-filter-wrap button,
-        .daily-healthcare-filter-wrap select,
-        .daily-healthcare-filter-wrap input {
-          max-width: 100% !important;
-        }
-
-        @media (max-width: 639px) {
-          .daily-healthcare-filter-wrap {
-            width: 100%;
-          }
-
-          .daily-healthcare-filter-wrap > * {
-            width: 100% !important;
-          }
-        }
-
-        .daily-tracking-fullscreen-body > .daily-tracking-expanded-chart {
-          width: 100%;
-          height: 100%;
-          min-width: 0;
-          min-height: 0;
-          flex: 1 1 0%;
-        }
-
-        .daily-tracking-fullscreen-body .daily-tracking-expanded-chart > * {
-          width: 100%;
-          height: 100%;
-          min-width: 0;
-          min-height: 0;
-          flex: 1 1 0%;
-        }
-
-        .daily-tracking-fullscreen-body .daily-tracking-expanded-chart > * > * {
-          min-width: 0;
-          min-height: 0;
-        }
-
-        .daily-tracking-fullscreen-body .recharts-responsive-container {
-          width: 100% !important;
-          height: 100% !important;
-          min-width: 0 !important;
-          min-height: 0 !important;
-          flex: 1 1 0%;
-        }
-
-        .daily-tracking-fullscreen-body .recharts-wrapper {
-          max-width: 100%;
-        }
-
-        .daily-tracking-fullscreen-body .daily-tracking-channel-panel {
-          min-height: 0;
-          height: 100%;
-        }
-
-        .daily-tracking-fullscreen-body .daily-tracking-channel-panel .recharts-responsive-container {
-          min-height: 220px !important;
-        }
-
-        @media (min-width: 768px) {
-          .daily-tracking-fullscreen-body .daily-tracking-channel-panel .recharts-responsive-container {
-            min-height: 0 !important;
-          }
-        }
-
-
-        /* JEC fullscreen is a true dark viewport stage.
-           Override the normal JEC light-card typography only here. */
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen {
-          padding: 0 !important;
-          background: #020916 !important;
-          color: #EAF8FF !important;
-        }
-
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen-body {
-          border: 0 !important;
-          border-radius: 0 !important;
-          background: #020916 !important;
-          box-shadow: none !important;
-        }
-
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen .daily-3d-shell {
-          border: 0 !important;
-          border-radius: 0 !important;
-          background: #020916 !important;
-          color: #EAF8FF !important;
-        }
-
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-white"] {
-          color: #FFFFFF !important;
-          -webkit-text-fill-color: #FFFFFF !important;
-        }
-
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-cyan-"],
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-sky-"] {
-          color: #C9F2FF !important;
-          -webkit-text-fill-color: currentColor !important;
-        }
-
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen [class*="text-slate-"] {
-          color: #9ABFD0 !important;
-        }
-
-        :is([data-theme="jec-horizon"], [data-theme="jec-skywave"]) .daily-tracking-fullscreen button[title="Close fullscreen"] {
-          background: rgba(3,25,40,.82) !important;
-          border-color: rgba(188,231,249,.48) !important;
-          color: #FFFFFF !important;
-          box-shadow: 0 8px 22px rgba(0,0,0,.28) !important;
-        }
-      `}</style>
     </div>
   );
 }

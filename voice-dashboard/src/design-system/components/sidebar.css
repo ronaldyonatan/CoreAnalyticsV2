@@ -1,0 +1,145 @@
+/* Navigation rail and item states. Theme values live in --nav-* tokens.
+   Do not add the retired .core-sidebar class to the current rail: it used to
+   activate an unrelated legacy skin that was not part of the approved UI. */
+.ds-navigation-rail {
+  background: var(--core-sidebar);
+  border-color: var(--core-border);
+  box-shadow: var(--nav-rail-shadow);
+}
+
+.core-nav-group-button {
+  background: var(--nav-group-bg) !important;
+  border-color: var(--nav-group-border) !important;
+  color: var(--nav-group-text) !important;
+  box-shadow: var(--nav-group-shadow) !important;
+}
+.core-nav-group-button:hover {
+  background: var(--_nav-group-hover-bg) !important;
+  border-color: var(--_nav-group-hover-border) !important;
+  color: var(--_nav-group-hover-text) !important;
+}
+.core-nav-group-button > div > span:first-child {
+  background: var(--nav-group-icon-bg) !important;
+  border-color: var(--nav-group-icon-border) !important;
+  color: var(--nav-group-icon-text) !important;
+  box-shadow: var(--nav-group-icon-shadow) !important;
+}
+
+.core-nav-child-button:not(.core-nav-child-active) {
+  background: var(--nav-item-bg) !important;
+  border-color: var(--nav-item-border) !important;
+  color: var(--nav-item-text) !important;
+}
+.core-nav-child-button:not(.core-nav-child-active):hover {
+  background: var(--_nav-item-hover-bg) !important;
+  border-color: var(--_nav-item-hover-border) !important;
+  color: var(--_nav-item-hover-text) !important;
+}
+.core-nav-child-button:not(.core-nav-child-active) > span:first-child {
+  background: var(--nav-item-icon-bg) !important;
+  border-color: var(--nav-item-icon-border) !important;
+  color: var(--nav-item-icon-text) !important;
+}
+.core-nav-child-button.core-nav-child-active {
+  background: var(--nav-active-bg) !important;
+  border-color: var(--nav-active-border) !important;
+  color: var(--nav-active-text) !important;
+  box-shadow: var(--nav-active-shadow) !important;
+}
+.core-nav-child-button.core-nav-child-active > span:first-child {
+  background: var(--nav-active-icon-bg) !important;
+  border-color: var(--nav-active-icon-border) !important;
+  color: var(--nav-active-icon-text) !important;
+  box-shadow: var(--nav-active-icon-shadow) !important;
+}
+
+.ds-menu-glyph {
+  color: var(--nav-glyph-text);
+}
+.group:hover .ds-menu-glyph:not(.ds-menu-glyph--active) {
+  color: var(--_nav-glyph-hover-text);
+}
+.ds-menu-glyph--active {
+  color: var(--nav-glyph-active-text);
+  filter: var(--nav-glyph-active-filter);
+}
+
+/* Navigation drawer introduction, shared by pinned and floating composition. */
+.core-nav-drawer-header {
+  background: var(--nav-intro-bg) !important;
+  border-color: var(--nav-intro-border) !important;
+  color: var(--nav-intro-text) !important;
+}
+.core-nav-drawer-header > div:first-child > div:first-child {
+  color: var(--nav-intro-title) !important;
+  text-shadow: var(--nav-intro-title-shadow) !important;
+}
+.core-nav-drawer-header > div:first-child > div:last-child { color: var(--nav-intro-description) !important; }
+
+/* Pin/close, account, voice state and logout retain their approved palette. */
+.ds-navigation-footer { border-color: var(--nav-footer-border); }
+.ds-nav-group-caret { color: var(--nav-group-caret-text); }
+.ds-navigation-overlay {
+  background: var(--navigation-overlay-bg);
+  backdrop-filter: var(--nav-overlay-filter);
+  -webkit-backdrop-filter: var(--nav-overlay-filter);
+}
+.ds-nav-pin {
+  background: var(--nav-pin-bg);
+  border-color: var(--nav-pin-border);
+  color: var(--nav-pin-text);
+}
+.ds-nav-pin:not(.ds-nav-pin--active):hover {
+  background: var(--_nav-pin-hover-bg);
+  border-color: var(--_nav-pin-hover-border);
+  color: var(--_nav-pin-hover-text);
+}
+.ds-nav-pin--active {
+  background: var(--nav-pin-active-bg);
+  border-color: var(--nav-pin-active-border);
+  color: var(--nav-pin-active-text);
+  box-shadow: var(--nav-pin-active-shadow);
+}
+.ds-nav-close {
+  background: var(--nav-close-bg);
+  border-color: var(--nav-close-border);
+  color: var(--nav-close-text);
+}
+.ds-nav-close:hover {
+  background: var(--_nav-close-hover-bg);
+  border-color: var(--_nav-close-hover-border);
+  color: var(--_nav-close-hover-text);
+}
+.core-my-account-sidebar {
+  background: var(--nav-account-bg);
+  border-color: var(--nav-account-border);
+  color: var(--nav-account-text);
+  box-shadow: var(--nav-account-shadow);
+}
+.core-my-account-sidebar:hover {
+  background: var(--_nav-account-hover-bg);
+  border-color: var(--_nav-account-hover-border);
+  color: var(--_nav-account-hover-text);
+}
+.ds-nav-voice--on {
+  background: var(--nav-voice-on-bg);
+  border-color: var(--nav-voice-on-border);
+  color: var(--nav-voice-on-text);
+  box-shadow: var(--nav-voice-on-shadow);
+}
+.ds-nav-voice--off {
+  background: var(--nav-voice-off-bg);
+  border-color: var(--nav-voice-off-border);
+  color: var(--nav-voice-off-text);
+  box-shadow: var(--nav-voice-off-shadow);
+}
+.ds-nav-logout {
+  background: var(--nav-logout-bg);
+  border-color: var(--nav-logout-border);
+  color: var(--nav-logout-text);
+  box-shadow: var(--nav-logout-shadow);
+}
+.ds-nav-logout:hover {
+  background: var(--_nav-logout-hover-bg);
+  color: var(--_nav-logout-hover-text);
+}
