@@ -1,0 +1,14 @@
+{
+  "baselineRef": "1308b46",
+  "themes": 7,
+  "registeredThemes": 8,
+  "valueComparisons": 1519,
+  "shaderProgramsUnchanged": 6,
+  "animationCallbacksUnchanged": 25,
+  "demographyInheritance": true,
+  "clinicalDarkStage": true,
+  "numericShaderBlend": true,
+  "basePaletteUnchanged": true,
+  "staticPerformancePreserved": true,
+  "webglPixelComparison": false
+}

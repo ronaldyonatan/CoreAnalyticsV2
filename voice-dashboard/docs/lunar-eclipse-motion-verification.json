@@ -1,0 +1,96 @@
+{
+  "lunar-eclipse": {
+    "nebula": "\"\"",
+    "stars": "\"\"",
+    "nebulaAnimation": "orbNebulaTurn",
+    "gridOpacity": "0",
+    "gridFilter": "blur(0px)",
+    "waveBorder": "0px",
+    "waveAnimation": "none",
+    "orbitOpacity": "0",
+    "coreFilter": "blur(10px)",
+    "rect": {
+      "x": 855.8062744140625,
+      "y": 302.06671142578125,
+      "width": 390.7716064453125,
+      "height": 390.77166748046875
+    }
+  },
+  "registry": {
+    "count": 8,
+    "name": "Lunar Eclipse",
+    "primary": "#8edff4",
+    "gateway": true,
+    "chartBackground": "#070915"
+  },
+  "motion": {
+    "before": {
+      "orb": "matrix(1.00508, 0, 0, 1.00508, 0, -2.53962)",
+      "corona": "matrix(0.727426, 0.686187, -0.686187, 0.727426, 0, 0)",
+      "particles": "matrix(0.929361, -0.369171, 0.369171, 0.929361, 0, 0)",
+      "field": "matrix(0.921465, -0.191968, 0.191968, 0.921465, -49.0681, -79.4407)",
+      "fieldAnimation": "orbMistDrift",
+      "fieldBackground": "radial-gradient(circle at 59% 21%, rgba(214, 237, 255, 0.8) 0px, rgba(214, 237, 255, 0.8) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 74% 65%, rgba(193, 209, 255, 0.75) 0px, rgba(193, 209, 255, 0.75) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 88% 38%, rgba(217, 244, 255, 0.85) 0px, rgba(217, 244, 255, 0.85) 1.2px, rgba(0, 0, 0, 0) 2.2px), radial-gradient(circle at 48% 83%, rgba(184, 191, 255, 0.65) 0px, rgba(184, 191, 255, 0.65) 0.8px, rgba(0, 0, 0, 0) 1.8px), radial-gradient(circle at 91% 84%, rgba(227, 243, 255, 0.75) 0px, rgba(227, 243, 255, 0.75) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(at 75% 35%, rgba(105, 78, 197, 0.19), rgba(0, 0, 0, 0) 35%), radial-gradient(at 58% 73%, rgba(89, 127, 206, 0.12), rgba(0, 0, 0, 0) 40%)"
+    },
+    "after": {
+      "orb": "matrix(1.0124, 0, 0, 1.0124, 0, -6.2019)",
+      "corona": "matrix(0.353026, 0.935613, -0.935613, 0.353026, 0, 0)",
+      "particles": "matrix(0.822504, -0.568759, 0.568759, 0.822504, 0, 0)",
+      "field": "matrix(0.924653, -0.186381, 0.186381, 0.924653, -47.3964, -76.6214)",
+      "fieldAnimation": "orbMistDrift",
+      "fieldBackground": "radial-gradient(circle at 59% 21%, rgba(214, 237, 255, 0.8) 0px, rgba(214, 237, 255, 0.8) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 74% 65%, rgba(193, 209, 255, 0.75) 0px, rgba(193, 209, 255, 0.75) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(circle at 88% 38%, rgba(217, 244, 255, 0.85) 0px, rgba(217, 244, 255, 0.85) 1.2px, rgba(0, 0, 0, 0) 2.2px), radial-gradient(circle at 48% 83%, rgba(184, 191, 255, 0.65) 0px, rgba(184, 191, 255, 0.65) 0.8px, rgba(0, 0, 0, 0) 1.8px), radial-gradient(circle at 91% 84%, rgba(227, 243, 255, 0.75) 0px, rgba(227, 243, 255, 0.75) 1px, rgba(0, 0, 0, 0) 2px), radial-gradient(at 75% 35%, rgba(105, 78, 197, 0.19), rgba(0, 0, 0, 0) 35%), radial-gradient(at 58% 73%, rgba(89, 127, 206, 0.12), rgba(0, 0, 0, 0) 40%)"
+    }
+  },
+  "states": {
+    "idle": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 18px 0px, rgba(0, 0, 0, 0) 0px 0px 16px 0px inset"
+    },
+    "listening": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 18px 0px, rgba(0, 0, 0, 0) 0px 0px 16px 0px inset"
+    },
+    "speaking": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 44%, rgba(0, 0, 0, 0) 72%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(142, 223, 244, 0.42) 0px 0px 22px 0px, rgba(142, 223, 244, 0.42) 0px 0px 50px 0px"
+    },
+    "authenticating": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(171, 160, 242, 0.38) 0px 0px 22px 0px, rgba(171, 160, 242, 0.38) 0px 0px 50px 0px"
+    },
+    "verified": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 44%, rgba(0, 0, 0, 0) 72%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(142, 223, 244, 0.42) 0px 0px 22px 0px, rgba(142, 223, 244, 0.42) 0px 0px 50px 0px"
+    },
+    "charged": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 18px 0px, rgba(0, 0, 0, 0) 0px 0px 16px 0px inset"
+    }
+  },
+  "reducedMotion": {
+    "orb": "0s",
+    "halo": "0s",
+    "field": "none"
+  },
+  "mobile": {
+    "width": 262.70440673828125,
+    "gridOpacity": "0"
+  },
+  "jec-horizon": {
+    "nebula": "none",
+    "stars": "none",
+    "nebulaAnimation": "none",
+    "gridOpacity": "0.58",
+    "gridFilter": "none",
+    "waveBorder": "2px",
+    "waveAnimation": "none",
+    "orbitOpacity": "1",
+    "coreFilter": "none",
+    "rect": {
+      "x": 856.793701171875,
+      "y": 305.59375,
+      "width": 388.796875,
+      "height": 388.796875
+    }
+  }
+}

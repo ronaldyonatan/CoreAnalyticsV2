@@ -1,0 +1,73 @@
+{
+  "lunar-eclipse": {
+    "nebula": "none",
+    "stars": "\"\"",
+    "nebulaAnimation": "none",
+    "gridOpacity": "0",
+    "gridFilter": "blur(0px)",
+    "waveBorder": "0px",
+    "waveAnimation": "none",
+    "orbitOpacity": "0",
+    "coreFilter": "blur(10px)",
+    "rect": {
+      "x": 856.793701171875,
+      "y": 305.59375,
+      "width": 388.796875,
+      "height": 388.796875
+    }
+  },
+  "registry": {
+    "count": 8,
+    "name": "Lunar Eclipse",
+    "primary": "#8edff4",
+    "gateway": true,
+    "chartBackground": "#070915"
+  },
+  "states": {
+    "idle": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 18px 0px, rgba(0, 0, 0, 0) 0px 0px 16px 0px inset"
+    },
+    "listening": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 18px 0px, rgba(0, 0, 0, 0) 0px 0px 16px 0px inset"
+    },
+    "speaking": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 44%, rgba(0, 0, 0, 0) 72%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(142, 223, 244, 0.42) 0px 0px 22px 0px, rgba(142, 223, 244, 0.42) 0px 0px 50px 0px"
+    },
+    "authenticating": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(171, 160, 242, 0.38) 0px 0px 22px 0px, rgba(171, 160, 242, 0.38) 0px 0px 50px 0px"
+    },
+    "verified": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 44%, rgba(0, 0, 0, 0) 72%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(142, 223, 244, 0.42) 0px 0px 22px 0px, rgba(142, 223, 244, 0.42) 0px 0px 50px 0px"
+    },
+    "charged": {
+      "core": "radial-gradient(circle at 34% 27%, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 8%, rgba(0, 0, 0, 0) 17%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0) 100%)",
+      "ring": "rgba(0, 0, 0, 0) 0px 0px 18px 0px, rgba(0, 0, 0, 0) 0px 0px 16px 0px inset"
+    }
+  },
+  "mobile": {
+    "width": 257.390625,
+    "gridOpacity": "0"
+  },
+  "jec-horizon": {
+    "nebula": "none",
+    "stars": "none",
+    "nebulaAnimation": "none",
+    "gridOpacity": "0.58",
+    "gridFilter": "none",
+    "waveBorder": "2px",
+    "waveAnimation": "none",
+    "orbitOpacity": "1",
+    "coreFilter": "none",
+    "rect": {
+      "x": 856.793701171875,
+      "y": 305.59375,
+      "width": 388.796875,
+      "height": 388.796875
+    }
+  }
+}

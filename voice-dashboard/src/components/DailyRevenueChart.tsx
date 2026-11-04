@@ -1,3 +1,4 @@
+import type { ChartRenderers } from '../theme/renderer-config';
 import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -33,7 +34,6 @@ interface DailyRevenueChartProps {
   onMonthChange?: (month: number) => void;
 }
 
-
 interface Revenue3DTooltip {
   day: number;
   adm: number;
@@ -42,19 +42,18 @@ interface Revenue3DTooltip {
   type: 'adm' | 'sur' | 'rev';
 }
 
-
 function Real3DRevenueScene({
   data,
   onHover,
   autoRotate,
   onInteractionStart,
-  isSolaris,
+  visual,
 }: {
   data: DailyDataModel[];
   onHover: (info: Revenue3DTooltip | null) => void;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isSolaris: boolean;
+  visual: ChartRenderers['DailyRevenueChart'];
 }) {
   const maxQty = Math.max(100, ...data.map((d) => Number(d.adm) + Number(d.sur)));
   const maxRev = Math.max(100, ...data.map((d) => Number(d.rev)));
@@ -223,43 +222,43 @@ function Real3DRevenueScene({
 
   return (
     <>
-      <color attach="background" args={[isSolaris ? '#5f97cb' : '#020916']} />
-      <fog attach="fog" args={[isSolaris ? '#91c8e8' : '#020916', 24, 46]} />
-      <ambientLight intensity={isSolaris ? 1.45 : 1.15} />
-      <directionalLight position={[4, 9, 6]} intensity={isSolaris ? 2.8 : 2.4} color={isSolaris ? '#eefaff' : '#b9f7ff'} />
-      <pointLight position={[-5, 4, 3]} intensity={isSolaris ? 26 : 38} color={isSolaris ? '#79cfff' : '#00cfff'} distance={15} />
-      <pointLight position={[5, 3, -2]} intensity={isSolaris ? 20 : 28} color={isSolaris ? '#6f8cff' : '#00d084'} distance={13} />
-      <pointLight position={[0, 5, -4]} intensity={isSolaris ? 14 : 18} color={isSolaris ? '#d7f3ff' : '#ff8a1f'} distance={12} />
+      <color attach="background" args={[visual.backgroundColor]} />
+      <fog attach="fog" args={[visual.fogColor, 24, 46]} />
+      <ambientLight intensity={visual.ambientLightIntensity} />
+      <directionalLight position={[4, 9, 6]} intensity={visual.directionalLightIntensity} color={visual.directionalLightColor} />
+      <pointLight position={[-5, 4, 3]} intensity={visual.pointLightIntensity} color={visual.pointLightColor} distance={15} />
+      <pointLight position={[5, 3, -2]} intensity={visual.pointLightIntensity2} color={visual.pointLightColor2} distance={13} />
+      <pointLight position={[0, 5, -4]} intensity={visual.pointLightIntensity3} color={visual.pointLightColor3} distance={12} />
 
       {/* Back wall + angled wings create the curved command-center enclosure. */}
       <mesh position={[0, 2.45, -2.7]}>
         <planeGeometry args={[chartWidth + 2.6, 5.35]} />
-        <meshPhysicalMaterial color={isSolaris ? '#78afd7' : '#031321'} transparent opacity={isSolaris ? 0.56 : 0.78} roughness={isSolaris ? 0.46 : 0.28} metalness={isSolaris ? 0.18 : 0.45} />
+        <meshPhysicalMaterial color={visual.backplateColor} transparent opacity={visual.backplateOpacity} roughness={visual.backplateRoughness} metalness={visual.backplateMetalness} />
       </mesh>
       <mesh position={[-chartWidth / 2 - 1.18, 2.2, -1.55]} rotation={[0, Math.PI / 5.5, 0]}>
         <planeGeometry args={[2.7, 4.9]} />
-        <meshPhysicalMaterial color={isSolaris ? '#5875bd' : '#041727'} transparent opacity={isSolaris ? 0.38 : 0.72} roughness={isSolaris ? 0.5 : 0.3} metalness={isSolaris ? 0.16 : 0.5} />
+        <meshPhysicalMaterial color={visual.secondaryMaterialColor} transparent opacity={visual.secondaryMaterialOpacity} roughness={visual.secondaryMaterialRoughness} metalness={visual.secondaryMaterialMetalness} />
       </mesh>
       <mesh position={[chartWidth / 2 + 1.18, 2.2, -1.55]} rotation={[0, -Math.PI / 5.5, 0]}>
         <planeGeometry args={[2.7, 4.9]} />
-        <meshPhysicalMaterial color={isSolaris ? '#5875bd' : '#041727'} transparent opacity={isSolaris ? 0.38 : 0.72} roughness={isSolaris ? 0.5 : 0.3} metalness={isSolaris ? 0.16 : 0.5} />
+        <meshPhysicalMaterial color={visual.tertiaryMaterialColor} transparent opacity={visual.tertiaryMaterialOpacity} roughness={visual.tertiaryMaterialRoughness} metalness={visual.tertiaryMaterialMetalness} />
       </mesh>
 
       {/* Horizontal luminous guides on the rear wall. */}
       {qtyTicks.map((_, i) => {
         const y = (4.6 / 4) * i;
-        return <DreiLine key={`back-h-${i}`} points={[[-chartWidth / 2 - 0.5, y, -2.63], [chartWidth / 2 + 0.5, y, -2.63]]} color={isSolaris ? "#d7f3ff" : "#087da5"} lineWidth={0.65} transparent opacity={0.42} />;
+        return <DreiLine key={`back-h-${i}`} points={[[-chartWidth / 2 - 0.5, y, -2.63], [chartWidth / 2 + 0.5, y, -2.63]]} color={visual.horizontalGridColor} lineWidth={0.65} transparent opacity={0.42} />;
       })}
       {Array.from({ length: 9 }, (_, i) => {
         const x = -chartWidth / 2 + (chartWidth / 8) * i;
-        return <DreiLine key={`back-v-${i}`} points={[[x, 0, -2.63], [x, 4.6, -2.63]]} color={isSolaris ? "#7fb7df" : "#07506d"} lineWidth={0.55} transparent opacity={0.3} />;
+        return <DreiLine key={`back-v-${i}`} points={[[x, 0, -2.63], [x, 4.6, -2.63]]} color={visual.verticalGridColor} lineWidth={0.55} transparent opacity={0.3} />;
       })}
 
       {/* Deeper floor: the chart sits toward the back instead of floating in the middle. */}
-      <gridHelper args={[chartWidth + 4, Math.min(48, data.length + 8), isSolaris ? '#a8e2ff' : '#087da5', isSolaris ? '#4f7fb0' : '#07304a']} position={[0, 0, 0]} />
+      <gridHelper args={[chartWidth + 4, Math.min(48, data.length + 8), visual.gridPrimaryColor, visual.gridSecondaryColor]} position={[0, 0, 0]} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.045, 0.25]} receiveShadow>
         <planeGeometry args={[chartWidth + 4, 6.6]} />
-        <meshStandardMaterial color={isSolaris ? '#24527f' : '#031523'} metalness={isSolaris ? 0.32 : 0.62} roughness={isSolaris ? 0.46 : 0.3} transparent opacity={isSolaris ? 0.90 : 0.92} />
+        <meshStandardMaterial color={visual.floorColor} metalness={visual.floorMetalness} roughness={visual.floorRoughness} transparent opacity={visual.floorOpacity} />
       </mesh>
 
       {/* Visible quantity axis on the left. */}
@@ -270,13 +269,13 @@ function Real3DRevenueScene({
           <group key={`qty-${tick}`}>
             <DreiLine points={[[-chartWidth / 2 - 0.5, y, 0.05], [-chartWidth / 2 - 0.32, y, 0.05]]} color="#22d3ee" lineWidth={1.2} />
             <Html position={[-chartWidth / 2 - 0.62, y, 0.05]} center style={{ pointerEvents: 'none' }}>
-              <div style={{ color: isSolaris ? '#f3fbff' : '#67e8f9', fontSize: 10, fontWeight: 800, textShadow: isSolaris ? '0 1px 4px rgba(8,47,73,.55)' : '0 0 8px #06b6d4', transform: 'translateX(-18px)' }}>{tick.toLocaleString('id-ID')}</div>
+              <div style={{ color: visual.color, fontSize: 10, fontWeight: 800, textShadow: visual.textShadow, transform: 'translateX(-18px)' }}>{tick.toLocaleString('id-ID')}</div>
             </Html>
           </group>
         );
       })}
       <Html position={[-chartWidth / 2 - 0.55, 4.95, 0.05]} center style={{ pointerEvents: 'none' }}>
-        <div style={{ color: isSolaris ? '#f3fbff' : '#67e8f9', fontSize: 11, fontWeight: 900, letterSpacing: 1.2, textShadow: isSolaris ? '0 1px 4px rgba(8,47,73,.55)' : '0 0 10px #06b6d4' }}>QTY</div>
+        <div style={{ color: visual.color2, fontSize: 11, fontWeight: 900, letterSpacing: 1.2, textShadow: visual.textShadow2 }}>QTY</div>
       </Html>
 
       {/* Visible revenue axis on the right. */}
@@ -302,7 +301,7 @@ function Real3DRevenueScene({
         const x = i * step - chartWidth / 2 + step / 2;
         return (
           <Html key={`day-${d.day}`} position={[x, -0.16, 0.58]} center style={{ pointerEvents: 'none' }}>
-            <div style={{ color: isSolaris ? '#e7f7ff' : '#22d3ee', fontSize: 9, fontWeight: 800, textShadow: isSolaris ? '0 1px 4px rgba(8,47,73,.55)' : '0 0 7px #0891b2' }}>{d.day}</div>
+            <div style={{ color: visual.color3, fontSize: 9, fontWeight: 800, textShadow: visual.textShadow3 }}>{d.day}</div>
           </Html>
         );
       })}
@@ -371,7 +370,8 @@ export default function DailyRevenueChart({
   isPeriodLoading = false,
   onMonthChange,
 }: DailyRevenueChartProps) {
-  const { isSolaris, isStaticTheme } = useTheme();
+  const { theme, isStaticTheme } = useTheme();
+  const visual = theme.three.renderers.DailyRevenueChart;
   const [hover3D, setHover3D] = useState<Revenue3DTooltip | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [autoRotate, setAutoRotate] = useState(true);
@@ -393,8 +393,8 @@ export default function DailyRevenueChart({
 
   if (isFullscreen && !isStaticTheme) {
     return (
-      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
-        <div className={`relative flex shrink-0 flex-col gap-2 border-b px-3 py-2.5 backdrop-blur-xl sm:px-4 ${isSolaris ? 'border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]' : 'border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/70 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]'}`}>
+      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${visual.shellClassName}`}>
+        <div className={`relative flex shrink-0 flex-col gap-2 border-b px-3 py-2.5 backdrop-blur-xl sm:px-4 ${visual.headerClassName}`}>
           <div className="absolute inset-x-8 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
 
           {/* Top row: title + year + close */}
@@ -571,7 +571,7 @@ export default function DailyRevenueChart({
                 onHover={setHover3D}
                 autoRotate={autoRotate}
                 onInteractionStart={() => setAutoRotate(false)}
-                isSolaris={isSolaris}
+                visual={visual}
               />
             </Canvas>
           </div>

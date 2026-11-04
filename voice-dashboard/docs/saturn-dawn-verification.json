@@ -1,0 +1,73 @@
+{
+  "saturn-dawn": {
+    "nebula": "\"\"",
+    "stars": "\"\"",
+    "nebulaAnimation": "orbNebulaTurn",
+    "gridOpacity": "0.035",
+    "gridFilter": "blur(2px)",
+    "waveBorder": "0px",
+    "waveAnimation": "orbMistDrift",
+    "orbitOpacity": "0.72",
+    "coreFilter": "blur(2px)",
+    "rect": {
+      "x": 856.1702880859375,
+      "y": 303.3669128417969,
+      "width": 390.043701171875,
+      "height": 390.0437316894531
+    }
+  },
+  "registry": {
+    "count": 8,
+    "name": "Saturn Dawn",
+    "primary": "#ba7933",
+    "gateway": true,
+    "chartBackground": "#140c04"
+  },
+  "states": {
+    "idle": {
+      "core": "radial-gradient(circle at 34% 27%, rgb(254, 251, 248) 0px, rgb(254, 251, 248) 8%, rgb(242, 205, 165) 17%, rgb(208, 136, 59) 38%, rgb(186, 121, 51) 56%, rgb(108, 62, 13) 100%)",
+      "ring": "rgba(244, 213, 180, 0.78)"
+    },
+    "listening": {
+      "core": "radial-gradient(circle at 34% 27%, rgb(254, 251, 248) 0px, rgb(254, 251, 248) 8%, rgb(242, 205, 165) 17%, rgb(208, 136, 59) 38%, rgb(186, 121, 51) 56%, rgb(108, 62, 13) 100%)",
+      "ring": "rgba(244, 213, 180, 0.78)"
+    },
+    "speaking": {
+      "core": "radial-gradient(circle at 34% 27%, rgb(243, 255, 245) 0px, rgb(243, 255, 245) 8%, rgb(164, 230, 172) 17%, rgb(59, 177, 74) 44%, rgb(33, 134, 58) 72%, rgb(20, 101, 41) 100%)",
+      "ring": "rgb(123, 224, 135)"
+    },
+    "authenticating": {
+      "core": "radial-gradient(circle at 34% 27%, rgb(254, 251, 248) 0px, rgb(254, 251, 248) 8%, rgb(242, 205, 165) 17%, rgb(208, 136, 59) 38%, rgb(186, 121, 51) 56%, rgb(108, 62, 13) 100%)",
+      "ring": "rgb(255, 211, 107)"
+    },
+    "verified": {
+      "core": "radial-gradient(circle at 34% 27%, rgb(243, 255, 245) 0px, rgb(243, 255, 245) 8%, rgb(164, 230, 172) 17%, rgb(59, 177, 74) 44%, rgb(33, 134, 58) 72%, rgb(20, 101, 41) 100%)",
+      "ring": "rgb(123, 224, 135)"
+    },
+    "charged": {
+      "core": "radial-gradient(circle at 34% 27%, rgb(254, 251, 248) 0px, rgb(254, 251, 248) 8%, rgb(242, 205, 165) 17%, rgb(208, 136, 59) 38%, rgb(186, 121, 51) 56%, rgb(108, 62, 13) 100%)",
+      "ring": "rgba(244, 213, 180, 0.78)"
+    }
+  },
+  "mobile": {
+    "width": 260.3904724121094,
+    "gridOpacity": "0.035"
+  },
+  "jec-horizon": {
+    "nebula": "none",
+    "stars": "none",
+    "nebulaAnimation": "none",
+    "gridOpacity": "0.58",
+    "gridFilter": "none",
+    "waveBorder": "2px",
+    "waveAnimation": "none",
+    "orbitOpacity": "1",
+    "coreFilter": "none",
+    "rect": {
+      "x": 856.793701171875,
+      "y": 305.59375,
+      "width": 388.796875,
+      "height": 388.796875
+    }
+  }
+}

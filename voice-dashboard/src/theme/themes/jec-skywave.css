@@ -1,5 +1,60 @@
 /* jec-skywave: theme values only. Component structure belongs to design-system. */
 [data-theme="jec-skywave"] {
+  /* Cosmic volume: a dark nucleus, luminous plasma and embedded stars. */
+  --orb-shell-border-width: 0px;
+  --orb-shell-surface:
+    radial-gradient(ellipse at 27% 20%, rgba(159,240,255,.48), transparent 24%),
+    radial-gradient(ellipse at 72% 75%, rgba(78,52,171,.48), transparent 56%),
+    radial-gradient(circle at 43% 40%, #12648b 0%, #08395e 35%, #04172f 66%, #073959 87%, #78d6f2 100%);
+  --orb-shell-mask: radial-gradient(circle, #000 65%, rgba(0,0,0,.96) 68%, transparent 72%);
+  --orb-nebula-content: "";
+  --orb-nebula-surface:
+    radial-gradient(ellipse at 28% 38%, rgba(73,229,255,.72), transparent 26%),
+    radial-gradient(ellipse at 72% 62%, rgba(126,93,248,.58), transparent 29%),
+    repeating-conic-gradient(from 30deg at 48% 52%, transparent 0deg 36deg, rgba(44,169,223,.03) 44deg, rgba(85,227,255,.62) 56deg, rgba(91,104,245,.24) 69deg, transparent 88deg 120deg);
+  --orb-nebula-mask: radial-gradient(ellipse, transparent 9%, #000 29% 52%, transparent 72%);
+  --orb-nebula-opacity: .8;
+  --orb-star-content: "";
+  --orb-star-surface:
+    radial-gradient(circle at 23% 32%, #ecfcff 0 .9px, transparent 1.8px),
+    radial-gradient(circle at 38% 17%, #8fefff 0 .7px, transparent 1.6px),
+    radial-gradient(circle at 65% 22%, #fff 0 1px, transparent 2px),
+    radial-gradient(circle at 76% 44%, #a5c4ff 0 .8px, transparent 1.8px),
+    radial-gradient(circle at 31% 67%, #c7f9ff 0 1.1px, transparent 2px),
+    radial-gradient(circle at 61% 74%, #e3dcff 0 .8px, transparent 1.8px),
+    radial-gradient(circle at 52% 35%, #c9fbff 0 .7px, transparent 1.6px),
+    radial-gradient(circle at 44% 81%, #8fefff 0 .8px, transparent 1.7px),
+    radial-gradient(circle at 81% 64%, #fff 0 .7px, transparent 1.5px),
+    radial-gradient(circle at 18% 48%, #8fd8ff 0 .7px, transparent 1.5px);
+  --orb-grid-opacity: .035;
+  --orb-grid-blur: 2px;
+  --orb-wave-border-width: 0px;
+  --orb-wave-surface: radial-gradient(ellipse at 36% 45%, rgba(167,246,255,.62), rgba(44,169,223,.22) 28%, rgba(114,86,235,.18) 48%, transparent 72%);
+  --orb-wave-blur: 3px;
+  --orb-core-blur: 2px;
+  --orb-highlight-width: 20%;
+  --orb-highlight-height: 12%;
+  --orb-highlight-right: 48%;
+  --orb-highlight-blur: 5px;
+  --orb-state-border-width: 1px;
+  --orb-state-blur: 2px;
+  --orb-orbit-opacity: .36;
+  --orb-orbit-blur: 1.2px;
+  --orb-satellite-opacity: .8;
+  --orb-satellite-blur: .6px;
+  --orb-floor-opacity: .20;
+  --orb-floor-blur: 4px;
+  --orb-float-duration: 5.8s;
+  --orb-halo-duration: 6.4s;
+  --orb-state-duration: 3.8s;
+  --orb-mist-motion: orbMistDrift 12s ease-in-out infinite alternate;
+  --orb-nebula-motion: orbNebulaTurn 24s linear infinite;
+  --orb-star-motion: orbNebulaTurn 65s linear infinite reverse;
+  --company-pnl-heading: #073B59;
+  --company-pnl-label: #0A5C91;
+  --company-pnl-previous: #426B82;
+  --company-pnl-section: #075985;
+  --company-pnl-meta: #356B87;
   --login-top-surface: transparent;
   --login-top-border: transparent;
   --login-top-shadow: none;

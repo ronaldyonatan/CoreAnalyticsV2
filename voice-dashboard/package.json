@@ -1,11 +1,11 @@
 {
   "name": "voice-dashboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/check-release-version.mjs && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "theme:audit": "node scripts/audit-theme-ownership.mjs",
@@ -16,7 +16,10 @@
     "theme:verify-clinic": "node scripts/verify-clinic-picker.mjs",
     "theme:audit:css": "node scripts/audit-theme-ownership.mjs --css-only --strict",
     "theme:verify-assets": "node scripts/verify-component-styles.mjs",
-    "theme:verify-login": "node scripts/verify-login-surfaces.mjs"
+    "theme:verify-login": "node scripts/verify-login-surfaces.mjs",
+    "theme:verify-renderers": "node scripts/verify-renderer-configuration.mjs",
+    "theme:verify-webgl": "node scripts/verify-renderer-webgl.mjs",
+    "release:check": "node scripts/check-release-version.mjs"
   },
   "dependencies": {
     "@nivo/bar": "^0.99.0",

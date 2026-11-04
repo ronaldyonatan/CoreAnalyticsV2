@@ -1,0 +1,879 @@
+[
+  {
+    "file": "src/components/Panel1Revenue.tsx",
+    "role": "palette",
+    "expression": "isSolaris\n    ? {\n        // Solaris Daylight Ion: electric azure + cobalt + ice, deliberately not Aurora teal.\n        background: '#5f97cb',\n        fog: '#91c8e8',\n        floor: '#24527f',\n        grid1: '#a8e2ff',\n        grid2: '#4f7fb0',\n        previous: '#3b82f6',\n        previousEmissive: '#1d4ed8',\n        current: '#79cfff',\n        currentEmissive: '#287cc4',\n        radiantOuter: '#9bdcff',\n        radiantOuterEmissive: '#287cc4',\n        radiantInner: '#d7f3ff',\n        radiantInnerEmissive: '#4b9bdd',\n        target: '#5b6ee1',\n        scanner: '#c3ecff',\n        scannerSecondary: '#6f8cff',\n        wall: '#78afd7',\n        sideWall: '#5875bd',\n        text: '#f8fdff',\n      }\n    : isAurora\n    ? {\n        background: '#0a2935',\n        fog: '#0b2f3b',\n        floor: '#0b2732',\n        grid1: '#2dd4bf',\n        grid2: '#315d69',\n        previous: '#60a5fa',\n        previousEmissive: '#2563eb',\n        current: '#2dd4bf',\n        currentEmissive: '#0f9f8c',\n        radiantOuter: '#59e8f5',\n        radiantOuterEmissive: '#159aaa',\n        radiantInner: '#2dd4bf',\n        radiantInnerEmissive: '#0f9f8c',\n        target: '#fbbf24',\n        scanner: '#59e8f5',\n        scannerSecondary: '#a78bfa',\n        wall: '#123945',\n        sideWall: '#2f3155',\n        text: '#eaffff',\n      }\n    : {\n        background: '#020916',\n        fog: '#020916',\n        floor: '#031523',\n        grid1: '#087da5',\n        grid2: '#07304a',\n        previous: '#0284c7',\n        previousEmissive: '#075985',\n        current: '#00f2fe',\n        currentEmissive: '#0891b2',\n        radiantOuter: '#0ea5e9',\n        radiantOuterEmissive: '#075985',\n        radiantInner: '#00f2fe',\n        radiantInnerEmissive: '#0891b2',\n        target: '#f59e0b',\n        scanner: '#67e8f9',\n        scannerSecondary: '#22d3ee',\n        wall: '#031321',\n        sideWall: '#07142a',\n        text: '#e8fdff',\n      }",
+    "values": [
+      {
+        "background": "#020916",
+        "fog": "#020916",
+        "floor": "#031523",
+        "grid1": "#087da5",
+        "grid2": "#07304a",
+        "previous": "#0284c7",
+        "previousEmissive": "#075985",
+        "current": "#00f2fe",
+        "currentEmissive": "#0891b2",
+        "radiantOuter": "#0ea5e9",
+        "radiantOuterEmissive": "#075985",
+        "radiantInner": "#00f2fe",
+        "radiantInnerEmissive": "#0891b2",
+        "target": "#f59e0b",
+        "scanner": "#67e8f9",
+        "scannerSecondary": "#22d3ee",
+        "wall": "#031321",
+        "sideWall": "#07142a",
+        "text": "#e8fdff"
+      },
+      {
+        "background": "#0a2935",
+        "fog": "#0b2f3b",
+        "floor": "#0b2732",
+        "grid1": "#2dd4bf",
+        "grid2": "#315d69",
+        "previous": "#60a5fa",
+        "previousEmissive": "#2563eb",
+        "current": "#2dd4bf",
+        "currentEmissive": "#0f9f8c",
+        "radiantOuter": "#59e8f5",
+        "radiantOuterEmissive": "#159aaa",
+        "radiantInner": "#2dd4bf",
+        "radiantInnerEmissive": "#0f9f8c",
+        "target": "#fbbf24",
+        "scanner": "#59e8f5",
+        "scannerSecondary": "#a78bfa",
+        "wall": "#123945",
+        "sideWall": "#2f3155",
+        "text": "#eaffff"
+      },
+      {
+        "background": "#5f97cb",
+        "fog": "#91c8e8",
+        "floor": "#24527f",
+        "grid1": "#a8e2ff",
+        "grid2": "#4f7fb0",
+        "previous": "#3b82f6",
+        "previousEmissive": "#1d4ed8",
+        "current": "#79cfff",
+        "currentEmissive": "#287cc4",
+        "radiantOuter": "#9bdcff",
+        "radiantOuterEmissive": "#287cc4",
+        "radiantInner": "#d7f3ff",
+        "radiantInnerEmissive": "#4b9bdd",
+        "target": "#5b6ee1",
+        "scanner": "#c3ecff",
+        "scannerSecondary": "#6f8cff",
+        "wall": "#78afd7",
+        "sideWall": "#5875bd",
+        "text": "#f8fdff"
+      }
+    ]
+  },
+  {
+    "file": "src/components/Panel1Revenue.tsx",
+    "role": "ambientLightIntensity",
+    "expression": "isSolaris ? 1.18 : isAurora ? 1.05 : 0.9",
+    "values": [
+      0.9,
+      1.05,
+      1.18
+    ]
+  },
+  {
+    "file": "src/components/Panel1Revenue.tsx",
+    "role": "pointLightColor",
+    "expression": "isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/Panel1Revenue.tsx",
+    "role": "backplateColor",
+    "expression": "isSolaris ? '#73a5ce' : isAurora ? '#382f57' : '#1a0a20'",
+    "values": [
+      "#1a0a20",
+      "#382f57",
+      "#73a5ce"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "colors",
+    "expression": "isSolaris ? EXSUM_3D_COLORS_SOLARIS : isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK",
+    "values": [
+      [
+        "#00f2fe",
+        "#00d4ff",
+        "#00b7ff",
+        "#0099ff",
+        "#007aff",
+        "#4d8aff",
+        "#759dff",
+        "#9fb0ff",
+        "#c5c4ff",
+        "#e0d8ff"
+      ],
+      [
+        "#59e8f5",
+        "#2dd4bf",
+        "#60a5fa",
+        "#818cf8",
+        "#a78bfa",
+        "#c084fc",
+        "#5eead4",
+        "#38bdf8",
+        "#f0abfc",
+        "#bae6fd"
+      ],
+      [
+        "#2f80ed",
+        "#318cff",
+        "#54a8ff",
+        "#79c7ff",
+        "#9cdaff",
+        "#c6edff",
+        "#6f93ff",
+        "#4e73dc",
+        "#a9c8ff",
+        "#e0f5ff"
+      ]
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "backgroundColor",
+    "expression": "isSolaris ? '#5f97cb' : isAurora ? '#092a35' : '#020916'",
+    "values": [
+      "#020916",
+      "#092a35",
+      "#5f97cb"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "fogColor",
+    "expression": "isSolaris ? '#91c8e8' : isAurora ? '#092a35' : '#020916'",
+    "values": [
+      "#020916",
+      "#092a35",
+      "#91c8e8"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "ambientLightIntensity",
+    "expression": "isSolaris ? 1.22 : isAurora ? 1.1 : 0.9",
+    "values": [
+      0.9,
+      1.1,
+      1.22
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "pointLightColor",
+    "expression": "isSolaris ? '#79cfff' : isAurora ? '#2dd4bf' : '#00f2fe'",
+    "values": [
+      "#00f2fe",
+      "#2dd4bf",
+      "#79cfff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "pointLightColor2",
+    "expression": "isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "backplateColor",
+    "expression": "isSolaris ? '#78afd7' : isAurora ? '#103744' : '#031321'",
+    "values": [
+      "#031321",
+      "#103744",
+      "#78afd7"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "gridPrimaryColor",
+    "expression": "isSolaris ? '#a8e2ff' : isAurora ? '#2dd4bf' : '#087da5'",
+    "values": [
+      "#087da5",
+      "#2dd4bf",
+      "#a8e2ff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "gridSecondaryColor",
+    "expression": "isSolaris ? '#4f7fb0' : isAurora ? '#315d69' : '#07304a'",
+    "values": [
+      "#07304a",
+      "#315d69",
+      "#4f7fb0"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "secondaryMaterialColor",
+    "expression": "isAurora ? '#0d3340' : '#03111e'",
+    "values": [
+      "#03111e",
+      "#0d3340",
+      "#03111e"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "textShadow",
+    "expression": "isAurora ? '#2dd4bf' : '#00f2fe'",
+    "values": [
+      "#00f2fe",
+      "#2dd4bf",
+      "#00f2fe"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "textColor",
+    "expression": "isAurora ? '#baf7f4' : '#b9f8ff'",
+    "values": [
+      "#b9f8ff",
+      "#baf7f4",
+      "#b9f8ff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "ledgerPalette",
+    "expression": "isSolaris ? {\n    wall:'#5f97cb', frame:'#4f7fb0', screen:'#4a82b8', cell:'#74acd4',\n    edge:'#a8e2ff', text:'#f8fdff', muted:'#d7ebf8', pos:'#8fd2ff',\n    neg:'#f05a7a', amber:'#6f8cff', glow:'#79cfff'\n  } : isAurora ? {\n    wall:'#0a2630', frame:'#17414d', screen:'#092832', cell:'#123844',\n    edge:'#59e8f5', text:'#efffff', muted:'#a9dce2', pos:'#5eead4',\n    neg:'#fb7185', amber:'#fbbf24', glow:'#2dd4bf'\n  } : {\n    wall:'#020916', frame:'#06263a', screen:'#031522', cell:'#052338',\n    edge:'#00f2fe', text:'#efffff', muted:'#9eefff', pos:'#2dd4bf',\n    neg:'#fb7185', amber:'#fbbf24', glow:'#00f2fe'\n  }",
+    "values": [
+      {
+        "wall": "#020916",
+        "frame": "#06263a",
+        "screen": "#031522",
+        "cell": "#052338",
+        "edge": "#00f2fe",
+        "text": "#efffff",
+        "muted": "#9eefff",
+        "pos": "#2dd4bf",
+        "neg": "#fb7185",
+        "amber": "#fbbf24",
+        "glow": "#00f2fe"
+      },
+      {
+        "wall": "#0a2630",
+        "frame": "#17414d",
+        "screen": "#092832",
+        "cell": "#123844",
+        "edge": "#59e8f5",
+        "text": "#efffff",
+        "muted": "#a9dce2",
+        "pos": "#5eead4",
+        "neg": "#fb7185",
+        "amber": "#fbbf24",
+        "glow": "#2dd4bf"
+      },
+      {
+        "wall": "#5f97cb",
+        "frame": "#4f7fb0",
+        "screen": "#4a82b8",
+        "cell": "#74acd4",
+        "edge": "#a8e2ff",
+        "text": "#f8fdff",
+        "muted": "#d7ebf8",
+        "pos": "#8fd2ff",
+        "neg": "#f05a7a",
+        "amber": "#6f8cff",
+        "glow": "#79cfff"
+      }
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "hoverColor",
+    "expression": "isSolaris ? '#80b5da' : isAurora ? '#17606b' : '#07516a'",
+    "values": [
+      "#07516a",
+      "#17606b",
+      "#80b5da"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "animatedBackdrop",
+    "expression": "(isAurora || isSolaris)",
+    "values": [
+      false,
+      true,
+      true
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "pointLightColor3",
+    "expression": "isSolaris?'#6f8cff':isAurora?'#a78bfa':'#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "tertiaryMaterialColor",
+    "expression": "isSolaris ? '#74acd4' : isAurora ? '#103642' : '#031725'",
+    "values": [
+      "#031725",
+      "#103642",
+      "#74acd4"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "scannerGlowColor",
+    "expression": "isAurora ? 'rgba(89,232,245,.62)' : 'rgba(0,242,254,.62)'",
+    "values": [
+      "rgba(0,242,254,.62)",
+      "rgba(89,232,245,.62)",
+      "rgba(0,242,254,.62)"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumRevenue.tsx",
+    "role": "background",
+    "expression": "isAurora\n                ? 'linear-gradient(90deg, transparent, rgba(89,232,245,.025), rgba(167,139,250,.065), rgba(89,232,245,.11), transparent)'\n                : 'linear-gradient(90deg, transparent, rgba(0,242,254,.020), rgba(34,211,238,.060), rgba(0,242,254,.10), transparent)'",
+    "values": [
+      "linear-gradient(90deg, transparent, rgba(0,242,254,.020), rgba(34,211,238,.060), rgba(0,242,254,.10), transparent)",
+      "linear-gradient(90deg, transparent, rgba(89,232,245,.025), rgba(167,139,250,.065), rgba(89,232,245,.11), transparent)",
+      "linear-gradient(90deg, transparent, rgba(0,242,254,.020), rgba(34,211,238,.060), rgba(0,242,254,.10), transparent)"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "colors",
+    "expression": "isSolaris ? EXSUM_3D_COLORS_SOLARIS : isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK",
+    "values": [
+      [
+        "#00f2fe",
+        "#00d4ff",
+        "#00b7ff",
+        "#0099ff",
+        "#007aff",
+        "#4d8aff",
+        "#759dff",
+        "#9fb0ff",
+        "#c5c4ff",
+        "#e0d8ff"
+      ],
+      [
+        "#59e8f5",
+        "#2dd4bf",
+        "#60a5fa",
+        "#818cf8",
+        "#a78bfa",
+        "#c084fc",
+        "#5eead4",
+        "#38bdf8",
+        "#f0abfc",
+        "#bae6fd"
+      ],
+      [
+        "#2f80ed",
+        "#318cff",
+        "#54a8ff",
+        "#79c7ff",
+        "#9cdaff",
+        "#c6edff",
+        "#6f93ff",
+        "#4e73dc",
+        "#a9c8ff",
+        "#e0f5ff"
+      ]
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "backgroundColor",
+    "expression": "isSolaris ? '#5f97cb' : isAurora ? '#092a35' : '#020916'",
+    "values": [
+      "#020916",
+      "#092a35",
+      "#5f97cb"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "fogColor",
+    "expression": "isSolaris ? '#91c8e8' : isAurora ? '#092a35' : '#020916'",
+    "values": [
+      "#020916",
+      "#092a35",
+      "#91c8e8"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "ambientLightIntensity",
+    "expression": "isSolaris ? 1.22 : isAurora ? 1.1 : 0.9",
+    "values": [
+      0.9,
+      1.1,
+      1.22
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "pointLightColor",
+    "expression": "isSolaris ? '#79cfff' : isAurora ? '#2dd4bf' : '#00f2fe'",
+    "values": [
+      "#00f2fe",
+      "#2dd4bf",
+      "#79cfff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "pointLightColor2",
+    "expression": "isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "backplateColor",
+    "expression": "isSolaris ? '#78afd7' : isAurora ? '#103744' : '#031321'",
+    "values": [
+      "#031321",
+      "#103744",
+      "#78afd7"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "gridPrimaryColor",
+    "expression": "isSolaris ? '#a8e2ff' : isAurora ? '#2dd4bf' : '#087da5'",
+    "values": [
+      "#087da5",
+      "#2dd4bf",
+      "#a8e2ff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "gridSecondaryColor",
+    "expression": "isSolaris ? '#4f7fb0' : isAurora ? '#315d69' : '#07304a'",
+    "values": [
+      "#07304a",
+      "#315d69",
+      "#4f7fb0"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "secondaryMaterialColor",
+    "expression": "isAurora ? '#0d3340' : '#03111e'",
+    "values": [
+      "#03111e",
+      "#0d3340",
+      "#03111e"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "textShadow",
+    "expression": "isAurora ? '#2dd4bf' : '#00f2fe'",
+    "values": [
+      "#00f2fe",
+      "#2dd4bf",
+      "#00f2fe"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "textColor",
+    "expression": "isAurora ? '#baf7f4' : '#b9f8ff'",
+    "values": [
+      "#b9f8ff",
+      "#baf7f4",
+      "#b9f8ff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "ledgerPalette",
+    "expression": "isSolaris ? {\n    wall:'#5f97cb', frame:'#4f7fb0', screen:'#4a82b8', cell:'#74acd4',\n    edge:'#a8e2ff', text:'#f8fdff', muted:'#d7ebf8', pos:'#8fd2ff',\n    neg:'#f05a7a', amber:'#6f8cff', glow:'#79cfff'\n  } : isAurora ? {\n    wall:'#0a2630', frame:'#17414d', screen:'#092832', cell:'#123844',\n    edge:'#59e8f5', text:'#efffff', muted:'#a9dce2', pos:'#5eead4',\n    neg:'#fb7185', amber:'#fbbf24', glow:'#2dd4bf'\n  } : {\n    wall:'#020916', frame:'#06263a', screen:'#031522', cell:'#052338',\n    edge:'#00f2fe', text:'#efffff', muted:'#9eefff', pos:'#2dd4bf',\n    neg:'#fb7185', amber:'#fbbf24', glow:'#00f2fe'\n  }",
+    "values": [
+      {
+        "wall": "#020916",
+        "frame": "#06263a",
+        "screen": "#031522",
+        "cell": "#052338",
+        "edge": "#00f2fe",
+        "text": "#efffff",
+        "muted": "#9eefff",
+        "pos": "#2dd4bf",
+        "neg": "#fb7185",
+        "amber": "#fbbf24",
+        "glow": "#00f2fe"
+      },
+      {
+        "wall": "#0a2630",
+        "frame": "#17414d",
+        "screen": "#092832",
+        "cell": "#123844",
+        "edge": "#59e8f5",
+        "text": "#efffff",
+        "muted": "#a9dce2",
+        "pos": "#5eead4",
+        "neg": "#fb7185",
+        "amber": "#fbbf24",
+        "glow": "#2dd4bf"
+      },
+      {
+        "wall": "#5f97cb",
+        "frame": "#4f7fb0",
+        "screen": "#4a82b8",
+        "cell": "#74acd4",
+        "edge": "#a8e2ff",
+        "text": "#f8fdff",
+        "muted": "#d7ebf8",
+        "pos": "#8fd2ff",
+        "neg": "#f05a7a",
+        "amber": "#6f8cff",
+        "glow": "#79cfff"
+      }
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "hoverColor",
+    "expression": "isSolaris ? '#80b5da' : isAurora ? '#17606b' : '#07516a'",
+    "values": [
+      "#07516a",
+      "#17606b",
+      "#80b5da"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "pointLightColor3",
+    "expression": "isSolaris?'#6f8cff':isAurora?'#a78bfa':'#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "tertiaryMaterialColor",
+    "expression": "isSolaris ? '#74acd4' : isAurora ? '#103642' : '#031725'",
+    "values": [
+      "#031725",
+      "#103642",
+      "#74acd4"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "backplateOpacity",
+    "expression": "isSolaris ? .84 : isAurora ? .82 : .90",
+    "values": [
+      0.9,
+      0.82,
+      0.84
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "scannerGlowColor",
+    "expression": "isAurora?'rgba(89,232,245,.62)':'rgba(0,242,254,.62)'",
+    "values": [
+      "rgba(0,242,254,.62)",
+      "rgba(89,232,245,.62)",
+      "rgba(0,242,254,.62)"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumMaterial.tsx",
+    "role": "background",
+    "expression": "isAurora\n              ?'linear-gradient(90deg,transparent,rgba(89,232,245,.025),rgba(167,139,250,.065),rgba(89,232,245,.11),transparent)'\n              :'linear-gradient(90deg,transparent,rgba(0,242,254,.020),rgba(34,211,238,.060),rgba(0,242,254,.10),transparent)'",
+    "values": [
+      "linear-gradient(90deg,transparent,rgba(0,242,254,.020),rgba(34,211,238,.060),rgba(0,242,254,.10),transparent)",
+      "linear-gradient(90deg,transparent,rgba(89,232,245,.025),rgba(167,139,250,.065),rgba(89,232,245,.11),transparent)",
+      "linear-gradient(90deg,transparent,rgba(0,242,254,.020),rgba(34,211,238,.060),rgba(0,242,254,.10),transparent)"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "colors",
+    "expression": "isSolaris ? EXSUM_3D_COLORS_SOLARIS : isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK",
+    "values": [
+      [
+        "#00f2fe",
+        "#00d4ff",
+        "#00b7ff",
+        "#0099ff",
+        "#007aff",
+        "#4d8aff",
+        "#759dff",
+        "#9fb0ff",
+        "#c5c4ff",
+        "#e0d8ff"
+      ],
+      [
+        "#59e8f5",
+        "#2dd4bf",
+        "#60a5fa",
+        "#818cf8",
+        "#a78bfa",
+        "#c084fc",
+        "#5eead4",
+        "#38bdf8",
+        "#f0abfc",
+        "#bae6fd"
+      ],
+      [
+        "#2f80ed",
+        "#318cff",
+        "#54a8ff",
+        "#79c7ff",
+        "#9cdaff",
+        "#c6edff",
+        "#6f93ff",
+        "#4e73dc",
+        "#a9c8ff",
+        "#e0f5ff"
+      ]
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "backgroundColor",
+    "expression": "isSolaris ? '#5f97cb' : isAurora ? '#092a35' : '#020916'",
+    "values": [
+      "#020916",
+      "#092a35",
+      "#5f97cb"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "fogColor",
+    "expression": "isSolaris ? '#91c8e8' : isAurora ? '#092a35' : '#020916'",
+    "values": [
+      "#020916",
+      "#092a35",
+      "#91c8e8"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "ambientLightIntensity",
+    "expression": "isSolaris ? 1.22 : isAurora ? 1.1 : 0.9",
+    "values": [
+      0.9,
+      1.1,
+      1.22
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "pointLightColor",
+    "expression": "isSolaris ? '#79cfff' : isAurora ? '#2dd4bf' : '#00f2fe'",
+    "values": [
+      "#00f2fe",
+      "#2dd4bf",
+      "#79cfff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "pointLightColor2",
+    "expression": "isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "backplateColor",
+    "expression": "isSolaris ? '#78afd7' : isAurora ? '#103744' : '#031321'",
+    "values": [
+      "#031321",
+      "#103744",
+      "#78afd7"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "gridPrimaryColor",
+    "expression": "isSolaris ? '#a8e2ff' : isAurora ? '#2dd4bf' : '#087da5'",
+    "values": [
+      "#087da5",
+      "#2dd4bf",
+      "#a8e2ff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "gridSecondaryColor",
+    "expression": "isSolaris ? '#4f7fb0' : isAurora ? '#315d69' : '#07304a'",
+    "values": [
+      "#07304a",
+      "#315d69",
+      "#4f7fb0"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "secondaryMaterialColor",
+    "expression": "isAurora ? '#0d3340' : '#03111e'",
+    "values": [
+      "#03111e",
+      "#0d3340",
+      "#03111e"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "textShadow",
+    "expression": "isAurora ? '#2dd4bf' : '#00f2fe'",
+    "values": [
+      "#00f2fe",
+      "#2dd4bf",
+      "#00f2fe"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "textColor",
+    "expression": "isAurora ? '#baf7f4' : '#b9f8ff'",
+    "values": [
+      "#b9f8ff",
+      "#baf7f4",
+      "#b9f8ff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "ledgerPalette",
+    "expression": "isSolaris ? {\n    wall:'#5f97cb', frame:'#4f7fb0', screen:'#4a82b8', cell:'#74acd4',\n    edge:'#a8e2ff', text:'#f8fdff', muted:'#d7ebf8', pos:'#8fd2ff',\n    neg:'#f05a7a', amber:'#6f8cff', glow:'#79cfff'\n  } : isAurora ? {\n    wall:'#0a2630', frame:'#17414d', screen:'#092832', cell:'#123844',\n    edge:'#59e8f5', text:'#efffff', muted:'#a9dce2', pos:'#5eead4',\n    neg:'#fb7185', amber:'#fbbf24', glow:'#2dd4bf'\n  } : {\n    wall:'#020916', frame:'#06263a', screen:'#031522', cell:'#052338',\n    edge:'#00f2fe', text:'#efffff', muted:'#9eefff', pos:'#2dd4bf',\n    neg:'#fb7185', amber:'#fbbf24', glow:'#00f2fe'\n  }",
+    "values": [
+      {
+        "wall": "#020916",
+        "frame": "#06263a",
+        "screen": "#031522",
+        "cell": "#052338",
+        "edge": "#00f2fe",
+        "text": "#efffff",
+        "muted": "#9eefff",
+        "pos": "#2dd4bf",
+        "neg": "#fb7185",
+        "amber": "#fbbf24",
+        "glow": "#00f2fe"
+      },
+      {
+        "wall": "#0a2630",
+        "frame": "#17414d",
+        "screen": "#092832",
+        "cell": "#123844",
+        "edge": "#59e8f5",
+        "text": "#efffff",
+        "muted": "#a9dce2",
+        "pos": "#5eead4",
+        "neg": "#fb7185",
+        "amber": "#fbbf24",
+        "glow": "#2dd4bf"
+      },
+      {
+        "wall": "#5f97cb",
+        "frame": "#4f7fb0",
+        "screen": "#4a82b8",
+        "cell": "#74acd4",
+        "edge": "#a8e2ff",
+        "text": "#f8fdff",
+        "muted": "#d7ebf8",
+        "pos": "#8fd2ff",
+        "neg": "#f05a7a",
+        "amber": "#6f8cff",
+        "glow": "#79cfff"
+      }
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "hoverColor",
+    "expression": "isSolaris ? '#80b5da' : isAurora ? '#17606b' : '#07516a'",
+    "values": [
+      "#07516a",
+      "#17606b",
+      "#80b5da"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "pointLightColor3",
+    "expression": "isSolaris?'#6f8cff':isAurora?'#a78bfa':'#2563eb'",
+    "values": [
+      "#2563eb",
+      "#a78bfa",
+      "#6f8cff"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "tertiaryMaterialColor",
+    "expression": "isSolaris ? '#74acd4' : isAurora ? '#103642' : '#031725'",
+    "values": [
+      "#031725",
+      "#103642",
+      "#74acd4"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "backplateOpacity",
+    "expression": "isSolaris ? .84 : isAurora ? .82 : .90",
+    "values": [
+      0.9,
+      0.82,
+      0.84
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "scannerGlowColor",
+    "expression": "isAurora?'rgba(89,232,245,.62)':'rgba(0,242,254,.62)'",
+    "values": [
+      "rgba(0,242,254,.62)",
+      "rgba(89,232,245,.62)",
+      "rgba(0,242,254,.62)"
+    ]
+  },
+  {
+    "file": "src/components/PanelExsumDoctorFee.tsx",
+    "role": "background",
+    "expression": "isAurora\n              ?'linear-gradient(90deg,transparent,rgba(89,232,245,.025),rgba(167,139,250,.065),rgba(89,232,245,.11),transparent)'\n              :'linear-gradient(90deg,transparent,rgba(0,242,254,.020),rgba(34,211,238,.060),rgba(0,242,254,.10),transparent)'",
+    "values": [
+      "linear-gradient(90deg,transparent,rgba(0,242,254,.020),rgba(34,211,238,.060),rgba(0,242,254,.10),transparent)",
+      "linear-gradient(90deg,transparent,rgba(89,232,245,.025),rgba(167,139,250,.065),rgba(89,232,245,.11),transparent)",
+      "linear-gradient(90deg,transparent,rgba(0,242,254,.020),rgba(34,211,238,.060),rgba(0,242,254,.10),transparent)"
+    ]
+  }
+]

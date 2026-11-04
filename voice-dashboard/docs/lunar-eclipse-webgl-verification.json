@@ -1,0 +1,30 @@
+{
+  "lunar-eclipse": {
+    "before": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "070915",
+          "fog": "070915",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "after": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "070915",
+          "fog": "070915",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  }
+}

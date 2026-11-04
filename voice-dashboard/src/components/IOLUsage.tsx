@@ -460,9 +460,9 @@ function IOLMatrixScene({
 }
 
 export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUsageProps) {
-  const { isStaticTheme, isLight, isJecHorizon, isJecSkywave } = useTheme();
-  const isJecTheme = isJecHorizon || isJecSkywave;
-  const sceneIsLight = isLight && !isJecTheme;
+  const { theme, isStaticTheme, isLight } = useTheme();
+  const visual = theme.three.renderers.IOLUsage;
+  const sceneIsLight = visual.lightMaterials;
   const now = new Date();
   const defaultMonth = Math.min(12, Math.max(1, now.getMonth() + 1));
   const selectedYear = String(now.getFullYear());
@@ -918,8 +918,8 @@ export default function IOLUsage({ selectedHealthcareId, healthcareList }: IOLUs
     <div
       className={`iol-matrix-shell relative overflow-hidden ${fullscreen ? 'h-full min-h-0' : 'h-[460px]'} rounded-xl border`}
       style={{
-        borderColor: isJecTheme ? 'rgba(37,135,200,.42)' : 'var(--core-border)',
-        background: isJecTheme ? '#010611' : 'var(--core-panel)',
+        borderColor: visual.borderColor,
+        background: visual.background,
       }}
     >
       <div

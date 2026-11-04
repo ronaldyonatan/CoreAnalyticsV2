@@ -49,11 +49,22 @@ function canonical(text) {
   });
   return JSON.stringify(declarations);
 }
+const baselineValues = new Map();
+postcss.parse(baseline('design-system/tokens/defaults.css')).walkDecls(decl => baselineValues.set(decl.prop, decl.value));
+function expand(text, key, tokens) {
+  return text.replace(/var\((--[\w-]+)\)/g, (match, prop) => prop.startsWith('--' + key + '-') && tokens.has(prop) ? tokens.get(prop) : match);
+}
 const results = [];
 for (const asset of assets) {
-  const before = canonical(template(baseline(asset.file), asset.block));
+  const baselineConsumer = baseline(asset.file);
+  // A later baseline may already own the extracted asset. Compare that asset
+  // rather than expecting an application <style> block to reappear.
+  const baselineSheet = baselineConsumer.includes(`<ComponentStyles name="${asset.key}" />`)
+    ? expand(baseline(asset.asset), asset.key, baselineValues)
+    : template(baselineConsumer, asset.block);
+  const before = canonical(baselineSheet);
   const current = fs.readFileSync(path.join(source, asset.asset), 'utf8');
-  const expanded = current.replace(/var\((--[\w-]+)\)/g, (match, prop) => prop.startsWith('--' + asset.key + '-') && values.has(prop) ? values.get(prop) : match);
+  const expanded = expand(current, asset.key, values);
   if (canonical(expanded) !== before) throw Error('Stylesheet declarations changed: ' + asset.key);
   const consumer = fs.readFileSync(path.join(source, asset.file), 'utf8');
   if (!consumer.includes(`<ComponentStyles name="${asset.key}" />`)) throw Error('Missing mounted stylesheet consumer: ' + asset.key);

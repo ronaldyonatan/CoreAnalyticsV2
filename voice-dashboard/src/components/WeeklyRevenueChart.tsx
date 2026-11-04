@@ -1,3 +1,4 @@
+import type { ChartRenderers } from '../theme/renderer-config';
 import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -43,7 +44,6 @@ interface WeeklyRevenueChartProps {
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const MONTH_NAMES = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 
-
 interface Revenue3DTooltip {
   week: string;
   adm: number;
@@ -52,21 +52,20 @@ interface Revenue3DTooltip {
   type: 'adm' | 'sur' | 'rev';
 }
 
-
 function Real3DRevenueScene({
   data,
   onHover,
   isMobile,
   autoRotate,
   onInteractionStart,
-  isSolaris,
+  visual,
 }: {
   data: WeeklyDataModel[];
   onHover: (info: Revenue3DTooltip | null) => void;
   isMobile: boolean;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isSolaris: boolean;
+  visual: ChartRenderers['WeeklyRevenueChart'];
 }) {
   const maxQty = Math.max(100, ...data.map((d) => Number(d.adm) + Number(d.sur)));
   const maxRev = Math.max(100, ...data.map((d) => Number(d.rev)));
@@ -206,9 +205,9 @@ function Real3DRevenueScene({
 
   return (
     <>
-      <color attach="background" args={[isSolaris ? '#5f97cb' : '#020916']} />
-      <fog attach="fog" args={[isSolaris ? '#91c8e8' : '#020916', 24, 46]} />
-      <ambientLight intensity={isSolaris ? 1.45 : 1.15} />
+      <color attach="background" args={[visual.backgroundColor]} />
+      <fog attach="fog" args={[visual.fogColor, 24, 46]} />
+      <ambientLight intensity={visual.ambientLightIntensity} />
       <directionalLight position={[4, 9, 6]} intensity={2.4} color="#b9f7ff" />
       <pointLight position={[-5, 4, 3]} intensity={38} color="#00cfff" distance={15} />
       <pointLight position={[5, 3, -2]} intensity={28} color="#00d084" distance={13} />
@@ -217,32 +216,32 @@ function Real3DRevenueScene({
       {/* Back wall + angled wings create the curved command-center enclosure. */}
       <mesh position={[0, 2.45, -2.7]}>
         <planeGeometry args={[chartWidth + 2.6, 5.35]} />
-        <meshPhysicalMaterial color={isSolaris ? '#78afd7' : '#031321'} transparent opacity={isSolaris ? 0.56 : 0.78} roughness={isSolaris ? 0.46 : 0.28} metalness={isSolaris ? 0.18 : 0.45} />
+        <meshPhysicalMaterial color={visual.backplateColor} transparent opacity={visual.backplateOpacity} roughness={visual.backplateRoughness} metalness={visual.backplateMetalness} />
       </mesh>
       <mesh position={[-chartWidth / 2 - 1.18, 2.2, -1.55]} rotation={[0, Math.PI / 5.5, 0]}>
         <planeGeometry args={[2.7, 4.9]} />
-        <meshPhysicalMaterial color={isSolaris ? '#5875bd' : '#041727'} transparent opacity={isSolaris ? 0.38 : 0.72} roughness={isSolaris ? 0.5 : 0.3} metalness={isSolaris ? 0.16 : 0.5} />
+        <meshPhysicalMaterial color={visual.secondaryMaterialColor} transparent opacity={visual.secondaryMaterialOpacity} roughness={visual.secondaryMaterialRoughness} metalness={visual.secondaryMaterialMetalness} />
       </mesh>
       <mesh position={[chartWidth / 2 + 1.18, 2.2, -1.55]} rotation={[0, -Math.PI / 5.5, 0]}>
         <planeGeometry args={[2.7, 4.9]} />
-        <meshPhysicalMaterial color={isSolaris ? '#5875bd' : '#041727'} transparent opacity={isSolaris ? 0.38 : 0.72} roughness={isSolaris ? 0.5 : 0.3} metalness={isSolaris ? 0.16 : 0.5} />
+        <meshPhysicalMaterial color={visual.tertiaryMaterialColor} transparent opacity={visual.tertiaryMaterialOpacity} roughness={visual.tertiaryMaterialRoughness} metalness={visual.tertiaryMaterialMetalness} />
       </mesh>
 
       {/* Horizontal luminous guides on the rear wall. */}
       {qtyTicks.map((_, i) => {
         const y = (4.6 / 4) * i;
-        return <DreiLine key={`back-h-${i}`} points={[[-chartWidth / 2 - 0.5, y, -2.63], [chartWidth / 2 + 0.5, y, -2.63]]} color={isSolaris ? '#d7f3ff' : '#087da5'} lineWidth={0.65} transparent opacity={0.42} />;
+        return <DreiLine key={`back-h-${i}`} points={[[-chartWidth / 2 - 0.5, y, -2.63], [chartWidth / 2 + 0.5, y, -2.63]]} color={visual.horizontalGridColor} lineWidth={0.65} transparent opacity={0.42} />;
       })}
       {Array.from({ length: 9 }, (_, i) => {
         const x = -chartWidth / 2 + (chartWidth / 8) * i;
-        return <DreiLine key={`back-v-${i}`} points={[[x, 0, -2.63], [x, 4.6, -2.63]]} color={isSolaris ? '#7fb7df' : '#07506d'} lineWidth={0.55} transparent opacity={0.3} />;
+        return <DreiLine key={`back-v-${i}`} points={[[x, 0, -2.63], [x, 4.6, -2.63]]} color={visual.verticalGridColor} lineWidth={0.55} transparent opacity={0.3} />;
       })}
 
       {/* Deeper floor: the chart sits toward the back instead of floating in the middle. */}
-      <gridHelper args={[chartWidth + 4, Math.min(48, data.length + 8), isSolaris ? '#a8e2ff' : '#087da5', isSolaris ? '#4f7fb0' : '#07304a']} position={[0, 0, 0]} />
+      <gridHelper args={[chartWidth + 4, Math.min(48, data.length + 8), visual.gridPrimaryColor, visual.gridSecondaryColor]} position={[0, 0, 0]} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.045, 0.25]} receiveShadow>
         <planeGeometry args={[chartWidth + 4, 6.6]} />
-        <meshStandardMaterial color={isSolaris ? '#24527f' : '#031523'} metalness={isSolaris ? 0.32 : 0.62} roughness={isSolaris ? 0.46 : 0.3} transparent opacity={isSolaris ? 0.90 : 0.92} />
+        <meshStandardMaterial color={visual.floorColor} metalness={visual.floorMetalness} roughness={visual.floorRoughness} transparent opacity={visual.floorOpacity} />
       </mesh>
 
       {/* Visible quantity axis on the left. */}
@@ -350,7 +349,8 @@ export default function WeeklyRevenueChart({
   isPeriodLoading = false,
   onMonthChange,
 }: WeeklyRevenueChartProps) {
-  const { isSolaris, isStaticTheme } = useTheme();
+  const { theme, isStaticTheme } = useTheme();
+  const visual = theme.three.renderers.WeeklyRevenueChart;
   const [hover3D, setHover3D] = useState<Revenue3DTooltip | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
@@ -399,8 +399,8 @@ export default function WeeklyRevenueChart({
 
   if (isFullscreen && !isStaticTheme) {
     return (
-      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
-        <div className={`relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl ${isSolaris ? 'border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]' : 'border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/80 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]'}`}>
+      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${visual.shellClassName}`}>
+        <div className={`relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl ${visual.headerClassName}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
@@ -560,7 +560,7 @@ export default function WeeklyRevenueChart({
                 isMobile={isMobile}
                 autoRotate={autoRotate}
                 onInteractionStart={() => setAutoRotate(false)}
-                isSolaris={isSolaris}
+                visual={visual}
               />
             </Canvas>
           </div>

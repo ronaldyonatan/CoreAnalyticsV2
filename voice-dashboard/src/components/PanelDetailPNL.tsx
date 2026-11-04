@@ -145,7 +145,7 @@ export default function PanelDetailPNL({
       <div className="company-panel-header flex items-center justify-between pb-2 mb-2 border-b border-[#00f2fe]/30 flex-shrink-0">
         <div className="flex items-center gap-2">
           <span className="company-status-dot w-2 h-2 rounded-full bg-[#00f2fe] animate-pulse"></span>
-          <h3 className="company-title text-xs font-bold text-[#00f2fe] tracking-widest uppercase text-hud-glow flex items-center gap-2">
+          <h3 className="company-title company-pnl-title text-xs font-bold text-[#00f2fe] tracking-widest uppercase text-hud-glow flex items-center gap-2">
             <span>DETAIL PROFIT & LOSS STATEMENT</span>
             
             <div 
@@ -218,7 +218,7 @@ export default function PanelDetailPNL({
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-cyan-400/70 font-mono tracking-wider">
+          <span className="company-pnl-mode text-[10px] text-cyan-400/70 font-mono tracking-wider">
             MODE: MACRO_FINANCE_PNL
           </span>
 

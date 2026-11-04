@@ -1617,3 +1617,28 @@ html[data-surface-family="clinical"]:where([data-performance="static"]) .company
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+/* Light immersive clinical P&L surfaces need readable ink in both dashboard
+   and fullscreen. Values remain owned by the theme definition. */
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card .company-panel-header .company-pnl-title {
+  color: var(--company-pnl-heading, var(--core-text)) !important;
+  -webkit-text-fill-color: currentColor !important;
+  text-shadow: none !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card .company-pnl-mode,
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card .company-icon-button {
+  color: var(--company-pnl-meta, var(--core-text-secondary)) !important;
+  -webkit-text-fill-color: var(--company-pnl-meta, var(--core-text-secondary)) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card .company-pnl-row > td:first-child {
+  color: var(--company-pnl-label, var(--core-text)) !important;
+  -webkit-text-fill-color: var(--company-pnl-label, var(--core-text)) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card :is(.company-pnl-row, .company-pnl-total) > td:nth-child(2) {
+  color: var(--company-pnl-previous, var(--core-text-secondary)) !important;
+  -webkit-text-fill-color: var(--company-pnl-previous, var(--core-text-secondary)) !important;
+}
+[data-surface-family="clinical"]:where([data-performance="immersive"]) .company-pnl-card :is(.company-pnl-group, tr.company-pnl-section) > td {
+  color: var(--company-pnl-section, var(--core-primary)) !important;
+  -webkit-text-fill-color: var(--company-pnl-section, var(--core-primary)) !important;
+}

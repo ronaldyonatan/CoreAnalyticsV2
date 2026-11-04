@@ -1,0 +1,44 @@
+{
+  "cosmic-black": {
+    "localImagesLoaded": true,
+    "nodes": 66,
+    "firstPaintTheme": "cosmic-black",
+    "differences": []
+  },
+  "aurora": {
+    "localImagesLoaded": true,
+    "nodes": 66,
+    "firstPaintTheme": "aurora",
+    "differences": []
+  },
+  "solaris": {
+    "localImagesLoaded": true,
+    "nodes": 66,
+    "firstPaintTheme": "solaris",
+    "differences": []
+  },
+  "obsidian": {
+    "localImagesLoaded": true,
+    "nodes": 66,
+    "firstPaintTheme": "obsidian",
+    "differences": []
+  },
+  "quartz": {
+    "localImagesLoaded": true,
+    "nodes": 66,
+    "firstPaintTheme": "quartz",
+    "differences": []
+  },
+  "jec-horizon": {
+    "localImagesLoaded": true,
+    "nodes": 86,
+    "firstPaintTheme": "jec-horizon",
+    "differences": []
+  },
+  "jec-skywave": {
+    "localImagesLoaded": true,
+    "nodes": 86,
+    "firstPaintTheme": "jec-skywave",
+    "differences": []
+  }
+}

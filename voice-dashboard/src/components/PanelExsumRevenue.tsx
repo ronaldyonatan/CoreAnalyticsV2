@@ -72,28 +72,12 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-
 /* =========================================================
    REVENUE EXSUM — FULLSCREEN 3D
    DONUT/SENTRA => 3D Revenue Core
    TABLE        => 3D Holographic Ledger
    Normal dashboard mode remains the original 2D implementation.
 ========================================================= */
-
-const EXSUM_3D_COLORS_AURORA = [
-  '#59e8f5', '#2dd4bf', '#60a5fa', '#818cf8', '#a78bfa',
-  '#c084fc', '#5eead4', '#38bdf8', '#f0abfc', '#bae6fd'
-];
-
-const EXSUM_3D_COLORS_SOLARIS = [
-  '#2f80ed', '#318cff', '#54a8ff', '#79c7ff', '#9cdaff',
-  '#c6edff', '#6f93ff', '#4e73dc', '#a9c8ff', '#e0f5ff'
-];
-
-const EXSUM_3D_COLORS_DARK = [
-  '#00f2fe', '#00d4ff', '#00b7ff', '#0099ff', '#007aff',
-  '#4d8aff', '#759dff', '#9fb0ff', '#c5c4ff', '#e0d8ff'
-];
 
 const formatBillion3D = (value: number) =>
   `${(Number(value || 0) / 1_000_000_000).toLocaleString('id-ID', {
@@ -122,17 +106,14 @@ const formatCell3D = (value: any, column: string) => {
 
 function RevenueCore3D({
   data,
-  isAurora,
-  isSolaris,
   onHover,
 }: {
   data: RadialDatum[];
-  isAurora: boolean;
-  isSolaris: boolean;
   onHover: (value: Revenue3DHover | null) => void;
 }) {
+  const visual = useTheme().theme.three.renderers.PanelExsumRevenue;
   const groupRef = useRef<THREE.Group>(null);
-  const colors = isSolaris ? EXSUM_3D_COLORS_SOLARIS : isAurora ? EXSUM_3D_COLORS_AURORA : EXSUM_3D_COLORS_DARK;
+  const colors = visual.colors;
 
   const total = useMemo(
     () => data.reduce((sum, item) => sum + Math.max(0, item.value), 0),
@@ -189,18 +170,18 @@ function RevenueCore3D({
 
   return (
     <>
-      <color attach="background" args={[isSolaris ? '#5f97cb' : isAurora ? '#092a35' : '#020916']} />
-      <fog attach="fog" args={[isSolaris ? '#91c8e8' : isAurora ? '#092a35' : '#020916', 15, 31]} />
+      <color attach="background" args={[visual.backgroundColor]} />
+      <fog attach="fog" args={[visual.fogColor, 15, 31]} />
 
-      <ambientLight intensity={isSolaris ? 1.22 : isAurora ? 1.1 : 0.9} />
+      <ambientLight intensity={visual.ambientLightIntensity} />
       <directionalLight position={[5, 8, 8]} intensity={2.0} color="#e7ffff" />
-      <pointLight position={[-5, 3, 5]} intensity={24} color={isSolaris ? '#79cfff' : isAurora ? '#2dd4bf' : '#00f2fe'} distance={15} />
-      <pointLight position={[5, 3, 4]} intensity={20} color={isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'} distance={14} />
+      <pointLight position={[-5, 3, 5]} intensity={24} color={visual.pointLightColor} distance={15} />
+      <pointLight position={[5, 3, 4]} intensity={20} color={visual.pointLightColor2} distance={14} />
 
       <mesh position={[0, 0, -2.15]}>
         <planeGeometry args={[13.5, 8]} />
         <meshPhysicalMaterial
-          color={isSolaris ? '#78afd7' : isAurora ? '#103744' : '#031321'}
+          color={visual.backplateColor}
           transparent
           opacity={0.68}
           metalness={0.42}
@@ -209,7 +190,7 @@ function RevenueCore3D({
       </mesh>
 
       <gridHelper
-        args={[15, 28, isSolaris ? '#a8e2ff' : isAurora ? '#2dd4bf' : '#087da5', isSolaris ? '#4f7fb0' : isAurora ? '#315d69' : '#07304a']}
+        args={[15, 28, visual.gridPrimaryColor, visual.gridSecondaryColor]}
         position={[0, -3.0, 0]}
         rotation={[0, 0, 0]}
       />
@@ -283,7 +264,7 @@ function RevenueCore3D({
         <mesh position={[0, 0, -0.08]}>
           <circleGeometry args={[1.72, 64]} />
           <meshPhysicalMaterial
-            color={isAurora ? '#0d3340' : '#03111e'}
+            color={visual.secondaryMaterialColor}
             transparent
             opacity={0.86}
             metalness={0.40}
@@ -298,7 +279,7 @@ function RevenueCore3D({
               textAlign: 'center',
               fontFamily: 'monospace',
               color: '#eaffff',
-              textShadow: `0 0 16px ${isAurora ? '#2dd4bf' : '#00f2fe'}`,
+              textShadow: `0 0 16px ${visual.textShadow}`,
             }}
           >
             <div style={{ fontSize: 9, letterSpacing: '0.24em', opacity: 0.62 }}>
@@ -317,7 +298,7 @@ function RevenueCore3D({
       <Text
         position={[0, 3.35, 0.2]}
         fontSize={0.22}
-        color={isAurora ? '#baf7f4' : '#b9f8ff'}
+        color={visual.textColor}
         anchorX="center"
       >
         REVENUE CORE · UNIT CONTRIBUTION
@@ -386,11 +367,12 @@ function BoardText({
 }
 
 function RevenueWallBoardScene({
-  rows, columns, isAurora, isSolaris, page, onHover
+  rows, columns, page, onHover
 }: {
-  rows:any[]; columns:string[]; isAurora:boolean; isSolaris:boolean; page:number;
+  rows:any[]; columns:string[]; page:number;
   onHover:(row:any|null)=>void;
 }) {
+  const visual = useTheme().theme.three.renderers.PanelExsumRevenue;
   const rowRefs=useRef<Array<THREE.Group|null>>([]);
   const hoveredRef=useRef<number|null>(null);
   const pageSize=7;
@@ -398,19 +380,7 @@ function RevenueWallBoardScene({
   const pageRows=rows.slice(start,start+pageSize);
   const visibleColumns=columns.slice(0,4);
 
-  const p=isSolaris ? {
-    wall:'#5f97cb', frame:'#4f7fb0', screen:'#4a82b8', cell:'#74acd4',
-    edge:'#a8e2ff', text:'#f8fdff', muted:'#d7ebf8', pos:'#8fd2ff',
-    neg:'#f05a7a', amber:'#6f8cff', glow:'#79cfff'
-  } : isAurora ? {
-    wall:'#0a2630', frame:'#17414d', screen:'#092832', cell:'#123844',
-    edge:'#59e8f5', text:'#efffff', muted:'#a9dce2', pos:'#5eead4',
-    neg:'#fb7185', amber:'#fbbf24', glow:'#2dd4bf'
-  } : {
-    wall:'#020916', frame:'#06263a', screen:'#031522', cell:'#052338',
-    edge:'#00f2fe', text:'#efffff', muted:'#9eefff', pos:'#2dd4bf',
-    neg:'#fb7185', amber:'#fbbf24', glow:'#00f2fe'
-  };
+  const p=visual.ledgerPalette;
 
   useFrame((_,delta)=>{
     rowRefs.current.forEach((g,i)=>{
@@ -425,7 +395,7 @@ function RevenueWallBoardScene({
       const material = rowMesh?.material as THREE.MeshPhysicalMaterial | undefined;
       if(material){
         const baseColor = new THREE.Color(p.cell);
-        const hoverColor = new THREE.Color(isSolaris ? '#80b5da' : isAurora ? '#17606b' : '#07516a');
+        const hoverColor = new THREE.Color(visual.hoverColor);
         material.color.lerp(active ? hoverColor : baseColor, 1 - Math.exp(-delta * 10));
         material.emissive.set(p.edge);
         material.emissiveIntensity = THREE.MathUtils.damp(
@@ -447,7 +417,7 @@ function RevenueWallBoardScene({
     <fog attach="fog" args={[p.wall,16,30]}/>
 
     {/* Theme environment: Aurora = aurora sky, Cosmic Black = deep space. */}
-    {(isAurora || isSolaris) ? (
+    {visual.animatedBackdrop ? (
       <group position={[0, 0, -5.8]}>
         <mesh>
           <planeGeometry args={[30, 18]}/>
@@ -520,7 +490,7 @@ function RevenueWallBoardScene({
     <ambientLight intensity={1.05}/>
     <directionalLight position={[4,7,7]} intensity={1.8} color="#eaffff"/>
     <pointLight position={[-7.2,2.8,1.2]} intensity={12} color={p.glow} distance={8}/>
-    <pointLight position={[7.0,-2.0,.8]} intensity={9} color={isSolaris?'#6f8cff':isAurora?'#a78bfa':'#2563eb'} distance={7}/>
+    <pointLight position={[7.0,-2.0,.8]} intensity={9} color={visual.pointLightColor3} distance={7}/>
 
     {/* Architectural wall: layered panels add depth without competing with the data */}
     <mesh position={[0,0,-1.30]}>
@@ -534,7 +504,7 @@ function RevenueWallBoardScene({
         <mesh position={[side * 6.35, 0, -1.02]}>
           <boxGeometry args={[1.45, 7.35, .22]}/>
           <meshPhysicalMaterial
-            color={isSolaris ? '#74acd4' : isAurora ? '#103642' : '#031725'}
+            color={visual.tertiaryMaterialColor}
             metalness={.42}
             roughness={.34}
           />
@@ -707,10 +677,9 @@ function RevenueWallBoardScene({
 }
 
 function RevenueLedger3D({
-  rows, columns, isAurora, isSolaris
-}: {rows:any[];columns:string[];isAurora:boolean;isSolaris:boolean}) {
-  void isAurora;
-  void isSolaris;
+  rows, columns
+}: {rows:any[];columns:string[];}) {
+
   const [page, setPage] = useState(0);
   const pageSize = 8;
   const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
@@ -840,7 +809,8 @@ function RevenueExsumFullscreen({
   selectedYear: 'Current Year' | 'Full Year 2025' | 'Full Year 2024';
   setSelectedYear: (year: 'Current Year' | 'Full Year 2025' | 'Full Year 2024') => void;
 }) {
-  const { isAurora, isSolaris } = useTheme();
+  const visual = useTheme().theme.three.renderers.PanelExsumRevenue;
+
   const [hover, setHover] = useState<Revenue3DHover | null>(null);
 
   // Demography-style transition state:
@@ -952,8 +922,6 @@ function RevenueExsumFullscreen({
         <RevenueLedger3D
           rows={exsumData}
           columns={data.columns}
-          isAurora={isAurora}
-          isSolaris={isSolaris}
         />
       );
     }
@@ -968,8 +936,6 @@ function RevenueExsumFullscreen({
         >
           <RevenueCore3D
             data={data.radialData}
-            isAurora={isAurora}
-            isSolaris={isSolaris}
             onHover={interactive ? setHover : () => undefined}
           />
         </Canvas>
@@ -1061,16 +1027,14 @@ function RevenueExsumFullscreen({
             width: 92,
             transition: 'none',
             filter: `drop-shadow(0 0 20px ${
-              isAurora ? 'rgba(89,232,245,.62)' : 'rgba(0,242,254,.62)'
+              visual.scannerGlowColor
             })`,
           }}
         >
           <div
             className="absolute inset-y-0 left-0 right-0"
             style={{
-              background: isAurora
-                ? 'linear-gradient(90deg, transparent, rgba(89,232,245,.025), rgba(167,139,250,.065), rgba(89,232,245,.11), transparent)'
-                : 'linear-gradient(90deg, transparent, rgba(0,242,254,.020), rgba(34,211,238,.060), rgba(0,242,254,.10), transparent)',
+              background: visual.background,
             }}
           />
           <div className="absolute inset-y-0 left-[39px] w-[12px] bg-cyan-200/7 blur-[7px]" />
@@ -1159,7 +1123,7 @@ export default function PanelExsumRevenue({ exsumData, sentraData, isMaximized =
   const desiredOrder = isSentraMode 
     ? ['Center', 'CurrentYear_Amount', 'LastYear_Amount', 'Variance_Amount', 'Growth_Percentage']
     : ['Current Year', 'Full Year 2025', 'Full Year 2024', '2026 vs 2025'];
-    
+
   const sortedColumns = [
     ...desiredOrder.filter(col => availableKeys.includes(col)),
     ...availableKeys.filter(key => 
@@ -1197,7 +1161,7 @@ export default function PanelExsumRevenue({ exsumData, sentraData, isMaximized =
 
   return (
     <div className="company-panel company-exsum-mobile-panel w-full h-full bg-[#000814]/90 border border-[#00f2fe]/40 rounded-2xl p-4 flex flex-col justify-between backdrop-blur-md shadow-[0_0_15px_rgba(0,242,254,0.15)] relative overflow-hidden">
-      
+
       {/* Header & Controls */}
       <div className="company-panel-header flex items-center justify-between pb-2 border-b border-[#00f2fe]/25 flex-shrink-0">
         <div className="flex items-center gap-2">

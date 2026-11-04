@@ -1,3 +1,4 @@
+import AppReleaseNotes from './components/AppReleaseNotes';
 import { ComponentStyles } from './design-system/ComponentStyles';
 import React, {
   useCallback,
@@ -60,7 +61,6 @@ interface CoreProps {
   phase: PortalPhase;
   isListening: boolean;
   isSpeaking: boolean;
-  isAurora?: boolean;
 }
 
 interface VoiceIdentityUser {
@@ -321,11 +321,10 @@ class SciFiAudio {
 
 function CyberTunnelBackground({
   phase,
-  isAurora = false,
 }: {
   phase: PortalPhase;
-  isAurora?: boolean;
 }) {
+  const login = useTheme().theme.login;
   const pointsRef = useRef<THREE.Points>(null!);
 
   /*
@@ -375,9 +374,9 @@ function CyberTunnelBackground({
 
   return (
     <>
-      {!isAurora && <color attach="background" args={['#010611']} />}
-      {!isAurora && <fog attach="fog" args={['#010611', 3, 18]} />}
-      <ambientLight intensity={isAurora ? 1.0 : 0.8} />
+      {login.spaceBackgroundEnabled && <color attach="background" args={['#010611']} />}
+      {login.spaceFogEnabled && <fog attach="fog" args={['#010611', 3, 18]} />}
+      <ambientLight intensity={login.spaceAmbientIntensity} />
 
       <Points
         ref={pointsRef}
@@ -387,11 +386,11 @@ function CyberTunnelBackground({
       >
         <PointMaterial
           transparent
-          color={isAurora ? '#c5fbff' : '#3bbcff'}
-          size={isAurora ? 0.025 : 0.035}
+          color={login.starColor}
+          size={login.starSize}
           sizeAttenuation
           depthWrite={false}
-          opacity={isAurora ? 0.30 : 1}
+          opacity={login.starOpacity}
           blending={THREE.AdditiveBlending}
         />
       </Points>
@@ -401,12 +400,10 @@ function CyberTunnelBackground({
 
 function SpaceScene({
   phase,
-  isAurora = false,
 }: {
   phase: PortalPhase;
-  isAurora?: boolean;
 }) {
-  return <CyberTunnelBackground phase={phase} isAurora={isAurora} />;
+  return <CyberTunnelBackground phase={phase} />;
 }
 
 /* =========================================================
@@ -686,7 +683,6 @@ function NeuralCore({
         />
       </Sphere>
 
-
       {/* Futuristic reactor crystal */}
       <mesh ref={reactor}>
         <octahedronGeometry args={[0.34, 0]} />
@@ -965,7 +961,6 @@ function PortalCamera({
 /* =========================================================
    CORE SCENE
 ========================================================= */
-
 
 /* =========================================================
    AURORA CRYSTAL CORE
@@ -1301,8 +1296,8 @@ function CoreMotionGroup({
   phase,
   isListening,
   isSpeaking,
-  isAurora = false,
 }: CoreProps) {
+  const login = useTheme().theme.login;
   const groupRef = useRef<THREE.Group>(null!);
   const { viewport } = useThree();
 
@@ -1370,7 +1365,7 @@ function CoreMotionGroup({
         }
         rotationIntensity={0.08}
       >
-        {isAurora ? (
+        {login.nexusGeometry ? (
           <AuroraNexusCore
             phase={phase}
             isListening={isListening}
@@ -1394,19 +1389,19 @@ function CoreScene({
   phase,
   isListening,
   isSpeaking,
-  isAurora = false,
 }: CoreProps) {
+  const login = useTheme().theme.login;
   return (
     <>
-      <ambientLight intensity={isAurora ? 0.90 : 0.65} />
+      <ambientLight intensity={login.coreAmbientIntensity} />
 
       <directionalLight
         position={[5, 6, 5]}
-        intensity={isAurora ? 1.35 : 1.1}
-        color={isAurora ? '#d9ffff' : '#e5fbff'}
+        intensity={login.coreDirectionalIntensity}
+        color={login.coreDirectionalColor}
       />
 
-      {isAurora && (
+      {login.accentLighting && (
         <>
           <directionalLight
             position={[-4, 3, 2]}
@@ -1428,12 +1423,10 @@ function CoreScene({
         phase={phase}
         isListening={isListening}
         isSpeaking={isSpeaking}
-        isAurora={isAurora}
       />
     </>
   );
 }
-
 
 /* =========================================================
    AURORA NIGHT SKY — REAL-TIME 2D CANVAS
@@ -2441,7 +2434,6 @@ function SolarisSkyCanvas({
   );
 }
 
-
 /* =========================================================
    SOLARIS HORIZONTAL PLASMA RIBBONS — V18 FINAL
    Three low-contrast atmospheric ribbons drift left-to-right behind
@@ -2795,13 +2787,11 @@ function SolarisHeliosCrownSvg({ phase }: { phase: PortalPhase }) {
   );
 }
 
-
 /* =========================================================
    AURORA ORB — IDLE/AUTH VISUAL
    Deliberately DOM/CSS based for a smooth, predictable sphere.
    Portal/charging still hands off to the original Three.js scene.
 ========================================================= */
-
 
 function AuroraOrbSurfaceCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -3105,7 +3095,6 @@ function AuroraOrbVisual({
   );
 }
 
-
 /* =========================================================
    JEC BRAND ORB
    Dedicated Friday visual for JEC Horizon / JEC Skywave.
@@ -3175,8 +3164,8 @@ function JecBrandOrb({
 export default function LoginPortal({
   onLoginSuccess,
 }: LoginPortalProps) {
-  const { isAurora, isSolaris, isJecHorizon, isJecSkywave, isStaticTheme, isObsidian, isQuartz, isLight } = useTheme();
-  const isJecTheme = isJecHorizon || isJecSkywave;
+  const login = useTheme().theme.login;
+
   const authenticatedSessionRef = useRef<AuthenticatedUser | null>(null);
   const rememberAuthenticatedUser = useCallback((
     identity: VoiceIdentityUser,
@@ -3208,7 +3197,6 @@ export default function LoginPortal({
     isSpeaking,
     setIsSpeaking,
   ] = useState(false);
-
 
   const [
     isAuthenticating,
@@ -3267,7 +3255,6 @@ export default function LoginPortal({
 
   const [resendSeconds, setResendSeconds] =
     useState(0);
-
 
   const [
     statusMessage,
@@ -4946,15 +4933,7 @@ export default function LoginPortal({
   return (
     <div
       className={`login-portal-root login-phase-${phase} ${mobileVoiceFocus ? 'login-mobile-voice-focus' : ''} fixed inset-0 z-50 h-[100dvh] w-screen overflow-hidden font-mono text-sky-100 select-none ${
-        isAurora
-          ? 'login-aurora-mode bg-[#071b25]'
-          : isJecTheme
-          ? `login-jec-mode ${isJecSkywave ? 'login-jec-skywave-mode' : 'login-jec-horizon-mode'} bg-[#b9d9ea]`
-          : isSolaris
-          ? 'login-solaris-mode bg-[#eaf8ff]'
-          : isLight
-          ? 'bg-[#edf8fc]'
-          : 'bg-[#010611]'
+        login.rootClassName
       }`}
     >
       {/* ===================================================
@@ -4962,7 +4941,7 @@ export default function LoginPortal({
           Bright solar atmosphere. V18 keeps the polished Helios Crown and Stellar Core, with only three subtle left-to-right plasma ribbons adding gentle depth behind the core.
       =================================================== */}
 
-      {isSolaris && (
+      {login.solarAtmosphere && (
         <div
           className="login-solaris-sky absolute inset-0 z-0 pointer-events-none"
           aria-hidden="true"
@@ -4976,10 +4955,10 @@ export default function LoginPortal({
         </div>
       )}
 
-      {isJecTheme && (
+      {login.fieldAtmosphere && (
         <div
           className={`login-jec-sky absolute inset-0 z-0 pointer-events-none ${
-            isJecSkywave ? 'login-jec-sky--animated' : 'login-jec-sky--static'
+            login.fieldMotionClassName
           }`}
           aria-hidden="true"
         >
@@ -4998,7 +4977,7 @@ export default function LoginPortal({
           The mountains/horizon are decorative and never block interaction.
       =================================================== */}
 
-      {isAurora && (
+      {login.curtainAtmosphere && (
         <div
           className="login-aurora-sky absolute inset-0 z-0 pointer-events-none"
           aria-hidden="true"
@@ -5018,7 +4997,7 @@ export default function LoginPortal({
           Solaris also avoids mounting a hidden space Canvas.
       =================================================== */}
 
-      {!isStaticTheme && !isSolaris && !isJecTheme && (
+      {login.spaceBackdrop && (
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Canvas
             style={{ pointerEvents: 'none' }}
@@ -5041,17 +5020,16 @@ export default function LoginPortal({
           >
             <SpaceScene
               phase={phase}
-              isAurora={isAurora}
             />
           </Canvas>
         </div>
       )}
 
       {/* STATIC PERFORMANCE SKY — zero WebGL / zero motion */}
-      {isStaticTheme && !isJecTheme && (
+      {login.staticSky && (
         <div
           className={`login-static-sky ${
-            isQuartz ? 'login-static-sky--quartz' : 'login-static-sky--obsidian'
+            login.staticSkyClassName
           }`}
           aria-hidden="true"
         />
@@ -5061,7 +5039,7 @@ export default function LoginPortal({
           CSS NEBULA
       =================================================== */}
 
-      {!isAurora && !isSolaris && !isStaticTheme && !isJecTheme && (
+      {login.nebula && (
         <div
           className="
             absolute
@@ -5077,15 +5055,7 @@ export default function LoginPortal({
 
       <div
         className={`absolute inset-0 z-[2] pointer-events-none ${
-          isAurora
-            ? 'bg-gradient-to-r from-[#06131d]/82 via-[#071923]/32 to-transparent'
-            : isJecTheme
-            ? 'login-jec-sidewash'
-            : isSolaris
-            ? 'login-solaris-sidewash'
-            : isLight
-            ? 'bg-gradient-to-r from-white/35 via-white/10 to-transparent'
-            : 'bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08'
+          login.sidewashClassName
         }`}
       />
 
@@ -5109,12 +5079,12 @@ export default function LoginPortal({
       {/* SOLARIS HORIZONTAL PLASMA RIBBONS — V18 FINAL
           Aurora-inspired up/down curtains add slow atmospheric motion behind
           the Helios Crown without covering the Stellar Core. */}
-      {isSolaris && <SolarisHorizontalRibbonsSvg phase={phase} />}
+      {login.plasmaRibbons && <SolarisHorizontalRibbonsSvg phase={phase} />}
 
       {/* SOLARIS HELIOS CROWN — FINAL V16
           A breathing radial corona surrounds a living stellar plasma core while
           pressure waves, solar wind, and an occasional flare radiate out. */}
-      {isSolaris && <SolarisHeliosCrownSvg phase={phase} />}
+      {login.heliosCrown && <SolarisHeliosCrownSvg phase={phase} />}
 
       {/* ===================================================
           TOP HUD
@@ -5146,7 +5116,7 @@ export default function LoginPortal({
           }
         `}
       >
-        <div className="flex items-center gap-3">
+        <div className="ds-login-brand flex items-center gap-3">
 
           <div className="relative flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10">
             <div className="absolute inset-1 rounded-full bg-sky-400/10 blur-md" />
@@ -5158,13 +5128,16 @@ export default function LoginPortal({
             />
           </div>
 
-          <div>
+          <div className="ds-login-brand-copy">
 
-            <div className="text-[12px] font-black tracking-[0.30em] text-sky-100 md:text-[13px]">
-              JEC // CORE ANALYTICS
+            <div className="ds-login-brand-line">
+              <div className="ds-login-brand-name text-[12px] font-black tracking-[0.30em] text-sky-100 md:text-[13px]">
+                JEC // CORE ANALYTICS
+              </div>
+              {!mobileVoiceFocus && !['charging', 'portal', 'flash'].includes(phase) && <AppReleaseNotes />}
             </div>
 
-            <div className="mt-0.5 text-[9px] tracking-[0.24em] text-sky-500/60">
+            <div className="ds-login-brand-subtitle mt-0.5 text-[9px] tracking-[0.24em] text-sky-500/60">
               EXECUTIVE INTELLIGENCE NETWORK
             </div>
 
@@ -5269,7 +5242,7 @@ export default function LoginPortal({
 
             <div
               data-tour="login-hud"
-              className={`login-hud-surface ${isAurora ? 'login-hud-surface--aurora' : ''} ${isSolaris ? 'login-hud-surface--solaris' : ''} ${isJecTheme ? 'login-hud-surface--jec' : ''} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
+              className={`login-hud-surface ${login.hudCurtainClassName} ${login.hudSolarClassName} ${login.hudFieldClassName} relative mt-4 overflow-hidden rounded-xl border border-sky-500/18 bg-[#020913]/82 px-1 pb-2 shadow-[0_0_34px_rgba(0,183,255,.065)] backdrop-blur-md sm:mt-5`}
             >
               {/* Holographic rails instead of a large boxed frame */}
               <div className="pointer-events-none absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-300/65 to-transparent" />
@@ -5286,10 +5259,10 @@ export default function LoginPortal({
                   </div>
                   <div>
                     <div className="text-[13px] font-black tracking-[0.22em] text-sky-100">
-                      {isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : isJecSkywave ? 'JEC SKYWAVE GATEWAY' : isJecHorizon ? 'JEC HORIZON GATEWAY' : isQuartz ? 'QUARTZ COMMAND LOGIN' : isObsidian ? 'OBSIDIAN COMMAND LOGIN' : 'IDENTITY GATEWAY'}
+                      {login.gatewayTitle}
                     </div>
                     <div className="mt-0.5 text-[10px] tracking-[0.22em] text-slate-600">
-                      {isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : isJecTheme ? 'JEC SECURE BLUE NETWORK // 01' : isQuartz ? 'EXECUTIVE NODE // QUARTZ' : isObsidian ? 'EXECUTIVE NODE // OBSIDIAN' : 'BIOMETRIC NODE // 01'}
+                      {login.networkLabel}
                     </div>
                   </div>
                 </div>
@@ -5859,18 +5832,12 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/90' : isJecTheme ? 'login-jec-portal-base' : isSolaris ? 'login-solaris-portal-base' : isLight ? 'bg-[#edf8fc]' : 'bg-[#010611]'
+                login.portalBaseClassName
               }`}
             />
             <div
               className={`absolute inset-0 ${
-                isAurora
-                  ? 'bg-[radial-gradient(circle_at_center,rgba(78,255,207,.16)_0%,rgba(54,207,231,.08)_30%,rgba(62,39,95,.10)_52%,rgba(2,11,16,.88)_82%,#020b10_100%)]'
-                  : isJecTheme
-                  ? 'login-jec-portal-radial'
-                  : isSolaris
-                  ? 'login-solaris-portal-radial'
-                  : 'bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]'
+                login.portalRadialClassName
               }`}
             />
           </div>
@@ -5881,7 +5848,7 @@ export default function LoginPortal({
           <div
             className={`
               absolute inset-0 transition-opacity duration-500
-              ${isAurora ? 'aurora-portal-stage' : ''} ${isSolaris ? 'solaris-portal-stage' : ''} ${isJecTheme ? 'jec-portal-stage' : ''}
+              ${login.curtainStageClassName} ${login.solarStageClassName} ${login.fieldStageClassName}
               ${
                 phase === 'charging' || phase === 'portal' || phase === 'flash'
                   ? 'opacity-100'
@@ -5891,18 +5858,12 @@ export default function LoginPortal({
           >
             <div
               className={`absolute inset-0 ${
-                isAurora ? 'bg-[#020b10]/88' : isJecTheme ? 'login-jec-portal-base' : isSolaris ? 'login-solaris-portal-base' : isLight ? 'bg-[#edf8fc]' : 'bg-[#010611]'
+                login.activePortalBaseClassName
               }`}
             />
             <div
               className={`absolute inset-0 ${
-                isAurora
-                  ? 'bg-[radial-gradient(circle_at_center,rgba(95,255,214,.18)_0%,rgba(66,221,239,.09)_26%,rgba(116,83,197,.10)_50%,rgba(3,15,21,.86)_75%,#020b10_100%)]'
-                  : isJecTheme
-                  ? 'login-jec-portal-radial login-jec-portal-radial--active'
-                  : isSolaris
-                  ? 'login-solaris-portal-radial login-solaris-portal-radial--active'
-                  : 'bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]'
+                login.activePortalRadialClassName
               }`}
             />
             <div className="frameless-portal-grid absolute inset-[-35%] opacity-[0.14]" />
@@ -5918,11 +5879,10 @@ export default function LoginPortal({
               w-[190px]
               sm:h-[230px]
               sm:w-[230px]
-              ${isAurora || isSolaris || isJecTheme ? 'lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]' : 'lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]'}
-              ${isAurora || isSolaris || isJecTheme ? 'rounded-full blur-[78px] opacity-55' : 'rounded-full blur-[120px]'}
+              ${login.coreHaloSizeClassName}
+              ${login.coreHaloEffectClassName}
               transition-colors
               duration-700
-
 
               ${
                 isVerified
@@ -5943,7 +5903,7 @@ export default function LoginPortal({
           {/* SOLARIS CORE
               Solaris uses a bright CSS solar core so the light environment never
               flashes the Cosmic Black Three.js scene during authentication. */}
-          {isSolaris && (
+          {login.stellarCore && (
             <div
               className={`login-solaris-core-stage absolute inset-0 z-[3] flex items-center justify-center transition-all ${
                 phase === 'portal'
@@ -5974,7 +5934,7 @@ export default function LoginPortal({
                     <div className="login-solaris-core-inner" />
                   </div>
                 </div>
-                <div className="login-solaris-core-caption">SOLARIS CORE</div>
+                <div className="login-solaris-core-spaceAmbientIntensity">SOLARIS CORE</div>
               </div>
             </div>
           )}
@@ -5982,7 +5942,7 @@ export default function LoginPortal({
           {/* AURORA ORB
               Aurora-only idle/auth visual. Cosmic Black never renders it.
               During charging/portal/flash the original Three.js scene takes over. */}
-          {isAurora && (
+          {login.nexusOrb && (
             <div
               className={`login-aurora-orb-stage absolute inset-0 z-[3] flex items-center justify-center transition-all ${
                 phase === 'portal'
@@ -6005,7 +5965,7 @@ export default function LoginPortal({
           {/* JEC BRAND ORB
               Both JEC themes use the same Friday identity.
               Horizon is static; Skywave animates through theme CSS. */}
-          {isJecTheme && (
+          {login.brandOrb && (
             <div
               className={`login-jec-orb-stage absolute inset-0 z-[4] flex items-center justify-center transition-all ${
                 phase === 'portal'
@@ -6027,7 +5987,7 @@ export default function LoginPortal({
 
           {/* STATIC PERFORMANCE CORE
               Pure CSS Holographic 2.5D: no Canvas, no orbit and no rotation. */}
-          {isStaticTheme && !isJecTheme && (
+          {login.staticCore && (
             <div
               className={`pointer-events-none absolute inset-0 z-[3] flex items-center justify-center ${
                 phase === 'portal'
@@ -6042,7 +6002,7 @@ export default function LoginPortal({
               <div className="login-static-core">
                 <div className="login-static-core__diamond" />
                 <div className="login-static-core__caption">
-                  {isQuartz ? 'QUARTZ CORE' : isObsidian ? 'OBSIDIAN CORE' : 'STATIC CORE'}
+                  {login.staticCoreLabel}
                 </div>
               </div>
             </div>
@@ -6051,7 +6011,7 @@ export default function LoginPortal({
           {/* CORE CANVAS
               Only Cosmic Black needs this central Three.js scene.
               Aurora and Solaris already use dedicated visual layers. */}
-          {!isAurora && !isSolaris && !isStaticTheme && !isJecTheme && (
+          {login.neuralCore && (
           <div
             className="pointer-events-none relative h-screen w-screen"
           >
@@ -6081,7 +6041,6 @@ export default function LoginPortal({
                 phase={phase}
                 isListening={isListening}
                 isSpeaking={isSpeaking}
-                isAurora={isAurora}
               />
             </Canvas>
 
@@ -6098,8 +6057,7 @@ export default function LoginPortal({
                 duration-500
 
                 ${
-                  isAurora ||
-                  isSolaris ||
+                  login.suppressCoreLabel ||
                   phase === 'charging' ||
                   phase === 'portal' ||
                   phase === 'flash'
@@ -6115,7 +6073,7 @@ export default function LoginPortal({
                 </div>
 
                 <div className="mt-1 text-[12px] font-black tracking-[0.22em] text-sky-50">
-                  {isAurora ? 'AURORA NEXUS' : isSolaris ? 'SOLARIS CORE' : isJecTheme ? 'JEC FRIDAY CORE' : 'AI CORE'}
+                  {login.coreLabel}
                 </div>
 
               </div>
@@ -6247,7 +6205,7 @@ export default function LoginPortal({
           -translate-x-1/2
           -translate-y-1/2
           rounded-full
-          ${isAurora ? 'bg-emerald-200' : 'bg-sky-100'}
+          ${login.statusDotClassName}
           blur-[60px]
           transition-all
           duration-1000

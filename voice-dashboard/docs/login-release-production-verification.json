@@ -1,0 +1,770 @@
+[
+  {
+    "theme": "cosmic-black",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "aurora",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "solaris",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "obsidian",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "quartz",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "jec-horizon",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "jec-skywave",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "lunar-eclipse",
+    "width": 1440,
+    "height": 1000,
+    "version": "1.0.4",
+    "menu": {
+      "top": 76.71875,
+      "bottom": 696.71875,
+      "left": 894.390625,
+      "right": 1194.390625,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 53.984375,
+      "bottom": 946.015625,
+      "left": 390,
+      "right": 1050,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "cosmic-black",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "aurora",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "solaris",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "obsidian",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "quartz",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "jec-horizon",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "jec-skywave",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "lunar-eclipse",
+    "width": 390,
+    "height": 844,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 685.203125,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 828,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "cosmic-black",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "aurora",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "solaris",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "obsidian",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "quartz",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "jec-horizon",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "jec-skywave",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  },
+  {
+    "theme": "lunar-eclipse",
+    "width": 390,
+    "height": 568,
+    "version": "1.0.4",
+    "menu": {
+      "top": 65.203125,
+      "bottom": 556,
+      "left": 67,
+      "right": 367,
+      "count": 8,
+      "scrollable": true,
+      "portal": true
+    },
+    "keyboardLastRowReachable": true,
+    "releaseDialog": {
+      "title": "CoreAnalytics V1.0.4",
+      "sections": [
+        "Fitur baru",
+        "Peningkatan",
+        "Perbaikan"
+      ],
+      "top": 16,
+      "bottom": 552,
+      "left": 16,
+      "right": 374,
+      "modal": true,
+      "focusInside": true,
+      "badgeVisible": true
+    },
+    "escapeCloses": true
+  }
+]

@@ -71,6 +71,8 @@ try{
       }
       if(!ready)throw Error('Login Portal failed to mount: '+origin+' '+theme);
       await delay(4500);
+      const failedImages=await evaluate(`([...document.images].filter(img=>img.currentSrc.startsWith(location.origin)&&(!img.complete||img.naturalWidth===0))).map(img=>img.currentSrc)`);
+      if(failedImages.length)throw Error('Baseline/application local images failed to load: '+JSON.stringify(failedImages));
       const snapshot=await evaluate(`(() => {
         for(const animation of document.getAnimations()){animation.pause();animation.currentTime=0;}
         const properties=['color','background-color','background-image','box-shadow','font-family','font-size','font-weight','line-height','letter-spacing','display','position','width','height','padding-top','padding-right','padding-bottom','padding-left','margin-top','margin-right','margin-bottom','margin-left','backdrop-filter','-webkit-backdrop-filter','fill','stroke',...['top','right','bottom','left'].flatMap(side=>['border-'+side+'-color','border-'+side+'-width','border-'+side+'-style']),...['top-left','top-right','bottom-right','bottom-left'].map(corner=>'border-'+corner+'-radius')];
@@ -93,7 +95,7 @@ try{
       for(let pseudo=0;pseudo<3;pseudo++)for(const [property,value]of Object.entries(before[node].styles[pseudo]))if(value!==after[node].styles[pseudo][property])differences.push({node,hook:after[node].hook,pseudo,property,before:value,after:after[node].styles[pseudo][property]});
     }
     if(firstFrames[1]?.theme!==theme)differences.push({kind:'first-paint-theme',expected:theme,actual:firstFrames[1]});
-    report[theme]={nodes:after.length,firstPaintTheme:firstFrames[1]?.theme,differences};
+    report[theme]={localImagesLoaded:true,nodes:after.length,firstPaintTheme:firstFrames[1]?.theme,differences};
     console.log(`${theme}: ${after.length} login surface nodes; ${differences.length} differences`,differences.slice(0,3));
     await call('Page.removeScriptToEvaluateOnNewDocument',{identifier:initScript});initScript=undefined;
   }

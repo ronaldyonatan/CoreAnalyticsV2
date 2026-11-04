@@ -1,3 +1,4 @@
+import type { ChartRenderers } from '../theme/renderer-config';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, Line as DreiLine, OrbitControls, Text } from '@react-three/drei';
@@ -28,13 +29,13 @@ function Monthly3DScene({
   onHover,
   autoRotate,
   onInteractionStart,
-  isSolaris,
+  visual,
 }: {
   data: any[];
   onHover: (v: Hover3D | null) => void;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isSolaris: boolean;
+  visual: ChartRenderers['MonthlyRevenueChart'];
 }) {
   const maxQty = Math.max(...data.map(d => d.adm + d.sur), 1);
   const maxRev = Math.max(...data.map(d => d.rev), 1);
@@ -173,11 +174,11 @@ function Monthly3DScene({
   });
 
   return <>
-    <color attach="background" args={[isSolaris ? "#5f97cb" : "#020916"]} /><fog attach="fog" args={[isSolaris ? "#91c8e8" : "#020916",25,50]} />
-    <ambientLight intensity={isSolaris ? 1.45 : 1.15}/><directionalLight position={[3,9,8]} intensity={2.4} color="#d9fbff"/>
+    <color attach="background" args={[visual.backgroundColor]} /><fog attach="fog" args={[visual.fogColor,25,50]} />
+    <ambientLight intensity={visual.ambientLightIntensity}/><directionalLight position={[3,9,8]} intensity={2.4} color="#d9fbff"/>
     <pointLight position={[-5,4,4]} intensity={28} color="#00bfff" distance={16}/><pointLight position={[5,4,3]} intensity={24} color="#fb923c" distance={16}/>
-    <mesh position={[0,2.5,-3.15]}><planeGeometry args={[14.5,6]}/><meshPhysicalMaterial color={isSolaris ? "#78afd7" : "#031321"} transparent opacity={isSolaris ? .56 : .82} metalness={isSolaris ? .18 : .4} roughness={isSolaris ? .46 : .32}/></mesh>
-    <gridHelper args={[16,32,isSolaris ? "#a8e2ff" : "#087da5",isSolaris ? "#4f7fb0" : "#07304a"]} position={[0,-.04,0]}/><mesh rotation={[-Math.PI/2,0,0]} position={[0,-.08,.4]}><planeGeometry args={[16,9]}/><meshStandardMaterial color={isSolaris ? "#24527f" : "#031523"} metalness={isSolaris ? .32 : .6} roughness={isSolaris ? .46 : .3} transparent opacity={isSolaris ? .90 : .92}/></mesh>
+    <mesh position={[0,2.5,-3.15]}><planeGeometry args={[14.5,6]}/><meshPhysicalMaterial color={visual.backplateColor} transparent opacity={visual.backplateOpacity} metalness={visual.backplateMetalness} roughness={visual.backplateRoughness}/></mesh>
+    <gridHelper args={[16,32,visual.gridPrimaryColor,visual.gridSecondaryColor]} position={[0,-.04,0]}/><mesh rotation={[-Math.PI/2,0,0]} position={[0,-.08,.4]}><planeGeometry args={[16,9]}/><meshStandardMaterial color={visual.floorColor} metalness={visual.floorMetalness} roughness={visual.floorRoughness} transparent opacity={visual.floorOpacity}/></mesh>
     <Text position={[0,5.15,-.5]} fontSize={.26} color="#a5f3fc" anchorX="center">12-MONTH REVENUE</Text>
     {data.map((d,i)=>{ const x=startX+i*step, ah=d.adm*qtyScale, sh=d.sur*qtyScale; return <group key={d.m}>
       <mesh position={[x,ah/2,0]} onPointerOver={e=>{e.stopPropagation();onHover(d)}} onPointerOut={()=>onHover(null)}><boxGeometry args={[.48,Math.max(ah,.02),.58]}/><meshPhysicalMaterial color="#00bfff" emissive="#0077aa" emissiveIntensity={.55} metalness={.3} roughness={.2}/></mesh>
@@ -263,11 +264,12 @@ function Monthly3DScene({
 }
 
 export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpand, isFullscreen = false }: MonthlyRevenueChartProps) {
-  const { isSolaris, isStaticTheme } = useTheme();
+  const { theme, isStaticTheme } = useTheme();
+  const visual = theme.three.renderers.MonthlyRevenueChart;
   const [hover3D,setHover3D]=useState<Hover3D|null>(null);
   const [tip,setTip]=useState({x:20,y:20});
   const [autoRotate, setAutoRotate] = useState(true);
-  
+
   // Mapping 12 Bulan secara Client-Side agar selalu konsisten Jan - Dec
   const processedData = useMemo(() => {
     const monthsMeta = [
@@ -300,7 +302,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
 
   if (isFullscreen && !isStaticTheme) {
     return (
-      <div className={`daily-3d-shell w-full h-full min-h-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
+      <div className={`daily-3d-shell w-full h-full min-h-0 flex flex-col border rounded-xl overflow-hidden relative ${visual.shellClassName}`}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-cyan-500/30 shrink-0 bg-gradient-to-r from-cyan-950/30 via-[#020916]/90 to-orange-950/25">
           <div><div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-cyan-300 animate-pulse shadow-[0_0_12px_#22d3ee]"/>
@@ -332,7 +334,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
               onHover={setHover3D}
               autoRotate={autoRotate}
               onInteractionStart={() => setAutoRotate(false)}
-              isSolaris={isSolaris}
+              visual={visual}
             />
           </Canvas>
           {hover3D && <div className="absolute z-20 w-[224px] pointer-events-none rounded-xl border border-cyan-300/55 p-4 backdrop-blur-xl" style={{left:tip.x,top:tip.y,transform:'perspective(900px) rotateX(2deg) rotateY(-4deg)',background:'linear-gradient(145deg, rgba(7,32,54,.78), rgba(2,12,27,.68))',boxShadow:'0 16px 36px rgba(0,0,0,.35), 0 0 26px rgba(0,191,255,.18)'}}>
@@ -345,7 +347,7 @@ export default function MonthlyRevenueChart({ isLoaded, monthlyData = [], onExpa
 
   return (
     <div className="daily-themed-card bg-[#000a17]/70 border border-[#2587C8]/30 rounded-xl p-3 flex flex-col justify-between backdrop-blur-sm relative group h-full">
-      
+
       <div className="absolute top-2.5 right-3 opacity-100 visible z-30">
         <DashboardExpandButton
           size="sm"

@@ -1,5 +1,7 @@
 # Pemusatan ownership stylesheet — 4 November 2026
 
+> Pembaruan lanjutan: migrasi consumer JavaScript sudah selesai; audit terbaru 0 temuan dan `complete: true`. Lihat [theme-renderer-migration.md](theme-renderer-migration.md). Angka 30 di bawah merupakan status historis saat tahap pemusatan CSS selesai.
+
 **Ownership file dan blok stylesheet sudah terpusat.** Audit CSS lulus dengan **0 temuan CSS**. Audit arsitektur keseluruhan masih mencatat **30 temuan consumer identitas theme di JavaScript**, sehingga `complete` tetap `false`. Angka ini sengaja tidak disamakan dengan status pemusatan stylesheet.
 
 Tidak ada commit Git. Perubahan tahap-tahap sebelumnya tetap berada di working tree.

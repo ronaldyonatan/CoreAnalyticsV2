@@ -1,3 +1,4 @@
+import type { ChartRenderers } from '../theme/renderer-config';
 import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -58,14 +59,14 @@ function Real3DSurgeryScene({
   isMobile,
   autoRotate,
   onInteractionStart,
-  isSolaris,
+  visual,
 }: {
   data: SurgeryBdDataModel[];
   onHover: (info: Surgery3DTooltip | null) => void;
   isMobile: boolean;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isSolaris: boolean;
+  visual: ChartRenderers['SurgeryBdChart'];
 }) {
   const maxValue = Math.max(1, ...data.map((d) => d.amountMio));
 
@@ -265,20 +266,20 @@ function Real3DSurgeryScene({
 
       <color
         attach="background"
-        args={[isSolaris ? '#79b5df' : '#020916']}
+        args={[visual.backgroundColor]}
       />
 
       <fog
         attach="fog"
         args={[
-          isSolaris ? '#c4e7f8' : '#020916',
+          visual.fogColor,
           25,
           52,
         ]}
       />
 
       <ambientLight
-        intensity={isSolaris ? 1.45 : 1.1}
+        intensity={visual.ambientLightIntensity}
       />
 
       <directionalLight
@@ -327,11 +328,11 @@ function Real3DSurgeryScene({
         />
 
         <meshPhysicalMaterial
-          color={isSolaris ? "#b6ddf3" : "#031321"}
+          color={visual.backplateColor}
           transparent
-          opacity={isSolaris ? 0.56 : 0.8}
-          roughness={isSolaris ? 0.46 : 0.28}
-          metalness={isSolaris ? 0.18 : 0.45}
+          opacity={visual.backplateOpacity}
+          roughness={visual.backplateRoughness}
+          metalness={visual.backplateMetalness}
         />
       </mesh>
 
@@ -357,11 +358,11 @@ function Real3DSurgeryScene({
         />
 
         <meshPhysicalMaterial
-          color={isSolaris ? "#8fb9df" : "#041727"}
+          color={visual.secondaryMaterialColor}
           transparent
-          opacity={isSolaris ? 0.38 : 0.74}
-          roughness={isSolaris ? 0.5 : 0.3}
-          metalness={isSolaris ? 0.16 : 0.5}
+          opacity={visual.secondaryMaterialOpacity}
+          roughness={visual.secondaryMaterialRoughness}
+          metalness={visual.secondaryMaterialMetalness}
         />
       </mesh>
 
@@ -387,11 +388,11 @@ function Real3DSurgeryScene({
         />
 
         <meshPhysicalMaterial
-          color={isSolaris ? "#8fb9df" : "#041727"}
+          color={visual.tertiaryMaterialColor}
           transparent
-          opacity={isSolaris ? 0.38 : 0.74}
-          roughness={isSolaris ? 0.5 : 0.3}
-          metalness={isSolaris ? 0.16 : 0.5}
+          opacity={visual.tertiaryMaterialOpacity}
+          roughness={visual.tertiaryMaterialRoughness}
+          metalness={visual.tertiaryMaterialMetalness}
         />
       </mesh>
 
@@ -424,7 +425,7 @@ function Real3DSurgeryScene({
                   -2.67,
                 ],
               ]}
-              color={isSolaris ? "#d7f3ff" : "#087da5"}
+              color={visual.horizontalGridColor}
               lineWidth={0.65}
               transparent
               opacity={0.42}
@@ -456,7 +457,7 @@ function Real3DSurgeryScene({
                   -2.67,
                 ],
               ]}
-              color={isSolaris ? "#7fb7df" : "#07506d"}
+              color={visual.verticalGridColor}
               lineWidth={0.55}
               transparent
               opacity={0.28}
@@ -479,8 +480,8 @@ function Real3DSurgeryScene({
               data.length * 3
             )
           ),
-          isSolaris ? '#a8e2ff' : '#087da5',
-          isSolaris ? '#4f86bb' : '#07304a',
+          visual.gridPrimaryColor,
+          visual.gridSecondaryColor,
         ]}
         position={[0, 0, 0]}
       />
@@ -506,7 +507,7 @@ function Real3DSurgeryScene({
         />
 
         <meshStandardMaterial
-          color={isSolaris ? "#245f96" : "#031523"}
+          color={visual.floorColor}
           metalness={0.62}
           roughness={0.3}
           transparent
@@ -994,7 +995,8 @@ export default function SurgeryBdChart({
   onMonthChange,
   onYtdToggle,
 }: SurgeryBdChartProps) {
-  const { isSolaris, isStaticTheme } = useTheme();
+  const { theme, isStaticTheme } = useTheme();
+  const visual = theme.three.renderers.SurgeryBdChart;
   const [
     hover3D,
     setHover3D,
@@ -1180,8 +1182,8 @@ export default function SurgeryBdChart({
     const hasData = isLoaded && chartData.length > 0;
 
     return (
-      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${isSolaris ? 'bg-[#dff2ff] border-blue-400/35' : 'bg-[#020916] border-cyan-500/40'}`}>
-        <div className={`relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl ${isSolaris ? 'border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]' : 'border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/80 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]'}`}>
+      <div className={`daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative ${visual.shellClassName}`}>
+        <div className={`relative flex flex-col gap-2 border-b px-3 pt-3 pb-2.5 md:px-4 md:pt-4 md:pb-3 shrink-0 backdrop-blur-xl ${visual.headerClassName}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
@@ -1380,7 +1382,7 @@ export default function SurgeryBdChart({
                   isMobile={isMobile}
                   autoRotate={autoRotate}
                   onInteractionStart={() => setAutoRotate(false)}
-                  isSolaris={isSolaris}
+                  visual={visual}
                 />
               </Canvas>
             </div>

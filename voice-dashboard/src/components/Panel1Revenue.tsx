@@ -29,7 +29,6 @@ type RevenueHover3D = {
   detail?: string;
 };
 
-
 /* =========================================================
    FULLSCREEN 3D REVENUE
    Normal Company Performance stays 2D.
@@ -163,15 +162,14 @@ function Revenue3DScene({
   data,
   mode,
   onHover,
-  isAurora,
-  isSolaris,
+
 }: {
   data: QuarterRevenue3D[];
   mode: RevenueMode;
   onHover: (value: RevenueHover3D | null) => void;
-  isAurora: boolean;
-  isSolaris: boolean;
+
 }) {
+  const visual = useTheme().theme.three.renderers.Panel1Revenue;
   const scannerGroupRef = useRef<THREE.Group>(null);
   const barRefs = useRef<Array<{ mesh: THREE.Mesh; x: number; baseOpacity: number }>>([]);
   const targetRefs = useRef<Array<{ mesh: THREE.Mesh; x: number; baseOpacity: number }>>([]);
@@ -182,72 +180,7 @@ function Revenue3DScene({
   const transitionStartRef = useRef<number | null>(null);
   const [displayedMode, setDisplayedMode] = useState<RevenueMode>(mode);
 
-  const palette = isSolaris
-    ? {
-        // Solaris Daylight Ion: electric azure + cobalt + ice, deliberately not Aurora teal.
-        background: '#5f97cb',
-        fog: '#91c8e8',
-        floor: '#24527f',
-        grid1: '#a8e2ff',
-        grid2: '#4f7fb0',
-        previous: '#3b82f6',
-        previousEmissive: '#1d4ed8',
-        current: '#79cfff',
-        currentEmissive: '#287cc4',
-        radiantOuter: '#9bdcff',
-        radiantOuterEmissive: '#287cc4',
-        radiantInner: '#d7f3ff',
-        radiantInnerEmissive: '#4b9bdd',
-        target: '#5b6ee1',
-        scanner: '#c3ecff',
-        scannerSecondary: '#6f8cff',
-        wall: '#78afd7',
-        sideWall: '#5875bd',
-        text: '#f8fdff',
-      }
-    : isAurora
-    ? {
-        background: '#0a2935',
-        fog: '#0b2f3b',
-        floor: '#0b2732',
-        grid1: '#2dd4bf',
-        grid2: '#315d69',
-        previous: '#60a5fa',
-        previousEmissive: '#2563eb',
-        current: '#2dd4bf',
-        currentEmissive: '#0f9f8c',
-        radiantOuter: '#59e8f5',
-        radiantOuterEmissive: '#159aaa',
-        radiantInner: '#2dd4bf',
-        radiantInnerEmissive: '#0f9f8c',
-        target: '#fbbf24',
-        scanner: '#59e8f5',
-        scannerSecondary: '#a78bfa',
-        wall: '#123945',
-        sideWall: '#2f3155',
-        text: '#eaffff',
-      }
-    : {
-        background: '#020916',
-        fog: '#020916',
-        floor: '#031523',
-        grid1: '#087da5',
-        grid2: '#07304a',
-        previous: '#0284c7',
-        previousEmissive: '#075985',
-        current: '#00f2fe',
-        currentEmissive: '#0891b2',
-        radiantOuter: '#0ea5e9',
-        radiantOuterEmissive: '#075985',
-        radiantInner: '#00f2fe',
-        radiantInnerEmissive: '#0891b2',
-        target: '#f59e0b',
-        scanner: '#67e8f9',
-        scannerSecondary: '#22d3ee',
-        wall: '#031321',
-        sideWall: '#07142a',
-        text: '#e8fdff',
-      };
+  const palette = visual.palette;
 
   useEffect(() => {
     if (previousModeRef.current === mode) return;
@@ -450,10 +383,10 @@ function Revenue3DScene({
       <color attach="background" args={[palette.background]} />
       <fog attach="fog" args={[palette.fog, 18, 34]} />
 
-      <ambientLight intensity={isSolaris ? 1.18 : isAurora ? 1.05 : 0.9} />
+      <ambientLight intensity={visual.ambientLightIntensity} />
       <directionalLight position={[5, 8, 7]} intensity={2.2} color="#d9ffff" />
       <pointLight position={[-5, 4.4, 4]} intensity={28} color={palette.current} distance={16} />
-      <pointLight position={[5, 4.0, 3]} intensity={22} color={isSolaris ? '#6f8cff' : isAurora ? '#a78bfa' : '#2563eb'} distance={15} />
+      <pointLight position={[5, 4.0, 3]} intensity={22} color={visual.pointLightColor} distance={15} />
       <pointLight position={[0, 2.3, -2]} intensity={16} color={palette.target} distance={11} />
 
       {/* command-center wall */}
@@ -482,7 +415,7 @@ function Revenue3DScene({
       <mesh position={[6.25, 2.40, -1.95]} rotation={[0, -Math.PI / 5.7, 0]}>
         <planeGeometry args={[3.1, 5.6]} />
         <meshPhysicalMaterial
-          color={isSolaris ? '#73a5ce' : isAurora ? '#382f57' : '#1a0a20'}
+          color={visual.backplateColor}
           transparent
           opacity={0.50}
           roughness={0.34}
@@ -912,7 +845,7 @@ function Revenue3DFullscreen({
   mode: RevenueMode;
   onModeChange: (mode: RevenueMode) => void;
 }) {
-  const { isAurora, isSolaris } = useTheme();
+
   const [hover, setHover] = useState<RevenueHover3D | null>(null);
 
   return (
@@ -960,8 +893,6 @@ function Revenue3DFullscreen({
           data={data}
           mode={mode}
           onHover={setHover}
-          isAurora={isAurora}
-          isSolaris={isSolaris}
         />
       </Canvas>
 
@@ -1009,7 +940,7 @@ export default function Panel1Revenue({
   animateChart = true,
   isMaximized = false,
 }: Panel1Props) {
-  
+
   const { isStaticTheme } = useTheme();
   const effectiveAnimateChart = isStaticTheme ? true : animateChart;
   const [internalMode, setInternalMode] = useState<'BAR' | 'RADIANT'>('BAR');
@@ -1043,7 +974,7 @@ export default function Panel1Revenue({
       let qKey = 'Q1';
       // Jika data SQL menggunakan MonthNo (1 sampai 12)
       const monthIndex = item.MonthNo ? item.MonthNo - 1 : idx;
-      
+
       if (monthIndex >= 3 && monthIndex <= 5) qKey = 'Q2';
       else if (monthIndex >= 6 && monthIndex <= 8) qKey = 'Q3';
       else if (monthIndex >= 9 && monthIndex <= 11) qKey = 'Q4';
@@ -1097,7 +1028,7 @@ export default function Panel1Revenue({
     const val2025 = total2025 / 1e9;
     const val2026 = total2026 / 1e9;
     const valTarget = totalTarget / 1e9;
-    
+
     const maxTarget = valTarget > 0 ? valTarget * 1.2 : 6000;
     const radius = 105;
     const circumference = 2 * Math.PI * radius;
@@ -1205,7 +1136,7 @@ export default function Panel1Revenue({
       </div>
 
       <div className="company-chart-stage flex-1 grid grid-cols-4 gap-6 pt-7 px-3 pb-2 bg-black/60 rounded-2xl border border-[#00f2fe]/30 mt-1 min-h-0 z-10 relative overflow-hidden">
-        
+
         <div className="company-axis absolute left-3 top-7 bottom-7 w-[1px] bg-cyan-400/50 z-20" />
         <div className="company-axis absolute left-3 right-3 bottom-7 h-[1px] bg-cyan-400/50 z-20" />
 
@@ -1244,7 +1175,7 @@ export default function Panel1Revenue({
         {quartalData.map((item: any, idx: number) => {
           const rev2025 = item.revenue_2025 / 1e9;
           const rev2026 = item.revenue_2026 / 1e9;
-          
+
           const height2025 = Math.max((rev2025 / maxVal) * 100, 6);
           const height2026 = rev2026 > 0 ? Math.max((rev2026 / maxVal) * 100, 6) : 0;
           const isAlert = rev2026 > 0 && rev2026 < rev2025;
@@ -1252,7 +1183,7 @@ export default function Panel1Revenue({
           return (
             <div key={idx} className="flex flex-col items-center h-full justify-end group/bar relative z-10">
               <div className="flex items-end justify-center w-full h-full gap-2 pb-1">
-                
+
                 {/* Batang 2025 */}
                 <div className="w-10 flex flex-col items-center h-full justify-end relative group">
                   <span className="absolute -top-7 px-1.5 py-0.5 rounded bg-black/90 text-[10px] text-cyan-300 font-bold border border-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap shadow-[0_0_10px_#00f2fe]">

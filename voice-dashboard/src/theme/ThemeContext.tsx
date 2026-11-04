@@ -22,16 +22,7 @@ interface ThemeContextValue {
   toggleTheme: () => void;
 
   isLight: boolean;
-  // TODO(theme-migration): Compatibility flags for existing procedural WebGL /
-  // login skins. New component styling must consume semantic CSS values.
-  isAurora: boolean;
-  isSolaris: boolean;
-  isJecHorizon: boolean;
-  isJecSkywave: boolean;
-
   isStaticTheme: boolean;
-  isObsidian: boolean;
-  isQuartz: boolean;
   performanceMode: CoreThemePerformance;
 }
 
@@ -88,17 +79,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           return THEME_CYCLE[(currentIndex + 1) % THEME_CYCLE.length];
         }),
 
-      // Light materials are shared by Solaris and Quartz.
+      // Appearance and performance are shared capabilities.
       isLight: theme.appearance === 'light',
-      isAurora: themeId === 'aurora',
-      isSolaris: themeId === 'solaris',
-      isJecHorizon: themeId === 'jec-horizon',
-      isJecSkywave: themeId === 'jec-skywave',
 
       // Performance/rendering flags for every dashboard/chart.
       isStaticTheme: theme.performance === 'static',
-      isObsidian: themeId === 'obsidian',
-      isQuartz: themeId === 'quartz',
       performanceMode: theme.performance,
     };
   }, [themeId]);

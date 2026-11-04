@@ -1,0 +1,772 @@
+[
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 226,
+    "role": "backgroundColor",
+    "light": "#5f97cb",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 227,
+    "role": "fogColor",
+    "light": "#91c8e8",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 228,
+    "role": "ambientLightIntensity",
+    "light": 1.45,
+    "dark": 1.15
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 229,
+    "role": "directionalLightIntensity",
+    "light": 2.8,
+    "dark": 2.4
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 229,
+    "role": "directionalLightColor",
+    "light": "#eefaff",
+    "dark": "#b9f7ff"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 230,
+    "role": "pointLightIntensity",
+    "light": 26,
+    "dark": 38
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 230,
+    "role": "pointLightColor",
+    "light": "#79cfff",
+    "dark": "#00cfff"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 231,
+    "role": "pointLightIntensity2",
+    "light": 20,
+    "dark": 28
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 231,
+    "role": "pointLightColor2",
+    "light": "#6f8cff",
+    "dark": "#00d084"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 232,
+    "role": "pointLightIntensity3",
+    "light": 14,
+    "dark": 18
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 232,
+    "role": "pointLightColor3",
+    "light": "#d7f3ff",
+    "dark": "#ff8a1f"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 237,
+    "role": "backplateColor",
+    "light": "#78afd7",
+    "dark": "#031321"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 237,
+    "role": "backplateOpacity",
+    "light": 0.56,
+    "dark": 0.78
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 237,
+    "role": "backplateRoughness",
+    "light": 0.46,
+    "dark": 0.28
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 237,
+    "role": "backplateMetalness",
+    "light": 0.18,
+    "dark": 0.45
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 241,
+    "role": "secondaryMaterialColor",
+    "light": "#5875bd",
+    "dark": "#041727"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 241,
+    "role": "secondaryMaterialOpacity",
+    "light": 0.38,
+    "dark": 0.72
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 241,
+    "role": "secondaryMaterialRoughness",
+    "light": 0.5,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 241,
+    "role": "secondaryMaterialMetalness",
+    "light": 0.16,
+    "dark": 0.5
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 245,
+    "role": "tertiaryMaterialColor",
+    "light": "#5875bd",
+    "dark": "#041727"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 245,
+    "role": "tertiaryMaterialOpacity",
+    "light": 0.38,
+    "dark": 0.72
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 245,
+    "role": "tertiaryMaterialRoughness",
+    "light": 0.5,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 245,
+    "role": "tertiaryMaterialMetalness",
+    "light": 0.16,
+    "dark": 0.5
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 251,
+    "role": "horizontalGridColor",
+    "light": "#d7f3ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 255,
+    "role": "verticalGridColor",
+    "light": "#7fb7df",
+    "dark": "#07506d"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 259,
+    "role": "gridPrimaryColor",
+    "light": "#a8e2ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 259,
+    "role": "gridSecondaryColor",
+    "light": "#4f7fb0",
+    "dark": "#07304a"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 262,
+    "role": "floorColor",
+    "light": "#24527f",
+    "dark": "#031523"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 262,
+    "role": "floorMetalness",
+    "light": 0.32,
+    "dark": 0.62
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 262,
+    "role": "floorRoughness",
+    "light": 0.46,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 262,
+    "role": "floorOpacity",
+    "light": 0.9,
+    "dark": 0.92
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 273,
+    "role": "color",
+    "light": "#f3fbff",
+    "dark": "#67e8f9"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 273,
+    "role": "textShadow",
+    "light": "0 1px 4px rgba(8,47,73,.55)",
+    "dark": "0 0 8px #06b6d4"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 279,
+    "role": "color2",
+    "light": "#f3fbff",
+    "dark": "#67e8f9"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 279,
+    "role": "textShadow2",
+    "light": "0 1px 4px rgba(8,47,73,.55)",
+    "dark": "0 0 10px #06b6d4"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 305,
+    "role": "color3",
+    "light": "#e7f7ff",
+    "dark": "#22d3ee"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 305,
+    "role": "textShadow3",
+    "light": "0 1px 4px rgba(8,47,73,.55)",
+    "dark": "0 0 7px #0891b2"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 396,
+    "role": "shellClassName",
+    "light": "bg-[#dff2ff] border-blue-400/35",
+    "dark": "bg-[#020916] border-cyan-500/40"
+  },
+  {
+    "file": "src/components/DailyRevenueChart.tsx",
+    "line": 397,
+    "role": "headerClassName",
+    "light": "border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]",
+    "dark": "border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/70 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 209,
+    "role": "backgroundColor",
+    "light": "#5f97cb",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 210,
+    "role": "fogColor",
+    "light": "#91c8e8",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 211,
+    "role": "ambientLightIntensity",
+    "light": 1.45,
+    "dark": 1.15
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 220,
+    "role": "backplateColor",
+    "light": "#78afd7",
+    "dark": "#031321"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 220,
+    "role": "backplateOpacity",
+    "light": 0.56,
+    "dark": 0.78
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 220,
+    "role": "backplateRoughness",
+    "light": 0.46,
+    "dark": 0.28
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 220,
+    "role": "backplateMetalness",
+    "light": 0.18,
+    "dark": 0.45
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 224,
+    "role": "secondaryMaterialColor",
+    "light": "#5875bd",
+    "dark": "#041727"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 224,
+    "role": "secondaryMaterialOpacity",
+    "light": 0.38,
+    "dark": 0.72
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 224,
+    "role": "secondaryMaterialRoughness",
+    "light": 0.5,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 224,
+    "role": "secondaryMaterialMetalness",
+    "light": 0.16,
+    "dark": 0.5
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 228,
+    "role": "tertiaryMaterialColor",
+    "light": "#5875bd",
+    "dark": "#041727"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 228,
+    "role": "tertiaryMaterialOpacity",
+    "light": 0.38,
+    "dark": 0.72
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 228,
+    "role": "tertiaryMaterialRoughness",
+    "light": 0.5,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 228,
+    "role": "tertiaryMaterialMetalness",
+    "light": 0.16,
+    "dark": 0.5
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 234,
+    "role": "horizontalGridColor",
+    "light": "#d7f3ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 238,
+    "role": "verticalGridColor",
+    "light": "#7fb7df",
+    "dark": "#07506d"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 242,
+    "role": "gridPrimaryColor",
+    "light": "#a8e2ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 242,
+    "role": "gridSecondaryColor",
+    "light": "#4f7fb0",
+    "dark": "#07304a"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 245,
+    "role": "floorColor",
+    "light": "#24527f",
+    "dark": "#031523"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 245,
+    "role": "floorMetalness",
+    "light": 0.32,
+    "dark": 0.62
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 245,
+    "role": "floorRoughness",
+    "light": 0.46,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 245,
+    "role": "floorOpacity",
+    "light": 0.9,
+    "dark": 0.92
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 402,
+    "role": "shellClassName",
+    "light": "bg-[#dff2ff] border-blue-400/35",
+    "dark": "bg-[#020916] border-cyan-500/40"
+  },
+  {
+    "file": "src/components/WeeklyRevenueChart.tsx",
+    "line": 403,
+    "role": "headerClassName",
+    "light": "border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]",
+    "dark": "border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/80 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 176,
+    "role": "backgroundColor",
+    "light": "#5f97cb",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 176,
+    "role": "fogColor",
+    "light": "#91c8e8",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 177,
+    "role": "ambientLightIntensity",
+    "light": 1.45,
+    "dark": 1.15
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 179,
+    "role": "backplateColor",
+    "light": "#78afd7",
+    "dark": "#031321"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 179,
+    "role": "backplateOpacity",
+    "light": 0.56,
+    "dark": 0.82
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 179,
+    "role": "backplateMetalness",
+    "light": 0.18,
+    "dark": 0.4
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 179,
+    "role": "backplateRoughness",
+    "light": 0.46,
+    "dark": 0.32
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 180,
+    "role": "gridPrimaryColor",
+    "light": "#a8e2ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 180,
+    "role": "gridSecondaryColor",
+    "light": "#4f7fb0",
+    "dark": "#07304a"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 180,
+    "role": "floorColor",
+    "light": "#24527f",
+    "dark": "#031523"
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 180,
+    "role": "floorMetalness",
+    "light": 0.32,
+    "dark": 0.6
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 180,
+    "role": "floorRoughness",
+    "light": 0.46,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 180,
+    "role": "floorOpacity",
+    "light": 0.9,
+    "dark": 0.92
+  },
+  {
+    "file": "src/components/MonthlyRevenueChart.tsx",
+    "line": 303,
+    "role": "shellClassName",
+    "light": "bg-[#dff2ff] border-blue-400/35",
+    "dark": "bg-[#020916] border-cyan-500/40"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 268,
+    "role": "backgroundColor",
+    "light": "#79b5df",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 274,
+    "role": "fogColor",
+    "light": "#c4e7f8",
+    "dark": "#020916"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 281,
+    "role": "ambientLightIntensity",
+    "light": 1.45,
+    "dark": 1.1
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 330,
+    "role": "backplateColor",
+    "light": "#b6ddf3",
+    "dark": "#031321"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 332,
+    "role": "backplateOpacity",
+    "light": 0.56,
+    "dark": 0.8
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 333,
+    "role": "backplateRoughness",
+    "light": 0.46,
+    "dark": 0.28
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 334,
+    "role": "backplateMetalness",
+    "light": 0.18,
+    "dark": 0.45
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 360,
+    "role": "secondaryMaterialColor",
+    "light": "#8fb9df",
+    "dark": "#041727"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 362,
+    "role": "secondaryMaterialOpacity",
+    "light": 0.38,
+    "dark": 0.74
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 363,
+    "role": "secondaryMaterialRoughness",
+    "light": 0.5,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 364,
+    "role": "secondaryMaterialMetalness",
+    "light": 0.16,
+    "dark": 0.5
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 390,
+    "role": "tertiaryMaterialColor",
+    "light": "#8fb9df",
+    "dark": "#041727"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 392,
+    "role": "tertiaryMaterialOpacity",
+    "light": 0.38,
+    "dark": 0.74
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 393,
+    "role": "tertiaryMaterialRoughness",
+    "light": 0.5,
+    "dark": 0.3
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 394,
+    "role": "tertiaryMaterialMetalness",
+    "light": 0.16,
+    "dark": 0.5
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 427,
+    "role": "horizontalGridColor",
+    "light": "#d7f3ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 459,
+    "role": "verticalGridColor",
+    "light": "#7fb7df",
+    "dark": "#07506d"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 482,
+    "role": "gridPrimaryColor",
+    "light": "#a8e2ff",
+    "dark": "#087da5"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 483,
+    "role": "gridSecondaryColor",
+    "light": "#4f86bb",
+    "dark": "#07304a"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 509,
+    "role": "floorColor",
+    "light": "#245f96",
+    "dark": "#031523"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 1183,
+    "role": "shellClassName",
+    "light": "bg-[#dff2ff] border-blue-400/35",
+    "dark": "bg-[#020916] border-cyan-500/40"
+  },
+  {
+    "file": "src/components/SurgeryBdChart.tsx",
+    "line": 1184,
+    "role": "headerClassName",
+    "light": "border-blue-400/25 bg-gradient-to-r from-sky-100/95 via-blue-50/95 to-indigo-100/80 shadow-[0_10px_34px_rgba(49,140,255,.08)]",
+    "dark": "border-cyan-500/30 bg-gradient-to-r from-cyan-950/35 via-[#020916]/80 to-orange-950/20 shadow-[0_10px_40px_rgba(0,191,255,0.06)]"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1416,
+    "role": "backgroundColor",
+    "light": "#5f97cb",
+    "dark": "#010812"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1423,
+    "role": "fogColor",
+    "light": "#91c8e8",
+    "dark": "#010812"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1432,
+    "role": "ambientLightIntensity",
+    "light": 1.4,
+    "dark": 0.95
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1497,
+    "role": "floorColor",
+    "light": "#78afd7",
+    "dark": "#02101d"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1499,
+    "role": "floorOpacity",
+    "light": 0.55,
+    "dark": 0.48
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1542,
+    "role": "gridPrimaryColor",
+    "light": "#a8e2ff",
+    "dark": "#07506d"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1543,
+    "role": "gridSecondaryColor",
+    "light": "#4f7fb0",
+    "dark": "#04283b"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1572,
+    "role": "meshStandardMaterialColor2",
+    "light": "#24527f",
+    "dark": "#010b14"
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1574,
+    "role": "meshStandardMaterialOpacity2",
+    "light": 0.9,
+    "dark": 0.92
+  },
+  {
+    "file": "src/components/PerChannel3DChart.tsx",
+    "line": 1768,
+    "role": "shellClassName",
+    "light": "border-blue-400/35 bg-[#dff2ff]",
+    "dark": "border-cyan-500/30 bg-[#010812]"
+  }
+]

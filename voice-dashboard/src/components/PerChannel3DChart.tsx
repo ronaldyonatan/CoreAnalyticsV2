@@ -1,3 +1,4 @@
+import type { ChartRenderers } from '../theme/renderer-config';
 import { ComponentStyles } from '../design-system/ComponentStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -223,7 +224,6 @@ function buildMetric(
     dominant,
   };
 }
-
 
 function buildStaticDonutGradient(
   slices: ChannelSlice[]
@@ -1276,7 +1276,7 @@ function ChannelTowerScene({
   onHover,
   autoRotate,
   onInteractionStart,
-  isSolaris,
+  visual,
 }: {
   metrics: MetricData[];
   onHover: (
@@ -1284,7 +1284,7 @@ function ChannelTowerScene({
   ) => void;
   autoRotate: boolean;
   onInteractionStart: () => void;
-  isSolaris: boolean;
+  visual: ChartRenderers['PerChannel3DChart'];
 }) {
   const { camera, size } = useThree();
   const [fitDistance, setFitDistance] = useState(16);
@@ -1413,14 +1413,14 @@ function ChannelTowerScene({
       <color
         attach="background"
         args={[
-          isSolaris ? '#5f97cb' : '#010812',
+          visual.backgroundColor,
         ]}
       />
 
       <fog
         attach="fog"
         args={[
-          isSolaris ? '#91c8e8' : '#010812',
+          visual.fogColor,
           28,
           58,
         ]}
@@ -1429,7 +1429,7 @@ function ChannelTowerScene({
       {/* LIGHT */}
 
       <ambientLight
-        intensity={isSolaris ? 1.4 : 0.95}
+        intensity={visual.ambientLightIntensity}
       />
 
       <directionalLight
@@ -1494,9 +1494,9 @@ function ChannelTowerScene({
         />
 
         <meshStandardMaterial
-          color={isSolaris ? "#78afd7" : "#02101d"}
+          color={visual.floorColor}
           transparent
-          opacity={isSolaris ? 0.55 : 0.48}
+          opacity={visual.floorOpacity}
           roughness={0.9}
         />
       </mesh>
@@ -1539,8 +1539,8 @@ function ChannelTowerScene({
         args={[
           24,
           24,
-          isSolaris ? '#a8e2ff' : '#07506d',
-          isSolaris ? '#4f7fb0' : '#04283b',
+          visual.gridPrimaryColor,
+          visual.gridSecondaryColor,
         ]}
         position={[
           0,
@@ -1569,9 +1569,9 @@ function ChannelTowerScene({
         />
 
         <meshStandardMaterial
-          color={isSolaris ? "#24527f" : "#010b14"}
+          color={visual.meshStandardMaterialColor2}
           transparent
-          opacity={isSolaris ? 0.90 : 0.92}
+          opacity={visual.meshStandardMaterialOpacity2}
           metalness={0.4}
           roughness={0.65}
         />
@@ -1665,7 +1665,8 @@ export default function PerChannel3DChart({
   onMonthChange,
   onYtdToggle,
 }: PerChannel3DChartProps) {
-  const { isSolaris, isStaticTheme, isLight } = useTheme();
+  const { theme, isStaticTheme, isLight } = useTheme();
+  const visual = theme.three.renderers.PerChannel3DChart;
   const [
     hover,
     setHover,
@@ -1765,7 +1766,7 @@ export default function PerChannel3DChart({
     revenueData.length > 0;
 
   return (
-    <div className={`daily-3d-shell relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border ${isSolaris ? 'border-blue-400/35 bg-[#dff2ff]' : 'border-cyan-500/30 bg-[#010812]'}`}>
+    <div className={`daily-3d-shell relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border ${visual.shellClassName}`}>
       {/* ===================================================
           HEADER / PERIOD CONTROL
       =================================================== */}
@@ -1995,7 +1996,7 @@ export default function PerChannel3DChart({
               onHover={setHover}
               autoRotate={autoRotate}
               onInteractionStart={() => setAutoRotate(false)}
-              isSolaris={isSolaris}
+              visual={visual}
             />
           </Canvas>
         </div>

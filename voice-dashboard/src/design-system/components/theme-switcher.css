@@ -14,6 +14,12 @@
 }
 
 .ds-theme-menu {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--font-mono, ui-monospace, monospace);
   background: var(--ui-surface-strong);
   border-color: var(--ui-border);
   color: var(--ui-text);
@@ -59,4 +65,18 @@ html[data-theme] body .login-top-hud .ds-theme-trigger:hover {
   background: var(--login-top-control-hover) !important;
   border-color: var(--ui-border-strong) !important;
   color: var(--ui-text) !important;
+}
+
+.ds-theme-menu-heading { flex-shrink: 0; }
+.ds-theme-menu-options {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ui-border-strong) transparent;
+}
+.ds-theme-menu-row:focus-visible {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: -2px;
+  background: var(--ui-control-hover);
 }

@@ -1,0 +1,12 @@
+{
+  "theme": "verdant-renderer-qa",
+  "primary": "#16a34a",
+  "gateway": true,
+  "core": true,
+  "canvasCount": 0,
+  "chartBackground": "#143b2e",
+  "registryCount": 8,
+  "buildPassed": true,
+  "applicationComponentsChanged": false,
+  "temporaryThemeRemoved": true
+}

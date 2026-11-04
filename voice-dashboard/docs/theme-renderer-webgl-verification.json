@@ -1,0 +1,150 @@
+{
+  "cosmic-black": {
+    "before": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "020916",
+          "fog": "020916",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "after": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "020916",
+          "fog": "020916",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  },
+  "aurora": {
+    "before": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "020916",
+          "fog": "020916",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "after": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "020916",
+          "fog": "020916",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  },
+  "solaris": {
+    "before": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "5f97cb",
+          "fog": "91c8e8",
+          "ambient": 1.45,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "after": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "5f97cb",
+          "fog": "91c8e8",
+          "ambient": 1.45,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  },
+  "obsidian": {
+    "before": {
+      "canvasCount": 0,
+      "scenes": []
+    },
+    "after": {
+      "canvasCount": 0,
+      "scenes": []
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  },
+  "quartz": {
+    "before": {
+      "canvasCount": 0,
+      "scenes": []
+    },
+    "after": {
+      "canvasCount": 0,
+      "scenes": []
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  },
+  "jec-horizon": {
+    "before": {
+      "canvasCount": 0,
+      "scenes": []
+    },
+    "after": {
+      "canvasCount": 0,
+      "scenes": []
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  },
+  "jec-skywave": {
+    "before": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "020916",
+          "fog": "020916",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "after": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "020916",
+          "fog": "020916",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  }
+}

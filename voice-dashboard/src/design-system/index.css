@@ -34,3 +34,5 @@
 @import 'react-grid-layout/css/styles.css';
 @import './components/executive-briefing.css';
 @import './components/company-presentation.css';
+
+@import './components/release-notes.css';

@@ -1,0 +1,646 @@
+[
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "spaceBackgroundEnabled",
+    "expression": "!isAurora",
+    "values": [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "spaceFogEnabled",
+    "expression": "!isAurora",
+    "values": [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "spaceAmbientIntensity",
+    "expression": "isAurora ? 1.0 : 0.8",
+    "values": [
+      0.8,
+      1,
+      0.8,
+      0.8,
+      0.8,
+      0.8,
+      0.8
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "starColor",
+    "expression": "isAurora ? '#c5fbff' : '#3bbcff'",
+    "values": [
+      "#3bbcff",
+      "#c5fbff",
+      "#3bbcff",
+      "#3bbcff",
+      "#3bbcff",
+      "#3bbcff",
+      "#3bbcff"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "starSize",
+    "expression": "isAurora ? 0.025 : 0.035",
+    "values": [
+      0.035,
+      0.025,
+      0.035,
+      0.035,
+      0.035,
+      0.035,
+      0.035
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "starOpacity",
+    "expression": "isAurora ? 0.30 : 1",
+    "values": [
+      1,
+      0.3,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "nexusGeometry",
+    "expression": "isAurora",
+    "values": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "coreAmbientIntensity",
+    "expression": "isAurora ? 0.90 : 0.65",
+    "values": [
+      0.65,
+      0.9,
+      0.65,
+      0.65,
+      0.65,
+      0.65,
+      0.65
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "coreDirectionalIntensity",
+    "expression": "isAurora ? 1.35 : 1.1",
+    "values": [
+      1.1,
+      1.35,
+      1.1,
+      1.1,
+      1.1,
+      1.1,
+      1.1
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "coreDirectionalColor",
+    "expression": "isAurora ? '#d9ffff' : '#e5fbff'",
+    "values": [
+      "#e5fbff",
+      "#d9ffff",
+      "#e5fbff",
+      "#e5fbff",
+      "#e5fbff",
+      "#e5fbff",
+      "#e5fbff"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "accentLighting",
+    "expression": "isAurora",
+    "values": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "rootClassName",
+    "expression": "isAurora\n          ? 'login-aurora-mode bg-[#071b25]'\n          : isJecTheme\n          ? `login-jec-mode ${isJecSkywave ? 'login-jec-skywave-mode' : 'login-jec-horizon-mode'} bg-[#b9d9ea]`\n          : isSolaris\n          ? 'login-solaris-mode bg-[#eaf8ff]'\n          : isLight\n          ? 'bg-[#edf8fc]'\n          : 'bg-[#010611]'",
+    "values": [
+      "bg-[#010611]",
+      "login-aurora-mode bg-[#071b25]",
+      "login-solaris-mode bg-[#eaf8ff]",
+      "bg-[#010611]",
+      "bg-[#edf8fc]",
+      "login-jec-mode login-jec-horizon-mode bg-[#b9d9ea]",
+      "login-jec-mode login-jec-skywave-mode bg-[#b9d9ea]"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "solarAtmosphere",
+    "expression": "isSolaris",
+    "values": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "fieldAtmosphere",
+    "expression": "isJecTheme",
+    "values": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "fieldMotionClassName",
+    "expression": "isJecSkywave ? 'login-jec-sky--animated' : 'login-jec-sky--static'",
+    "values": [
+      "login-jec-sky--static",
+      "login-jec-sky--static",
+      "login-jec-sky--static",
+      "login-jec-sky--static",
+      "login-jec-sky--static",
+      "login-jec-sky--static",
+      "login-jec-sky--animated"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "curtainAtmosphere",
+    "expression": "isAurora",
+    "values": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "spaceBackdrop",
+    "expression": "!isStaticTheme && !isSolaris && !isJecTheme",
+    "values": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "staticSky",
+    "expression": "isStaticTheme && !isJecTheme",
+    "values": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "staticSkyClassName",
+    "expression": "isQuartz ? 'login-static-sky--quartz' : 'login-static-sky--obsidian'",
+    "values": [
+      "login-static-sky--obsidian",
+      "login-static-sky--obsidian",
+      "login-static-sky--obsidian",
+      "login-static-sky--obsidian",
+      "login-static-sky--quartz",
+      "login-static-sky--obsidian",
+      "login-static-sky--obsidian"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "nebula",
+    "expression": "!isAurora && !isSolaris && !isStaticTheme && !isJecTheme",
+    "values": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "sidewashClassName",
+    "expression": "isAurora\n            ? 'bg-gradient-to-r from-[#06131d]/82 via-[#071923]/32 to-transparent'\n            : isJecTheme\n            ? 'login-jec-sidewash'\n            : isSolaris\n            ? 'login-solaris-sidewash'\n            : isLight\n            ? 'bg-gradient-to-r from-white/35 via-white/10 to-transparent'\n            : 'bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08'",
+    "values": [
+      "bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08",
+      "bg-gradient-to-r from-[#06131d]/82 via-[#071923]/32 to-transparent",
+      "login-solaris-sidewash",
+      "bg-gradient-to-r from-[#010611]/88 via-[#010611]/42 to-[#010611]/08",
+      "bg-gradient-to-r from-white/35 via-white/10 to-transparent",
+      "login-jec-sidewash",
+      "login-jec-sidewash"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "plasmaRibbons",
+    "expression": "isSolaris",
+    "values": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "heliosCrown",
+    "expression": "isSolaris",
+    "values": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "hudCurtainClassName",
+    "expression": "isAurora ? 'login-hud-surface--aurora' : ''",
+    "values": [
+      "",
+      "login-hud-surface--aurora",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "hudSolarClassName",
+    "expression": "isSolaris ? 'login-hud-surface--solaris' : ''",
+    "values": [
+      "",
+      "",
+      "login-hud-surface--solaris",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "hudFieldClassName",
+    "expression": "isJecTheme ? 'login-hud-surface--jec' : ''",
+    "values": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "login-hud-surface--jec",
+      "login-hud-surface--jec"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "gatewayTitle",
+    "expression": "isAurora ? 'AURORA COMMAND LOGIN' : isSolaris ? 'SOLARIS COMMAND LOGIN' : isJecSkywave ? 'JEC SKYWAVE GATEWAY' : isJecHorizon ? 'JEC HORIZON GATEWAY' : isQuartz ? 'QUARTZ COMMAND LOGIN' : isObsidian ? 'OBSIDIAN COMMAND LOGIN' : 'IDENTITY GATEWAY'",
+    "values": [
+      "IDENTITY GATEWAY",
+      "AURORA COMMAND LOGIN",
+      "SOLARIS COMMAND LOGIN",
+      "OBSIDIAN COMMAND LOGIN",
+      "QUARTZ COMMAND LOGIN",
+      "JEC HORIZON GATEWAY",
+      "JEC SKYWAVE GATEWAY"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "networkLabel",
+    "expression": "isAurora ? 'EXECUTIVE NODE // AURORA' : isSolaris ? 'EXECUTIVE NODE // SOLARIS' : isJecTheme ? 'JEC SECURE BLUE NETWORK // 01' : isQuartz ? 'EXECUTIVE NODE // QUARTZ' : isObsidian ? 'EXECUTIVE NODE // OBSIDIAN' : 'BIOMETRIC NODE // 01'",
+    "values": [
+      "BIOMETRIC NODE // 01",
+      "EXECUTIVE NODE // AURORA",
+      "EXECUTIVE NODE // SOLARIS",
+      "EXECUTIVE NODE // OBSIDIAN",
+      "EXECUTIVE NODE // QUARTZ",
+      "JEC SECURE BLUE NETWORK // 01",
+      "JEC SECURE BLUE NETWORK // 01"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "portalBaseClassName",
+    "expression": "isAurora ? 'bg-[#020b10]/90' : isJecTheme ? 'login-jec-portal-base' : isSolaris ? 'login-solaris-portal-base' : isLight ? 'bg-[#edf8fc]' : 'bg-[#010611]'",
+    "values": [
+      "bg-[#010611]",
+      "bg-[#020b10]/90",
+      "login-solaris-portal-base",
+      "bg-[#010611]",
+      "bg-[#edf8fc]",
+      "login-jec-portal-base",
+      "login-jec-portal-base"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "portalRadialClassName",
+    "expression": "isAurora\n                  ? 'bg-[radial-gradient(circle_at_center,rgba(78,255,207,.16)_0%,rgba(54,207,231,.08)_30%,rgba(62,39,95,.10)_52%,rgba(2,11,16,.88)_82%,#020b10_100%)]'\n                  : isJecTheme\n                  ? 'login-jec-portal-radial'\n                  : isSolaris\n                  ? 'login-solaris-portal-radial'\n                  : 'bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]'",
+    "values": [
+      "bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]",
+      "bg-[radial-gradient(circle_at_center,rgba(78,255,207,.16)_0%,rgba(54,207,231,.08)_30%,rgba(62,39,95,.10)_52%,rgba(2,11,16,.88)_82%,#020b10_100%)]",
+      "login-solaris-portal-radial",
+      "bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]",
+      "bg-[radial-gradient(circle_at_center,rgba(0,183,255,.12)_0%,rgba(0,74,130,.055)_28%,rgba(1,6,17,.94)_68%,#010611_100%)]",
+      "login-jec-portal-radial",
+      "login-jec-portal-radial"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "curtainStageClassName",
+    "expression": "isAurora ? 'aurora-portal-stage' : ''",
+    "values": [
+      "",
+      "aurora-portal-stage",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "solarStageClassName",
+    "expression": "isSolaris ? 'solaris-portal-stage' : ''",
+    "values": [
+      "",
+      "",
+      "solaris-portal-stage",
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "fieldStageClassName",
+    "expression": "isJecTheme ? 'jec-portal-stage' : ''",
+    "values": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "jec-portal-stage",
+      "jec-portal-stage"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "activePortalBaseClassName",
+    "expression": "isAurora ? 'bg-[#020b10]/88' : isJecTheme ? 'login-jec-portal-base' : isSolaris ? 'login-solaris-portal-base' : isLight ? 'bg-[#edf8fc]' : 'bg-[#010611]'",
+    "values": [
+      "bg-[#010611]",
+      "bg-[#020b10]/88",
+      "login-solaris-portal-base",
+      "bg-[#010611]",
+      "bg-[#edf8fc]",
+      "login-jec-portal-base",
+      "login-jec-portal-base"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "activePortalRadialClassName",
+    "expression": "isAurora\n                  ? 'bg-[radial-gradient(circle_at_center,rgba(95,255,214,.18)_0%,rgba(66,221,239,.09)_26%,rgba(116,83,197,.10)_50%,rgba(3,15,21,.86)_75%,#020b10_100%)]'\n                  : isJecTheme\n                  ? 'login-jec-portal-radial login-jec-portal-radial--active'\n                  : isSolaris\n                  ? 'login-solaris-portal-radial login-solaris-portal-radial--active'\n                  : 'bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]'",
+    "values": [
+      "bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]",
+      "bg-[radial-gradient(circle_at_center,rgba(95,255,214,.18)_0%,rgba(66,221,239,.09)_26%,rgba(116,83,197,.10)_50%,rgba(3,15,21,.86)_75%,#020b10_100%)]",
+      "login-solaris-portal-radial login-solaris-portal-radial--active",
+      "bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]",
+      "bg-[radial-gradient(circle_at_center,rgba(52,211,153,.08)_0%,rgba(0,183,255,.055)_25%,rgba(1,6,17,.90)_66%,#010611_100%)]",
+      "login-jec-portal-radial login-jec-portal-radial--active",
+      "login-jec-portal-radial login-jec-portal-radial--active"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "coreHaloSizeClassName",
+    "expression": "isAurora || isSolaris || isJecTheme ? 'lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]' : 'lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]'",
+    "values": [
+      "lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]",
+      "lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]",
+      "lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]",
+      "lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]",
+      "lg:h-[300px] lg:w-[300px] md:h-[420px] md:w-[420px]",
+      "lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]",
+      "lg:h-[240px] lg:w-[240px] md:h-[330px] md:w-[330px]"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "coreHaloEffectClassName",
+    "expression": "isAurora || isSolaris || isJecTheme ? 'rounded-full blur-[78px] opacity-55' : 'rounded-full blur-[120px]'",
+    "values": [
+      "rounded-full blur-[120px]",
+      "rounded-full blur-[78px] opacity-55",
+      "rounded-full blur-[78px] opacity-55",
+      "rounded-full blur-[120px]",
+      "rounded-full blur-[120px]",
+      "rounded-full blur-[78px] opacity-55",
+      "rounded-full blur-[78px] opacity-55"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "stellarCore",
+    "expression": "isSolaris",
+    "values": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "nexusOrb",
+    "expression": "isAurora",
+    "values": [
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "brandOrb",
+    "expression": "isJecTheme",
+    "values": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "staticCore",
+    "expression": "isStaticTheme && !isJecTheme",
+    "values": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "staticCoreLabel",
+    "expression": "isQuartz ? 'QUARTZ CORE' : isObsidian ? 'OBSIDIAN CORE' : 'STATIC CORE'",
+    "values": [
+      "STATIC CORE",
+      "STATIC CORE",
+      "STATIC CORE",
+      "OBSIDIAN CORE",
+      "QUARTZ CORE",
+      "STATIC CORE",
+      "STATIC CORE"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "neuralCore",
+    "expression": "!isAurora && !isSolaris && !isStaticTheme && !isJecTheme",
+    "values": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "suppressCoreLabel",
+    "expression": "isAurora ||\n                  isSolaris",
+    "values": [
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "coreLabel",
+    "expression": "isAurora ? 'AURORA NEXUS' : isSolaris ? 'SOLARIS CORE' : isJecTheme ? 'JEC FRIDAY CORE' : 'AI CORE'",
+    "values": [
+      "AI CORE",
+      "AURORA NEXUS",
+      "SOLARIS CORE",
+      "AI CORE",
+      "AI CORE",
+      "JEC FRIDAY CORE",
+      "JEC FRIDAY CORE"
+    ]
+  },
+  {
+    "file": "src/LoginPortal.tsx",
+    "role": "statusDotClassName",
+    "expression": "isAurora ? 'bg-emerald-200' : 'bg-sky-100'",
+    "values": [
+      "bg-sky-100",
+      "bg-emerald-200",
+      "bg-sky-100",
+      "bg-sky-100",
+      "bg-sky-100",
+      "bg-sky-100",
+      "bg-sky-100"
+    ]
+  }
+]

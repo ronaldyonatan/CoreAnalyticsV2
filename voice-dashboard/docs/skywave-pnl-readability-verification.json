@@ -1,0 +1,142 @@
+{
+  "cosmic-black": [
+    {
+      "mode": "normal",
+      "title": "rgb(103, 232, 249)",
+      "label": "oklch(0.956 0.045 203.388)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(0, 242, 254)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "oklch(0.765 0.177 163.223)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(103, 232, 249)",
+      "label": "oklch(0.956 0.045 203.388)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(0, 242, 254)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "oklch(0.765 0.177 163.223)"
+    }
+  ],
+  "aurora": [
+    {
+      "mode": "normal",
+      "title": "rgb(239, 253, 255)",
+      "label": "oklch(0.956 0.045 203.388)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(143, 244, 243)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "oklch(0.765 0.177 163.223)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(239, 253, 255)",
+      "label": "oklch(0.956 0.045 203.388)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(143, 244, 243)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "oklch(0.765 0.177 163.223)"
+    }
+  ],
+  "solaris": [
+    {
+      "mode": "normal",
+      "title": "rgb(11, 39, 64)",
+      "label": "rgb(49, 95, 120)",
+      "previous": "rgb(49, 95, 120)",
+      "section": "rgb(12, 111, 148)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "rgb(4, 120, 87)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(11, 39, 64)",
+      "label": "rgb(49, 95, 120)",
+      "previous": "rgb(49, 95, 120)",
+      "section": "rgb(12, 111, 148)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "rgb(4, 120, 87)"
+    }
+  ],
+  "obsidian": [
+    {
+      "mode": "normal",
+      "title": "rgb(125, 235, 245)",
+      "label": "oklch(0.956 0.045 203.388)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(0, 242, 254)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "oklch(0.765 0.177 163.223)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(125, 235, 245)",
+      "label": "oklch(0.956 0.045 203.388)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(0, 242, 254)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "oklch(0.765 0.177 163.223)"
+    }
+  ],
+  "quartz": [
+    {
+      "mode": "normal",
+      "title": "rgb(11, 39, 64)",
+      "label": "rgb(49, 95, 120)",
+      "previous": "rgb(49, 95, 120)",
+      "section": "rgb(12, 111, 148)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "rgb(4, 120, 87)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(11, 39, 64)",
+      "label": "rgb(49, 95, 120)",
+      "previous": "rgb(49, 95, 120)",
+      "section": "rgb(12, 111, 148)",
+      "meta": "oklab(0.789 -0.131264 -0.0805335 / 0.7)",
+      "current": "rgb(4, 120, 87)"
+    }
+  ],
+  "jec-horizon": [
+    {
+      "mode": "normal",
+      "title": "rgb(255, 255, 255)",
+      "label": "rgb(10, 92, 145)",
+      "previous": "oklch(0.869 0.022 252.894)",
+      "section": "rgb(7, 59, 89)",
+      "meta": "rgb(10, 92, 145)",
+      "current": "rgb(33, 138, 70)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(255, 255, 255)",
+      "label": "rgb(201, 242, 255)",
+      "previous": "rgb(154, 191, 208)",
+      "section": "rgb(7, 59, 89)",
+      "meta": "rgb(201, 242, 255)",
+      "current": "rgb(4, 120, 87)"
+    }
+  ],
+  "jec-skywave": [
+    {
+      "mode": "normal",
+      "title": "rgb(7, 59, 89)",
+      "label": "rgb(10, 92, 145)",
+      "previous": "rgb(66, 107, 130)",
+      "section": "rgb(7, 89, 133)",
+      "meta": "rgb(53, 107, 135)",
+      "current": "rgb(33, 138, 70)"
+    },
+    {
+      "mode": "fullscreen",
+      "title": "rgb(7, 59, 89)",
+      "label": "rgb(10, 92, 145)",
+      "previous": "rgb(66, 107, 130)",
+      "section": "rgb(7, 89, 133)",
+      "meta": "rgb(53, 107, 135)",
+      "current": "rgb(4, 120, 87)"
+    }
+  ]
+}

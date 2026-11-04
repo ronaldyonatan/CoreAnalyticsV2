@@ -1,0 +1,7 @@
+{
+  "changedApplicationFiles": [
+    "src/theme/themes.ts",
+    "src/theme/themes/lunar-eclipse.css"
+  ],
+  "otherApplicationFilesUnchanged": true
+}

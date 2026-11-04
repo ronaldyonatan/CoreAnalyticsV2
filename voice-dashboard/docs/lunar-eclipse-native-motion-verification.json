@@ -1,0 +1,61 @@
+{
+  "before": {
+    "nativeReducedMotion": true,
+    "theme": "lunar-eclipse",
+    "orb": {
+      "animation": "jecV4OrbFloat",
+      "duration": "6.8s",
+      "transform": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    "halo": {
+      "animation": "jecV4Halo",
+      "duration": "5.2s",
+      "transform": "matrix(0.9, 0, 0, 0.9, 0, 0)"
+    },
+    "corona": {
+      "animation": "orbNebulaTurn",
+      "duration": "9s",
+      "transform": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    "particles": {
+      "animation": "orbNebulaTurn",
+      "duration": "18s",
+      "transform": "matrix(1, 0, 0, 1, 0, 0)"
+    },
+    "field": {
+      "animation": "orbMistDrift",
+      "duration": "16s",
+      "transform": "matrix(0.919459, -0.195437, 0.195437, 0.919459, -50.1113, -81.2)"
+    }
+  },
+  "after": {
+    "nativeReducedMotion": true,
+    "theme": "lunar-eclipse",
+    "orb": {
+      "animation": "jecV4OrbFloat",
+      "duration": "6.8s",
+      "transform": "matrix(1.00375, 0, 0, 1.00375, 0, -1.87647)"
+    },
+    "halo": {
+      "animation": "jecV4Halo",
+      "duration": "5.2s",
+      "transform": "matrix(0.964461, 0, 0, 0.964461, 0, 0)"
+    },
+    "corona": {
+      "animation": "orbNebulaTurn",
+      "duration": "9s",
+      "transform": "matrix(0.795163, 0.606396, -0.606396, 0.795163, 0, 0)"
+    },
+    "particles": {
+      "animation": "orbNebulaTurn",
+      "duration": "18s",
+      "transform": "matrix(0.947408, -0.320029, 0.320029, 0.947408, 0, 0)"
+    },
+    "field": {
+      "animation": "orbMistDrift",
+      "duration": "16s",
+      "transform": "matrix(0.920943, -0.192873, 0.192873, 0.920943, -49.34, -79.8993)"
+    }
+  },
+  "mediaEmulationOverride": false
+}

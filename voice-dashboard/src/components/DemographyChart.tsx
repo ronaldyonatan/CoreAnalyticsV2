@@ -289,7 +289,6 @@ function Demography3DScene({
       mesh.material.needsUpdate = true;
     };
 
-
     const currentAgeBreakdowns = ageGroups.map((group) => ({
       group,
       breakdown: getAgeBreakdown(group, currentDisplayed),
@@ -1134,9 +1133,9 @@ export default function DemographyChart({
   donutMode: controlledDonutMode,
   onDonutModeChange,
 }: DemographyChartProps) {
-  const { theme, isLight, isSolaris, isStaticTheme, isJecHorizon, isJecSkywave } = useTheme();
-  const isJecTheme = isJecHorizon || isJecSkywave;
-  const sceneIsLight = isLight && !isJecTheme;
+  const { theme, isLight, isStaticTheme } = useTheme();
+  const visual = theme.three.renderers.DemographyChart;
+  const sceneIsLight = visual.lightMaterials;
   const [hover3D, setHover3D] = useState<Hover3D | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [autoRotate, setAutoRotate] = useState(true);
@@ -1151,33 +1150,7 @@ export default function DemographyChart({
   const previousCompactModeRef = useRef<DemographyDonutMode>(
     controlledDonutMode ?? 'gender'
   );
-  const sceneTheme = isJecTheme
-    ? {
-        ...theme.three,
-        background: '#010b16',
-        fog: '#03182b',
-        floor: '#06233a',
-        gridPrimary: '#167da8',
-        gridSecondary: '#0b4968',
-        wall: '#08283d',
-        wallSecondary: '#0b3550',
-        wallAccent: '#0f5f89',
-        ambientIntensity: 1.12,
-      }
-    : isSolaris
-      ? {
-          ...theme.three,
-          background: '#5f97cb',
-          fog: '#91c8e8',
-          floor: '#24527f',
-          gridPrimary: '#a8e2ff',
-          gridSecondary: '#4f7fb0',
-          wall: '#78afd7',
-          wallSecondary: '#6f96c9',
-          wallAccent: '#5875bd',
-          ambientIntensity: 1.45,
-        }
-      : theme.three;
+  const sceneTheme = { ...theme.three, ...visual.scene };
 
   const donutMode = controlledDonutMode ?? internalDonutMode;
   const setDonutMode = (mode: DemographyDonutMode) => {
@@ -1339,15 +1312,14 @@ export default function DemographyChart({
     return `${MONTHS[safeSelectedMonth - 1]} ${selectedYear}`;
   }, [safeSelectedMonth, selectedYear, ytdActive]);
 
-
   if (isFullscreen && !isStaticTheme) {
     return (
       <div
         className="daily-3d-shell w-full h-full min-h-0 min-w-0 flex flex-col border rounded-xl overflow-hidden relative"
         style={{
-          background: isJecTheme ? '#020916' : 'var(--core-bg-secondary)',
-          borderColor: isJecTheme ? 'rgba(37,135,200,.42)' : 'var(--core-border)',
-          color: isJecTheme ? '#e9f8ff' : 'var(--core-text)',
+          background: visual.background,
+          borderColor: visual.borderColor,
+          color: visual.color,
         }}
       >
         {/* HEADER + PERIOD FILTER */}

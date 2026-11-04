@@ -15,7 +15,9 @@ RUN if [ -f package-lock.json ]; then \
 
 COPY . .
 
-RUN npm run build
+ARG APP_VERSION
+RUN if [ -n "$APP_VERSION" ]; then node scripts/check-release-version.mjs "$APP_VERSION"; fi \
+    && npm run build
 
 
 # ==========================================

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CORE_THEMES, CORE_THEME_LIST } from '../theme/themes';
 import type { CoreThemeId } from '../theme/themes';
 import { useTheme } from '../theme/ThemeContext';
@@ -22,10 +23,86 @@ export default function ThemeSwitcher({
   const { themeId, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const activeTheme = CORE_THEMES[themeId];
+  const menuId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const focusedMenu = useRef(false);
+  const [position, setPosition] = useState<React.CSSProperties | null>(null);
+
+  useLayoutEffect(() => {
+    if (!open || !compact) return;
+    const placeMenu = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const viewport = window.visualViewport;
+      const width = viewport?.width ?? window.innerWidth;
+      const height = viewport?.height ?? window.innerHeight;
+      const leftEdge = viewport?.offsetLeft ?? 0;
+      const topEdge = viewport?.offsetTop ?? 0;
+      const menuWidth = Math.min(300, width - 24);
+      const below = topEdge + height - rect.bottom - 20;
+      const above = rect.top - topEdge - 20;
+      const upwards = below < 220 && above > below;
+      setPosition({
+        width: menuWidth,
+        left: Math.max(leftEdge + 12, Math.min(align === 'right' ? rect.right - menuWidth : rect.left, leftEdge + width - menuWidth - 12)),
+        top: upwards ? undefined : rect.bottom + 8,
+        bottom: upwards ? window.innerHeight - rect.top + 8 : undefined,
+        maxHeight: Math.max(0, Math.min(620, upwards ? above : below)),
+      });
+    };
+    placeMenu();
+    window.addEventListener('resize', placeMenu);
+    window.addEventListener('scroll', placeMenu, true);
+    window.visualViewport?.addEventListener('resize', placeMenu);
+    window.visualViewport?.addEventListener('scroll', placeMenu);
+    return () => {
+      window.removeEventListener('resize', placeMenu);
+      window.removeEventListener('scroll', placeMenu, true);
+      window.visualViewport?.removeEventListener('resize', placeMenu);
+      window.visualViewport?.removeEventListener('scroll', placeMenu);
+    };
+  }, [open, compact, align]);
+
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!triggerRef.current?.contains(target) && !menuRef.current?.contains(target)) setOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setOpen(false); triggerRef.current?.focus(); }
+    };
+    document.addEventListener('pointerdown', dismiss);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', dismiss);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open) { focusedMenu.current = false; return; }
+    if (!position || !menuRef.current || focusedMenu.current) return;
+    focusedMenu.current = true;
+    const active = menuRef.current.querySelector<HTMLButtonElement>('[aria-checked="true"]');
+    active?.focus({ preventScroll: true });
+    active?.scrollIntoView({ block: 'nearest' });
+  }, [open, position]);
+
+  const navigateMenu = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const rows = Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]') ?? []);
+    const current = rows.indexOf(document.activeElement as HTMLButtonElement);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? rows.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : -1) + rows.length) % rows.length;
+    rows[next]?.focus();
+  };
 
   const selectTheme = (id: CoreThemeId) => {
     setTheme(id);
     setOpen(false);
+    triggerRef.current?.focus();
   };
 
   const renderCompactThemeRow = (id: CoreThemeId) => {
@@ -36,6 +113,8 @@ export default function ThemeSwitcher({
       <button
         type="button"
         key={item.id}
+        role="menuitemradio"
+        aria-checked={active}
         onClick={() => selectTheme(item.id)}
         className={`core-theme-menu-row ds-theme-menu-row flex w-full items-start gap-2 px-3 py-2.5 text-left ${active ? 'ds-theme-menu-row--active' : ''}`}
       >
@@ -162,33 +241,44 @@ export default function ThemeSwitcher({
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
+        ref={triggerRef}
         title={`Theme: ${activeTheme.name}`}
+        aria-label={`Theme: ${activeTheme.name}`}
+        aria-haspopup="menu"
+        aria-controls={open ? menuId : undefined}
+        onKeyDown={(event) => { if (event.key === 'ArrowDown') { event.preventDefault(); setOpen(true); } }}
         className="core-control ds-theme-trigger flex w-full items-center justify-center gap-2 rounded-md border p-1.5 text-xs font-bold"
         aria-expanded={open}
       >
         <span className="text-sm">{activeTheme.icon}</span>
       </button>
 
-      {open && (
+      {open && position && createPortal(
         <div
-          className={`ds-theme-menu absolute top-full z-[999] mt-2 w-[260px] overflow-hidden rounded-lg border ${
-            align === 'right' ? 'right-0' : 'left-0'
-          }`}
+          ref={menuRef}
+          id={menuId}
+          role="menu"
+          aria-label="Application themes"
+          onKeyDown={navigateMenu}
+          style={position}
+          className="ds-theme-menu rounded-lg border"
         >
           <div className="ds-theme-menu-heading border-b px-3 py-2 text-[9px] font-black uppercase tracking-[0.18em]">
             Appearance
           </div>
 
-          <div className="ds-theme-menu-section px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]">
-            Immersive
-          </div>
-          {IMMERSIVE_THEMES.map(renderCompactThemeRow)}
+          <div className="ds-theme-menu-options">
+            <div className="ds-theme-menu-section px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]">
+              Immersive
+            </div>
+            {IMMERSIVE_THEMES.map(renderCompactThemeRow)}
 
-          <div className="ds-theme-menu-section mt-1 border-t px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]">
-            Static Performance · Zero Motion
+            <div className="ds-theme-menu-section mt-1 border-t px-3 pb-1.5 pt-2 text-[7px] font-black uppercase tracking-[0.18em]">
+              Static Performance · Zero Motion
+            </div>
+            {STATIC_THEMES.map(renderCompactThemeRow)}
           </div>
-          {STATIC_THEMES.map(renderCompactThemeRow)}
-        </div>
+        </div>, document.body
       )}
     </div>
   );

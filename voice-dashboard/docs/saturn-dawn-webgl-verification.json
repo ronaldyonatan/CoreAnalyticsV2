@@ -1,0 +1,30 @@
+{
+  "saturn-dawn": {
+    "before": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "140c04",
+          "fog": "140c04",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "after": {
+      "canvasCount": 1,
+      "scenes": [
+        {
+          "background": "140c04",
+          "fog": "140c04",
+          "ambient": 1.15,
+          "drawCalls": 41,
+          "contextLost": false
+        }
+      ]
+    },
+    "sceneInputsEqual": true,
+    "pixelComparison": false
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "before": {
+    "nativeReducedMotion": true,
+    "theme": "lunar-eclipse",
+    "orb": {
+      "animation": "jecV4OrbFloat",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "halo": {
+      "animation": "jecV4Halo",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "corona": {
+      "animation": "none",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "particles": {
+      "animation": "none",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "field": {
+      "animation": "none",
+      "duration": "0s",
+      "transform": "none"
+    }
+  },
+  "after": {
+    "nativeReducedMotion": true,
+    "theme": "lunar-eclipse",
+    "orb": {
+      "animation": "jecV4OrbFloat",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "halo": {
+      "animation": "jecV4Halo",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "corona": {
+      "animation": "none",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "particles": {
+      "animation": "none",
+      "duration": "0s",
+      "transform": "none"
+    },
+    "field": {
+      "animation": "none",
+      "duration": "0s",
+      "transform": "none"
+    }
+  },
+  "mediaEmulationOverride": false
+}
