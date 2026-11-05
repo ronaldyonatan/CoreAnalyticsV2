@@ -50,6 +50,12 @@ class CoreApiClient:
         if payload is not None:
             debug_payload = dict(payload)
 
+            if "EncryptedPasswordBase64" in debug_payload:
+                debug_payload["EncryptedPasswordBase64"] = "<HIDDEN>"
+
+            if "SessionTokenHash" in debug_payload:
+                debug_payload["SessionTokenHash"] = "<HIDDEN>"
+
             if "PasswordHash" in debug_payload:
                 debug_payload["PasswordHash"] = "<HIDDEN>"
 
@@ -363,6 +369,33 @@ class CoreApiClient:
         )
 
     # =========================================================
+    # SERVER-SIDE SESSION (BEAM API CONTRACT - MUST IMPLEMENT)
+    # =========================================================
+
+    def create_user_session(self, *, user_id: str, token_hash: str,
+                            auth_method: str, ip_address: Optional[str] = None,
+                            user_agent: Optional[str] = None,
+                            ttl_minutes: int = 480) -> dict[str, Any]:
+        if auth_method not in ("PASSWORD", "VOICE"):
+            raise ValueError("Invalid auth_method")
+        return self._post_mode("CoreUserSessionCreate", {
+            "UserID": str(user_id), "SessionTokenHash": token_hash,
+            "AuthMethod": auth_method, "IPAddress": ip_address,
+            "UserAgent": user_agent, "TTLMinutes": int(ttl_minutes),
+        })
+
+    def validate_user_session(self, *, token_hash: str) -> dict[str, Any]:
+        return self._post_mode("CoreUserSessionValidate", {
+            "SessionTokenHash": token_hash,
+        })
+
+    def revoke_user_session(self, *, token_hash: str,
+                            reason: str = "LOGOUT") -> dict[str, Any]:
+        return self._post_mode("CoreUserSessionRevoke", {
+            "SessionTokenHash": token_hash, "RevokedReason": reason,
+        })
+
+    # =========================================================
     # USER GROUP / EFFECTIVE ACCESS
     # =========================================================
 
@@ -660,6 +693,31 @@ class CoreApiClient:
             "CoreVoiceAuthLogAdd",
             payload,
         )
+
+
+    # DATA STUDIO METADATA - BEAM API
+    def list_studio_connections(self, *, user_id: str):
+        return self._post_mode("CoreStudioConnectionList", {"UserID": str(user_id)})
+
+    def create_studio_connection(self, *, user_id: str, record: dict):
+        return self._post_mode("CoreStudioConnectionCreate", {
+            "UserID": str(user_id),
+            "ConnectionName": record["connection_name"],
+            "ServerHost": record["server_host"],
+            "ServerPort": record.get("server_port", 1433),
+            "DatabaseName": record["database_name"],
+            "LoginUsername": record["login_username"],
+            "EncryptedPasswordBase64": record["encrypted_password_base64"],
+            "EncryptionKeyVersion": record["encryption_key_version"],
+            "EncryptTransport": record.get("encrypt_transport", True),
+            "TrustServerCertificate": record.get("trust_server_certificate", False),
+            "ConnectionTimeoutSeconds": record.get("connection_timeout_seconds", 10),
+        })
+
+    def set_studio_connection_active(self, *, user_id: str, connection_id: str, active: bool):
+        return self._post_mode("CoreStudioConnectionSetActive", {
+            "UserID": str(user_id), "ConnectionID": str(connection_id), "IsActive": bool(active),
+        })
 
 
 # IMPORTANT:

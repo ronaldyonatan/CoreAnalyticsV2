@@ -8,6 +8,7 @@ from typing import Any
 from flask import Blueprint, jsonify, request
 
 from app.clients.core_api_client import core_api
+from app.services.session_security import (issue_session, current_session, clear_session, valid_csrf, revoke_current_session)
 from app.services.duplicate_voice_guard import VoiceDuplicateError
 from app.services.enrollment_service import enrollment_service
 
@@ -128,7 +129,16 @@ def password_login():
     }
 
     if result.success:
-        return jsonify(payload), 200
+        user_id = str((result.user or {}).get("user_id") or "")
+        if not user_id:
+            return jsonify({"success": False, "code": "SESSION_USER_MISSING"}), 503
+        response = jsonify(payload)
+        try:
+            if not issue_session(response, user_id, "PASSWORD"):
+                return jsonify({"success": False, "code": "SESSION_CREATE_FAILED"}), 503
+        except Exception:
+            return jsonify({"success": False, "code": "SESSION_CREATE_FAILED"}), 503
+        return response, 200
 
     if result.code == "ACCOUNT_LOCKED":
         return jsonify(payload), 423
@@ -419,3 +429,34 @@ def forgot_password_reset():
         return jsonify(payload), 403
 
     return jsonify(payload), 503
+
+
+@auth_bp.route("/session", methods=["GET"])
+def session_status():
+    try:
+        session = current_session()
+        if not session:
+            return jsonify({"success": False, "code": "SESSION_INVALID"}), 401
+        access_response = core_api.get_user_access(str(session["user_id"]))
+        access_row = _first_data_row(access_response)
+        # Access shape depends on existing BEAM adapter; do not invent permissions.
+        if not access_row or access_row.get("success") is False:
+            return jsonify({"success": False, "code": "ACCESS_UNAVAILABLE"}), 503
+        return jsonify({"success": True, "code": "SESSION_VALID", "user": {
+            "user_id": session["user_id"], "username": session.get("username"),
+            "display_name": session.get("display_name"), "email": session.get("email"),
+        }, "access_raw": access_response}), 200
+    except Exception:
+        return jsonify({"success": False, "code": "SESSION_UNAVAILABLE"}), 503
+
+
+@auth_bp.route("/logout", methods=["POST"])
+def session_logout():
+    if not valid_csrf():
+        return jsonify({"success": False, "code": "CSRF_INVALID"}), 403
+    try:
+        if not revoke_current_session():
+            return jsonify({"success": False, "code": "SESSION_REVOKE_FAILED"}), 503
+    except Exception:
+        return jsonify({"success": False, "code": "SESSION_REVOKE_FAILED"}), 503
+    return clear_session(jsonify({"success": True, "code": "LOGGED_OUT"})), 200

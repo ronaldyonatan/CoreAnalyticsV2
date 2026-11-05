@@ -9,3 +9,12 @@ soundfile
 edge-tts
 sounddevice
 certifi>=2026.7.22
+
+# Data Studio: SQL Server connector + secret encryption
+pyodbc>=5.2,<6
+cryptography>=44
+
+# Lock Python package versions to match CPU-only wheels installed by Dockerfile.
+# SpeechBrain 1.1.2 requires torch/torchaudio >= 2.7.1.
+torch==2.7.1+cpu
+torchaudio==2.7.1+cpu

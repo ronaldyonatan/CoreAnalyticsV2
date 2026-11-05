@@ -11,6 +11,7 @@ from flask import (
 )
 
 from app.services.auth_service import get_user_access_profile
+from app.services.session_security import issue_session
 from app.services.identification_service import (
     identification_service,
 )
@@ -115,7 +116,29 @@ def identify_voice():
                     "access": None,
                 }), 502
 
-            status_code = 200
+            # A verified identity must also obtain a server-side session.
+            # Do not return a successful login if session creation fails.
+            response = jsonify(result)
+            try:
+                if not issue_session(response, user_id.strip(), "VOICE"):
+                    return jsonify({
+                        "success": False,
+                        "decision": "ERROR",
+                        "code": "SESSION_CREATE_FAILED",
+                        "message": "Login session could not be created.",
+                        "user": None,
+                        "access": None,
+                    }), 503
+            except Exception:
+                return jsonify({
+                    "success": False,
+                    "decision": "ERROR",
+                    "code": "SESSION_CREATE_FAILED",
+                    "message": "Login session could not be created.",
+                    "user": None,
+                    "access": None,
+                }), 503
+            return response, 200
 
         elif decision in {
             "UNKNOWN",

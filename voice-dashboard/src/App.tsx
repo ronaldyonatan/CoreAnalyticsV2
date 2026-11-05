@@ -33,6 +33,7 @@ import WidgetRevenuePage from './dashboards/WidgetRevenuePage';
 import IOLUsage from './components/IOLUsage';
 import UserManagement from './management/UserManagement';
 import GroupManagement from './management/GroupManagement';
+import DataStudioWorkspace from './dataStudio/DataStudioWorkspace';
 import ExecutiveBriefing from './executiveIntelligence/components/ExecutiveBriefing';
 import { queueExecutiveBriefingAutoRun } from './executiveIntelligence/engine/executiveBriefingTrigger';
 
@@ -157,6 +158,7 @@ const DASHBOARD_COMPONENTS: Record<
   user_management: UserManagementView,
   group_management: GroupManagementView,
   executive_briefing: ExecutiveBriefingView,
+  data_studio: DataStudioWorkspace,
 };
 
 // =========================================================
@@ -199,6 +201,7 @@ const SCREEN_ORDER = [
   ...HARDCODED_MENU.flatMap(category => category.children?.map(menu => menu.id) ?? [category.id]),
   'user_management',
   'group_management',
+  'data_studio',
   'dashboard_designer',
   'widget_revenue',
 ];
@@ -383,6 +386,26 @@ function readStoredAuthenticatedUser(): AuthenticatedUser | null {
   }
 }
 
+// Session API uses the same-origin nginx /voice-api/ proxy.
+const SESSION_API_BASE = '/voice-api/api/auth';
+
+function csrfCookie(): string {
+  const entry = document.cookie.split('; ').find(part => part.startsWith('core_csrf='));
+  if (!entry) return '';
+  try { return decodeURIComponent(entry.slice('core_csrf='.length)); }
+  catch { return ''; }
+}
+
+async function fetchVerifiedSession(): Promise<{ user: Record<string, unknown>; access?: unknown } | null> {
+  const response = await fetch(`${SESSION_API_BASE}/session`, {
+    method: 'GET', credentials: 'include', cache: 'no-store',
+  });
+  if (!response.ok) return null;
+  const data = await response.json();
+  if (data?.success !== true || data?.code !== 'SESSION_VALID' || !data?.user?.user_id) return null;
+  return data;
+}
+
 // =========================================================
 // APP
 // =========================================================
@@ -392,9 +415,9 @@ function AppContent() {
   const [authenticatedUser, setAuthenticatedUser] = useState<AuthenticatedUser | null>(
     () => readStoredAuthenticatedUser()
   );
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
-    () => authenticatedUser !== null
-  );
+  // Never treat localStorage as proof of authentication.
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [sessionChecking, setSessionChecking] = useState<boolean>(true);
   const [isWidgetMode, setIsWidgetMode] = useState(false);
   const [selectedHealthcareId, setSelectedHealthcareId] =
     useState<string>('');
@@ -445,6 +468,52 @@ function AppContent() {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Restore only after backend verifies the HttpOnly cookie. An old localStorage
+  // identity cannot independently unlock a dashboard.
+  useEffect(() => {
+    let alive = true;
+    const restore = async () => {
+      try {
+        const verified = await fetchVerifiedSession();
+        if (!alive) return;
+        const cached = readStoredAuthenticatedUser();
+        if (!verified) {
+          setAuthenticatedUser(null);
+          setIsLoggedIn(false);
+          localStorage.removeItem('core_authenticated_user');
+          return;
+        }
+        const user = verified.user;
+        const uid = String(user.user_id);
+        // Stage 4A currently returns access_raw, not normalized access. Cached
+        // menus are only a UI hint for the same verified identity, not authority.
+        const sameUser = cached?.user_id === uid;
+        const identity = {
+          ...(sameUser ? cached : {}),
+          user_id: uid,
+          username: String(user.username || (sameUser ? cached?.username : '') || uid),
+          display_name: String(user.display_name || (sameUser ? cached?.display_name : '') || user.username || uid),
+          groups: sameUser ? cached?.groups ?? [] : [],
+          menus: sameUser ? cached?.menus ?? [] : [],
+          auth_method: sameUser ? cached?.auth_method ?? 'manual' : 'manual',
+          authenticated_at: sameUser ? cached?.authenticated_at ?? new Date().toISOString() : new Date().toISOString(),
+        } as AuthenticatedUser;
+        setAuthenticatedUser(identity);
+        setIsLoggedIn(true);
+        localStorage.setItem('core_authenticated_user', JSON.stringify(identity));
+      } catch {
+        if (!alive) return;
+        setAuthenticatedUser(null);
+        setIsLoggedIn(false);
+        try { localStorage.removeItem('core_authenticated_user'); } catch {}
+      } finally {
+        if (alive) setSessionChecking(false);
+      }
+    };
+    void restore();
+    return () => { alive = false; };
   }, []);
 
   // Auto-login for iframe / widget mode
@@ -806,6 +875,14 @@ function AppContent() {
   }, [isMobileView, isSidebarPinned]);
 
   const handleResetToLogin = useCallback(() => {
+    // Revoke on the server; do not silently claim a successful logout if it fails.
+    const csrf = csrfCookie();
+    void fetch(`${SESSION_API_BASE}/logout`, {
+      method: 'POST', credentials: 'include',
+      headers: csrf ? { 'X-CSRF-Token': csrf } : {},
+    }).then(response => {
+      if (!response.ok) console.warn('[CoreAnalytics] Session revoke failed:', response.status);
+    }).catch(error => console.warn('[CoreAnalytics] Session revoke unavailable:', error));
     SciFiAudio.playBeep(400, 'sawtooth', 0.15, 0.05);
     setIsLoggedIn(false);
     setAuthenticatedUser(null);
@@ -886,6 +963,10 @@ function AppContent() {
   // =======================================================
   // LOGIN
   // =======================================================
+
+  if (sessionChecking && !isWidgetMode) {
+    return <div role="status" className="flex h-screen w-screen items-center justify-center bg-slate-950 text-sm text-cyan-100">Validating session…</div>;
+  }
 
   if (!isLoggedIn) {
     return (
@@ -1253,6 +1334,17 @@ function AppContent() {
                         Access groups & permission foundation
                       </span>
                     </span>
+                  </button>}
+
+                  {canAccess('data_studio') && <button
+                    type="button"
+                    onClick={() => { navigateTo('data_studio'); setShowSettingsMenu(false); if (!isSidebarPinned) setIsSidebarExpanded(false); }}
+                    className={`group mt-1 flex w-full items-center gap-3 rounded-lg border px-3.5 py-3 text-left transition-all ${effectiveRoute === 'data_studio' ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50' : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'}`}
+                  >
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/25 text-cyan-300">
+                      <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+                    </span>
+                    <span className="min-w-0"><span className="block text-[12px] font-bold tracking-[0.045em]">Data Studio</span><span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">Database connections & sources</span></span>
                   </button>}
 
                   {canAccess('dashboard_designer') && <button

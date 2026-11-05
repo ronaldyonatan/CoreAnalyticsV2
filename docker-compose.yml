@@ -1,67 +1,48 @@
+# CoreAnalyticsV2 — one Compose definition for local build and registry deployment.
+# Local: docker compose up -d --build
+# Production: docker compose pull && docker compose up -d --no-build
+# Override image tags with CORE_VOICE_AUTH_IMAGE / CORE_VOICE_DASHBOARD_IMAGE
+# in the shell or via --env-file; do not put credentials or Fernet keys here.
 services:
-
-  # ==========================================
-  # Voice Authentication Backend
-  # CPU-only AMD64 image
-  # ==========================================
+  # Voice authentication + Data Studio backend (CPU-only AMD64).
   voice-auth:
-    image: coreanalyticsv2-voice-auth:amd64-cpu
+    build:
+      context: ./voice-auth-backend
+      dockerfile: Dockerfile
+    image: ${CORE_VOICE_AUTH_IMAGE:-coreanalyticsv2-voice-auth:amd64-cpu}
     platform: linux/amd64
-
     container_name: coreanalytics-voice-auth
-
     restart: unless-stopped
-
     env_file:
       - ./voice-auth-backend/.env
-
     environment:
       VOICE_STORAGE_ROOT: /app/voice-profiles
-
     volumes:
       - voice_profiles:/app/voice-profiles
-
     expose:
       - "5001"
-
     networks:
       - coreanalytics
 
-
-  # ==========================================
-  # CoreAnalytics Dashboard
-  # ==========================================
+  # Dashboard served by Nginx; proxies /voice-api to voice-auth.
   voice-dashboard:
     build:
       context: ./voice-dashboard
       dockerfile: Dockerfile
-
-      
-
+    image: ${CORE_VOICE_DASHBOARD_IMAGE:-coreanalyticsv2-voice-dashboard:amd64-cpu}
+    platform: linux/amd64
     container_name: coreanalytics-dashboard
-
     restart: unless-stopped
-
     depends_on:
       - voice-auth
-
     ports:
       - "8080:80"
-
     networks:
       - coreanalytics
 
-
-# ============================================
-# Persistent Storage
-# ============================================
 volumes:
   voice_profiles:
 
-
-# ============================================
-# Docker Network
-# ============================================
 networks:
   coreanalytics:
     driver: bridge

@@ -146,7 +146,7 @@ const MAX_LOGIN_ATTEMPTS = 3;
 
 const VOICE_API_BASE =
   import.meta.env.VITE_VOICE_API_URL ||
-  'http://127.0.0.1:5001';
+  '/voice-api';
 
 const COLORS = {
   cyan: '#00b7ff',
@@ -2998,10 +2998,12 @@ function AuroraOrbVisual({
   phase,
   isListening,
   isSpeaking,
+  paused = false,
 }: {
   phase: PortalPhase;
   isListening: boolean;
   isSpeaking: boolean;
+  paused?: boolean;
 }) {
   const isVerified =
     phase === 'verified';
@@ -3069,7 +3071,7 @@ function AuroraOrbVisual({
         <div className="aurora-orb-current" />
         <div className="aurora-orb-inner" />
 
-        <AuroraOrbSurfaceCanvas />
+        {!paused && <AuroraOrbSurfaceCanvas />}
 
         <div className="aurora-orb-shimmer" />
         <div className="aurora-orb-specular" />
@@ -3155,6 +3157,32 @@ function JecBrandOrb({
       </div>
     </div>
   );
+}
+
+/** The idle login atmosphere and core are shared with the Data Studio command center. */
+export function LoginAtmosphere({ paused = false }: { paused?: boolean }) {
+  const login = useTheme().theme.login;
+  return <div className={`studio-login-atmosphere ${login.rootClassName}`} aria-hidden="true">
+    {login.solarAtmosphere && <div className="login-solaris-sky absolute inset-0 z-0 pointer-events-none"><div className="login-solaris-haze" /><div className="login-solaris-sun-disc" />{!paused && <SolarisSkyCanvas phase="idle" />}<div className="login-solaris-orbit login-solaris-orbit--a" /><div className="login-solaris-orbit login-solaris-orbit--b" /><div className="login-solaris-horizon" /></div>}
+    {login.fieldAtmosphere && <div className={`login-jec-sky absolute inset-0 z-0 pointer-events-none ${login.fieldMotionClassName}`}><div className="login-jec-sky__deep" /><div className="login-jec-sky__mesh" /><div className="login-jec-sky__wave login-jec-sky__wave--a" /><div className="login-jec-sky__wave login-jec-sky__wave--b" /><div className="login-jec-sky__wave login-jec-sky__wave--c" /><div className="login-jec-sky__dots" /></div>}
+    {login.curtainAtmosphere && <div className="login-aurora-sky absolute inset-0 z-0 pointer-events-none">{!paused && <AuroraSkyCanvas phase="idle" />}<div className="login-aurora-mountain login-aurora-mountain--far" /><div className="login-aurora-mountain login-aurora-mountain--near" /><div className="login-aurora-reflection absolute inset-x-0 bottom-0 h-[20%]" /></div>}
+    {login.spaceBackdrop && !paused && <div className="absolute inset-0 z-0 pointer-events-none"><Canvas style={{ pointerEvents: 'none' }} camera={{ position: [0, 1.3, 11], fov: 52 }} dpr={[1, 1.4]} gl={{ antialias: true }}><SpaceScene phase="idle" /></Canvas></div>}
+    {login.staticSky && <div className={`login-static-sky ${login.staticSkyClassName}`} />}
+    {login.nebula && <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(ellipse_at_78%_28%,rgba(0,140,255,.13)_0%,rgba(30,70,180,.045)_24%,transparent_48%),radial-gradient(ellipse_at_24%_72%,rgba(0,110,255,.070)_0%,transparent_38%),radial-gradient(ellipse_at_52%_48%,rgba(18,55,120,.055)_0%,transparent_42%)]" />}
+    {login.plasmaRibbons && <SolarisHorizontalRibbonsSvg phase="idle" />}
+    {login.heliosCrown && <SolarisHeliosCrownSvg phase="idle" />}
+  </div>;
+}
+
+export function LoginIdleCore({ paused = false }: { paused?: boolean }) {
+  const login = useTheme().theme.login;
+  return <div className="studio-login-core" aria-hidden="true">
+    {login.stellarCore && <div className="login-solaris-core"><div className="login-solaris-core-rayfield" /><div className="login-solaris-core-aura" /><div className="login-solaris-core-orbit login-solaris-core-orbit--a" /><div className="login-solaris-core-orbit login-solaris-core-orbit--b" /><div className="login-solaris-core-orbit login-solaris-core-orbit--c" /><div className="login-solaris-core-shell"><div className="login-solaris-core-limb" /><div className="login-solaris-core-surface"><div className="login-solaris-core-granulation" /><div className="login-solaris-core-stream login-solaris-core-stream--a" /><div className="login-solaris-core-stream login-solaris-core-stream--b" /><div className="login-solaris-core-stream login-solaris-core-stream--c" /><div className="login-solaris-core-hotspot login-solaris-core-hotspot--a" /><div className="login-solaris-core-hotspot login-solaris-core-hotspot--b" /><div className="login-solaris-core-hotspot login-solaris-core-hotspot--c" /><div className="login-solaris-core-inner" /></div></div><div className="login-solaris-core-spaceAmbientIntensity">SOLARIS CORE</div></div>}
+    {login.nexusOrb && <AuroraOrbVisual phase="idle" isListening={false} isSpeaking={false} paused={paused} />}
+    {login.brandOrb && <JecBrandOrb phase="idle" isListening={false} isSpeaking={false} />}
+    {login.staticCore && <div className="login-static-core"><div className="login-static-core__diamond" /><div className="login-static-core__caption">{login.staticCoreLabel}</div></div>}
+    {login.neuralCore && !paused && <Canvas style={{ pointerEvents: 'none' }} camera={{ position: [0, 0, 6], fov: 42 }} dpr={[1, 1.5]} gl={{ antialias: true, alpha: true }}><CoreScene phase="idle" isListening={false} isSpeaking={false} /></Canvas>}
+  </div>;
 }
 
 /* =========================================================
@@ -4100,6 +4128,8 @@ export default function LoginPortal({
                       method:
                         'POST',
 
+                      credentials: 'include',
+
                       body:
                         formData,
                     }
@@ -4544,6 +4574,7 @@ export default function LoginPortal({
             `${VOICE_API_BASE}/api/auth/login`,
             {
               method: 'POST',
+              credentials: 'include',
               headers: {
                 'Content-Type': 'application/json',
               },
