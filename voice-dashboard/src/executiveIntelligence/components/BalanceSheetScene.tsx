@@ -1,3 +1,5 @@
+import { BoardTakeaway } from "./BoardTakeaway";
+import { usePresentationPoint } from "./PresentationReveal";
 import type { ExecutiveBriefingScene } from "../types";
 import { formatIdrCompact, formatPct } from "../utils/formatters";
 
@@ -12,14 +14,18 @@ function DeltaRow({
   metric,
   favorable,
   highlighted,
+  pointKey,
 }: {
   label: string;
   metric: BalanceMetric;
   favorable: boolean;
   highlighted: boolean;
+  pointKey: string;
 }) {
+  const point = usePresentationPoint();
   return (
     <div
+      {...point(pointKey)}
       className={`ebi5-delta-row ${favorable ? "positive" : "negative"} ${
         highlighted ? "ebi5-explained" : ""
       }`}
@@ -80,12 +86,14 @@ export function BalanceSheetScene({
       <div className="ebi5-delta-panel ebi5-rise delay-1">
         <div className="ebi5-delta-list">
           <DeltaRow
+            pointKey="liabilities"
             label="Liabilities"
             metric={liabilities}
             favorable={true}
             highlighted={highlightKeys.includes("liabilities")}
           />
           <DeltaRow
+            pointKey="equity"
             label="Equity"
             metric={equity}
             favorable={true}
@@ -93,6 +101,7 @@ export function BalanceSheetScene({
           />
         </div>
       </div>
+      <BoardTakeaway after="equity">Liabilitas menurun dan ekuitas meningkat dibandingkan Desember 2025.</BoardTakeaway>
     </div>
   );
 }

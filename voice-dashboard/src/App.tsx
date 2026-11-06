@@ -206,6 +206,19 @@ const SCREEN_ORDER = [
   'widget_revenue',
 ];
 const REGISTERED_ROUTES = new Set([...Object.keys(DASHBOARD_COMPONENTS), 'dashboard_designer']);
+const LAST_ROUTE_KEY = 'coreanalytics:last-route';
+
+function saveLastRoute(userId: string, route: string) {
+  try { sessionStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ userId, route })); } catch { /* Storage is optional. */ }
+}
+
+function readLastRoute(userId: string, menus: AuthenticatedUser['menus']): string | null {
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(LAST_ROUTE_KEY) || 'null');
+    if (stored?.userId !== userId || typeof stored?.route !== 'string' || !REGISTERED_ROUTES.has(stored.route)) return null;
+    return menus?.some(menu => menu?.route_key === stored.route) ? stored.route : null;
+  } catch { return null; }
+}
 
 function FuturisticMenuIcon({
   type,
@@ -445,21 +458,14 @@ function AppContent() {
   const [expandedGroups, setExpandedGroups] = useState<
     Record<string, boolean>
   >({ financial: true });
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return window.innerWidth >= 1024;
-  });
-  const [isSidebarPinned, setIsSidebarPinned] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return window.innerWidth >= 1024;
-  });
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [isSidebarPinned, setIsSidebarPinned] = useState(false);
   const [isMobileView, setIsMobileView] = useState(() => {
     if (typeof window === 'undefined') return false;
     return window.innerWidth < 768;
   });
 
-  // Mobile: sidebar starts as a floating drawer and does not consume content width.
-  // Desktop: sidebar starts pinned to preserve the familiar layout.
+  // An unpinned sidebar behaves as a floating drawer on all screen sizes.
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
@@ -500,6 +506,11 @@ function AppContent() {
           auth_method: sameUser ? cached?.auth_method ?? 'manual' : 'manual',
           authenticated_at: sameUser ? cached?.authenticated_at ?? new Date().toISOString() : new Date().toISOString(),
         } as AuthenticatedUser;
+        const lastRoute = readLastRoute(uid, identity.menus);
+        if (lastRoute) {
+          setShowManager(lastRoute === 'dashboard_designer');
+          if (lastRoute !== 'dashboard_designer') setActiveMenuId(lastRoute);
+        }
         setAuthenticatedUser(identity);
         setIsLoggedIn(true);
         localStorage.setItem('core_authenticated_user', JSON.stringify(identity));
@@ -542,7 +553,8 @@ function AppContent() {
     if (!isLoggedIn || !canAccess(routeKey)) return;
     setShowManager(routeKey === 'dashboard_designer');
     if (routeKey !== 'dashboard_designer') setActiveMenuId(routeKey);
-  }, [isLoggedIn, canAccess]);
+    if (!isWidgetMode && authenticatedUser?.user_id) saveLastRoute(authenticatedUser.user_id, routeKey);
+  }, [isLoggedIn, canAccess, isWidgetMode, authenticatedUser?.user_id]);
   const firstDashboardRoute = SCREEN_ORDER.find(route => route !== 'dashboard_designer' && canAccess(route));
   const closeDashboardDesigner = () => {
     if (firstDashboardRoute) {
@@ -892,6 +904,7 @@ function AppContent() {
     setShowMyAccount(false);
     setShowVoiceCommandGuide(false);
     setActiveMenuId('company_performance');
+    try { sessionStorage.removeItem(LAST_ROUTE_KEY); } catch { /* Storage is optional. */ }
     try { localStorage.removeItem('core_authenticated_user'); } catch {
       // Reactive identity and widget state are cleared even when storage is unavailable.
     }
@@ -987,6 +1000,7 @@ function AppContent() {
 
           if (requestedRouteIsAuthorized && requestedRoute) {
             setActiveMenuId(requestedRoute);
+            if (session?.user_id) saveLastRoute(session.user_id, requestedRoute);
 
             if (requestedRoute === 'executive_briefing') {
               queueExecutiveBriefingAutoRun('voice');
@@ -1339,12 +1353,12 @@ function AppContent() {
                   {canAccess('data_studio') && <button
                     type="button"
                     onClick={() => { navigateTo('data_studio'); setShowSettingsMenu(false); if (!isSidebarPinned) setIsSidebarExpanded(false); }}
-                    className={`group mt-1 flex w-full items-center gap-3 rounded-lg border px-3.5 py-3 text-left transition-all ${effectiveRoute === 'data_studio' ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50' : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'}`}
+                    className={`core-data-studio-action group mt-1 flex w-full items-center gap-3 rounded-lg border px-3.5 py-3 text-left transition-all ${effectiveRoute === 'data_studio' ? 'border-cyan-300/35 bg-cyan-500/10 text-cyan-50' : 'border-transparent text-sky-200/80 hover:border-sky-400/20 hover:bg-[#071b31]/70 hover:text-cyan-50'}`}
                   >
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-950/25 text-cyan-300">
                       <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
                     </span>
-                    <span className="min-w-0"><span className="block text-[12px] font-bold tracking-[0.045em]">Data Studio</span><span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">Database connections & sources</span></span>
+                    <span className="min-w-0"><span className="core-data-studio-title block text-[12px] font-bold tracking-[0.045em]">Data Studio <span className="core-data-studio-badge">EXPLORE <span aria-hidden="true">↗</span></span></span><span className="mt-0.5 block text-[9px] leading-relaxed tracking-[0.035em] text-slate-400">Database connections & sources</span></span>
                   </button>}
 
                   {canAccess('dashboard_designer') && <button

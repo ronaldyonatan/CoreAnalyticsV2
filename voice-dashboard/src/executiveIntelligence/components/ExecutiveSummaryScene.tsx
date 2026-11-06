@@ -1,3 +1,5 @@
+import { BoardTakeaway } from "./BoardTakeaway";
+import { usePresentationPoint } from "./PresentationReveal";
 import type { ExecutiveBriefingScene } from "../types";
 
 interface SummaryHighlight {
@@ -25,6 +27,7 @@ export function ExecutiveSummaryScene({
   scene: ExecutiveBriefingScene;
   highlightKeys?: string[];
 }) {
+  const point = usePresentationPoint();
   const highlights = (scene.payload.highlights ?? []) as SummaryHighlight[];
 
   return (
@@ -46,6 +49,7 @@ export function ExecutiveSummaryScene({
         {highlights.map((item, index) => (
           <div
             key={item.label}
+            {...point(item.key)}
             className={`ebi5-summary-item ${
               item.trend === "up"
                 ? "positive"
@@ -60,6 +64,7 @@ export function ExecutiveSummaryScene({
           </div>
         ))}
       </div>
+      <BoardTakeaway after="lasik">Pantau profitabilitas dan performa LASIK bersama pertumbuhan pendapatan serta posisi neraca.</BoardTakeaway>
     </div>
   );
 }

@@ -11,3 +11,55 @@
 .core-settings-popover [class*="text-[9px]"] { font-size: 10px !important; }
 .core-settings-popover [class*="text-[10px]"] { font-size: 11px !important; }
 .core-settings-popover .ds-settings-voice-icon { color: var(--settings-voice-icon-text) !important; }
+
+/* Compact management menu: keep each action readable and the theme selector visible. */
+.core-settings-popover {
+  padding: 8px !important;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.core-settings-popover .core-settings-intro {
+  margin-bottom: 6px !important;
+  padding: 8px 10px !important;
+}
+.core-settings-popover .core-settings-intro > div:last-child {
+  margin-top: 2px !important;
+}
+.core-settings-popover [data-tour="theme-switcher"] {
+  margin-bottom: 6px !important;
+  padding: 8px 10px !important;
+}
+.core-settings-popover [data-tour="theme-switcher"] > div:first-child {
+  margin-bottom: 5px !important;
+}
+.core-settings-popover .core-theme-switcher select {
+  height: 34px !important;
+  font-size: 11px !important;
+}
+/* The selector already shows the active theme; avoid repeating its full card. */
+.core-settings-popover .core-theme-switcher > div:nth-child(2) { display: none; }
+.core-settings-popover > button {
+  min-height: 46px;
+  margin: 2px 0 !important;
+  padding: 5px 9px !important;
+  gap: 9px !important;
+}
+.core-settings-popover > button > span:first-child {
+  width: 32px !important;
+  height: 32px !important;
+}
+.core-settings-popover > button > span:first-child svg {
+  width: 17px !important;
+  height: 17px !important;
+}
+.core-settings-popover > button > span:last-child > span:last-child {
+  margin-top: 1px !important;
+  line-height: 1.25 !important;
+}
+.core-settings-popover > div:last-child {
+  margin-top: 5px !important;
+  padding-top: 6px !important;
+}
+@media (max-height: 600px) {
+  .core-settings-popover { max-height: calc(100dvh - 72px) !important; }
+}

@@ -1,3 +1,5 @@
+import { BoardTakeaway } from "./BoardTakeaway";
+import { usePresentationPoint } from "./PresentationReveal";
 import type { CSSProperties } from "react";
 import type { ExecutiveBriefingScene } from "../types";
 import { formatIdrCompact, formatPct } from "../utils/formatters";
@@ -17,6 +19,7 @@ export function ServiceScene({
   scene: ExecutiveBriefingScene;
   highlightKeys?: string[];
 }) {
+  const point = usePresentationPoint();
   const services = (scene.payload.services ?? []) as ServicePayload[];
   const maxAbs = Math.max(...services.map((s) => Math.abs(s.growth)), 1);
 
@@ -50,6 +53,7 @@ export function ServiceScene({
           return (
             <div
               key={service.key}
+              {...point(service.key)}
               className={`ebi5-service-row ${
                 service.growth >= 0 ? "positive" : "negative"
               } ${service.emphasis ? "emphasis" : ""} ${
@@ -74,6 +78,7 @@ export function ServiceScene({
           );
         })}
       </div>
+      <BoardTakeaway after="lasik">Pertumbuhan tidak merata; pendapatan LASIK bergerak berlawanan dengan layanan lainnya.</BoardTakeaway>
     </div>
   );
 }

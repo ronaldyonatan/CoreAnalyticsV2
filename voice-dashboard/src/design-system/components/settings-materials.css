@@ -205,3 +205,25 @@
   backdrop-filter: var(--settings-select-immersive-backdrop-filter) !important;
   -webkit-backdrop-filter: var(--settings-select-immersive-webkit-backdrop-filter) !important;
 }
+
+/* Data Studio receives a distinct, theme-aware highlight in Management Center. */
+[data-surface-family] .core-settings-popover > .core-data-studio-action {
+  position: relative;
+  border-color: color-mix(in srgb, var(--settings-studio-accent) 65%, transparent) !important;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--settings-studio-accent) 18%, var(--core-panel)), color-mix(in srgb, var(--settings-studio-accent) 5%, var(--core-panel))) !important;
+  box-shadow: inset 3px 0 0 var(--settings-studio-accent), 0 0 15px color-mix(in srgb, var(--settings-studio-accent) 20%, transparent) !important;
+}
+[data-surface-family] .core-settings-popover > .core-data-studio-action:hover,
+[data-surface-family] .core-settings-popover > .core-data-studio-action:focus-visible {
+  border-color: var(--settings-studio-accent) !important;
+  box-shadow: inset 3px 0 0 var(--settings-studio-accent), 0 0 20px color-mix(in srgb, var(--settings-studio-accent) 35%, transparent) !important;
+}
+.core-settings-popover .core-data-studio-title { display: flex; align-items: center; gap: 7px; }
+.core-settings-popover .core-data-studio-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 5px; border-radius: 999px;
+  border: 1px solid var(--settings-studio-accent);
+  background: var(--settings-studio-accent);
+  color: var(--settings-studio-accent-text);
+  font-size: 8px; line-height: 1; letter-spacing: .07em; white-space: nowrap;
+}

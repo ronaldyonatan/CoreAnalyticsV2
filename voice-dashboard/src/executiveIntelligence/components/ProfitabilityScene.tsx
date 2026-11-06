@@ -1,3 +1,5 @@
+import { BoardTakeaway } from "./BoardTakeaway";
+import { usePresentationPoint } from "./PresentationReveal";
 import type { ExecutiveBriefingScene } from "../types";
 import { formatIdrCompact, formatPct } from "../utils/formatters";
 
@@ -16,6 +18,7 @@ export function ProfitabilityScene({
   scene: ExecutiveBriefingScene;
   highlightKeys?: string[];
 }) {
+  const point = usePresentationPoint();
   const metrics = (scene.payload.metrics ?? []) as ProfitMetric[];
 
   return (
@@ -35,9 +38,10 @@ export function ProfitabilityScene({
 
       <div className="ebi5-flow-panel ebi5-rise delay-1">
         <div className="ebi5-profit-flow">
-          {metrics.map((metric, index) => (
+          {metrics.map((metric) => (
             <div
               key={metric.label}
+              {...point(metric.key)}
               className={`ebi5-profit-point ${
                 metric.growth >= 0 ? "positive" : "negative"
               } ${metric.emphasis ? "emphasis" : ""} ${
@@ -53,10 +57,7 @@ export function ProfitabilityScene({
         </div>
       </div>
 
-      <div className="ebi5-profit-message ebi5-rise delay-2">
-        <span>KEY MESSAGE</span>
-        <strong>Top line is resilient. Bottom line is under pressure.</strong>
-      </div>
+      <BoardTakeaway after="net-profit">Pertumbuhan pendapatan belum diikuti pertumbuhan laba operasi dan laba bersih.</BoardTakeaway>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import type {
   ExecutiveBriefingScene,
 } from "../types";
 
+import { PresentationReveal } from "./PresentationReveal";
 import { OverviewScene } from "./OverviewScene";
 import { RevenueScene } from "./RevenueScene";
 import { ServiceScene } from "./ServiceScene";
@@ -66,6 +67,8 @@ export default function ExecutiveBriefing() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const engineRef = useRef<ExecutiveBriefingEngine | null>(null);
+  const sceneTimerRef = useRef<number | null>(null);
+  const currentSceneRef = useRef<ExecutiveBriefingScene | null>(null);
 
   const [status, setStatus] = useState<BriefingEngineStatus>("idle");
   const [activeScene, setActiveScene] =
@@ -74,17 +77,32 @@ export default function ExecutiveBriefing() {
   const [progress, setProgress] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [highlightKeys, setHighlightKeys] = useState<string[]>([]);
+  const [previousScene, setPreviousScene] = useState<ExecutiveBriefingScene | null>(null);
+  const [revealedKeys, setRevealedKeys] = useState<ReadonlySet<string>>(new Set());
+
+  const changeScene = useCallback((scene: ExecutiveBriefingScene, index: number) => {
+    if (sceneTimerRef.current !== null) window.clearTimeout(sceneTimerRef.current);
+    setPreviousScene(currentSceneRef.current);
+    currentSceneRef.current = scene;
+    setActiveScene(scene);
+    setActiveIndex(index);
+    setHighlightKeys([]);
+    setRevealedKeys(new Set());
+    sceneTimerRef.current = window.setTimeout(() => {
+      setPreviousScene(null);
+      sceneTimerRef.current = null;
+    }, 1550);
+  }, []);
 
   useEffect(() => {
     const engine = new ExecutiveBriefingEngine({
       onStatusChange: setStatus,
       onSceneChange: (scene, index) => {
-        setActiveScene(scene);
-        setActiveIndex(index);
-        setHighlightKeys([]);
+        changeScene(scene, index);
       },
       onNarrationHighlightChange: (_scene, _sceneIndex, keys) => {
         setHighlightKeys(keys);
+        setRevealedKeys(previous => new Set([...previous, ...keys]));
       },
       onProgress: setProgress,
     });
@@ -92,10 +110,11 @@ export default function ExecutiveBriefing() {
     engineRef.current = engine;
 
     return () => {
+      if (sceneTimerRef.current !== null) window.clearTimeout(sceneTimerRef.current);
       engine.stop();
       engineRef.current = null;
     };
-  }, []);
+  }, [changeScene]);
 
   useEffect(() => {
     const handleFullscreen = () => {
@@ -113,29 +132,23 @@ export default function ExecutiveBriefing() {
   }, [status]);
 
   useEffect(() => {
-    const root = rootRef.current;
     const stage = stageRef.current;
-    if (!root || !stage || activeIndex < 0) return;
-
-    const rootRect = root.getBoundingClientRect();
-    const stageRect = stage.getBoundingClientRect();
-    const nextTop = Math.max(0, root.scrollTop + stageRect.top - rootRect.top - 12);
-
-    root.scrollTo({ top: nextTop, behavior: "auto" });
+    if (!stage || activeIndex < 0) return;
+    stage.scrollTo({ top: 0, behavior: "auto" });
   }, [activeIndex]);
 
   useEffect(() => {
     if (!highlightKeys.length || status !== "running") return;
 
     const timer = window.setTimeout(() => {
-      const root = rootRef.current;
+      const root = stageRef.current;
       const target = root?.querySelector<HTMLElement>(".ebi5-explained");
       if (!root || !target) return;
 
       const rootRect = root.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
-      const safeTop = rootRect.top + 96;
-      const safeBottom = rootRect.bottom - 72;
+      const safeTop = rootRect.top + 16;
+      const safeBottom = rootRect.bottom - 16;
 
       if (targetRect.top >= safeTop && targetRect.bottom <= safeBottom) return;
 
@@ -160,16 +173,21 @@ export default function ExecutiveBriefing() {
       const scene = briefing.scenes[safeIndex];
       if (!scene) return;
 
-      setActiveIndex(safeIndex);
-      setActiveScene(scene);
+      if (safeIndex === activeIndex) return;
+      changeScene(scene, safeIndex);
       setProgress(totalScenes <= 1 ? 1 : safeIndex / (totalScenes - 1));
       if (status === "idle") setStatus("completed");
     },
-    [briefing.scenes, status, totalScenes]
+    [activeIndex, briefing.scenes, changeScene, status, totalScenes]
   );
 
   const runBriefing = useCallback(async () => {
     if (!engineRef.current || status === "running") return;
+
+    if (sceneTimerRef.current !== null) window.clearTimeout(sceneTimerRef.current);
+    sceneTimerRef.current = null;
+    setPreviousScene(null);
+    currentSceneRef.current = null;
 
     setActiveScene(null);
     setActiveIndex(-1);
@@ -184,6 +202,7 @@ export default function ExecutiveBriefing() {
 
   const stopBriefing = useCallback(() => {
     engineRef.current?.stop();
+    setPreviousScene(null);
   }, []);
 
   const toggleFullscreen = useCallback(async () => {
@@ -246,7 +265,7 @@ export default function ExecutiveBriefing() {
   const isStartState = !activeScene && status !== "running";
 
   return (
-    <div ref={rootRef} className="ebi5-page">
+    <div ref={rootRef} className={`ebi5-page${status === "running" ? " ebi5-page--live" : ""}`}>
       <div className="ebi5-viewport">
         <header className="ebi5-shell-header">
           <div className="ebi5-brand">
@@ -412,11 +431,19 @@ export default function ExecutiveBriefing() {
                   </div>
                 </div>
               ) : activeScene ? (
-                <SceneRenderer
-                  key={`${activeScene.id}-${activeIndex}`}
-                  scene={activeScene}
-                  highlightKeys={highlightKeys}
-                />
+                <div className={`ebi5-scan-scene${previousScene ? " ebi5-scan-scene--active" : ""}`} key={`${activeScene.id}-${activeIndex}`}>
+                {previousScene && <div className="ebi5-scan-previous" aria-hidden="true" inert><PresentationReveal.Provider value={null}><SceneRenderer scene={previousScene} highlightKeys={[]} /></PresentationReveal.Provider></div>}
+                <div className="ebi5-scan-incoming">
+                <PresentationReveal.Provider value={status === "running" ? revealedKeys : null}>
+                  <SceneRenderer
+                    key={`${activeScene.id}-${activeIndex}`}
+                    scene={activeScene}
+                    highlightKeys={highlightKeys}
+                  />
+                </PresentationReveal.Provider>
+                </div>
+                {previousScene && <div className="ebi5-hologram" aria-hidden="true"><i className="ebi5-hologram-grid" /><i className="ebi5-hologram-trail" /><i className="ebi5-hologram-reticle" /></div>}
+                </div>
               ) : null}
             </div>
 

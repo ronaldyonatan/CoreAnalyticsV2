@@ -64,6 +64,10 @@ export class ExecutiveBriefingEngine {
         this.callbacks.onNarrationHighlightChange?.(scene, index, []);
         this.callbacks.onProgress?.(index / scenes.length);
 
+        // Let the new scene arrive before its first narrated point appears.
+        await sleep(index === 0 ? 500 : 1550);
+        if (token !== this.runToken) return;
+
         if (audio) {
           for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex += 1) {
             if (token !== this.runToken) return;
@@ -100,7 +104,9 @@ export class ExecutiveBriefingEngine {
         if (token !== this.runToken) return;
         this.callbacks.onNarrationHighlightChange?.(scene, index, []);
 
-        if (gapAfterSceneMs > 0) await sleep(gapAfterSceneMs);
+        if (index < scenes.length - 1) {
+          if (gapAfterSceneMs > 0) await sleep(gapAfterSceneMs);
+        }
       }
 
       if (token !== this.runToken) return;

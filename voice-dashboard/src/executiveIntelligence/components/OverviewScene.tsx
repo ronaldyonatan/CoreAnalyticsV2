@@ -1,3 +1,5 @@
+import { BoardTakeaway } from "./BoardTakeaway";
+import { usePresentationPoint } from "./PresentationReveal";
 import type { ExecutiveBriefingScene } from "../types";
 import { formatPct } from "../utils/formatters";
 
@@ -8,6 +10,7 @@ export function OverviewScene({
   scene: ExecutiveBriefingScene;
   highlightKeys?: string[];
 }) {
+  const point = usePresentationPoint();
   const revenueGrowth = Number(scene.payload.revenueGrowth ?? 0);
   const netProfitGrowth = Number(scene.payload.netProfitGrowth ?? 0);
 
@@ -28,6 +31,7 @@ export function OverviewScene({
 
       <div className="ebi5-overview-metrics">
         <div
+          {...point("revenue")}
           className={`ebi5-metric-panel positive ebi5-rise delay-1 ${
             highlightKeys.includes("revenue") ? "ebi5-explained" : ""
           }`}
@@ -40,6 +44,7 @@ export function OverviewScene({
         </div>
 
         <div
+          {...point("net-profit")}
           className={`ebi5-metric-panel negative ebi5-rise delay-2 ${
             highlightKeys.includes("net-profit") ? "ebi5-explained" : ""
           }`}
@@ -51,6 +56,7 @@ export function OverviewScene({
           <p>Profitability is the key area to watch.</p>
         </div>
       </div>
+      <BoardTakeaway after="net-profit">Pendapatan bertumbuh, sementara laba bersih memerlukan perhatian.</BoardTakeaway>
     </div>
   );
 }

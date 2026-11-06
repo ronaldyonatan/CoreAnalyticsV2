@@ -83,6 +83,7 @@ export async function speakFriday(
 
   // Server-side render / unsupported browser: silently continue with visuals.
   if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+    options.onStart?.();
     return;
   }
 
@@ -110,17 +111,23 @@ export async function speakFriday(
     }
 
     let completed = false;
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      options.onStart?.();
+    };
     const finish = () => {
       if (completed) return;
       completed = true;
       resolve();
     };
 
-    utterance.onstart = () => options.onStart?.();
+    utterance.onstart = start;
     utterance.onend = finish;
 
     // Do not break the whole presentation when a browser voice fails.
-    utterance.onerror = finish;
+    utterance.onerror = () => { start(); finish(); };
 
     try {
       synth.resume();

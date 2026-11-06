@@ -198,6 +198,8 @@
   --header-online-dot-bg: var(--color-emerald-400);
   --header-online-dot-shadow: 0 0 #0000, 0 0 #0000, 0 0 #0000, 0 0 #0000, 0 0 8px #34d399;
   --settings-voice-icon-text: var(--color-emerald-300);
+  --settings-studio-accent: #f6b940;
+  --settings-studio-accent-text: #302000;
 }
 :where(:root[data-performance="static"]) {
   --header-logo-filter: none;
