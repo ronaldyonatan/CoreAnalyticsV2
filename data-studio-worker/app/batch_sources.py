@@ -1,0 +1,41 @@
+"""Trusted source bindings produced by the server; never accepted directly from a browser."""
+import ipaddress
+import os
+from pathlib import Path
+from pyspark.sql.types import StructType,StructField,StringType
+from app.batch_graph import BatchError
+from app.batch_storage import contained
+from app.operation_common import schema,fields,text
+
+
+def read_sources(spark,definitions,root):
+    frames={}
+    for item in definitions:
+        if not isinstance(item,dict) or item.get('id') in frames:raise BatchError('INVALID_SOURCE')
+        kind=item.get('kind')
+        if kind=='fixed':
+            fields(item,'id kind columns rows');schema(item['columns'])
+            if not isinstance(item['rows'],list) or len(item['rows'])>50 or any(not isinstance(r,list) or len(r)!=len(item['columns']) or any(v is not None and (not isinstance(v,str) or len(v)>256) for v in r) for r in item['rows']):raise BatchError('INVALID_FIXED_INPUT')
+            frame=spark.createDataFrame(item['rows'],StructType([StructField(n,StringType(),True) for n in item['columns']]))
+        elif kind=='parquet':
+            fields(item,'id kind path')
+            if not isinstance(item['path'],str):raise BatchError('INVALID_SOURCE')
+            path=contained(root,Path(root)/item['path'])
+            if not path.is_dir():raise BatchError('SOURCE_NOT_FOUND')
+            frame=spark.read.parquet(str(path))
+        elif kind=='sqlserver':
+            fields(item,'id kind address hostname port database schema table username password encrypt trust_server_certificate timeout')
+            # The server resolves and validates the address through its existing SQL host policy.
+            try:ipaddress.ip_address(item['address'])
+            except (ValueError,TypeError):raise BatchError('INVALID_SQL_SOURCE') from None
+            if type(item['port']) is not int or not 1<=item['port']<=65535 or type(item['timeout']) is not int or not 1<=item['timeout']<=120 or type(item['encrypt']) is not bool or type(item['trust_server_certificate']) is not bool:raise BatchError('INVALID_SQL_SOURCE')
+            for key in ('hostname','database','schema','table','username','password'):text(item[key],1024 if key=='password' else 255,True)
+            if any(c in item['hostname'] for c in ';{}\r\n'):raise BatchError('INVALID_SQL_SOURCE')
+            escape=lambda value:'{'+value.replace('}','}}')+'}'
+            address='['+item['address']+']' if ':' in item['address'] else item['address']
+            url='jdbc:sqlserver://'+address+':'+str(item['port'])+';databaseName='+escape(item['database'])+';encrypt='+str(item['encrypt']).lower()+';trustServerCertificate='+str(item['trust_server_certificate']).lower()+';hostNameInCertificate='+escape(item['hostname'])+';loginTimeout='+str(item['timeout'])
+            quote=lambda name:'['+name.replace(']',']]')+']'
+            frame=spark.read.format('jdbc').option('url',url).option('dbtable',quote(item['schema'])+'.'+quote(item['table'])).option('driver','com.microsoft.sqlserver.jdbc.SQLServerDriver').option('user',item['username']).option('password',item['password']).option('fetchsize','10000').option('queryTimeout','300').load()
+        else:raise BatchError('UNRESOLVED_SOURCE','Dataset ID harus diotorisasi dan diikat ke sumber oleh server sebelum worker dijalankan.')
+        schema(frame.columns);frames[item['id']]=frame
+    return frames

@@ -1,0 +1,7 @@
+**
+!voice-auth-backend/
+!voice-auth-backend/app/
+!voice-auth-backend/app/**/*.py
+!data-studio-worker/
+!data-studio-worker/cluster/
+!data-studio-worker/cluster/start.py

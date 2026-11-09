@@ -1,0 +1,32 @@
+# Overlay: docker compose -f docker-compose.spark.yml -f docker-compose.spark-dispatcher.yml up -d
+# First build the base Spark image. Exactly one dispatcher initially (fixed driver ports).
+services:
+  spark-dispatcher:
+    image: coreanalytics-studio-dispatcher:3.5.8
+    build:
+      context: .
+      dockerfile: data-studio-worker/cluster/Dockerfile.dispatcher
+      args:
+        SPARK_IMAGE: ${CORE_STUDIO_SPARK_IMAGE:-coreanalytics-studio-spark:3.5.8}
+    hostname: spark-dispatcher
+    command: [dispatcher]
+    restart: unless-stopped
+    init: true
+    security_opt: [no-new-privileges:true]
+    networks: [spark-private]
+    secrets: [spark_auth_secret]
+    volumes:
+      - type: bind
+        source: ${STUDIO_PARQUET_HOST_PATH:?Set STUDIO_PARQUET_HOST_PATH to an existing absolute host directory}
+        target: /var/lib/coreanalytics/parquet
+        read_only: false
+        bind:
+          create_host_path: false
+    depends_on: [spark-master, spark-worker-1, spark-worker-2]
+    env_file:
+      - ${STUDIO_DISPATCHER_ENV_FILE:?Set STUDIO_DISPATCHER_ENV_FILE to an external protected env file}
+    environment:
+      STUDIO_SPARK_DRIVER_HOST: spark-dispatcher
+      STUDIO_SPARK_JOB_CORES: ${STUDIO_SPARK_JOB_CORES:-2}
+      STUDIO_SPARK_EXECUTOR_MEMORY: ${STUDIO_SPARK_EXECUTOR_MEMORY:-1g}
+      STUDIO_SPARK_DRIVER_MEMORY: ${STUDIO_SPARK_DRIVER_MEMORY:-1g}

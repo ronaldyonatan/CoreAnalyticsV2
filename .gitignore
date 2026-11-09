@@ -1,0 +1,39 @@
+
+# Local Spark deployment paths (data itself lives outside this repository).
+.env.spark.local
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.env.local
+*token*
+*secret*
+harbor-images.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+venv/
+.pytest_cache/
+
+# Node.js
+node_modules/
+dist/
+.vite/
+
+# Local data
+*.parquet
+*.duckdb
+*.db
+CoreAnalyticsData/
+
+# OS
+.DS_Store
+
+# Local backup files
+*.bak
+*.backup_*

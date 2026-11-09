@@ -11,6 +11,7 @@ Use 0.0.0.0/0,::/0 for self-service destinations without per-server approvals.
 Infrastructure exclusions still apply. Permissions and egress remain required.
 """
 from dataclasses import dataclass
+from contextlib import closing
 import ipaddress
 import os
 import re
@@ -207,8 +208,9 @@ def validate_target(target: SqlServerTarget, allowed_hosts: set[str] | None = No
     return validate_sqlserver_host(target.host, target.port)
 
 
-def test_sqlserver_connection(target: SqlServerTarget, allowed_hosts: set[str] | None = None) -> dict:
-    original_host, resolved_ip = validate_target(target, allowed_hosts)
+def open_readonly_connection(target: SqlServerTarget):
+    """Open a policy-validated source connection; callers must close it."""
+    original_host, resolved_ip = validate_target(target)
     server = f'[{resolved_ip}]' if ':' in resolved_ip else resolved_ip
     connection_string = (
         'DRIVER={ODBC Driver 18 for SQL Server};'
@@ -222,8 +224,147 @@ def test_sqlserver_connection(target: SqlServerTarget, allowed_hosts: set[str] |
     )
     if original_host != resolved_ip and target.encrypt and not target.trust_server_certificate:
         connection_string += f'HostnameInCertificate={original_host};'
+    return pyodbc.connect(connection_string, timeout=target.timeout, autocommit=True)
+
+
+# SQL Server's system catalog distinguishes user objects from Microsoft-shipped
+# objects even when system objects happen to be in a non-system schema.
+_USER_OBJECTS = "FROM sys.objects AS o JOIN sys.schemas AS s ON s.schema_id = o.schema_id WHERE o.type IN ('U', 'V') AND o.is_ms_shipped = 0 AND s.name NOT IN ('sys', 'INFORMATION_SCHEMA')"
+_SOURCE_TYPE = "CASE WHEN o.type = 'U' THEN 'BASE TABLE' ELSE 'VIEW' END"
+
+
+def list_sqlserver_objects(target: SqlServerTarget, query: str = '', offset: int = 0, limit: int = 50) -> dict:
+    if not isinstance(query, str) or len(query) > 128 or type(offset) is not int or not 0 <= offset <= 100000 or type(limit) is not int or not 1 <= limit <= 100:
+        raise ValueError('DATASET_SEARCH_INVALID')
+    escaped = query.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_').replace('[', '\\[')
+    pattern = f'%{escaped}%'
+    with closing(open_readonly_connection(target)) as connection:
+        connection.timeout = min(target.timeout, 30)
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT s.name, o.name, {_SOURCE_TYPE} {_USER_OBJECTS} AND (s.name LIKE ? ESCAPE '\\' OR o.name LIKE ? ESCAPE '\\' OR (s.name + '.' + o.name) LIKE ? ESCAPE '\\') ORDER BY s.name, o.name, o.type OFFSET ? ROWS FETCH NEXT ? ROWS ONLY", pattern, pattern, pattern, offset, limit + 1)
+        rows = cursor.fetchmany(limit + 1)
+        return {'items': [{'schema': str(row[0]), 'name': str(row[1]), 'type': str(row[2])} for row in rows[:limit]], 'has_more': len(rows) > limit, 'offset': offset}
+
+
+def sqlserver_object_exists(target: SqlServerTarget, source: dict) -> bool:
+    with closing(open_readonly_connection(target)) as connection:
+        connection.timeout = min(target.timeout, 30)
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT TOP 1 1 {_USER_OBJECTS} AND s.name = ? AND o.name = ? AND {_SOURCE_TYPE} = ?", source['schema'], source['name'], source['type'])
+        return cursor.fetchone() is not None
+
+
+_PREVIEW_TYPES = frozenset(('bit', 'tinyint', 'smallint', 'int', 'bigint', 'decimal', 'numeric', 'money', 'smallmoney', 'float', 'real', 'char', 'varchar', 'nchar', 'nvarchar', 'date', 'datetime', 'datetime2', 'smalldatetime', 'datetimeoffset', 'time', 'uniqueidentifier'))
+
+
+def _quote_identifier(name: str) -> str:
+    return '[' + name.replace(']', ']]') + ']'
+
+
+def _filter_sql(filters, supported):
+    if not isinstance(filters, dict) or len(filters) > 30 or not set(filters).issubset({c['name'] for c in supported}):
+        raise ValueError('DATASET_FILTER_INVALID')
+    conditions, parameters = [], []
+    for name, spec in filters.items():
+        if not isinstance(spec, dict) or set(spec) != {'mode', 'values'} or spec['mode'] not in ('include', 'exclude') or not isinstance(spec['values'], list) or not 1 <= len(spec['values']) <= 50:
+            raise ValueError('DATASET_FILTER_INVALID')
+        values = spec['values']
+        if any(value is not None and (not isinstance(value, str) or len(value) > 256) for value in values):
+            raise ValueError('DATASET_FILTER_INVALID')
+        nonnull = [value for value in values if value is not None]
+        has_null = None in values
+        column = _quote_identifier(name)
+        parts = []
+        if nonnull:
+            expression = f"CONVERT(nvarchar(max), {column}) {'IN' if spec['mode'] == 'include' else 'NOT IN'} ({', '.join('?' for _ in nonnull)})"
+            parts.append(expression)
+            parameters.extend(nonnull)
+        if spec['mode'] == 'include':
+            if has_null: parts.append(f'{column} IS NULL')
+            conditions.append('(' + ' OR '.join(parts) + ')')
+        else:
+            if has_null:
+                parts.append(f'{column} IS NOT NULL')
+                conditions.append('(' + ' AND '.join(parts) + ')')
+            else:
+                parts.append(f'{column} IS NULL')
+                conditions.append('(' + ' OR '.join(parts) + ')')
+    return conditions, parameters
+
+
+def _dataset_columns(cursor, source):
+    if source.get('type') not in ('BASE TABLE', 'VIEW'):
+        raise ValueError('DATASET_SOURCE_INVALID')
+    cursor.execute(f"SELECT o.object_id {_USER_OBJECTS} AND s.name = ? AND o.name = ? AND {_SOURCE_TYPE} = ?", source['schema'], source['name'], source['type'])
+    found = cursor.fetchone()
+    if not found: raise ValueError('DATASET_SOURCE_INVALID')
+    cursor.execute("SELECT c.name, t.name FROM sys.columns AS c JOIN sys.types AS t ON t.user_type_id = c.user_type_id WHERE c.object_id = ? ORDER BY c.column_id", found[0])
+    metadata = cursor.fetchmany(513)
+    if len(metadata) > 512: raise ValueError('DATASET_TOO_MANY_COLUMNS')
+    columns = [{'name': str(row[0]), 'type': str(row[1])} for row in metadata]
+    return found[0], columns, [column for column in columns if column['type'].lower() in _PREVIEW_TYPES][:30]
+
+
+def preview_sqlserver_object(target: SqlServerTarget, source: dict, page: int = 1, filters: dict | None = None, sort: dict | None = None) -> dict:
+    """Read one bounded page from a verified table/view, never arbitrary SQL."""
+    if type(page) is not int or not 1 <= page <= 42949672:
+        raise ValueError('DATASET_PAGE_INVALID')
+    if filters is None:
+        filters = {}
+    with closing(open_readonly_connection(target)) as connection:
+        connection.timeout = min(target.timeout, 30)
+        cursor = connection.cursor()
+        object_id, columns, supported = _dataset_columns(cursor, source)
+        conditions, parameters = _filter_sql(filters, supported)
+        if sort is not None and (not isinstance(sort, dict) or set(sort) != {'column', 'direction'} or not isinstance(sort['column'], str) or sort['column'] not in {item['name'] for item in supported} or sort['direction'] not in ('asc', 'desc')):
+            raise ValueError('DATASET_SORT_INVALID')
+        if not supported:
+            return {'columns': columns, 'preview_columns': [], 'rows': [], 'has_more': False, 'omitted_columns': len(columns), 'page': page, 'stable_order': False}
+        quote = _quote_identifier
+        # Conversion is bounded in SQL Server so large text values cannot be
+        # transferred in full. Column names originate from catalog metadata.
+        projection = ', '.join(f'LEFT(CONVERT(nvarchar(max), {quote(column["name"])}), 256)' for column in supported)
+        where = ' WHERE ' + ' AND '.join(conditions) if conditions else ''
+        cursor.execute("SELECT c.name FROM sys.indexes AS i JOIN sys.index_columns AS ic ON ic.object_id=i.object_id AND ic.index_id=i.index_id JOIN sys.columns AS c ON c.object_id=ic.object_id AND c.column_id=ic.column_id WHERE i.object_id=? AND i.index_id=(SELECT TOP 1 idx.index_id FROM sys.indexes AS idx WHERE idx.object_id=? AND idx.is_unique=1 AND idx.is_disabled=0 AND idx.is_hypothetical=0 AND idx.has_filter=0 ORDER BY idx.is_primary_key DESC, idx.index_id) AND ic.key_ordinal>0 ORDER BY ic.key_ordinal", object_id, object_id)
+        key_columns = [str(row[0]) for row in cursor.fetchmany(33)]
+        if len(key_columns) > 32:
+            key_columns = []
+        order_columns = key_columns or [column['name'] for column in supported]
+        if sort:
+            direction = 'ASC' if sort['direction'] == 'asc' else 'DESC'
+            ordering = ', '.join([f'{quote(sort["column"])} {direction}'] + [quote(name) for name in order_columns if name != sort['column']])
+        else:
+            ordering = ', '.join(quote(name) for name in order_columns)
+        cursor.execute(f'SELECT {projection} FROM {quote(source["schema"])}.{quote(source["name"])}{where} ORDER BY {ordering} OFFSET ? ROWS FETCH NEXT ? ROWS ONLY', *parameters, (page - 1) * 50, 51)
+        rows = cursor.fetchmany(51)
+        return {'columns': columns, 'preview_columns': supported, 'rows': [list(row) for row in rows[:50]], 'has_more': len(rows) > 50, 'omitted_columns': len(columns) - len(supported), 'page': page, 'stable_order': bool(key_columns)}
+
+
+def dataset_filter_values(target: SqlServerTarget, source: dict, column: str, search: str, offset: int, filters: dict) -> dict:
+    if not isinstance(column, str) or not isinstance(search, str) or len(search) > 128 or type(offset) is not int or not 0 <= offset <= 100000:
+        raise ValueError('DATASET_FILTER_INVALID')
+    with closing(open_readonly_connection(target)) as connection:
+        connection.timeout = min(target.timeout, 30)
+        cursor = connection.cursor()
+        _, _, supported = _dataset_columns(cursor, source)
+        if column not in {item['name'] for item in supported}: raise ValueError('DATASET_FILTER_INVALID')
+        conditions, params = _filter_sql(filters, supported)
+        identifier = _quote_identifier(column)
+        expression = f'CONVERT(nvarchar(256), {identifier})'
+        conditions.append(f'({identifier} IS NULL OR DATALENGTH(CONVERT(nvarchar(max), {identifier})) <= 512)')
+        if search:
+            escaped = search.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_').replace('[', '\\[')
+            conditions.append(f"{expression} LIKE ? ESCAPE '\\'")
+            params.append(f'%{escaped}%')
+        where = ' AND '.join(conditions)
+        cursor.execute(f'SELECT DISTINCT {expression} AS value FROM {_quote_identifier(source["schema"])}.{_quote_identifier(source["name"])} WHERE {where} ORDER BY value OFFSET ? ROWS FETCH NEXT ? ROWS ONLY', *params, offset, 51)
+        rows = cursor.fetchmany(51)
+        return {'values': [row[0] for row in rows[:50]], 'has_more': len(rows) > 50}
+
+
+def test_sqlserver_connection(target: SqlServerTarget, allowed_hosts: set[str] | None = None) -> dict:
     try:
-        with pyodbc.connect(connection_string, timeout=target.timeout, autocommit=True) as connection:
+        with open_readonly_connection(target) as connection:
             cursor = connection.cursor()
             cursor.execute('SELECT DB_NAME(), @@VERSION')
             row = cursor.fetchone()

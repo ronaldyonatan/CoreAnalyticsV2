@@ -1,0 +1,493 @@
+/* CoreAnalyticsV2 Data Studio — executive density layer.
+   Scoped to the folder/modal, preserves theme-owned colors and effects.
+   Import once from DataStudioWorkspace.tsx; no Spark/data logic changes. */
+.studio-window-overlay {
+  --ca-ui-line: color-mix(in srgb, currentColor 16%, transparent);
+  --ca-ui-soft: color-mix(in srgb, currentColor 4%, transparent);
+  --ca-ui-hover: color-mix(in srgb, currentColor 8%, transparent);
+  --ca-ui-focus: var(--accent, var(--color-accent, currentColor));
+  font-size: 13px;
+  line-height: 1.42;
+}
+/* Folder window: lower chrome, more usable reading area. */
+.studio-window-overlay .studio-window { border-radius: 11px; overflow: hidden; }
+.studio-window-overlay .studio-window-header {
+  min-height: 38px; padding: 6px 13px; gap: 10px;
+  border-bottom: 1px solid var(--ca-ui-line);
+}
+.studio-window-overlay .studio-window-heading {min-width:0;gap:8px}
+.studio-window-overlay .studio-window-heading h2 {
+  margin: 0; font-size: 12px; font-weight: 650; line-height: 1.3;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.studio-window-overlay .studio-window-glyph {width:20px;height:20px;flex:0 0 20px}
+.studio-window-overlay .studio-window-close {
+  width:27px;min-width:27px;height:27px;padding:0;border-radius:6px;
+}
+.studio-window-overlay .studio-window-content {min-width:0; min-height:0; overflow:auto;}
+/* Buttons stay readable and clickable in every theme. */
+.studio-window-content :is(button, input, select, textarea) {font-family:inherit}
+.studio-window-content :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ca-ui-focus); outline-offset: 2px;
+}
+/* Common section headers and toolbars. */
+.studio-window-content :is(.datasets-header,.connections-header,.studio-etl-hero,.studio-etl-detail-header) {
+  padding: 11px 16px; gap: 12px;
+}
+.studio-window-content :is(.datasets-header,.connections-header) h1 {font-size:clamp(19px,1.75vw,25px);line-height:1.2;margin:2px 0 3px}
+.studio-window-content :is(.studio-etl-hero,.studio-etl-detail-header) h2 {font-size:clamp(18px,1.6vw,23px);line-height:1.2;margin:2px 0}
+.studio-window-content :is(.datasets-header,.connections-header,.studio-etl-hero) p {
+  margin:2px 0 0; font-size:12px;line-height:1.35;
+}
+.studio-window-content :is(.datasets-eyebrow,.connections-eyebrow,.studio-etl-kicker) {font-size:10px;letter-spacing:.09em}
+.studio-window-content :is(.studio-etl-landing,.studio-etl-overview,.studio-etl-monitor) {padding:12px 16px}
+.studio-window-content :is(.studio-etl-catalog-bar,.studio-etl-filters,.connections-toolbar) {margin:9px 0;gap:8px}
+.studio-window-content :is(.studio-etl-landing,.studio-etl-detail-header,.studio-etl-monitor) button {font-size:12px}
+.studio-window-content .studio-etl-catalog-bar :is(button,input),
+.studio-window-content .studio-etl-detail-header button,
+.studio-window-content .studio-etl-hero button,
+.studio-window-content .datasets-action {min-height:32px;padding:6px 11px;border-radius:7px}
+/* Pipeline list: fixed row rhythm, labels do not wrap on desktop. */
+.studio-window-content .studio-etl-catalog {gap:6px}
+.studio-window-content .studio-etl-catalog-item {
+  min-height:54px; padding:8px 12px; gap:11px; border-radius:8px;
+  background:var(--ca-ui-soft); min-width:0;
+}
+.studio-window-content .studio-etl-catalog-icon {font-size:19px;line-height:1;flex:0 0 22px}
+.studio-window-content .studio-etl-catalog-main {display:flex;flex-direction:column;gap:3px;min-width:0}
+.studio-window-content .studio-etl-catalog-main strong {font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.studio-window-content .studio-etl-catalog-item small {font-size:11px;margin:0;line-height:1.3}
+.studio-window-content .studio-etl-catalog-main small {white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.studio-window-content .studio-etl-catalog-meta {min-width:126px;margin-right:6px}
+.studio-window-content .studio-etl-catalog-meta strong {font-size:12px;font-weight:600;white-space:nowrap}
+.studio-window-content .studio-etl-status {font-size:11px;padding:2px 8px;white-space:nowrap}
+/* Detail overview: read in one glance instead of towering cards. */
+.studio-window-content .studio-etl-nav {padding:2px 16px;gap:3px}
+.studio-window-content .studio-etl-nav button {padding:9px 11px;font-size:12px}
+.studio-window-content .studio-etl-overview-metrics {gap:8px}
+.studio-window-content .studio-etl-overview-metrics>div {padding:10px 12px;border-radius:8px;min-width:0}
+.studio-window-content .studio-etl-overview-metrics small {font-size:11px}
+.studio-window-content .studio-etl-overview-metrics strong {font-size:17px;line-height:1.2;margin:4px 0}
+.studio-window-content .studio-etl-overview-grid {gap:9px;margin-top:10px}
+.studio-window-content .studio-etl-overview-grid>article {padding:12px;border-radius:8px;min-width:0}
+.studio-window-content .studio-etl-overview-grid h3 {font-size:13px;margin:0 0 8px}
+.studio-window-content .studio-etl-overview-grid p {font-size:12px;line-height:1.4;margin:6px 0}
+.studio-window-content .studio-etl-mini-flow>div {padding:7px 6px}
+.studio-window-content .studio-etl-mini-flow b {font-size:18px}
+.studio-window-content .studio-etl-overview-grid button {margin-top:8px;padding:6px 9px}
+/* Job history: one visual row per job; allow horizontal scroll rather than wrapping IDs. */
+.studio-window-content .studio-etl-stats {gap:8px;margin:10px 0}
+.studio-window-content .studio-etl-stats>div {padding:9px 11px;gap:3px}
+.studio-window-content .studio-etl-stats strong {font-size:18px}
+.studio-window-content .studio-etl-table-wrap {overflow-x:auto;max-width:100%;border-radius:8px}
+.studio-window-content .studio-etl-table-wrap table {min-width:820px;table-layout:auto}
+.studio-window-content .studio-etl-table-wrap :is(th,td) {padding:7px 10px;line-height:1.3;vertical-align:middle}
+.studio-window-content .studio-etl-table-wrap td {font-size:12px}
+.studio-window-content .studio-etl-table-wrap td:not(:first-child) {white-space:nowrap}
+.studio-window-content .studio-etl-table-wrap td:first-child {min-width:155px}
+.studio-window-content .studio-etl-table-wrap :is(td,th) button {padding:4px 7px;font-size:11px;white-space:nowrap}
+.studio-window-content .studio-etl-table-wrap tr:hover {background:var(--ca-ui-hover)}
+.studio-window-content .studio-etl-detail {margin-top:10px;padding:10px 12px}
+.studio-window-content .studio-etl-detail h3 {font-size:14px;margin:0 0 7px}
+.studio-window-content .studio-etl-output {padding:7px 0}
+.studio-window-content .studio-etl-lineage-node {padding:10px;margin-bottom:6px}
+.studio-window-content .studio-etl-lineage {gap:7px;margin:9px 0}
+/* Dataset catalog: prevent metadata breaking into two lines. */
+.studio-window-content .datasets-catalog {padding-top:8px}
+.studio-window-content .datasets-catalog-heading h2 {font-size:17px;margin:3px 0}
+.studio-window-content .datasets-catalog-heading p {font-size:12px;margin:2px 0}
+.studio-window-content .datasets-catalog-row {min-height:49px;padding:7px 10px;gap:9px}
+.studio-window-content .datasets-catalog-name {min-width:0}
+.studio-window-content .datasets-catalog-name :is(strong,small) {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.studio-window-content .ca-catalog-metadata {min-width:75px;gap:2px}
+.studio-window-content .ca-catalog-metadata :is(small,strong) {white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.studio-window-content .datasets-detail {padding:12px}
+.studio-window-content .datasets-detail h2 {font-size:16px;overflow-wrap:anywhere}
+.studio-window-content .datasets-detail dl {font-size:12px;gap:6px}
+/* Data explorer header and preview: prioritize the grid. */
+.studio-window-content .explorer-page .ca-compact-toolbar {margin:2px 0 5px;gap:7px}
+.studio-window-content .explorer-page .ca-compact-heading {padding:5px 0;gap:10px}
+.studio-window-content .explorer-page .ca-compact-title-row h2 {font-size:19px}
+.studio-window-content .explorer-page .ca-compact-stats>span {padding:0 11px;min-width:77px}
+.studio-window-content .explorer-page .ca-compact-tabs {margin:1px 0 6px}
+.studio-window-content .explorer-page .ca-compact-tabs button {padding:7px 11px}
+.studio-window-content .explorer-page .ca-compact-info-row {padding:8px 10px;gap:9px}
+/* Generic Data Studio tables, except canvas and its inner editors. */
+.studio-window-content :is(.connections-table-scroll,.explorer-table-scroll,.datasets-table-scroll) {max-width:100%;overflow:auto}
+.studio-window-content :is(.connections-table,.explorer-table-scroll table,.datasets-catalog table) {border-collapse:collapse}
+.studio-window-content :is(.connections-table,.explorer-table-scroll table,.datasets-catalog table) :is(th,td) {
+  padding:6px 9px;line-height:1.3;vertical-align:middle;font-size:12px;
+}
+.studio-window-content .connections-table :is(th,td) {white-space:nowrap}
+.studio-window-content .connections-table tbody tr:hover {background:var(--ca-ui-hover)}
+.studio-window-content .connections-table-host {min-width:0}
+/* Form spacing, keep touch areas usable. */
+.studio-window-content :is(.connection-form-section,.datasets-section-heading) {margin-bottom:10px}
+.studio-window-content :is(.connection-form-grid,.datasets-fields-grid) {gap:10px}
+.studio-window-content :is(.connection-form,.datasets-layout) input:not([type=checkbox]):not([type=radio]),
+.studio-window-content :is(.connection-form,.datasets-layout) select {min-height:34px;padding:6px 9px}
+.studio-window-content :is(.connection-form,.datasets-layout) label {line-height:1.4}
+/* Maintain legibility and horizontal data access on narrow screens. */
+@media(max-width:960px){
+  .studio-window-content .studio-etl-catalog-meta {display:none}
+  .studio-window-content .studio-etl-overview-grid {grid-template-columns:1fr}
+  .studio-window-content .studio-etl-overview-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .studio-window-content .studio-etl-hero,.studio-window-content .studio-etl-detail-header {flex-wrap:wrap}
+}
+@media(max-width:560px){
+  .studio-window-overlay .studio-window-header {padding:6px 10px}
+  .studio-window-content :is(.studio-etl-landing,.studio-etl-overview,.studio-etl-monitor) {padding:10px}
+  .studio-window-content .studio-etl-catalog-item {gap:7px;padding:8px}
+  .studio-window-content .studio-etl-catalog-main strong {font-size:12px}
+  .studio-window-content .studio-etl-catalog-main small {font-size:10px}
+  .studio-window-content .studio-etl-overview-metrics {gap:6px}
+  .studio-window-content .studio-etl-overview-metrics strong {font-size:15px}
+  .studio-window-content .ca-compact-stats {width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ .studio-window-content *, .studio-window-content *::before, .studio-window-content *::after {scroll-behavior:auto}
+}
+
+/* Executive depth refinement — additive, scoped, theme adaptive.
+   Intent: less boxed-in, layered surfaces, restrained semi-3D (no animation). */
+.studio-window-overlay {
+  --ca-depth-edge: color-mix(in srgb, currentColor 13%, transparent);
+  --ca-depth-hairline: color-mix(in srgb, currentColor 9%, transparent);
+  --ca-depth-wash: color-mix(in srgb, currentColor 3%, transparent);
+  --ca-depth-wash-strong: color-mix(in srgb, currentColor 6%, transparent);
+  --ca-depth-shadow: 0 12px 30px rgba(0,0,0,.13), 0 2px 7px rgba(0,0,0,.055);
+  --ca-depth-small-shadow: 0 4px 12px rgba(0,0,0,.09), 0 1px 3px rgba(0,0,0,.055);
+}
+/* The outer window is the single main surface, not a stack of nested rectangles. */
+.studio-window-overlay .studio-window {
+  border-radius: 19px;
+  box-shadow: 0 22px 64px rgba(0,0,0,.24), 0 7px 22px rgba(0,0,0,.12);
+  border-color: var(--ca-depth-edge);
+}
+.studio-window-overlay .studio-window-header {
+  border-bottom-color: var(--ca-depth-hairline);
+  background: linear-gradient(180deg, var(--ca-depth-wash-strong), transparent);
+}
+.studio-window-overlay .studio-window-close { border-radius: 50%; }
+/* Create a quiet header-to-content hierarchy instead of boxed header sections. */
+.studio-window-content :is(.studio-etl-hero,.studio-etl-detail-header,.datasets-header,.connections-header) {
+  border-bottom-color: var(--ca-depth-hairline);
+}
+/* Pipeline catalog: floating list rows with a soft left accent on hover/selection. */
+.studio-window-content .studio-etl-catalog { gap: 7px; }
+.studio-window-content .studio-etl-catalog-item {
+  position: relative;
+  border: 1px solid var(--ca-depth-hairline);
+  border-radius: 14px;
+  background: linear-gradient(115deg, var(--ca-depth-wash-strong), var(--ca-depth-wash)) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,.045);
+  overflow: hidden;
+}
+.studio-window-content .studio-etl-catalog-item::before {
+  content:""; position:absolute; left:0; top:12px; bottom:12px; width:3px;
+  border-radius:0 4px 4px 0; background: var(--ca-ui-focus); opacity:.35;
+}
+.studio-window-content .studio-etl-catalog-item:hover,
+.studio-window-content .studio-etl-catalog-item:focus-visible {
+  border-color: color-mix(in srgb, var(--ca-ui-focus) 48%, transparent);
+  box-shadow: var(--ca-depth-small-shadow);
+}
+/* Metrics: continuous executive strip rather than four separate tiles. */
+.studio-window-content :is(.studio-etl-overview-metrics,.studio-etl-stats,.ca-overview-metrics) {
+  display:grid;
+  gap:0;
+  border: 1px solid var(--ca-depth-hairline);
+  border-radius: 15px;
+  background:linear-gradient(130deg, var(--ca-depth-wash-strong), var(--ca-depth-wash));
+  box-shadow:0 3px 12px rgba(0,0,0,.045);
+  overflow:hidden;
+}
+.studio-window-content :is(.studio-etl-overview-metrics,.studio-etl-stats,.ca-overview-metrics)>div {
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  position:relative;
+  min-height:57px;
+  padding:10px 15px;
+}
+.studio-window-content :is(.studio-etl-overview-metrics,.studio-etl-stats,.ca-overview-metrics)>div+div::before {
+  content:""; position:absolute; width:1px; left:0; top:14px; bottom:14px;
+  background:var(--ca-depth-edge);
+}
+/* Large detail groupings retain depth, internal sub-panels lose their box-heavy borders. */
+.studio-window-content :is(.studio-etl-overview-grid>article,.ca-overview-panel) {
+  border:1px solid var(--ca-depth-hairline);
+  border-radius: 16px;
+  background:linear-gradient(145deg, var(--ca-depth-wash-strong), transparent);
+  box-shadow:var(--ca-depth-small-shadow);
+}
+.studio-window-content .studio-etl-mini-flow>div {
+  border:0;
+  border-radius:0;
+  border-right:1px solid var(--ca-depth-hairline);
+  background:transparent;
+  box-shadow:none;
+}
+.studio-window-content .studio-etl-mini-flow>div:last-child { border-right:0; }
+/* Tables should read like a single surface, not individual boxed cells. */
+.studio-window-content :is(.studio-etl-table-wrap,.connections-table-scroll,.explorer-table-scroll) {
+  border:1px solid var(--ca-depth-hairline);
+  border-radius:14px;
+  box-shadow:var(--ca-depth-small-shadow);
+  background:var(--ca-depth-wash);
+}
+.studio-window-content :is(.studio-etl-table-wrap,.connections-table-scroll,.explorer-table-scroll) th {
+  background: var(--ca-depth-wash-strong);
+  border-bottom:1px solid var(--ca-depth-edge);
+  font-weight:650;
+}
+.studio-window-content :is(.studio-etl-table-wrap,.connections-table-scroll,.explorer-table-scroll) td {
+  border-bottom-color:var(--ca-depth-hairline);
+}
+.studio-window-content :is(.studio-etl-table-wrap,.connections-table-scroll,.explorer-table-scroll) tbody tr:last-child td { border-bottom:0; }
+.studio-window-content :is(.studio-etl-table-wrap,.connections-table-scroll,.explorer-table-scroll) tbody tr:hover {
+  background:var(--ca-depth-wash-strong);
+}
+/* Status, quick filters and controls have a gently raised feeling, not thick outlines. */
+.studio-window-content :is(.studio-etl-status,.ca-status-pill) { border-radius:999px; }
+.studio-window-content :is(.studio-etl-catalog-bar button,.studio-etl-detail-header button,.studio-etl-hero button,.ca-compact-copy,.ca-compact-view) {
+  border-radius:999px;
+  box-shadow: inset 0 1px 0 color-mix(in srgb,white 16%,transparent), 0 2px 5px rgba(0,0,0,.09);
+}
+.studio-window-content :is(.studio-etl-catalog-bar input,.studio-etl-filters input,.studio-etl-filters select) {
+  border-radius:12px;
+  background: var(--ca-depth-wash);
+}
+/* Data Explorer overview: keep compact hierarchy with a soft info ribbon. */
+.studio-window-content .ca-compact-info-row {
+  border: 1px solid var(--ca-depth-hairline);
+  border-radius: 14px;
+  background: linear-gradient(100deg, var(--ca-depth-wash-strong), transparent);
+  box-shadow:0 3px 9px rgba(0,0,0,.045);
+}
+.studio-window-content .ca-compact-details {
+  border: 1px solid var(--ca-depth-hairline);
+  border-radius:14px;
+  overflow:hidden;
+}
+.studio-window-content .ca-compact-details[open] {box-shadow:var(--ca-depth-small-shadow)}
+.studio-window-content .ca-compact-details .ca-overview-panel {box-shadow:none}
+/* Dataset catalog: rows feel like a continuous list with airy edges. */
+.studio-window-content .datasets-catalog-row {
+  border-radius:11px;
+  border-color:var(--ca-depth-hairline);
+  background:linear-gradient(100deg,var(--ca-depth-wash-strong),transparent);
+  box-shadow:0 2px 5px rgba(0,0,0,.035);
+}
+/* Lineage is a connected flow: fewer card walls, clearer accent. */
+.studio-window-content .studio-etl-lineage-node {
+  border-color:var(--ca-depth-hairline);
+  border-radius:14px;
+  background:linear-gradient(145deg,var(--ca-depth-wash-strong),transparent);
+  box-shadow:var(--ca-depth-small-shadow);
+}
+.studio-window-content .studio-etl-lineage-latest {
+  border-radius:0 12px 12px 0;
+  background:linear-gradient(90deg,var(--ca-depth-wash-strong),transparent);
+}
+@media(max-width:900px){
+  .studio-window-content :is(.studio-etl-overview-metrics,.studio-etl-stats,.ca-overview-metrics)>div:nth-child(odd)::before {display:none}
+  .studio-window-content :is(.studio-etl-overview-metrics,.studio-etl-stats,.ca-overview-metrics)>div {border-bottom:1px solid var(--ca-depth-hairline)}
+}
+@media(max-width:560px){
+  .studio-window-overlay .studio-window {border-radius:13px}
+  .studio-window-content .studio-etl-catalog-item {border-radius:11px}
+  .studio-window-content :is(.studio-etl-overview-grid>article,.ca-overview-panel) {border-radius:12px}
+}
+
+/* Dataset catalog – aligned and compact rows, no TSX changes required. */
+.studio-window-content .datasets-catalog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(225px, 22%, 315px);
+  align-items: start;
+  gap: 14px;
+  min-width: 0;
+}
+.studio-window-content .datasets-catalog-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.studio-window-content .datasets-catalog-list > li {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.studio-window-content .datasets-catalog-list .datasets-catalog-row {
+  display: grid;
+  grid-template-columns: 34px minmax(140px, 1fr) minmax(72px, 88px) minmax(95px, 112px) 58px 12px;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 49px;
+  padding: 5px 10px;
+  text-align: left;
+  box-sizing: border-box;
+}
+.studio-window-content .datasets-catalog-row > :first-child {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  margin: 0 !important;
+}
+.studio-window-content .datasets-catalog-row > .datasets-catalog-name {
+  min-width: 0;
+  width: 100%;
+}
+.studio-window-content .datasets-catalog-row .datasets-catalog-name strong,
+.studio-window-content .datasets-catalog-row .datasets-catalog-name small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.studio-window-content .datasets-catalog-row > .ca-catalog-metadata {
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  align-items: flex-start;
+}
+.studio-window-content .datasets-catalog-row > .ca-catalog-metadata small,
+.studio-window-content .datasets-catalog-row > .ca-catalog-metadata strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.studio-window-content .datasets-catalog-row > .datasets-mode-label {
+  text-align: center;
+  min-width: 0;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.studio-window-content .datasets-catalog-row > :last-child {
+  justify-self: end;
+  width: 12px;
+  text-align: center;
+}
+.studio-window-content .datasets-catalog-grid > .datasets-detail {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 1120px) {
+  .studio-window-content .datasets-catalog-list .datasets-catalog-row {
+    grid-template-columns: 34px minmax(115px, 1fr) 76px 55px 12px;
+    gap: 8px;
+  }
+  .studio-window-content .datasets-catalog-row > .ca-catalog-metadata:nth-child(4) { display: none; }
+}
+@media (max-width: 860px) {
+  .studio-window-content .datasets-catalog-grid { grid-template-columns: minmax(0, 1fr); }
+  .studio-window-content .datasets-catalog-list .datasets-catalog-row {
+    grid-template-columns: 34px minmax(0,1fr) 66px 54px 12px;
+  }
+  .studio-window-content .datasets-catalog-row > .ca-catalog-metadata:nth-child(4) { display: none; }
+}
+@media (max-width: 490px) {
+  .studio-window-content .datasets-catalog-list .datasets-catalog-row {
+    grid-template-columns: 32px minmax(0,1fr) 54px 12px;
+    gap: 7px;
+  }
+  .studio-window-content .datasets-catalog-row > .ca-catalog-metadata { display: none; }
+}
+
+
+/* Command Center / original radial style: five staggered rows, left 1/3/5 and right 2/4.
+   Scoped to opt-in stage, so dataset and popup layouts remain unchanged. */
+.studio-command-stage.studio-command-stage--left3-right2 {
+  position: relative;
+  min-height: 560px;
+  height: min(68vh, 650px);
+  display: block;
+}
+.studio-command-stage--left3-right2 .studio-network {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.studio-command-stage--left3-right2 .studio-command-card {
+  position: absolute !important;
+  bottom: auto !important;
+  right: auto !important;
+  margin: 0 !important;
+  width: 25% !important;
+  max-width: 370px;
+  min-width: 0;
+  transform: translateY(-50%) !important;
+  z-index: 2;
+}
+.studio-command-stage--left3-right2 .studio-command-card--connections {
+  left: 3% !important; top: 10% !important;
+}
+.studio-command-stage--left3-right2 .studio-command-card--datasets {
+  left: 3% !important; top: 50% !important;
+}
+.studio-command-stage--left3-right2 .studio-command-card--pipelines {
+  left: 3% !important; top: 90% !important;
+}
+.studio-command-stage--left3-right2 .studio-command-card--charts {
+  left: 72% !important; top: 30% !important;
+}
+.studio-command-stage--left3-right2 .studio-command-card--designer {
+  left: 72% !important; top: 70% !important;
+}
+.studio-command-stage--left3-right2 .studio-orb-area {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(40%, 480px);
+  max-width: 480px;
+  z-index: 1;
+}
+@media (max-width: 1080px) {
+  .studio-command-stage.studio-command-stage--left3-right2 {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 12px;
+    height: auto;
+    min-height: 0;
+    padding: 10px;
+  }
+  .studio-command-stage--left3-right2 .studio-network {display:none}
+  .studio-command-stage--left3-right2 .studio-orb-area {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    transform: none !important;
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: min(100%, 390px);
+    justify-self:center;
+  }
+  .studio-command-stage--left3-right2 .studio-command-card {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none;
+  }
+}
+@media (max-width: 600px) {
+  .studio-command-stage.studio-command-stage--left3-right2 {grid-template-columns:minmax(0,1fr)}
+}

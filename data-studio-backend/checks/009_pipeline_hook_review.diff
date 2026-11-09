@@ -1,0 +1,28 @@
+--- supplied spDashboard (without pasted Text header)
++++ prepared BI.spDashboard
+@@ -2,7 +2,7 @@
+    Baseline: procedure definition supplied by user on 2026-11-06. 
+    Apply 003_create_studio_dataset.sql in CoreAnalytics first. 
+    Compare the deployed procedure with the baseline before running this ALTER. */ 
+-CREATE PROCEDURE [dbo].[spDashboard]         
++ALTER PROCEDURE [dbo].[spDashboard]         
+ (         
+     @Mode varchar(100) = '',         
+     @HealthcareID varchar(3) = '',         
+@@ -11,7 +11,15 @@
+ )         
+ AS         
+          
+-SET NOCOUNT ON;         
++SET NOCOUNT ON;
++
++/* Pipeline metadata/job routing. Requires CoreAnalytics migrations 006 and 007. */
++IF @Mode = 'CoreStudioPipelines'
++BEGIN
++    EXEC [CoreAnalytics].studio.spPipelineControl @Payload=@Payload;
++    RETURN;
++END;
++         
+          
+ DECLARE @CurrentYear INT = YEAR(GETDATE());         
+ DECLARE @LastYear INT = @CurrentYear - 1;         

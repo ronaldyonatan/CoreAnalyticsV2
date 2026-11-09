@@ -1,0 +1,59 @@
+/* Additive Dataset Overview styles; inherits CoreAnalytics theme tokens and colors. */
+.ca-dataset-tabs { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 0; margin:14px 0; border-bottom:1px solid currentColor; border-color:color-mix(in srgb,currentColor 18%,transparent); }
+.ca-dataset-tabs button { font:inherit; font-weight:600; cursor:pointer; padding:10px 16px; border:0; border-radius:8px 8px 0 0; background:transparent; color:inherit; opacity:.76; }
+.ca-dataset-tabs button.active { opacity:1; box-shadow:inset 0 -3px 0 currentColor; }
+.ca-dataset-overview { display:grid; gap:18px; padding:4px 0 24px; color:inherit; }
+.ca-overview-hero { display:flex; align-items:start; justify-content:space-between; gap:16px; }
+.ca-overview-hero h2 { font-size:clamp(22px,2.2vw,30px); margin:6px 0; }
+.ca-overview-hero p { margin:0; opacity:.75; }
+.ca-status-pill { border:1px solid currentColor; border-radius:20px; padding:6px 12px; font-size:12px; font-weight:700; }
+.ca-overview-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.ca-overview-metrics>div,.ca-overview-panel { border:1px solid color-mix(in srgb,currentColor 18%,transparent); border-radius:12px; padding:17px; background:color-mix(in srgb,currentColor 4%,transparent); }
+.ca-overview-metrics small,.ca-overview-metrics strong { display:block; }
+.ca-overview-metrics small { opacity:.72; margin-bottom:8px; }
+.ca-overview-metrics strong { font-size:clamp(14px,1.5vw,20px); overflow-wrap:anywhere; }
+.ca-overview-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.ca-overview-panel h3 { font-size:17px; margin:0 0 16px; }
+.ca-overview-panel dl { display:grid; grid-template-columns:minmax(110px,34%) minmax(0,1fr); gap:12px; font-size:14px; margin:0; }
+.ca-overview-panel dt { opacity:.7; } .ca-overview-panel dd { margin:0; min-width:0; overflow-wrap:anywhere; }
+.ca-id { overflow-wrap:anywhere; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; }
+.ca-overview-panel button { margin-top:14px; cursor:pointer; background:transparent; border:1px solid currentColor; color:inherit; border-radius:6px; padding:8px 12px; }
+.ca-overview-actions { display:flex; justify-content:flex-end; }
+.ca-catalog-metadata { display:flex; flex-direction:column; gap:3px; min-width:88px; }
+.ca-catalog-metadata small { opacity:.67; font-size:11px; } .ca-catalog-metadata strong { font-size:12px; font-weight:600; }
+@media(max-width:860px) { .ca-overview-metrics {grid-template-columns:repeat(2,minmax(0,1fr));} .ca-overview-columns {grid-template-columns:1fr;} .ca-catalog-metadata {display:none;} }
+@media(max-width:460px) { .ca-overview-metrics {grid-template-columns:1fr 1fr;} .ca-overview-panel dl {grid-template-columns:1fr;gap:5px;} .ca-overview-panel dd {margin-bottom:10px;} }
+
+/* Phase 1 compact detail: metrics beside dataset title, technical metadata collapsible. */
+.explorer-page .ca-compact-toolbar { display:flex; align-items:end; gap:10px; margin:4px 0 10px; }
+.explorer-page .ca-compact-toolbar .explorer-catalog-back { white-space:nowrap; }
+.ca-compact-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:10px 0 8px; }
+.ca-compact-identity { flex:1 1 240px; min-width:0; }
+.ca-compact-title-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.ca-compact-title-row h2 { margin:0; font-size:clamp(20px,1.7vw,26px); line-height:1.2; overflow-wrap:anywhere; }
+.ca-compact-identity p { margin:4px 0 0; font-size:12px; opacity:.72; }
+.ca-compact-heading .ca-status-pill { padding:3px 9px; font-size:10px; }
+.ca-compact-stats { display:flex; align-items:center; flex-wrap:wrap; gap:0; }
+.ca-compact-stats>span { display:flex; flex-direction:column; gap:3px; min-width:94px; max-width:200px; padding:1px 15px; border-left:1px solid color-mix(in srgb,currentColor 17%,transparent); }
+.ca-compact-stats small,.ca-compact-info-row small { opacity:.65; font-size:11px; }
+.ca-compact-stats strong { font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ca-compact-tabs { margin:3px 0 10px; padding:0; gap:3px; }
+.ca-compact-tabs button { padding:8px 14px; }
+.ca-compact-overview { display:grid; gap:8px; padding-bottom:8px; }
+.ca-compact-info-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 12px; border:1px solid color-mix(in srgb,currentColor 17%,transparent); border-radius:9px; background:color-mix(in srgb,currentColor 3%,transparent); }
+.ca-compact-info-row>span { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.ca-compact-info-row>span:first-child { flex:0 1 30%; }
+.ca-compact-info-row>span:nth-child(2) { flex:1 1 245px; }
+.ca-compact-info-row strong { font-size:12px; overflow-wrap:anywhere; }
+.ca-compact-mono { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ca-compact-copy { background:transparent; border:1px solid color-mix(in srgb,currentColor 38%,transparent); color:inherit; border-radius:7px; padding:7px 10px; cursor:pointer; white-space:nowrap; }
+.ca-compact-view { margin-left:auto; white-space:nowrap; }
+.ca-compact-details { border:1px solid color-mix(in srgb,currentColor 17%,transparent); border-radius:9px; }
+.ca-compact-details>summary { padding:10px 12px; cursor:pointer; font-size:13px; font-weight:600; }
+.ca-compact-details>summary span { margin-left:8px; font-size:11px; font-weight:400; opacity:.6; }
+.ca-compact-details .ca-overview-columns { padding:0 10px 10px; }
+.ca-compact-details .ca-overview-panel { padding:12px; }
+.ca-compact-details .ca-overview-panel h3 { font-size:14px; margin:0 0 10px; }
+.ca-compact-details .ca-overview-panel dl { font-size:12px; gap:8px; }
+@media(max-width:900px) { .ca-compact-heading {align-items:start;} .ca-compact-stats {width:100%;} .ca-compact-stats>span:first-child {border-left:0;padding-left:0;} }
+@media(max-width:540px) { .ca-compact-stats {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;} .ca-compact-stats>span {border-left:0;padding:0;min-width:0;} .ca-compact-info-row>span:first-child {flex-basis:100%;} .ca-compact-view {width:100%;margin-left:0;} .ca-compact-details>summary span {display:none;} }

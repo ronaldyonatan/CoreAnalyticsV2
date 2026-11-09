@@ -1,3 +1,5 @@
+> Implementasi aktif Data Studio sekarang berada di `voice-auth-backend/app/routes/studio_*` dengan session/CSRF server. Bagian di bawah adalah catatan fondasi awal. Untuk mengaktifkan pipeline Spark, gunakan [panduan aktivasi](ACTIVATION.md); script pemeriksaan SQL hanya-baca tersedia di `checks/`.
+
 # CoreAnalytics Data Studio - Stage 2 (safe foundation)
 
 This package contains a SQL Server connection tester, password encryption helper, and a server-side RBAC contract. **No HTTP API is exposed yet**: the existing CoreAnalytics login currently returns user/access to React, but the supplied files do not establish a server-verifiable session/token for subsequent requests. Adding an unprotected Connections API would be unsafe.

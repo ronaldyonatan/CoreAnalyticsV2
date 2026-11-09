@@ -1,0 +1,78 @@
+# Separate Spark stack; does not change the existing application deployment.
+name: coreanalytics-spark
+# The directory must exist on the Docker host before startup.
+x-parquet: &parquet
+  type: bind
+  source: ${STUDIO_PARQUET_HOST_PATH:?Set STUDIO_PARQUET_HOST_PATH to an existing absolute host directory}
+  target: /var/lib/coreanalytics/parquet
+  bind:
+    create_host_path: false
+x-spark: &spark
+  image: ${CORE_STUDIO_SPARK_IMAGE:-coreanalytics-studio-spark:3.5.8}
+  build:
+    context: ./data-studio-worker
+    dockerfile: Dockerfile.batch
+  restart: unless-stopped
+  init: true
+  security_opt: [no-new-privileges:true]
+  networks: [spark-private]
+  secrets: [spark_auth_secret]
+  volumes:
+    - *parquet
+
+services:
+  spark-master:
+    <<: *spark
+    hostname: spark-master
+    command: [master]
+    environment:
+      SPARK_MASTER_HOST: spark-master
+    # RPC remains on the private container network. Admin UI is loopback-only.
+    ports: ["127.0.0.1:${STUDIO_SPARK_UI_PORT:-18088}:8080"]
+
+  spark-worker-1:
+    <<: *spark
+    hostname: spark-worker-1
+    command: [worker]
+    depends_on: [spark-master]
+    environment:
+      STUDIO_SPARK_WORKER_HOST: spark-worker-1
+      STUDIO_SPARK_WORKER_CORES: ${STUDIO_SPARK_WORKER_CORES:-2}
+      STUDIO_SPARK_WORKER_MEMORY: ${STUDIO_SPARK_WORKER_MEMORY:-2g}
+    volumes:
+      - *parquet
+      - spark_worker_1:/opt/spark/work
+
+  spark-worker-2:
+    <<: *spark
+    hostname: spark-worker-2
+    command: [worker]
+    depends_on: [spark-master]
+    environment:
+      STUDIO_SPARK_WORKER_HOST: spark-worker-2
+      STUDIO_SPARK_WORKER_CORES: ${STUDIO_SPARK_WORKER_CORES:-2}
+      STUDIO_SPARK_WORKER_MEMORY: ${STUDIO_SPARK_WORKER_MEMORY:-2g}
+    volumes:
+      - *parquet
+      - spark_worker_2:/opt/spark/work
+
+  spark-gateway:
+    <<: *spark
+    hostname: spark-gateway
+    command: [gateway]
+    depends_on: [spark-master, spark-worker-1, spark-worker-2]
+    environment:
+      STUDIO_SPARK_DRIVER_HOST: spark-gateway
+      STUDIO_SPARK_JOB_CORES: ${STUDIO_SPARK_JOB_CORES:-2}
+      STUDIO_SPARK_EXECUTOR_MEMORY: ${STUDIO_SPARK_EXECUTOR_MEMORY:-1g}
+      STUDIO_SPARK_DRIVER_MEMORY: ${STUDIO_SPARK_DRIVER_MEMORY:-1g}
+
+secrets:
+  spark_auth_secret:
+    file: ${STUDIO_SPARK_SECRET_FILE:?Set STUDIO_SPARK_SECRET_FILE to an external protected secret file}
+volumes:
+  spark_worker_1:
+  spark_worker_2:
+networks:
+  spark-private:
+    driver: bridge

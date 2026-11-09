@@ -1,0 +1,29 @@
+# Overlay with docker-compose.spark.yml. Publish only loopback; remote apps require a private TLS proxy/tunnel.
+services:
+  parquet-reader:
+    image: coreanalytics-parquet-reader:1
+    build:
+      context: ./data-studio-worker/reader
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [SETUID, SETGID, DAC_OVERRIDE]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 1g
+    cpus: 1
+    pids_limit: 64
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    volumes:
+      - type: bind
+        source: ${STUDIO_PARQUET_HOST_PATH:?Set STUDIO_PARQUET_HOST_PATH to an existing absolute host directory}
+        target: /var/lib/coreanalytics/parquet
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [spark-private]
+    secrets: [parquet_reader_secret]
+    ports: ["127.0.0.1:${STUDIO_PARQUET_READER_PORT:-18089}:8090"]
+secrets:
+  parquet_reader_secret:
+    file: ${STUDIO_PARQUET_READER_SECRET_FILE:?Set an external protected reader secret file}

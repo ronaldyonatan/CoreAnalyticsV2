@@ -1,0 +1,12 @@
+FROM apache/spark:3.5.8-python3@sha256:1916d1d43a6ff0e4d7ac682c84c0412e4a609fca11dd56cfdae592dcde3a378c
+USER root
+RUN mkdir -p /opt/coreanalytics /var/lib/coreanalytics/parquet /opt/spark/work && chown -R 185:185 /opt/coreanalytics /var/lib/coreanalytics /opt/spark/work
+ADD --checksum=sha256:e6933c0711e598a224060e52ed31392f720a4a7664e85d8ae37c52a85b67ebb0 --chown=185:185 https://repo.maven.apache.org/maven2/com/microsoft/sqlserver/mssql-jdbc/12.8.1.jre11/mssql-jdbc-12.8.1.jre11.jar /opt/spark/jars/mssql-jdbc-12.8.1.jre11.jar
+WORKDIR /opt/coreanalytics
+COPY --chown=185:185 app ./app
+COPY --chown=185:185 run_batch.py ./run_batch.py
+COPY --chown=185:185 cluster/start.py ./start_cluster.py
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 STUDIO_SQLSERVER_JDBC_JAR=/opt/spark/jars/mssql-jdbc-12.8.1.jre11.jar
+# Bootstrap reads the externally mounted secret, then drops UID/GID before starting Spark.
+ENTRYPOINT ["python3", "/opt/coreanalytics/start_cluster.py"]
+CMD ["gateway"]
