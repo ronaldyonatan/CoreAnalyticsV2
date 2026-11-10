@@ -26,8 +26,35 @@ def read_sources(spark,definitions,root):
         elif kind=='sqlserver':
             fields(item,'id kind address hostname port database schema table username password encrypt trust_server_certificate timeout')
             # The server resolves and validates the address through its existing SQL host policy.
-            try:ipaddress.ip_address(item['address'])
-            except (ValueError,TypeError):raise BatchError('INVALID_SQL_SOURCE') from None
+            try:
+                ip = ipaddress.ip_address(item['address'])
+            except (ValueError,TypeError):
+                raise BatchError('INVALID_SQL_SOURCE') from None
+            if ip.version == 6 and ip.ipv4_mapped:
+                raise BatchError('INVALID_SQL_SOURCE')
+            if (ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_unspecified
+                    or ip.is_reserved or ip in ipaddress.ip_network('100.64.0.0/10')
+                    or ip in ipaddress.ip_network('198.18.0.0/15')
+                    or ip == ipaddress.ip_address('168.63.129.16')):
+                raise BatchError('INVALID_SQL_SOURCE')
+            if ip.is_private and os.getenv('STUDIO_SQL_ALLOW_PRIVATE','false').lower() != 'true':
+                raise BatchError('INVALID_SQL_SOURCE')
+            raw_networks = os.getenv('STUDIO_SQL_ALLOWED_NETWORKS','').strip()
+            if raw_networks:
+                try:
+                    networks = [ipaddress.ip_network(x.strip(),strict=True) for x in raw_networks.split(',')]
+                except ValueError:
+                    raise BatchError('INVALID_SQL_SOURCE') from None
+                if not any(ip in network for network in networks if network.version == ip.version):
+                    raise BatchError('INVALID_SQL_SOURCE')
+            raw_ports = os.getenv('STUDIO_SQL_ALLOWED_PORTS','1433').strip()
+            if raw_ports != '*':
+                try:
+                    ports = {int(x.strip()) for x in raw_ports.split(',')}
+                except ValueError:
+                    raise BatchError('INVALID_SQL_SOURCE') from None
+                if item['port'] not in ports:
+                    raise BatchError('INVALID_SQL_SOURCE')
             if type(item['port']) is not int or not 1<=item['port']<=65535 or type(item['timeout']) is not int or not 1<=item['timeout']<=120 or type(item['encrypt']) is not bool or type(item['trust_server_certificate']) is not bool:raise BatchError('INVALID_SQL_SOURCE')
             for key in ('hostname','database','schema','table','username','password'):text(item[key],1024 if key=='password' else 255,True)
             if any(c in item['hostname'] for c in ';{}\r\n'):raise BatchError('INVALID_SQL_SOURCE')

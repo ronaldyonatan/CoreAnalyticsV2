@@ -4,11 +4,12 @@ The SQL host comes from the user-supplied connection configuration, not a
 hardcoded IP list. Explicit opt-in STUDIO_SQL_HOST_POLICY=dynamic allows new
 routable IPs/FQDNs while refusing local/multicast/link-local infrastructure.
 
-For backward compatibility, the default policy is 'allowlist'; operators can
-opt in to dynamic once via environment configuration. Dynamic mode additionally requires STUDIO_SQL_ALLOWED_NETWORKS (CIDRs).
+For backward compatibility, explicit 'allowlist' is supported. Dynamic mode is
+the default; private destinations require STUDIO_SQL_ALLOW_PRIVATE=true, for
+trusted single-tenant deployments only. Optional network CIDRs restrict further.
 STUDIO_SQL_ALLOWED_PORTS defaults to 1433; '*' explicitly permits custom ports.
-Use 0.0.0.0/0,::/0 for self-service destinations without per-server approvals.
-Infrastructure exclusions still apply. Permissions and egress remain required.
+Infrastructure exclusions still apply. Permissions and network egress controls
+remain mandatory, particularly for multi-tenant deployments.
 """
 from dataclasses import dataclass
 from contextlib import closing
@@ -85,8 +86,6 @@ def _validate_host_syntax(host: str) -> str:
 def _configured_networks(mode: str):
     raw = os.getenv('STUDIO_SQL_ALLOWED_NETWORKS', '').strip()
     if not raw:
-        if mode == 'dynamic':
-            raise SqlTargetPolicyError('SQL_NETWORK_POLICY_REQUIRED', 503)
         return ()
     try:
         networks = tuple(ipaddress.ip_network(value.strip(), strict=True)
@@ -143,7 +142,7 @@ def validate_sqlserver_host(host: str, port: int = 1433) -> tuple[str, str]:
     rebinding risk. HostnameInCertificate preserves TLS hostname checks.
     """
     host = _validate_host_syntax(host)
-    mode = os.getenv('STUDIO_SQL_HOST_POLICY', 'allowlist').strip().lower()
+    mode = os.getenv('STUDIO_SQL_HOST_POLICY', 'dynamic').strip().lower()
     if mode not in ('dynamic', 'allowlist'):
         raise SqlTargetPolicyError('SQL_HOST_POLICY_INVALID', 503)
     networks = _configured_networks(mode)
@@ -175,6 +174,10 @@ def validate_sqlserver_host(host: str, port: int = 1433) -> tuple[str, str]:
     # Reject mixed DNS records: prevents resolving to unsafe local endpoints.
     if not all(_valid_ip(address) and not _is_local_address(address, port) for address in candidates):
         raise SqlTargetPolicyError('SQL_HOST_BLOCKED', 403)
+    # Private networks require an explicit, deployment-wide trusted-runtime opt-in.
+    # Never enable this for shared public SaaS workers.
+    if os.getenv('STUDIO_SQL_ALLOW_PRIVATE', 'false').strip().lower() != 'true' and any(address.is_private for address in candidates):
+        raise SqlTargetPolicyError('SQL_PRIVATE_DESTINATION_DISABLED', 403)
     if networks and not all(any(address in network for network in networks
                                 if address.version == network.version) for address in candidates):
         raise SqlTargetPolicyError('SQL_NETWORK_NOT_ALLOWED', 403)

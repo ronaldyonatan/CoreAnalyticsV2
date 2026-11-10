@@ -24,6 +24,7 @@ class PolicyTests(unittest.TestCase):
     def setUp(self):
         self.env = patch.dict(os.environ, {
             'STUDIO_SQL_HOST_POLICY': 'dynamic',
+            'STUDIO_SQL_ALLOW_PRIVATE': 'true',
             'STUDIO_SQL_ALLOWED_NETWORKS': '172.16.20.0/24',
             'STUDIO_SQL_ALLOWED_PORTS': '1433',
             'STUDIO_ALLOWED_SQL_HOSTS': '172.16.20.174',
@@ -44,6 +45,14 @@ class PolicyTests(unittest.TestCase):
         self.assertEqual(error.exception.code, code)
         if status is not None:
             self.assertEqual(error.exception.http_status, status)
+
+    def test_dynamic_without_network_list_requires_private_opt_in(self):
+        os.environ.pop('STUDIO_SQL_ALLOWED_NETWORKS', None)
+        os.environ['STUDIO_SQL_ALLOW_PRIVATE'] = 'false'
+        self.code(self.target, 'SQL_PRIVATE_DESTINATION_DISABLED', 403)
+        self.assertEqual(sql.validate_target(replace(self.target, host='8.8.8.8'))[1], '8.8.8.8')
+        os.environ['STUDIO_SQL_ALLOW_PRIVATE'] = 'true'
+        self.assertEqual(sql.validate_target(self.target)[1], '172.16.20.174')
 
     def test_dynamic_existing_new_and_unlisted_server(self):
         for host in ['172.16.20.174', '172.16.20.12', '172.16.20.99']:
@@ -67,7 +76,7 @@ class PolicyTests(unittest.TestCase):
         self.code(self.target, 'SQL_HOST_BLOCKED', 403)
 
     def test_allowlist_default_and_explicit_remain_restricted(self):
-        for mode in [None, 'allowlist']:
+        for mode in ['allowlist']:
             if mode is None:
                 os.environ.pop('STUDIO_SQL_HOST_POLICY', None)
             else:
@@ -85,7 +94,7 @@ class PolicyTests(unittest.TestCase):
         sql.validate_target(replace(self.target, port=1444))
 
     def test_invalid_or_missing_config_fails_closed(self):
-        for value in ['', ', ,', 'not-a-cidr', '172.16.20.12/24']:
+        for value in [', ,', 'not-a-cidr', '172.16.20.12/24']:
             os.environ['STUDIO_SQL_ALLOWED_NETWORKS'] = value
             with self.assertRaises(sql.SqlTargetPolicyError) as error:
                 sql.validate_target(self.target)
@@ -176,7 +185,7 @@ class PolicyTests(unittest.TestCase):
 class ApiTests(unittest.TestCase):
     def setUp(self):
         self.env = patch.dict(os.environ, {
-            'STUDIO_SQL_HOST_POLICY': 'dynamic', 'STUDIO_SQL_ALLOWED_NETWORKS': '172.16.20.0/24',
+            'STUDIO_SQL_HOST_POLICY': 'dynamic', 'STUDIO_SQL_ALLOW_PRIVATE': 'true', 'STUDIO_SQL_ALLOWED_NETWORKS': '172.16.20.0/24',
             'STUDIO_SQL_ALLOWED_PORTS': '1433', 'STUDIO_ALLOW_UNTRUSTED_CERT': 'false',
             'CORE_ALLOWED_BROWSER_ORIGINS': 'http://localhost:5173',
         }); self.env.start()
@@ -271,7 +280,7 @@ class StartupTests(unittest.TestCase):
             self.assertEqual(result.stdout.splitlines()[0], 'allowlist')
             env_file.write_text('')
             result = subprocess.run(['bash', '-eu', '-c', command], cwd=directory, env=clean, check=True, text=True, capture_output=True)
-            self.assertEqual(result.stdout.splitlines(), ['allowlist', '', '1433'])
+            self.assertEqual(result.stdout.splitlines(), ['dynamic', '', '1433'])
 
 
 if __name__ == '__main__':

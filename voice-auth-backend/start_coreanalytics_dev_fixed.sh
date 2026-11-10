@@ -42,6 +42,8 @@ if [[ -f .env ]]; then
         if [[ -z "${STUDIO_SQL_HOST_POLICY:-}" ]]; then STUDIO_SQL_HOST_POLICY="${line#STUDIO_SQL_HOST_POLICY=}"; fi ;;
       STUDIO_SQL_ALLOWED_NETWORKS=*)
         if [[ -z "${STUDIO_SQL_ALLOWED_NETWORKS:-}" ]]; then STUDIO_SQL_ALLOWED_NETWORKS="${line#STUDIO_SQL_ALLOWED_NETWORKS=}"; fi ;;
+      STUDIO_SQL_ALLOW_PRIVATE=*)
+        if [[ -z "${STUDIO_SQL_ALLOW_PRIVATE:-}" ]]; then STUDIO_SQL_ALLOW_PRIVATE="${line#STUDIO_SQL_ALLOW_PRIVATE=}"; fi ;;
       STUDIO_SQL_ALLOWED_PORTS=*)
         if [[ -z "${STUDIO_SQL_ALLOWED_PORTS:-}" ]]; then STUDIO_SQL_ALLOWED_PORTS="${line#STUDIO_SQL_ALLOWED_PORTS=}"; fi ;;
       STUDIO_ALLOWED_SQL_HOSTS=*)
@@ -52,9 +54,11 @@ fi
 export STUDIO_FERNET_KEY
 export STUDIO_SQL_ALLOWED_NETWORKS="${STUDIO_SQL_ALLOWED_NETWORKS:-${STUDIO_DEV_SQL_ALLOWED_NETWORKS:-}}"
 export STUDIO_SQL_ALLOWED_PORTS="${STUDIO_SQL_ALLOWED_PORTS:-${STUDIO_DEV_SQL_ALLOWED_PORTS:-1433}}"
-export STUDIO_SQL_HOST_POLICY="${STUDIO_SQL_HOST_POLICY:-${STUDIO_DEV_SQL_HOST_POLICY:-allowlist}}"
+export STUDIO_SQL_HOST_POLICY="${STUDIO_SQL_HOST_POLICY:-${STUDIO_DEV_SQL_HOST_POLICY:-dynamic}}"
 if [[ -n "${STUDIO_ALLOWED_SQL_HOSTS:-}" ]]; then export STUDIO_ALLOWED_SQL_HOSTS; fi
-log "SQL host policy: $STUDIO_SQL_HOST_POLICY"
+export STUDIO_SQL_ALLOW_PRIVATE=true
+
+log "SQL host policy: $STUDIO_SQL_HOST_POLICY (private destinations: $STUDIO_SQL_ALLOW_PRIVATE)"
 [[ -n "${STUDIO_FERNET_KEY:-}" ]] || fail "STUDIO_FERNET_KEY belum ada di environment atau .env. Jangan buat key baru jika sudah ada koneksi tersimpan."
 
 if [[ -x ../.venv/bin/python ]]; then
