@@ -2,6 +2,10 @@
 import copy
 import uuid
 from app.connectors.sqlserver import validate_target
+from app.connectors.registry import get
+from app.connectors.sqlserver_adapter import install as install_sqlserver_adapter
+
+install_sqlserver_adapter()
 from app.services.studio_graph_preview import validate_graph_request
 
 NATIVE_BATCH_STEPS=frozenset(('filter','select','combine','replace','split','string','format','calculate','date','formula','query','constant','duplicate','alter','schema','json','limit','series','meta_select','order','mapper','deduplicate','expression_filter','group','window','pivot','unpivot','append','join','split_join','split_filter'))
@@ -32,6 +36,8 @@ def bind_run(owner,run_id,graph,definitions,target_resolver):
         if source['kind']=='fixed':sources.append(copy.deepcopy(source));continue
         metadata=approved[str(uuid.UUID(source['dataset_id']))]
         target=target_resolver(owner,metadata['connection_id'])
-        hostname,address=validate_target(target)
-        sources.append({'id':source['id'],'kind':'sqlserver','hostname':hostname,'address':address,'port':target.port,'database':target.database,'schema':metadata['source_schema'],'table':metadata['source_name'],'username':target.username,'password':target.password,'encrypt':target.encrypt,'trust_server_certificate':target.trust_server_certificate,'timeout':target.timeout})
+        # Existing metadata has no connector type; treat it as SQL Server.
+        # Future connector types must be explicitly stored and allowlisted.
+        kind=metadata.get('connector_type') or 'sqlserver'
+        sources.append(get(kind).bind_source(source,metadata,target,validate_target))
     return {'run_id':run_id,'sources':sources,'nodes':copy.deepcopy(graph['nodes']),'outputs':copy.deepcopy(graph['outputs'])}
