@@ -35,7 +35,9 @@ export async function loadDatasetCatalog(signal?:AbortSignal):Promise<{items:Cat
   const [direct,outputs]=await Promise.allSettled([get('datasets',signal),get('pipelines/outputs',signal)]);
   for (const result of [direct,outputs]) if(result.status==='rejected' && /AUTH_REQUIRED|DATA_STUDIO_FORBIDDEN/.test(String(result.reason))) throw result.reason;
   if (direct.status==='rejected' && outputs.status==='rejected') throw Error('DATASET_METADATA_UNAVAILABLE');
-  const items:CatalogDataset[]=direct.status==='fulfilled' ? direct.value.filter((item:CatalogDataset)=>item.access_mode==='DIRECT').map((item:CatalogDataset)=>({...item,dataset_id:item.dataset_id.toLowerCase()})):[];
+  const items:CatalogDataset[]=direct.status==='fulfilled' ? direct.value
+    .filter((item:CatalogDataset)=>String(item.access_mode||'DIRECT').trim().toUpperCase()!=='STORED')
+    .map((item:CatalogDataset)=>({...item,access_mode:String(item.access_mode||'DIRECT').trim().toUpperCase(),dataset_id:item.dataset_id.toLowerCase()})):[];
   if (outputs.status==='fulfilled') items.push(...parquetDatasets(outputs.value));
   const notices=[];
   if (direct.status==='rejected') notices.push('Daftar sumber Direct belum dapat dimuat.');

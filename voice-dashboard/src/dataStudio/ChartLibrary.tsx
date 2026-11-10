@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { loadDatasetCatalog, parquetPreviewUrl } from './datasetCatalog';
 import type { CatalogDataset } from './datasetCatalog';
 import { SharedChart } from './visualization/SharedChart';
+import { Chart3DFullscreen, isChart3DSupported } from './chart3d/Chart3DFullscreen';
 import { CHART_KINDS, emptyConfig, defaultChartProperties } from './visualization/chartTypes';
 import type {
   ChartConfig,
@@ -27,11 +29,30 @@ const OPERATORS: Array<{ value: ChartFilterOperator; label: string }> = [
 ];
 
 const CHART_GROUPS: Array<{ name: string; kinds: ChartKind[] }> = [
-  { name: 'Perbandingan', kinds: ['column', 'bar', 'grouped', 'stacked'] },
-  { name: 'Tren', kinds: ['line', 'area', 'composed', 'lollipop', 'waterfall'] },
-  { name: 'Komposisi', kinds: ['pie', 'donut', 'treemap', 'waffle', 'funnel'] },
-  { name: 'Ringkasan', kinds: ['kpi', 'table', 'radial', 'bullet'] },
+  { name: 'Besaran & Peringkat', kinds: ['column', 'bar', 'grouped', 'lollipop', 'pareto'] },
+  { name: 'Perjalanan Nilai', kinds: ['line', 'step', 'area', 'cumulative_line', 'cumulative_bar', 'variance', 'waterfall'] },
+  { name: 'Profil & Perbandingan', kinds: ['radar', 'slope', 'combo', 'composed'] },
+  { name: 'Bagian & Komposisi', kinds: ['stacked', 'pie', 'donut', 'stacked100', 'area100', 'treemap', 'waffle', 'funnel'] },
+  { name: 'Intensitas & Detail', kinds: ['heatmap', 'table'] },
+  { name: 'Indikator & Target', kinds: ['kpi', 'radial', 'bullet', 'progress'] },
 ];
+const ORDERED_CHARTS: ChartKind[] = ['cumulative_line', 'cumulative_bar', 'variance', 'slope'];
+const ANALYTICAL_CHARTS: ChartKind[] = [...ORDERED_CHARTS, 'combo', 'progress'];
+
+const CHART_HINTS: Partial<Record<ChartKind, string>> = {
+  stacked100: 'Pilih Category dan Series. Nilai non-negatif dinormalisasi menjadi 100% per kategori dari series hasil query (Top N).',
+  area100: 'Pilih Category dan Series. Persentase area dihitung per kategori dari series hasil query (Top N); gunakan urutan kategori untuk tren.',
+  heatmap: 'Category menjadi kolom, Series menjadi baris, dan Value menentukan intensitas warna. Sel tanpa nilai dibedakan dari nilai nol.',
+  radar: 'Gunakan sedikitnya 3 kategori dengan nilai non-negatif. Series opsional untuk membandingkan beberapa profil.',
+  pareto: 'Kategori diurutkan dari nilai terbesar. Persentase kumulatif memakai kategori hasil query (Top N), bukan total seluruh dataset.',
+  step: 'Menampilkan perubahan bertahap. Untuk kategori waktu, pilih urutan Kategori A–Z.',
+  cumulative_line: 'Akumulasi per Series mengikuti kategori A–Z pada hasil query (Top N), bukan saldo awal atau total historis. Gunakan kategori tanggal ISO untuk urutan waktu.',
+  cumulative_bar: 'Batang menunjukkan total berjalan per Series pada kategori hasil query (Top N). Orientasi dapat diatur pada Variasi Analitik.',
+  variance: 'Perubahan dihitung terhadap kategori sebelumnya pada hasil query, bukan varians statistik. Pilih selisih angka atau persentase pada Variasi Analitik.',
+  slope: 'Bandingkan dua kategori ujung dari hasil query. Series opsional untuk membandingkan profil; pilih kategori awal dan akhir pada Variasi Analitik.',
+  combo: 'Pilih Series dengan sedikitnya dua kelompok. Satu kelompok ditampilkan sebagai garis dan kelompok lainnya sebagai batang, menggunakan measure dan skala yang sama.',
+  progress: 'Pencapaian per kategori dibandingkan dengan target eksplisit. Isi target positif pada Variasi Analitik; persentase di atas 100% tetap ditampilkan.',
+};
 
 const SORT_OPTIONS: Array<{ value: ChartConfig['sort']; label: string }> = [
   { value: 'value_desc', label: 'Nilai terbesar' },
@@ -132,6 +153,18 @@ function ChartThumbnail({ kind }: { kind: ChartKind }) {
           <text x="32" y="26" fill="#53B7DC" textAnchor="middle" fontSize="18" fontWeight="700">123</text>
         </>
       )}
+      {kind === 'stacked100' && [8, 22, 36, 50].map((x, i) => <g key={x}><rect x={x} y="5" width="8" height="32" fill="#53B7DC" /><rect x={x} y={5 + [12, 20, 8, 16][i]} width="8" height={32 - [12, 20, 8, 16][i]} fill="#E5B35A" /></g>)}
+      {kind === 'area100' && <><path d="M5 5H59V37H5Z" fill="#a991ed" /><path d="M5 15 18 23 32 18 46 25 59 15V37H5Z" fill="#53B7DC" /><path d="M5 28 18 30 32 25 46 32 59 27V37H5Z" fill="#4CC79F" /></>}
+      {kind === 'heatmap' && Array.from({ length: 24 }, (_, i) => <rect key={i} x={5 + i % 6 * 9} y={4 + Math.floor(i / 6) * 9} width="8" height="8" rx="1" fill="#53B7DC" opacity={.2 + (i * 7 % 5) * .18} />)}
+      {kind === 'radar' && <><path d="M32 3 50 16 43 36 21 36 14 16Z" stroke="currentColor" opacity=".3" /><path d="M32 3V21M50 16 32 21 43 36M21 36 32 21 14 16" stroke="currentColor" opacity=".2" /><path d="M32 7 45 17 37 30 24 32 20 17Z" fill="#53B7DC" fillOpacity=".3" stroke="#53B7DC" strokeWidth="2" /><path d="M32 13 41 18 40 32 27 28 16 17Z" stroke="#E5B35A" strokeWidth="1.5" /></>}
+      {kind === 'pareto' && <><path d="M4 37H60" stroke="currentColor" opacity=".22" />{[28, 20, 12, 5].map((h, i) => <rect key={i} x={7 + i * 14} y={37 - h} width="9" height={h} fill="#53B7DC" />)}<path d="M11 26 25 17 39 9 53 5" stroke="#E5B35A" strokeWidth="2.5" strokeLinejoin="round" /></>}
+      {kind === 'step' && <><path d="M5 37H59" stroke="currentColor" opacity=".22" /><path d="M5 34H18V26H31V30H44V12H58" stroke="#53B7DC" strokeWidth="3" strokeLinejoin="round" /></>}
+      {kind === 'cumulative_line' && <><path d="M6 35H59" stroke="currentColor" opacity=".2" /><path d="M8 32 20 28 33 20 46 16 58 6" stroke="#53B7DC" strokeWidth="2.5" strokeLinecap="round" />{[[8,32],[20,28],[33,20],[46,16],[58,6]].map(([x,y],i) => <circle key={i} cx={x} cy={y} r="2.5" fill="#4CC79F" />)}<text x="8" y="15" fill="#E5B35A" fontSize="12">Σ</text></>}
+      {kind === 'cumulative_bar' && <><path d="M5 37H59" stroke="currentColor" opacity=".2" />{[8,14,23,31].map((h,i) => <rect key={i} x={8+i*13} y={37-h} width="9" height={h} rx="2" fill="#53B7DC" opacity={.45+i*.18} />)}<path d="M8 24V18H18" stroke="#E5B35A" strokeWidth="2" /></>}
+      {kind === 'variance' && <><path d="M5 21H59" stroke="currentColor" opacity=".35" /><rect x="9" y="8" width="9" height="13" rx="2" fill="#4CC79F" /><rect x="22" y="21" width="9" height="11" rx="2" fill="#E5B35A" /><rect x="35" y="4" width="9" height="17" rx="2" fill="#4CC79F" /><rect x="48" y="21" width="9" height="6" rx="2" fill="#E5B35A" /></>}
+      {kind === 'slope' && <><path d="M12 5V37M52 5V37" stroke="currentColor" opacity=".2" />{[[9,29,'#53B7DC'],[21,10,'#4CC79F'],[34,18,'#E5B35A']].map(([a,b,color],i) => <g key={i}><path d={`M12 ${a}L52 ${b}`} stroke={String(color)} strokeWidth="2" /><circle cx="12" cy={a} r="3" fill={String(color)} /><circle cx="52" cy={b} r="3" fill={String(color)} /></g>)}</>}
+      {kind === 'combo' && <><path d="M5 37H59" stroke="currentColor" opacity=".2" />{[14,25,19,29].map((h,i) => <rect key={i} x={8+i*13} y={37-h} width="8" height={h} rx="2" fill="#53B7DC" opacity=".7" />)}<path d="M12 12 25 23 38 8 51 16" stroke="#4CC79F" strokeWidth="2.5" />{[[12,12],[25,23],[38,8],[51,16]].map(([x,y],i) => <circle key={i} cx={x} cy={y} r="2.5" fill="#4CC79F" />)}</>}
+      {kind === 'progress' && <>{[8,20,32].map((y,i) => <g key={y}><rect x="6" y={y} width="51" height="6" rx="3" fill="currentColor" opacity=".12" /><rect x="6" y={y} width={[38,24,48][i]} height="6" rx="3" fill="#4CC79F" /><path d={`M47 ${y-2}V${y+8}`} stroke="#E5B35A" strokeWidth="1.5" /></g>)}</>}
       {kind === 'waterfall' && <><rect x="7" y="24" width="10" height="13" fill="#53B7DC"/><rect x="21" y="14" width="10" height="10" fill="#4CC79F"/><rect x="35" y="20" width="10" height="7" fill="#E5B35A"/><rect x="49" y="9" width="10" height="18" fill="#53B7DC"/><path d="M17 24H21M31 14H35M45 20H49" stroke="currentColor" opacity=".5"/></>}
       {kind === 'waffle' && Array.from({length:40},(_,i)=><rect key={i} x={5+(i%10)*5.5} y={5+Math.floor(i/10)*9} width="4.5" height="7" rx=".6" fill={i<25?'#53B7DC':i<34?'#E5B35A':'#4CC79F'}/>)}
       {kind === 'funnel' && <><path d="M4 5H60L51 15H13Z" fill="#53B7DC"/><path d="M13 18H51L44 28H20Z" fill="#a991ed"/><path d="M20 31H44L39 39H25Z" fill="#4CC79F"/></>}
@@ -154,6 +187,8 @@ function FieldBadge({ numeric }: { numeric: boolean }) {
 export default function ChartLibrary() {
   const [catalog, setCatalog] = useState<CatalogDataset[]>([]);
   const [charts, setCharts] = useState<SavedChart[]>([]);
+  const [libraryLoading, setLibraryLoading] = useState(true);
+  const [catalogNotices, setCatalogNotices] = useState<string[]>([]);
   const [chartId, setChartId] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const [name, setName] = useState('Chart baru');
@@ -172,31 +207,50 @@ export default function ChartLibrary() {
   const [showSettings, setShowSettings] = useState(true);
   const [showChartTypes, setShowChartTypes] = useState(true);
   const [fullCanvas, setFullCanvas] = useState(false);
+  const [fullscreenView, setFullscreenView] = useState<'2d' | '3d'>('2d');
   const [dragged, setDragged] = useState('');
   const [activeTools, setActiveTools] = useState<'filter' | 'properties'>('filter');
   const [propertyTab, setPropertyTab] = useState('General');
   const props = { ...defaultChartProperties(), ...config.properties };
-  // Visual properties do not change the aggregate query. Changing chart type,
-  // fields, filters, sort or dataset does. Preserve existing query API contract.
-  const querySpec = useMemo(() => (({ properties: _properties, ...query }) => query)(config), [config]);
+  // Progress requires its explicit target during query validation.
+  const querySpec = useMemo(() => {
+    const { properties, ...query } = config;
+    return config.chart_type === 'progress'
+      ? { ...query, properties: { gaugeTarget: properties?.gaugeTarget ?? 0 } }
+      : query;
+  }, [config]);
   const signature = JSON.stringify(querySpec);
   const ready = Boolean(config.dataset_id && (config.chart_type === 'kpi' || config.dimension)
     && (config.aggregation === 'count' || config.measure)
-    && (!['grouped','stacked'].includes(config.chart_type) || config.series)
-    && (!['pie','donut','kpi'].includes(config.chart_type) || !config.series)
+    && (!['grouped','stacked','stacked100','area100','heatmap','combo'].includes(config.chart_type) || config.series)
+    && (!['pie','donut','kpi','pareto','progress'].includes(config.chart_type) || !config.series)
+    && (config.chart_type !== 'pareto' || config.sort === 'value_desc')
+    && (!ORDERED_CHARTS.includes(config.chart_type) || config.sort === 'dimension_asc')
+    && (config.chart_type !== 'progress' || props.gaugeTarget > 0)
     && (!config.series || config.series !== config.dimension)
     && columns.length > 0
     && (!config.dimension || columns.some(c => c.name === config.dimension))
     && (!config.measure || columns.some(c => c.name === config.measure))
     && (!config.series || columns.some(c => c.name === config.series)));
   const validResults = ready && querySignature === signature ? results : null;
+  const resultSeries = Array.from(new Set(validResults?.rows.map(row => row.series).filter((value): value is string => Boolean(value))));
+  const resultCategories = Array.from(new Set(validResults?.rows.map(row => row.dimension)));
   const updateProp = <K extends keyof ChartProperties>(key: K, value: ChartProperties[K]) => {
     setConfig(old => ({ ...old, properties: { ...defaultChartProperties(), ...old.properties, [key]: value } }));
   };
+  const chooseFullscreenView = (view: '2d' | '3d') => {
+    setFullscreenView(view);
+    updateProp('fullscreen3d', view === '3d');
+  };
   const toggle = (key: keyof ChartProperties, label: string) => <label className="ca-chart-prop-check"><span>{label}</span><input type="checkbox" checked={Boolean(props[key])} onChange={e => updateProp(key, e.target.checked as never)} /></label>;
   const textField = (key: keyof ChartProperties, label: string) => <label className="ca-chart-setting-control"><span>{label}</span><input maxLength={100} value={String(props[key])} onChange={e => updateProp(key, e.target.value as never)} /></label>;
-  const numberField = (key: keyof ChartProperties, label: string, min: number, max: number) => <label className="ca-chart-setting-control"><span>{label}</span><input type="number" min={min} max={max} value={Number(props[key])} onChange={e => updateProp(key, Math.max(min,Math.min(max,Number(e.target.value)||min)) as never)} /></label>;
+  const numberField = (key: keyof ChartProperties, label: string, min: number, max: number) => <label className="ca-chart-setting-control"><span>{label}</span><input type="number" min={min} max={max} value={Number(props[key])} onChange={e => updateProp(key, Math.round(Math.max(min,Math.min(max,Number(e.target.value)||min))) as never)} /></label>;
   const choice = (key: keyof ChartProperties, label: string, choices: Array<[string | number,string]>) => <label className="ca-chart-setting-control"><span>{label}</span><select value={String(props[key])} onChange={e => updateProp(key, (typeof choices[0][0] === 'number' ? Number(e.target.value) : e.target.value) as never)}>{choices.map(([value,name]) => <option key={value} value={value}>{name}</option>)}</select></label>;
+  const chart3DReady = isChart3DSupported(config.chart_type);
+  useEffect(() => {
+    if (!fullCanvas) return;
+    setFullscreenView(props.fullscreen3d && chart3DReady ? '3d' : '2d');
+  }, [fullCanvas, props.fullscreen3d, chart3DReady]);
   const chartRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
   const datasetPickerRef = useRef<HTMLSelectElement>(null);
@@ -207,9 +261,15 @@ export default function ChartLibrary() {
       api<SavedChart[]>('', 'GET', undefined, signal),
     ]);
     if (signal?.aborted) return;
-    if (datasets.status === 'fulfilled') setCatalog(datasets.value.items);
+    if (datasets.status === 'fulfilled') {
+      setCatalog(datasets.value.items);
+      setCatalogNotices(datasets.value.notices);
+    }
     if (saved.status === 'fulfilled') setCharts(saved.value);
-    if (datasets.status === 'rejected') setError('Katalog dataset belum tersedia.');
+    if (datasets.status === 'rejected') {
+      setCatalogNotices([]);
+      setError('Katalog dataset belum tersedia.');
+    }
     if (saved.status === 'rejected') {
       setError('Chart API belum siap. Periksa route dan migrasi database Chart Library.');
     }
@@ -217,7 +277,9 @@ export default function ChartLibrary() {
 
   useEffect(() => {
     const controller = new AbortController();
-    void reload(controller.signal);
+    void reload(controller.signal).finally(() => {
+      if (!controller.signal.aborted) setLibraryLoading(false);
+    });
     return () => controller.abort();
   }, [reload]);
 
@@ -226,8 +288,13 @@ export default function ChartLibrary() {
     const dismiss = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setFullCanvas(false);
     };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', dismiss);
-    return () => window.removeEventListener('keydown', dismiss);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', dismiss);
+    };
   }, [fullCanvas]);
 
   const numeric = useMemo(
@@ -267,8 +334,16 @@ export default function ChartLibrary() {
       ...previous,
       chart_type: kind,
       dimension: kind === 'kpi' ? '' : previous.dimension,
-      series: ['pie', 'donut', 'kpi'].includes(kind) ? '' : previous.series,
+      series: ['pie', 'donut', 'kpi', 'pareto', 'progress'].includes(kind) ? '' : previous.series,
+      sort: kind === 'pareto' ? 'value_desc' : ORDERED_CHARTS.includes(kind) ? 'dimension_asc' : previous.sort,
     }));
+    if (ANALYTICAL_CHARTS.includes(kind)) {
+      setActiveTools('properties');
+      setPropertyTab('Variasi Analitik');
+      setShowSettings(true);
+    } else if (propertyTab === 'Variasi Analitik') {
+      setPropertyTab('General');
+    }
     setResults(null);
     setMessage('');
   };
@@ -284,7 +359,7 @@ export default function ChartLibrary() {
     setConfig({
       ...emptyConfig(),
       dataset_id: id,
-      dataset_kind: row?.access_mode === 'DIRECT' ? 'DIRECT' : 'PARQUET',
+      dataset_kind: row?.access_mode === 'PARQUET' ? 'PARQUET' : 'DIRECT',
     });
     setResults(null);
     setColumns([]);
@@ -429,10 +504,15 @@ export default function ChartLibrary() {
       setChartId(saved.chart_id);
       setVersion(saved.version);
       setMessage('Chart berhasil tersimpan di Chart Library.');
+      setFullCanvas(false);
+      setChartSearch('');
+      setLibraryLoading(true);
+      setWorking('library');
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'CHART_SAVE_FAILED');
     } finally {
+      setLibraryLoading(false);
       setBusy(false);
     }
   };
@@ -457,6 +537,7 @@ export default function ChartLibrary() {
     const label = event.dataTransfer.getData('text/plain') || dragged;
     if (!columns.some(column => column.name === label)) return;
     if (field === 'measure' && !isNumeric(label)) return;
+    if (field === 'series' && ['pie', 'donut', 'kpi', 'pareto', 'progress'].includes(config.chart_type)) return;
     setField(field, label);
     setDragged('');
   };
@@ -479,6 +560,68 @@ export default function ChartLibrary() {
     setShowTable(true);
     window.requestAnimationFrame(() => tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
   };
+
+  const plotPanel = (
+    <div ref={chartRef} className={`ca-chart-plot${fullCanvas ? ' is-fullscreen' : ''}`}>
+      <div className="ca-chart-plot-heading">
+        <div>
+          <span className="ca-chart-section-eyebrow">CHART PREVIEW</span>
+          {props.showTitle && <h2>{name.trim() || 'Untitled Chart'}</h2>}
+          <small>{activeDataset?.dataset_name || 'Pilih dataset'} · {chartLabel}</small>
+        </div>
+        {!fullCanvas && (
+          <div className="ca-chart-plot-actions">
+            {chart3DReady && (
+              <button
+                type="button"
+                className={`ca-chart-3d-quick${props.fullscreen3d ? ' is-active' : ''}`}
+                aria-pressed={props.fullscreen3d}
+                title="Tampilkan versi 3D saat fullscreen"
+                onClick={() => updateProp('fullscreen3d', !props.fullscreen3d)}
+              >3D</button>
+            )}
+            <button
+              type="button"
+              className="ca-chart-maximize"
+              aria-label="Layar penuh grafik"
+              onClick={() => setFullCanvas(true)}
+            >
+              ⛶ Fullscreen
+            </button>
+          </div>
+        )}
+      </div>
+      {fullCanvas && (
+        <div className="ca-chart-fullscreen-actions">
+          {chart3DReady && (
+            <div className="ca-chart-view-toggle" role="group" aria-label="Mode tampilan">
+              <button type="button" className={fullscreenView === '2d' ? 'is-selected' : ''} aria-pressed={fullscreenView === '2d'} onClick={() => chooseFullscreenView('2d')}>2D</button>
+              <button type="button" className={fullscreenView === '3d' ? 'is-selected' : ''} aria-pressed={fullscreenView === '3d'} onClick={() => chooseFullscreenView('3d')}>3D</button>
+            </div>
+          )}
+          <button
+            type="button"
+            className="ca-chart-maximize"
+            aria-label="Kembali dari fullscreen"
+            onClick={() => setFullCanvas(false)}
+          >
+            ↙ Kembali
+          </button>
+        </div>
+      )}
+      <div className="ca-chart-canvas ca-chart-preview-container" aria-busy={queryBusy}>
+        {validResults && (fullCanvas && fullscreenView === '3d' && chart3DReady
+          ? <Chart3DFullscreen kind={config.chart_type} rows={validResults.rows} title={name} height={Math.max(540, props.chartHeight)} properties={props} />
+          : <SharedChart kind={config.chart_type} rows={validResults.rows} title={name} height={fullCanvas ? Math.max(540, props.chartHeight) : props.chartHeight} properties={props} />)}
+        {!validResults && !queryBusy && <div className="chart-empty">{ready ? 'Menyiapkan preview otomatis…' : 'Pilih dataset dan lengkapi field grafik.'}</div>}
+        {queryBusy && <div className="ca-chart-loading-overlay" role="status"><span className="ca-chart-spinner ca-chart-spinner-large" /><strong>Memproses data grafik</strong><small>Agregasi seluruh dataset sedang berjalan…</small></div>}
+      </div>
+      <div className="ca-chart-plot-foot">
+        <span>{validResults ? `${validResults.rows.length} baris hasil agregasi` : queryBusy ? 'Sedang mengambil data…' : 'Preview otomatis'}</span>
+        <span>{validResults ? (validResults.is_sample ? 'Sample' : 'Full dataset aggregation') : 'Recharts · auto preview'}{validResults && fullCanvas && fullscreenView === '3d' && chart3DReady ? ' · WebGL 3D' : ''}</span>
+      </div>
+    </div>
+  );
 
   return (
     <section className={`ca-chart-library${working === 'analyzer' ? ' is-analyzer' : ''}`}>
@@ -504,7 +647,7 @@ export default function ChartLibrary() {
         </div>
       </header>
 
-      {error && <p role="alert" className="ca-chart-error">{error}</p>}
+      {!libraryLoading && error && <p role="alert" className="ca-chart-error">{error}</p>}
       {message && <p role="status" className="ca-chart-message">{message}</p>}
 
       {working === 'library' ? (
@@ -524,14 +667,21 @@ export default function ChartLibrary() {
               />
             </label>
           </div>
-          {visibleCharts.length ? (
+          {catalogNotices.map(notice => <p key={notice} className="ca-chart-catalog-notice" role="status">{notice}</p>)}
+          {libraryLoading ? (
+            <div className="ca-chart-empty ca-chart-library-empty" role="status" aria-live="polite">
+              <span className="ca-chart-spinner ca-chart-spinner-large" />
+              <h3>Memuat Chart Library…</h3>
+              <p>Mengambil chart tersimpan dan katalog dataset.</p>
+            </div>
+          ) : visibleCharts.length ? (
             <div className="ca-chart-list">
               {visibleCharts.map(chart => (
                 <article key={chart.chart_id} className="ca-chart-card">
                   <div className="ca-chart-card-icon"><ChartThumbnail kind={chart.config.chart_type} /></div>
                   <div className="ca-chart-card-copy">
                     <strong>{chart.name}</strong>
-                    <small>{chart.config.chart_type} · {chart.config.dataset_kind} · V{chart.version}</small>
+                    <small>{CHART_KINDS.find(kind => kind.value === chart.config.chart_type)?.name || chart.config.chart_type} · {chart.config.dataset_kind} · V{chart.version}</small>
                   </div>
                   <div className="ca-chart-card-actions">
                     <button type="button" onClick={() => void openSaved(chart.chart_id)}>Buka Analyzer</button>
@@ -605,8 +755,8 @@ export default function ChartLibrary() {
             </label>
             <label className={`ca-chart-data-slot${config.series ? ' is-filled' : ''}`} onDragOver={event => event.preventDefault()} onDrop={dropField('series')}>
               <span>SERIES</span>
-              <select value={config.series} onChange={event => setField('series', event.target.value)} aria-label="Series">
-                <option value="">Tanpa series</option>
+              <select value={config.series} disabled={['pie', 'donut', 'kpi', 'pareto', 'progress'].includes(config.chart_type)} onChange={event => setField('series', event.target.value)} aria-label="Series">
+                <option value="">{['grouped', 'stacked', 'stacked100', 'area100', 'heatmap', 'combo'].includes(config.chart_type) ? 'Pilih series (wajib)' : 'Tanpa series'}</option>
                 {columns.filter(column => column.name !== config.dimension).map(column => (
                   <option key={column.name} value={column.name}>{column.name}</option>
                 ))}
@@ -618,6 +768,7 @@ export default function ChartLibrary() {
             </div>
           </div>
 
+          {CHART_HINTS[config.chart_type] && <p className="ca-chart-kind-hint">{CHART_HINTS[config.chart_type]}</p>}
           <div className={`ca-chart-body${showSettings ? '' : ' hide-settings'}${showChartTypes ? '' : ' hide-types'}`}>
             <aside className="ca-chart-fields" aria-label="Daftar kolom dataset">
               <div className="ca-chart-pane-heading">
@@ -626,15 +777,16 @@ export default function ChartLibrary() {
               </div>
               <label className="ca-chart-dataset-picker">
                 <span className="ca-chart-sr-only">Pilih dataset</span>
-                <select ref={datasetPickerRef} value={config.dataset_id} onChange={event => chooseDataset(event.target.value)}>
-                  <option value="">Pilih dataset</option>
+                <select ref={datasetPickerRef} value={config.dataset_id} disabled={libraryLoading} onChange={event => chooseDataset(event.target.value)}>
+                  <option value="">{libraryLoading ? 'Memuat dataset…' : 'Pilih dataset'}</option>
                   {catalog.map(dataset => (
                     <option key={dataset.dataset_id} value={dataset.dataset_id}>
-                      {dataset.dataset_name} · {dataset.access_mode === 'DIRECT' ? 'DIRECT' : 'PARQUET'}
+                      {dataset.dataset_name} · {dataset.access_mode === 'PARQUET' ? 'PARQUET' : 'DIRECT'}
                     </option>
                   ))}
                 </select>
               </label>
+              {catalogNotices.map(notice => <small key={notice} className="ca-chart-dataset-note" role="status">{notice}</small>)}
               {activeDataset && <small className="ca-chart-dataset-name" title={activeDataset.dataset_name}>{activeDataset.dataset_name}</small>}
               <div className="ca-chart-field-tabs" aria-label="Tab kolom"><strong>Columns</strong><span>{columns.length} fields</span></div>
               <label className="ca-chart-field-search">
@@ -722,7 +874,7 @@ export default function ChartLibrary() {
                       <div className="ca-chart-setting-heading"><strong>Sorting</strong></div>
                       <label className="ca-chart-setting-control">
                         <span>Urutan grafik</span>
-                        <select value={config.sort} onChange={event => setField('sort', event.target.value as ChartConfig['sort'])}>
+                        <select value={config.sort} disabled={config.chart_type === 'pareto' || ORDERED_CHARTS.includes(config.chart_type)} onChange={event => setField('sort', event.target.value as ChartConfig['sort'])}>
                           {SORT_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
                         </select>
                       </label>
@@ -748,11 +900,47 @@ export default function ChartLibrary() {
                     </div>
                     <div className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Chart Properties</strong><button type="button" onClick={() => updateProp('showGrid', true)}>Reset grid</button></div>
-                      <div className="ca-chart-property-tabs">{['General','Axes & Grid','Hover Text','Number Format','Legend & Labels','Full Size'].map(tab => <button type="button" key={tab} className={propertyTab === tab ? 'is-selected' : ''} onClick={() => setPropertyTab(tab)}>{tab} ›</button>)}</div>
+                      <div className="ca-chart-property-tabs">{['General', ...(ANALYTICAL_CHARTS.includes(config.chart_type) ? ['Variasi Analitik'] : []), 'Axes & Grid','Hover Text','Number Format','Legend & Labels','Full Size','Layar Penuh 3D'].map(tab => <button type="button" key={tab} className={propertyTab === tab ? 'is-selected' : ''} onClick={() => setPropertyTab(tab)}>{tab} ›</button>)}</div>
                       <div className="ca-chart-property-controls">
                         {propertyTab === 'General' && <>
                           {toggle('showTitle','Tampilkan judul')}{choice('colorDirection','Arah warna',[['normal','Normal'],['reverse','Reverse']])}
                           {textField('noDataMessage','Pesan tanpa data')}{numberField('fontSize','Ukuran font',9,20)}
+                        </>}
+                        {propertyTab === 'Variasi Analitik' && <>
+                          {['cumulative_bar', 'variance'].includes(config.chart_type) && choice('orientation', 'Orientasi batang', [['vertical', 'Tegak'], ['horizontal', 'Mendatar']])}
+                          {['cumulative_line', 'combo'].includes(config.chart_type) && <>
+                            {choice('trendStyle', 'Bentuk garis', [['linear', 'Lurus'], ['smooth', 'Halus'], ['step', 'Bertahap']])}
+                            {toggle('trendMarkers', 'Penanda titik')}
+                          </>}
+                          {config.chart_type === 'variance' && <>
+                            {choice('varianceMode', 'Perubahan nilai', [['absolute', 'Selisih angka'], ['percent', 'Persentase perubahan']])}
+                            <small>Kategori pertama tidak memiliki pembanding. Persentase tidak dihitung jika nilai sebelumnya nol atau kosong.</small>
+                          </>}
+                          {config.chart_type === 'combo' && <>
+                            <label className="ca-chart-setting-control"><span>Kelompok untuk garis</span>
+                              <select value={props.comboLineSeries} disabled={!validResults} onChange={event => updateProp('comboLineSeries', event.target.value)}>
+                                <option value="">Otomatis: kelompok terakhir</option>
+                                {props.comboLineSeries && !resultSeries.includes(props.comboLineSeries) && <option value={props.comboLineSeries}>Tidak ada dalam hasil: {props.comboLineSeries}</option>}
+                                {resultSeries.map(series => <option key={series} value={series}>{series}</option>)}
+                              </select>
+                            </label>
+                            <small>Semua kelompok memakai measure, agregasi, dan skala yang sama. Kelompok selain garis menjadi batang.</small>
+                          </>}
+                          {config.chart_type === 'slope' && <>
+                            {(['slopeStart', 'slopeEnd'] as const).map(key => <label key={key} className="ca-chart-setting-control"><span>{key === 'slopeStart' ? 'Kategori awal' : 'Kategori akhir'}</span>
+                              <select value={props[key]} disabled={!validResults} onChange={event => updateProp(key, event.target.value)}>
+                                <option value="">{key === 'slopeStart' ? 'Kategori pertama pada hasil' : 'Kategori terakhir pada hasil'}</option>
+                                {props[key] && !resultCategories.includes(props[key]) && <option value={props[key]}>Tidak ada dalam hasil: {props[key]}</option>}
+                                {resultCategories.map(category => <option key={category} value={category}>{category}</option>)}
+                              </select>
+                            </label>)}
+                            <small>Hanya Series yang mempunyai nilai pada kedua kategori yang dibandingkan; pilih dua kategori berbeda.</small>
+                          </>}
+                          {config.chart_type === 'progress' && <>
+                            {numberField('gaugeTarget', 'Target per kategori (wajib > 0)', 0, 1000000000)}
+                            <small>Target menggunakan satuan nilai asli, sebelum pembagian format angka. Tidak ada target otomatis.</small>
+                          </>}
+                          {ORDERED_CHARTS.includes(config.chart_type) && <small>Urutan kategori dikunci A–Z. Analisis hanya mencakup kategori dan Series hasil query (Top N).</small>}
                         </>}
                         {propertyTab === 'Axes & Grid' && <>
                           {toggle('showXAxis','Sumbu X')}{toggle('showYAxis','Sumbu Y')}{toggle('showGrid','Grid')}
@@ -773,7 +961,12 @@ export default function ChartLibrary() {
                           {choice('legendPosition','Posisi legend',[['top','Atas'],['bottom','Bawah']])}
                         </>}
                         {propertyTab === 'Full Size' && <>
-                          {numberField('chartHeight','Tinggi grafik',260,900)}{numberField('gaugeTarget','Target Gauge (0 = skala otomatis)',0,1000000000)}{numberField('fontSize','Ukuran font',9,20)}
+                          {numberField('chartHeight','Tinggi grafik',260,900)}{numberField('gaugeTarget',config.chart_type === 'progress' ? 'Target per kategori (wajib > 0)' : 'Target Gauge (0 = skala otomatis)',0,1000000000)}{numberField('fontSize','Ukuran font',9,20)}
+                        </>}
+                        {propertyTab === 'Layar Penuh 3D' && <>
+                          {toggle('fullscreen3d','Tampilkan versi 3D saat fullscreen')}
+                          <small className="ca-chart-3d-note">Chart yang sama tetap 2D di panel ini dan otomatis menjadi 3D ketika dibuka layar penuh. Tombol 3D di samping Fullscreen juga bisa dipakai untuk mengaktifkannya.</small>
+                          {!chart3DReady && <small className="ca-chart-3d-note">Jenis grafik ini belum punya tampilan 3D, sehingga tetap 2D saat fullscreen.</small>}
                         </>}
                       </div>
                     </div>
@@ -783,33 +976,12 @@ export default function ChartLibrary() {
             )}
 
             <main className="ca-chart-main">
-              <div ref={chartRef} className={`ca-chart-plot${fullCanvas ? ' is-fullscreen' : ''}`}>
-                <div className="ca-chart-plot-heading">
-                  <div>
-                    <span className="ca-chart-section-eyebrow">CHART PREVIEW</span>
-                    {props.showTitle && <h2>{name.trim() || 'Untitled Chart'}</h2>}
-                    <small>{activeDataset?.dataset_name || 'Pilih dataset'} · {chartLabel}</small>
-                  </div>
-                  <button
-                    type="button"
-                    className="ca-chart-maximize"
-                    aria-label={fullCanvas ? 'Kembali dari fullscreen' : 'Layar penuh grafik'}
-                    onClick={() => setFullCanvas(value => !value)}
-                  >
-                    {fullCanvas ? '↙ Kembali' : '⛶ Fullscreen'}
-                  </button>
-                </div>
-                <div className="ca-chart-canvas ca-chart-preview-container" aria-busy={queryBusy}>
-                  {validResults && <SharedChart kind={config.chart_type} rows={validResults.rows} title={name} height={fullCanvas ? Math.max(540, props.chartHeight) : props.chartHeight} properties={props} />}
-                  {!validResults && !queryBusy && <div className="chart-empty">{ready ? 'Menyiapkan preview otomatis…' : 'Pilih dataset dan lengkapi field grafik.'}</div>}
-                  {queryBusy && <div className="ca-chart-loading-overlay" role="status"><span className="ca-chart-spinner ca-chart-spinner-large" /><strong>Memproses data grafik</strong><small>Agregasi seluruh dataset sedang berjalan…</small></div>}
-                </div>
-                <div className="ca-chart-plot-foot">
-                  <span>{validResults ? `${validResults.rows.length} baris hasil agregasi` : queryBusy ? 'Sedang mengambil data…' : 'Preview otomatis'}</span>
-                  <span>{validResults ? (validResults.is_sample ? 'Sample' : 'Full dataset aggregation') : 'Recharts · auto preview'}</span>
-                </div>
-              </div>
+              {!fullCanvas && plotPanel}
             </main>
+            {fullCanvas && createPortal(
+              <div className="ca-chart-library ca-chart-fullscreen-portal">{plotPanel}</div>,
+              document.body,
+            )}
 
             {showChartTypes && (
               <aside className="ca-chart-types" aria-label="Galeri jenis grafik">

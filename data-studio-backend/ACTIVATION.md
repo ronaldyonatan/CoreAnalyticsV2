@@ -159,3 +159,31 @@ Hasil pemeriksaan pengguna untuk run `3f5602c0-431c-4c29-bbb6-3cd95c59658e` menu
 `012_register_existing_output.sql` adalah pemulihan metadata manual khusus run tersebut setelah `011`. Script memeriksa transaksi kosong, status FAILED dengan error registrasi yang tepat, tidak ada pembatalan/metadata output existing, graph versi dan payload manifest cocok, serta path canonical. Insert metadata dan perubahan status SUCCEEDED berada dalam satu transaksi; kegagalan rollback. Run yang sudah SUCCEEDED tidak diubah. Data source, owner, graph, versi, dan Parquet tidak diubah; tidak ada Spark retry atau DELETE.
 
 File pemulihan disiapkan dari manifest aktual dengan SHA-256 pada komentar; `_SUCCESS` dan part Parquet diperiksa saat persiapan. Script SQL belum dieksekusi oleh Codex. Operator perlu memastikan file masih ada lalu menjalankan file penuh melalui SSMS pada CoreAnalytics. Pengujian SQL hanya-baca untuk valid/traversal/path lain/trailing whitespace tersedia pada `checks/output_path_regression.sql`.
+
+
+## Chart Library (Phase B): metadata simpan/buka bagan
+
+Gejala `CHART_METADATA_UNAVAILABLE` bukan kegagalan preview Direct/Parquet. Backend memakai Mode BEAM `CoreStudioCharts`, tetapi mode tersebut belum memiliki handler di SQL dan `spDashboard` tidak meneruskannya, sehingga BEAM tidak mengembalikan rowset. Akibatnya List saat halaman dimuat dan Save sama-sama gagal. Preview bagan tetap berjalan melalui endpoint terpisah.
+
+Tidak ada database baru dan tidak ada perubahan pada Direct SQL, Parquet reader, pipeline, dashboard, atau otorisasi pengguna/grup. Metadata disimpan di SQL Server `CoreAnalytics` yang sudah dipakai, dengan scope pemilik dan versi optimistik.
+
+### Urutan penerapan (dijalankan operator melalui SSMS)
+
+1. `migrations/013_create_studio_chart.sql` di database `CoreAnalytics`: menambah tabel `studio.chart`, index `IX_studio_chart_owner_updated`, dan procedure `studio.spChartControl` (Action List/Get/Save/Delete). File bersifat aditif; tidak mengubah objek pipeline.
+2. Tinjau dulu `migrations/014_alter_spDashboard_chart.sql`. File membaca definisi live `dbo.spDashboard` melalui `OBJECT_DEFINITION`, berhenti bila definisi tidak terbaca, bila `013` belum terpasang, atau bila branch `CoreStudioCharts` sudah ada. Hanya satu anchor `IF @Mode = 'CoreStudioPipelines'` yang diterima; branch chart disisipkan tepat sebelum anchor tersebut dan seluruh body lain dipertahankan. Jalankan dengan `@PreviewOnly = 1` untuk mencetak definisi usulan tanpa mengubah procedure, lalu jalankan dengan `@PreviewOnly = 0` bila hasil tinjauan sesuai. Eksekusi ALTER berada dalam transaksi dan rollback saat gagal.
+3. `checks/chart_metadata_readiness.sql`: hanya SELECT. Memeriksa tabel, procedure, marker kontrak (`CHART_VERSION_CONFLICT`, `JSON_QUERY(config_json)`), kolom, index, foreign key, izin EXECUTE, route `CoreStudioCharts` pada `spDashboard`, dan memastikan route pipeline tetap ada.
+4. `checks/chart_crud_smoke.sql`: kontrak CRUD langsung ke `studio.spChartControl` tanpa BEAM. Menguji List kosong, Save, Get, List berisi config objek, Update ke versi 2, konflik versi basi, Delete, Delete ulang `CHART_NOT_FOUND`, serta isolasi pemilik. Script membersihkan baris uji yang dibuatnya dan `THROW` bila ada kegagalan.
+
+Alternatif bila Anda ingin mengeksekusi ALTER penuh tanpa `OBJECT_DEFINITION`: `migrations/015_alter_spDashboard_chart_full.sql` dibuat dari definisi yang Anda kirim pada 2026-11-06, dengan hanya header `CREATE` → `ALTER` dan satu branch chart yang ditambahkan. File ini tidak membaca definisi live, sehingga perubahan database setelah tanggal baseline tidak ikut terbawa; gunakan `014` bila memungkinkan. Keduanya tidak boleh dijalankan bersamaan.
+
+### Prasyarat BEAM
+
+Identity login yang dipakai BEAM memerlukan EXECUTE pada `CoreAnalytics.studio.spChartControl`, setara dengan izin yang sudah ada untuk `studio.spPipelineControl`. Objek sebaiknya tetap dimiliki `dbo` agar ownership chaining berjalan; jangan mengubah GRANT/identity dengan tebakan. Route chart harus berada di procedure yang benar-benar dipanggil koneksi BEAM.
+
+### Batasan verifikasi saat ini
+
+Semua Mode BEAM yang diuji (termasuk `CoreUserList` dan `CoreMenuList`) mengembalikan HTTP 500 `database connection error` dari sisi server BEAM, sehingga verifikasi CRUD end-to-end melalui aplikasi belum dapat dilakukan meskipun SQL sudah dipasang. Setelah koneksi database BEAM pulih, ulangi urutan di atas lalu buka Chart Library dengan session pengguna sah.
+
+Kontrak backend tidak berubah: List/Get/Create/Update/Delete memakai `/api/studio/charts`, Create hanya menerima `{name, config}`, Update menerima `{name, config, expected_version}`, UUID divalidasi sebelum BEAM, konflik versi menjadi HTTP 409, metadata tidak ditemukan menjadi HTTP 404, dan kegagalan transport/rowset kosong tetap dipetakan ke `CHART_METADATA_UNAVAILABLE` tanpa menyamarkan kode `CHART_*` dari server. Seluruh UUID hasil SQL dikirim sebagai teks lowercase. Config lengkap (termasuk `properties`) disimpan utuh; ekstraksi memakai `OPENJSON` agar tidak terkena batas 4000 karakter `JSON_VALUE`, dan List selalu mengembalikan satu row dengan `items_json` agar katalog kosong bukan error.
+
+Pengujian unit backend ditambahkan di `voice-auth-backend/tests/test_studio_charts.py` (23 kasus, tanpa menghubungi BEAM/SQL) dan seluruh suite backend lulus. Codex tidak menjalankan DDL, tidak mengubah `spDashboard`, dan tidak mengubah konfigurasi deployment; penerapan SQL tetap dilakukan operator pada CoreAnalytics melalui BEAM.

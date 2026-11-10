@@ -3,8 +3,9 @@
 No browser SQL, filesystem paths or connection credentials are accepted.
 """
 import json
+import traceback
 import uuid
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from app.clients.core_api_client import core_api
 from app.services.studio_connections import _rows
 from app.routes.studio_connections_api import _principal, _mutating, _error
@@ -27,6 +28,9 @@ def _error_response(exc):
         code=str(exc)
         if not code.startswith(('CHART_','PIPELINE_')):code='CHART_INPUT_INVALID'
         return jsonify(success=False,code=code),getattr(exc,'http_status',400)
+    frames=traceback.extract_tb(exc.__traceback__)
+    current_app.logger.error('Chart service failure (%s): %s',type(exc).__name__,
+                             ' -> '.join(f'{frame.name}:{frame.lineno}' for frame in frames))
     return jsonify(success=False,code='CHART_SERVICE_UNAVAILABLE'),503
 
 

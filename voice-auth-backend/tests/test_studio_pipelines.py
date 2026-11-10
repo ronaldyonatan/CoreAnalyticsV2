@@ -151,6 +151,21 @@ class DispatcherTests(unittest.TestCase):
     def test_child_secrets_whitelist(self):
         result=dispatch.driver_environment({'PATH':'/bin','BEAM_X_TOKEN':'private','STUDIO_CONNECTION_FERNET_KEY':'private','_SPARK_AUTH_SECRET':'cluster-secret','PYTHONPATH':'/backend','STUDIO_SPARK_MASTER':'spark://master'})
         self.assertEqual(set(result),{'PATH','_SPARK_AUTH_SECRET','STUDIO_SPARK_MASTER'})
+    def test_local_driver_launch_is_explicit_and_isolated(self):
+        with tempfile.TemporaryDirectory() as root:
+            python=Path(root)/'python';python.touch()
+            script=Path(root)/'run_batch.py';script.touch()
+            command,env=dispatch.driver_launch({'STUDIO_BATCH_DRIVER_MODE':'local','STUDIO_BATCH_LOCAL_PYTHON':str(python),'STUDIO_BATCH_LOCAL_SCRIPT':str(script),'STUDIO_SPARK_MASTER':'local[2]','PATH':'/usr/bin','STUDIO_CONNECTION_FERNET_KEY':'secret','PYTHONPATH':'/unsafe'})
+            self.assertEqual(command,[str(python),str(script)])
+            self.assertEqual(env['PYTHONPATH'],root)
+            self.assertEqual(env['PYSPARK_PYTHON'],str(python))
+            self.assertNotIn('STUDIO_CONNECTION_FERNET_KEY',env)
+            with self.assertRaisesRegex(ValueError,'BATCH_DRIVER_START_FAILED'):
+                dispatch.driver_launch({'STUDIO_BATCH_DRIVER_MODE':'local','STUDIO_BATCH_LOCAL_PYTHON':str(python),'STUDIO_BATCH_LOCAL_SCRIPT':str(script),'STUDIO_SPARK_MASTER':'spark://remote:7077'})
+        command,env=dispatch.driver_launch({'PATH':'/bin'})
+        self.assertEqual(command,['python3','/opt/coreanalytics/start_cluster.py','submit'])
+        self.assertEqual(env,{'PATH':'/bin'})
+
     def test_child_requires_actual_committed_manifest(self):
         worker=self.dispatcher(command=[sys.executable,'-c','print(\'{"success":true}\')']);worker.once()
         self.assertEqual(self.store.complete.call_args.kwargs['error_code'],'BATCH_MANIFEST_MISSING')

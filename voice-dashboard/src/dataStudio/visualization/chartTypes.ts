@@ -1,5 +1,5 @@
 /** Shared Chart Library contract. Existing dashboards can migrate via adapters. */
-export type ChartKind = 'column' | 'bar' | 'line' | 'area' | 'stacked' | 'grouped' | 'pie' | 'donut' | 'kpi' | 'table' | 'composed' | 'treemap' | 'radial' | 'lollipop' | 'waterfall' | 'waffle' | 'funnel' | 'bullet';
+export type ChartKind = 'column' | 'bar' | 'line' | 'area' | 'stacked' | 'grouped' | 'pie' | 'donut' | 'kpi' | 'table' | 'composed' | 'treemap' | 'radial' | 'lollipop' | 'waterfall' | 'waffle' | 'funnel' | 'bullet' | 'stacked100' | 'area100' | 'heatmap' | 'radar' | 'pareto' | 'step' | 'cumulative_line' | 'cumulative_bar' | 'variance' | 'slope' | 'combo' | 'progress';
 export type ChartAggregation = 'count' | 'sum' | 'avg' | 'min' | 'max';
 export type ChartFilterOperator = 'eq' | 'neq' | 'contains' | 'gt' | 'gte' | 'lt' | 'lte';
 export type ChartFilter = { column: string; operator: ChartFilterOperator; value: string };
@@ -11,6 +11,13 @@ export type ChartProperties = {
   currencySymbol: string; decimals: number; divideBy: number;
   negativeParentheses: boolean; fontSize: number; chartHeight: number;
   gaugeTarget: number; noDataMessage: string; colorDirection: 'normal' | 'reverse';
+  fullscreen3d: boolean;
+  orientation: 'vertical' | 'horizontal';
+  trendStyle: 'linear' | 'smooth' | 'step';
+  trendMarkers: boolean;
+  varianceMode: 'absolute' | 'percent';
+  comboLineSeries: string;
+  slopeStart: string; slopeEnd: string;
 };
 export const defaultChartProperties = (): ChartProperties => ({
   showXAxis:true,showYAxis:true,showGrid:true,showLegend:true,
@@ -19,6 +26,9 @@ export const defaultChartProperties = (): ChartProperties => ({
   numberFormat:'standard',currencySymbol:'Rp',decimals:2,divideBy:1,
   negativeParentheses:false,fontSize:11,chartHeight:410,
   gaugeTarget:0,noDataMessage:'Belum ada hasil query.',colorDirection:'normal',
+  fullscreen3d:true,
+  orientation:'vertical',trendStyle:'linear',trendMarkers:false,
+  varianceMode:'absolute',comboLineSeries:'',slopeStart:'',slopeEnd:'',
 });
 export type ChartConfig = {
   properties?: ChartProperties;
@@ -58,6 +68,15 @@ export const CHART_KINDS: Array<{ value: ChartKind; name: string }> = [
   { value: 'pie', name: 'Pie' }, { value: 'donut', name: 'Donut' },
   { value: 'waterfall', name: 'Waterfall' }, { value: 'waffle', name: 'Waffle' },
   { value: 'funnel', name: 'Funnel' }, { value: 'bullet', name: 'Bullet Gauge' },
+  { value: 'stacked100', name: '100% Stacked Bar' }, { value: 'area100', name: '100% Stacked Area' },
+  { value: 'heatmap', name: 'Heatmap' }, { value: 'radar', name: 'Radar' },
+  { value: 'pareto', name: 'Pareto' }, { value: 'step', name: 'Step Line' },
+  { value: 'cumulative_line', name: 'Akumulasi · Garis' },
+  { value: 'cumulative_bar', name: 'Akumulasi · Batang' },
+  { value: 'variance', name: 'Perubahan antar kategori' },
+  { value: 'slope', name: 'Perbandingan ujung (Slope)' },
+  { value: 'combo', name: 'Batang + Garis' },
+  { value: 'progress', name: 'Pencapaian Target' },
   { value: 'kpi', name: 'KPI' }, { value: 'table', name: 'Table' },
 ];
 export const emptyConfig = (): ChartConfig => ({

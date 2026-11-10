@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
 type Connection = { connection_id: string; connection_name: string; connection_type: string; server_host: string; server_port: number; database_name: string; login_username: string; is_active: boolean; encrypt_transport: boolean; trust_server_certificate: boolean; created_at?: string };
 type Form = { connection_name: string; server_host: string; server_port: number; database_name: string; login_username: string; password: string; encrypt_transport: boolean; trust_server_certificate: boolean; connection_timeout_seconds: number };
 const empty: Form = { connection_name: '', server_host: '', server_port: 1433, database_name: '', login_username: '', password: '', encrypt_transport: true, trust_server_certificate: false, connection_timeout_seconds: 10 };
 const BASE = '/voice-api/api/studio/connections';
 function csrf() { const entry = document.cookie.split('; ').find(v => v.startsWith('core_csrf=')); return entry ? decodeURIComponent(entry.substring('core_csrf='.length)) : ''; }
-async function api(path: string, method = 'GET', body?: unknown) {
-  const res = await fetch(BASE + path, { method, credentials: 'include', cache: 'no-store', headers: body === undefined ? {} : { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() }, body: body === undefined ? undefined : JSON.stringify(body) });
+async function api(path: string, method = 'GET', body?: unknown, signal?: AbortSignal) {
+  const res = await fetch(BASE + path, { method, credentials: 'include', cache: 'no-store', signal, headers: body === undefined ? {} : { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() }, body: body === undefined ? undefined : JSON.stringify(body) });
   const data = await res.json().catch(() => ({ success: false, code: `HTTP_${res.status}` }));
   if (!res.ok || data.success === false) throw new Error(String(data.code || data.message || `HTTP_${res.status}`));
   return data;
@@ -28,7 +28,7 @@ function Icon({ name }: { name: IconName }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="connection-field"><span>{label}</span>{children}</label>;
 }
-export default function Connections() {
+export default function Connections({ active = true }: { active?: boolean }) {
   const [items, setItems] = useState<Connection[]>([]);
   const [form, setForm] = useState<Form>(empty);
   const [adding, setAdding] = useState(false);
@@ -44,28 +44,22 @@ export default function Connections() {
     return items.filter(item => (status === 'all' || (status === 'active') === item.is_active) &&
       [item.connection_name, item.server_host, item.database_name, item.connection_type].some(value => String(value ?? '').toLowerCase().includes(query)));
   }, [items, search, status]);
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (signal?: AbortSignal) => {
     setLoading(true); setError('');
-    try { const result = await api(''); const value = result.data; setItems(Array.isArray(value) ? value : Array.isArray(value?.data) ? value.data : []); }
-    catch (e) { setError(e instanceof Error ? e.message : 'Gagal memuat koneksi'); }
-    finally { setLoading(false); }
+    try {
+      const result = await api('', 'GET', undefined, signal);
+      if (signal?.aborted) return;
+      const value = result.data;
+      setItems(Array.isArray(value) ? value : Array.isArray(value?.data) ? value.data : []);
+    } catch (e) { if (!signal?.aborted) setError(e instanceof Error ? e.message : 'Gagal memuat koneksi'); }
+    finally { if (!signal?.aborted) setLoading(false); }
   }, []);
-  useEffect(() => {
-    let cancelled = false;
-    async function loadInitial() {
-      try {
-        const result = await api('');
-        const value = result.data;
-        if (!cancelled) setItems(Array.isArray(value) ? value : Array.isArray(value?.data) ? value.data : []);
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Gagal memuat koneksi');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    void loadInitial();
-    return () => { cancelled = true; };
-  }, []);
+  useLayoutEffect(() => {
+    if (!active) { setLoading(true); return; }
+    const controller = new AbortController();
+    void reload(controller.signal);
+    return () => controller.abort();
+  }, [active, reload]);
   const update = <K extends keyof Form>(key: K, value: Form[K]) => setForm(prev => ({ ...prev, [key]: value }));
   async function test() { setBusy(true); setNotice(''); setError(''); try { const result = await api('/test', 'POST', form); setNotice(result.message || result.data?.message || 'Test connection berhasil.'); } catch(e) { setError(e instanceof Error ? e.message : 'Test connection gagal'); } finally { setBusy(false); } }
   async function save(e: React.FormEvent) { e.preventDefault(); setBusy(true); setNotice(''); setError(''); try { await api('', 'POST', form); setNotice('Connection berhasil ditambahkan.'); setAdding(false); setForm(empty); await reload(); } catch(e) { setError(e instanceof Error ? e.message : 'Gagal menyimpan koneksi'); } finally { setBusy(false); } }
@@ -91,7 +85,7 @@ export default function Connections() {
         <div className="connections-metric"><span>Inactive</span><strong>{loading ? '—' : String(items.length - activeCount).padStart(2, '0')}</strong><small><i className="connections-status-dot" /> DISABLED</small></div>
       </div>
 
-      {error && <div role="alert" className="connections-alert is-error"><span>!</span><div><strong>Unable to complete request</strong><p>{error}</p></div></div>}
+      {!loading && error && <div role="alert" className="connections-alert is-error"><span>!</span><div><strong>Unable to complete request</strong><p>{error}</p></div></div>}
       {notice && <div role="status" className="connections-alert is-success"><span>✓</span><div><strong>Update berhasil</strong><p>{notice}</p></div></div>}
 
       {adding && <form id="connection-form" className="connection-form" onSubmit={save}>
@@ -117,7 +111,7 @@ export default function Connections() {
 
       <div className="connections-list-heading"><div><div className="connections-eyebrow"><span className="connections-eyebrow-line" /> YOUR CONNECTIONS</div><h2>Registered sources <span>{loading ? '—' : items.length}</span></h2><p>Kelola konfigurasi dan status sumber data Anda.</p></div><span className="connections-list-caption">DATA STUDIO <span>//</span> SOURCES</span></div>
       <div className="connections-toolbar"><label className="connections-search"><Icon name="search" /><span className="connections-sr-only">Search connections</span><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, host or database" /></label><label className="connections-filter"><span className="connections-sr-only">Filter by status</span><select value={status} onChange={e => setStatus(e.target.value)}><option value="all">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select></label></div>
-      {loading ? <div className="connections-empty">Loading connections...</div> : !items.length ? <div className="connections-empty"><span className="connection-icon"><Icon name="database" /></span><strong>Belum ada koneksi</strong><p>Tambahkan sumber data pertama Anda untuk memulai.</p><button type="button" className="connections-button" onClick={() => setAdding(true)}><Icon name="plus" /> Add Connection</button></div> : !filtered.length ? <div className="connections-empty"><strong>Tidak ada koneksi yang cocok</strong><p>Coba kata pencarian atau filter status lainnya.</p></div> : <div className="connections-table-scroll" role="region" aria-label="Registered connections" tabIndex={0}><table className="connections-table"><thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Host</th><th scope="col">Database</th><th scope="col">Username</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead><tbody>{filtered.map(item => <tr key={item.connection_id}>
+      {loading ? <div className="studio-loading" role="status" aria-live="polite"><span className="studio-loading-spinner" aria-hidden="true" /><strong>Memuat Connections…</strong><span>Mengambil daftar sumber data terdaftar.</span></div> : error && !items.length ? null : !items.length ? <div className="connections-empty"><span className="connection-icon"><Icon name="database" /></span><strong>Belum ada koneksi</strong><p>Tambahkan sumber data pertama Anda untuk memulai.</p><button type="button" className="connections-button" onClick={() => setAdding(true)}><Icon name="plus" /> Add Connection</button></div> : !filtered.length ? <div className="connections-empty"><strong>Tidak ada koneksi yang cocok</strong><p>Coba kata pencarian atau filter status lainnya.</p></div> : <div className="connections-table-scroll" role="region" aria-label="Registered connections" tabIndex={0}><table className="connections-table"><thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Host</th><th scope="col">Database</th><th scope="col">Username</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead><tbody>{filtered.map(item => <tr key={item.connection_id}>
         <th scope="row" className="connections-table-name">{item.connection_name}</th>
         <td><span className="connection-type-badge">{item.connection_type === 'SQLSERVER' ? 'SQL SERVER' : item.connection_type}</span></td>
         <td className="connections-table-host">{item.server_host}:{item.server_port}</td>

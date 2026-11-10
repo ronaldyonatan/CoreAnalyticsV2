@@ -30,6 +30,33 @@
 .studio-window-content :is(button, input, select, textarea):focus-visible {
   outline: 2px solid var(--ca-ui-focus); outline-offset: 2px;
 }
+.studio-window-content .studio-loading {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 16px;
+  text-align: center;
+  color: inherit;
+}
+.studio-window-content .studio-loading > strong {font-size:14px;font-weight:650}
+.studio-window-content .studio-loading > span:not(.studio-loading-spinner) {font-size:12px;opacity:.7}
+.studio-window-content .studio-loading-spinner {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 3px solid var(--ca-ui-line);
+  border-top-color: var(--ca-ui-focus);
+  border-radius: 50%;
+  animation: studio-loading-spin .8s linear infinite;
+}
+@keyframes studio-loading-spin {to {transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce) {
+  .studio-window-content .studio-loading-spinner {animation:none}
+}
+:root[data-performance="static"] .studio-window-content .studio-loading-spinner {animation:none}
 /* Common section headers and toolbars. */
 .studio-window-content :is(.datasets-header,.connections-header,.studio-etl-hero,.studio-etl-detail-header) {
   padding: 11px 16px; gap: 12px;

@@ -128,7 +128,7 @@ export default function DataStudioWorkspace() {
       <div className="studio-window" role="dialog" aria-modal="true" aria-labelledby="studio-window-title" ref={dialogRef} onKeyDown={handleDialogKeyDown}>
         <header className="studio-window-header"><div className="studio-window-heading"><span className="studio-window-glyph" aria-hidden="true"><StudioIcon module={current} /></span><h2 id="studio-window-title">{current.label}</h2></div><button ref={closeRef} type="button" className="studio-window-close" aria-label="Tutup dan kembali ke Command Center" onClick={() => selectModule('overview')}><span aria-hidden="true">×</span></button></header>
         <div className="studio-window-content">
-          {connectionsOpened && <div className="studio-connections" hidden={selected !== 'connections'}><Connections /></div>}
+          {connectionsOpened && <div className="studio-connections" hidden={selected !== 'connections'}><Connections active={selected === 'connections'} /></div>}
           {selected === 'charts' && <ChartLibrary />}
           {selected === 'datasets' && <Datasets onExplore={(datasetId,parquet=false) => { setExplorerDataset(datasetId);setExplorerParquet(parquet); originRectRef.current = null; setSelected('explorer'); }} />}
           {selected === 'explorer' && <DataExplorer initialDatasetId={explorerDataset} initialParquet={explorerParquet} onBackToDatasets={() => { originRectRef.current = null; setExplorerDataset(''); setExplorerParquet(false); setSelected('datasets'); }} />}

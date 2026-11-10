@@ -2,6 +2,7 @@
 import json
 import os
 import signal
+import sys
 import subprocess
 import threading
 import time
@@ -40,6 +41,27 @@ def driver_environment(environment):
     allowed={'PATH','HOME','JAVA_HOME','LANG','LC_ALL','SPARK_HOME','SPARK_CONF_DIR','_SPARK_AUTH_SECRET','STUDIO_BATCH_STORAGE_ROOT','STUDIO_SQLSERVER_JDBC_JAR'}
     return {k:v for k,v in environment.items() if k in allowed or k.startswith('STUDIO_SPARK_')}
 
+
+
+def driver_launch(environment):
+    """Select a trusted, operator-configured driver; never accept shell commands."""
+    mode=environment.get('STUDIO_BATCH_DRIVER_MODE','cluster')
+    if mode=='cluster':
+        return ['python3','/opt/coreanalytics/start_cluster.py','submit'],driver_environment(environment)
+    if mode!='local':
+        raise ValueError('BATCH_DRIVER_START_FAILED')
+    python=Path(environment.get('STUDIO_BATCH_LOCAL_PYTHON',''))
+    script=Path(environment.get('STUDIO_BATCH_LOCAL_SCRIPT',''))
+    if not python.is_absolute() or not python.is_file() or not script.is_absolute() or not script.is_file() or script.name!='run_batch.py':
+        raise ValueError('BATCH_DRIVER_START_FAILED')
+    if not environment.get('STUDIO_SPARK_MASTER','').startswith('local[') or not environment['STUDIO_SPARK_MASTER'].endswith(']'):
+        raise ValueError('BATCH_DRIVER_START_FAILED')
+    env=driver_environment(environment)
+    env['PYTHONPATH']=str(script.parent)
+    env['PYSPARK_PYTHON']=str(python)
+    env['PYSPARK_DRIVER_PYTHON']=str(python)
+    env['SPARK_LOCAL_IP']='127.0.0.1'
+    return [str(python),str(script)],env
 
 def committed_outputs(root,run_id,graph):
     root=Path(root).resolve();directory=root/run_id;path=directory/'manifest.json'
@@ -93,7 +115,8 @@ def terminate(process):
 class Dispatcher:
     def __init__(self,store=pipeline_store,root=None,command=None,authorize_owner=authorize,binder=None,timeout=3600,heartbeat_seconds=5):
         self.store=store;self.root=Path(root or os.environ['STUDIO_BATCH_STORAGE_ROOT'])
-        self.command=command or ['python3','/opt/coreanalytics/start_cluster.py','submit']
+        self.command=command
+        self.driver_env=None
         self.authorize=authorize_owner;self.worker_id=str(uuid.uuid4());self.stopping=False
         self.bind=binder or (lambda owner,run_id,graph:bind(owner,run_id,graph,lambda:self.store.heartbeat(self.worker_id,run_id)))
         self.timeout=max(1,min(int(timeout),86400));self.heartbeat_seconds=heartbeat_seconds
@@ -123,7 +146,8 @@ class Dispatcher:
             if heartbeat.get('cancel_requested'):
                 self.store.complete(self.worker_id,run_id,'CANCELLED');return True
             phase='EXECUTE'
-            process=subprocess.Popen(self.command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=driver_environment(os.environ),start_new_session=True,cwd='/tmp')
+            command,child_env=driver_launch(os.environ) if self.command is None else (self.command,driver_environment(os.environ))
+            process=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=child_env,start_new_session=True,cwd='/tmp')
             # Drain both streams without retaining logs or credentials, or risking pipe deadlock.
             output=bytearray();overflow=threading.Event()
             def drain(stream,retain=False):

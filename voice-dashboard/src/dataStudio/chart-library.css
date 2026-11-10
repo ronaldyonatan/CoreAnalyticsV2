@@ -1,5 +1,4 @@
-/* Chart Analyzer — Domo-inspired workspace, native CoreAnalytics visual system.
-   Scope is intentionally limited to ChartLibrary. No global dashboard CSS changes. */
+/* Chart Library — scoped CoreAnalytics visual system. */
 .ca-chart-library {
   --ca-chart-line: var(--studio-border, rgba(127, 185, 215, .22));
   --ca-chart-accent: var(--studio-info, #39b9ec);
@@ -20,6 +19,14 @@
 .ca-chart-library *,
 .ca-chart-library *::before,
 .ca-chart-library *::after { box-sizing: border-box; }
+.ca-chart-library .ca-chart-heatmap {overflow:auto;max-height:100%;width:100%}
+.ca-chart-library .ca-chart-heatmap table {border-collapse:separate;border-spacing:3px;min-width:100%;table-layout:fixed}
+.ca-chart-library .ca-chart-heatmap th,
+.ca-chart-library .ca-chart-heatmap td {min-width:90px;padding:10px 12px;border:1px solid var(--ca-chart-line);border-radius:4px;text-align:center;white-space:nowrap}
+.ca-chart-library .ca-chart-heatmap th {font-weight:600;color:var(--ca-chart-muted);background:var(--ca-chart-panel)}
+.ca-chart-library .ca-chart-heatmap thead th {position:sticky;top:0;z-index:2}
+.ca-chart-library .ca-chart-heatmap tbody th {position:sticky;left:0;z-index:1;text-align:left}
+.ca-chart-library .ca-chart-kind-hint {margin:0;padding:8px 12px;color:var(--ca-chart-muted);border-bottom:1px solid var(--ca-chart-line);font-size:11px;line-height:1.45}
 .ca-chart-library button,
 .ca-chart-library input,
 .ca-chart-library select { font: inherit; color: inherit; }
@@ -152,7 +159,7 @@
 .ca-chart-technology { color: var(--ca-chart-muted); font-size: 9px; font-weight: 650; letter-spacing: .09em; white-space: nowrap; }
 .ca-chart-run { white-space: nowrap; padding: 10px 15px !important; }
 
-/* Domo-style data shelf: real controls, drag-and-drop targets. */
+/* Data mapping shelf. */
 .ca-chart-shelf {
   display: flex;
   align-items: center;
@@ -234,6 +241,21 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.ca-chart-dataset-note {
+  display: block;
+  padding: 4px 11px 0;
+  color: var(--studio-warning, #e2b65e);
+  font-size: 9px;
+  line-height: 1.5;
+}
+.ca-chart-catalog-notice {
+  margin: 0 0 10px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--studio-warning, #e2b65e) 34%, transparent);
+  border-radius: 7px;
+  color: var(--studio-warning, #e2b65e);
+  font-size: 10px;
 }
 .ca-chart-field-tabs {
   padding: 8px 11px;
@@ -320,6 +342,21 @@
 .ca-chart-plot-heading h2 { font-size: clamp(15px, 1.6vw, 20px); margin: 5px 0 3px; font-weight: 740; }
 .ca-chart-plot-heading small { color: var(--ca-chart-muted); font-size: 10px; }
 .ca-chart-library .ca-chart-maximize { white-space: nowrap; padding: 7px 9px; font-size: 10px; }
+.ca-chart-plot-actions { display: flex; align-items: center; gap: 8px; }
+.ca-chart-library .ca-chart-3d-quick { padding: 7px 10px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+.ca-chart-library .ca-chart-3d-quick.is-active { border-color: var(--ca-chart-accent); background: var(--ca-chart-chip); }
+.ca-chart-fullscreen-actions { position: absolute; top: 10px; right: 12px; z-index: 30; display: flex; align-items: center; gap: 8px; padding: 5px; border: 1px solid var(--ca-chart-line); border-radius: 9px; background: color-mix(in srgb, var(--ca-chart-panel) 88%, transparent); box-shadow: 0 8px 24px rgba(0, 0, 0, .35); backdrop-filter: blur(8px); }
+.ca-chart-plot.is-fullscreen .ca-chart-plot-heading { padding-right: 230px; }
+.ca-chart-view-toggle { display: inline-flex; border: 1px solid var(--ca-chart-line); border-radius: 7px; overflow: hidden; }
+.ca-chart-library .ca-chart-view-toggle button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 10px; background: transparent; color: var(--ca-chart-muted); }
+.ca-chart-library .ca-chart-view-toggle button.is-selected { background: var(--ca-chart-accent); color: #061f2d; font-weight: 750; }
+.ca-chart-3d { position: relative; width: 100%; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid var(--ca-chart-line); background: var(--ca-chart-bg); }
+.ca-chart-3d canvas { display: block; }
+.ca-chart-3d-legend { position: absolute; left: 12px; bottom: 34px; display: flex; flex-wrap: wrap; gap: 10px; max-width: calc(100% - 24px); padding: 6px 9px; border: 1px solid var(--ca-chart-line); border-radius: 8px; background: color-mix(in srgb, var(--ca-chart-panel) 78%, transparent); color: var(--ca-chart-muted); font-size: 10px; pointer-events: none; }
+.ca-chart-3d-legend i { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 2px; }
+.ca-chart-3d-hint { position: absolute; right: 12px; bottom: 10px; color: var(--ca-chart-muted); font-size: 9px; letter-spacing: .03em; pointer-events: none; }
+.ca-chart-3d-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ca-chart-muted); font-size: 12px; pointer-events: none; }
+.ca-chart-3d-note { display: block; margin-top: 8px; color: var(--ca-chart-muted); }
 .ca-chart-canvas {
   flex: 1 1 0;
   min-height: 0;
@@ -352,6 +389,16 @@
   border-radius: 12px;
   box-shadow: 0 0 0 200vmax rgba(0, 0, 0, .75), 0 18px 60px rgba(0, 0, 0, .45);
   overflow: hidden;
+}
+/* Portaled fullscreen escapes Data Studio's size containment so the overlay
+   covers the viewport and its toolbar cannot be clipped by the studio window. */
+.ca-chart-fullscreen-portal {
+  width: 0;
+  height: 0;
+  min-height: 0;
+  padding: 0;
+  color: var(--ca-chart-text);
+  font-size: 12px;
 }
 .ca-chart-plot.is-fullscreen .ca-chart-canvas { justify-content: center; }
 .chart-empty { min-height: 260px; padding: 28px; display: grid; place-items: center; text-align: center; color: var(--ca-chart-muted); font-size: 12px; }
@@ -408,6 +455,7 @@
 .ca-chart-card-actions button:last-child { color: var(--studio-warning, #e2b65e); }
 .ca-chart-empty { text-align: center; color: var(--ca-chart-muted); }
 .ca-chart-library-empty { min-height: 330px; border: 1px dashed var(--ca-chart-line); border-radius: 12px; }
+.ca-chart-library-empty .ca-chart-spinner-large { display: block; margin: 0 auto 14px; }
 .ca-chart-empty-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
 .ca-chart-empty-icon .ca-chart-thumb { height: 72px; max-width: 120px; }
 .ca-chart-empty h3 { color: var(--ca-chart-text); margin: 6px 0; }

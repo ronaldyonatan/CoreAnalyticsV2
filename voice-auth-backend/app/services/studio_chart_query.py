@@ -15,7 +15,8 @@ TEXT_TYPES = frozenset({'char','varchar','nchar','nvarchar','uniqueidentifier'})
 DATE_TYPES = frozenset({'date','datetime','datetime2','smalldatetime','datetimeoffset'})
 ALLOWED_TYPES = NUMERIC_TYPES | TEXT_TYPES | DATE_TYPES
 AGGREGATIONS = frozenset({'count', 'sum', 'avg', 'min', 'max'})
-CHART_TYPES = frozenset({'bar','column','line','area','pie','donut','table','kpi','stacked','grouped','composed','treemap','radial','lollipop','waterfall','waffle','funnel','bullet'})
+CHART_TYPES = frozenset({'bar','column','line','area','pie','donut','table','kpi','stacked','grouped','composed','treemap','radial','lollipop','waterfall','waffle','funnel','bullet','stacked100','area100','heatmap','radar','pareto','step','cumulative_line','cumulative_bar','variance','slope','combo','progress'})
+ORDERED_CHART_TYPES = frozenset({'cumulative_line','cumulative_bar','variance','slope'})
 FILTER_OPERATORS = frozenset({'eq','neq','contains','gt','gte','lt','lte'})
 
 class ChartQueryError(ValueError):
@@ -45,15 +46,19 @@ def parse_chart_spec(value):
         raise ChartQueryError('CHART_KPI_DIMENSION_INVALID')
     if value.get('series') and value['series'] == value['dimension']:
         raise ChartQueryError('CHART_SERIES_INVALID')
-    if value.get('series') and value['chart_type'] in ('pie','donut','kpi'):
+    if value.get('series') and value['chart_type'] in ('pie','donut','kpi','pareto','progress'):
         raise ChartQueryError('CHART_SERIES_UNSUPPORTED')
-    if value['chart_type'] in ('stacked','grouped') and not value.get('series'):
+    if value['chart_type'] in ('stacked','grouped','stacked100','area100','heatmap','combo') and not value.get('series'):
         raise ChartQueryError('CHART_SERIES_REQUIRED')
     limit = value.get('limit', 30)
     if type(limit) is not int or not 1 <= limit <= MAX_RESULTS:
         raise ChartQueryError('CHART_LIMIT_INVALID')
-    sort = value.get('sort','value_desc')
+    sort = value.get('sort','dimension_asc' if value['chart_type'] in ORDERED_CHART_TYPES else 'value_desc')
     if sort not in ('value_desc','value_asc','dimension_asc','dimension_desc'):
+        raise ChartQueryError('CHART_SORT_INVALID')
+    if value['chart_type'] == 'pareto' and sort != 'value_desc':
+        raise ChartQueryError('CHART_SORT_INVALID')
+    if value['chart_type'] in ORDERED_CHART_TYPES and sort != 'dimension_asc':
         raise ChartQueryError('CHART_SORT_INVALID')
     filters = value.get('filters',[])
     if not isinstance(filters,list) or len(filters)>8:
@@ -67,19 +72,25 @@ def parse_chart_spec(value):
         clean.append(f)
     properties=value.get('properties')
     if properties is not None:
-        if not isinstance(properties,dict) or len(properties)>25:
+        allowed={'showXAxis','showYAxis','showGrid','showLegend','showTooltip','showDataLabels','showTitle','xAxisLabel','yAxisLabel','legendPosition','numberFormat','currencySymbol','decimals','divideBy','negativeParentheses','fontSize','chartHeight','noDataMessage','colorDirection','gaugeTarget','fullscreen3d','orientation','trendStyle','trendMarkers','varianceMode','comboLineSeries','slopeStart','slopeEnd'}
+        if not isinstance(properties,dict) or len(properties)>len(allowed) or set(properties)-allowed:
             raise ChartQueryError('CHART_PROPERTIES_INVALID')
-        allowed={'showXAxis','showYAxis','showGrid','showLegend','showTooltip','showDataLabels','showTitle','xAxisLabel','yAxisLabel','legendPosition','numberFormat','currencySymbol','decimals','divideBy','negativeParentheses','fontSize','chartHeight','noDataMessage','colorDirection','gaugeTarget'}
-        if set(properties)-allowed:
-            raise ChartQueryError('CHART_PROPERTIES_INVALID')
+        enums={'orientation':{'vertical','horizontal'},'trendStyle':{'linear','smooth','step'},
+               'varianceMode':{'absolute','percent'}}
         for key,val in properties.items():
-            if key.startswith('show') or key=='negativeParentheses':
+            if key.startswith('show') or key in ('negativeParentheses','fullscreen3d','trendMarkers'):
                 valid=type(val) is bool
             elif key in ('decimals','fontSize','chartHeight','divideBy','gaugeTarget'):
                 valid=type(val) is int and 0<=val<=1000000000
+            elif key in enums:
+                valid=isinstance(val,str) and val in enums[key]
+            elif key in ('comboLineSeries','slopeStart','slopeEnd'):
+                valid=isinstance(val,str) and len(val)<=256
             else:
                 valid=isinstance(val,str) and len(val)<=100
             if not valid:raise ChartQueryError('CHART_PROPERTIES_INVALID')
+    if value['chart_type'] == 'progress' and (not properties or not properties.get('gaugeTarget')):
+        raise ChartQueryError('CHART_TARGET_REQUIRED')
     return {**value,'measure':value.get('measure',''),'series':value.get('series',''),
             'sort':sort,'limit':limit,'filters':clean}
 
