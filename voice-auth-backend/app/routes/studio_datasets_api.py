@@ -5,7 +5,27 @@ from flask import Blueprint, jsonify, request
 from app.clients.core_api_client import core_api
 from app.routes.studio_connections_api import _principal, _mutating, _error
 from app.services.studio_connections import _cipher, _rows
-from app.connectors.sqlserver import SqlServerTarget, list_sqlserver_objects, sqlserver_object_exists, preview_sqlserver_object, dataset_filter_values
+from app.connectors.registry import resolve
+
+
+
+def _connector(kind=None):
+    return resolve(kind)
+
+def list_sqlserver_objects(target, query='', offset=0, limit=50):
+    return _connector().browse(target, query, offset, limit)
+
+def sqlserver_object_exists(target, source):
+    return _connector().object_exists(target, source)
+
+def preview_sqlserver_object(target, source, page=1, filters=None, sort=None):
+    return _connector().preview(target, source, page, filters, sort)
+
+def dataset_filter_values(target, source, column, search, offset, filters):
+    return _connector().filter_values(target, source, column, search, offset, filters)
+
+def _dataset_connector(row):
+    return _connector(row.get('connector_type') or 'sqlserver')
 
 studio_datasets_bp = Blueprint('studio_datasets', __name__, url_prefix='/api/studio/datasets')
 
@@ -96,6 +116,7 @@ def preview_graph_spark():
                 samples.append({key: source[key] for key in ('id', 'columns', 'rows')})
             else:
                 row = definitions[str(uuid.UUID(source['dataset_id']))]
+                _dataset_connector(row)
                 selected = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
                 sample = preview_sqlserver_object(_target(user, row['connection_id']), selected, 1, {}, None)
                 samples.append({'id': source['id'], 'columns': [column['name'] for column in sample['preview_columns']], 'rows': sample['rows']})
@@ -164,6 +185,7 @@ def preview_dataset_spark(dataset_id):
         if row.get('access_mode') != 'DIRECT':
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
         from app.services.studio_spark_preview import spark_preview
+        _dataset_connector(row)
         source = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
         sample = preview_sqlserver_object(_target(user, row['connection_id']), source, 1, body['filters'], None)
         result = spark_preview(sample, body['steps'])
@@ -194,7 +216,7 @@ def _target(user_id, connection_id):
     if row.get('encryption_key_version') != 1:
         raise ValueError('CONNECTION_KEY_VERSION_UNSUPPORTED')
     password = _cipher().decrypt(base64.b64decode(row['encrypted_password_base64'], validate=True)).decode('utf-8')
-    return SqlServerTarget(host=row['server_host'], port=int(row['server_port'] or 1433), database=row['database_name'], username=row['login_username'], password=password, encrypt=bool(row['encrypt_transport']), trust_server_certificate=bool(row['trust_server_certificate']), timeout=int(row['connection_timeout_seconds'] or 10))
+    return _connector(row.get('connector_type') or 'sqlserver').make_target({**row, 'server_port': int(row['server_port'] or 1433), 'password': password, 'connection_timeout_seconds': int(row['connection_timeout_seconds'] or 10)})
 
 
 @studio_datasets_bp.get('/sources/<uuid:connection_id>')
@@ -241,6 +263,7 @@ def preview_dataset(dataset_id):
             return jsonify(success=False, code='DATASET_NOT_FOUND'), 404
         if row.get('access_mode') != 'DIRECT':
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
+        _dataset_connector(row)
         source = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
         filters = {}
         sort = None
@@ -285,6 +308,7 @@ def filter_values(dataset_id):
             return jsonify(success=False, code='DATASET_NOT_FOUND'), 404
         if row.get('access_mode') != 'DIRECT':
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
+        _dataset_connector(row)
         source = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
         result = dataset_filter_values(_target(user, row['connection_id']), source, body['column'], body['search'], body['offset'], body['filters'])
         response = jsonify(success=True, data=result)

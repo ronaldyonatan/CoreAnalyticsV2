@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 from app.services.session_security import current_session, valid_csrf
 from app.services.auth_service import get_user_access_profile
 from app.services import studio_connections as store
+from app.connectors.registry import resolve, capabilities
 
 studio_connections_bp = Blueprint('studio_connections', __name__, url_prefix='/api/studio/connections')
 
@@ -30,9 +31,11 @@ def _body():
     body = request.get_json(silent=True)
     if not isinstance(body, dict):
         raise ValueError('JSON_OBJECT_REQUIRED')
-    allowed = {'connection_name', 'server_host', 'server_port', 'database_name', 'login_username', 'password', 'encrypt_transport', 'trust_server_certificate', 'connection_timeout_seconds'}
+    allowed = {'connector_type', 'connection_name', 'server_host', 'server_port', 'database_name', 'login_username', 'password', 'encrypt_transport', 'trust_server_certificate', 'connection_timeout_seconds'}
     if set(body) - allowed:
         raise ValueError('UNKNOWN_FIELDS')
+    if body.get('connector_type', 'sqlserver') != 'sqlserver':
+        raise ValueError('CONNECTOR_UNSUPPORTED')
     for key, limit in (('connection_name',150),('server_host',255),('database_name',128),('login_username',255)):
         if not isinstance(body.get(key), str) or not body[key].strip() or len(body[key]) > limit:
             raise ValueError('INVALID_' + key.upper())
@@ -47,6 +50,9 @@ def _body():
             raise ValueError('INVALID_BOOLEAN')
     if body.get('trust_server_certificate', False) and os.getenv('STUDIO_ALLOW_UNTRUSTED_CERT','false').lower() != 'true':
         raise ValueError('UNTRUSTED_CERT_DISABLED')
+    # Existing metadata RPC only accepts SQL Server fields. Do not persist an
+    # unsupported connector_type until the BEAM schema is migrated.
+    body.pop('connector_type', None)
     return body
 
 
@@ -56,14 +62,16 @@ def _mutating():
 
 
 def _sql_target(body):
-    from app.connectors.sqlserver import SqlServerTarget
-    return SqlServerTarget(
-        host=body['server_host'], port=body.get('server_port', 1433),
-        database=body['database_name'], username=body['login_username'],
-        password=body['password'], encrypt=body.get('encrypt_transport', True),
-        trust_server_certificate=body.get('trust_server_certificate', False),
-        timeout=body.get('connection_timeout_seconds', 10),
-    )
+    return resolve('sqlserver').make_target(body)
+
+
+@studio_connections_bp.get('/connector-capabilities')
+def connector_capabilities():
+    try:
+        _principal()
+        return jsonify(success=True, data=capabilities())
+    except PermissionError as exc:
+        return _error(exc)
 
 
 @studio_connections_bp.get('')
@@ -82,8 +90,7 @@ def create_connection():
         user_id = _principal()
         _mutating()
         body = _body()
-        from app.connectors.sqlserver import validate_target
-        validate_target(_sql_target(body))
+        resolve('sqlserver').validate_target(_sql_target(body))
         return jsonify(success=True, data=store.create_connection(user_id, body)), 201
     except PermissionError as exc:
         return _error(exc)
@@ -117,8 +124,7 @@ def test_connection():
         _mutating()
         body = _body()
         # Test and Save use the same central network/port/TLS policy.
-        from app.connectors.sqlserver import test_sqlserver_connection
-        return jsonify(test_sqlserver_connection(_sql_target(body)))
+        return jsonify(resolve('sqlserver').test_connection(_sql_target(body)))
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:

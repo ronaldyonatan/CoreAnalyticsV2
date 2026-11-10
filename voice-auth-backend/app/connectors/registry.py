@@ -8,6 +8,13 @@ class ConnectorSpec:
     kind: str
     capabilities: frozenset[str]
     bind_source: Callable
+    make_target: Callable | None = None
+    validate_target: Callable | None = None
+    test_connection: Callable | None = None
+    browse: Callable | None = None
+    object_exists: Callable | None = None
+    preview: Callable | None = None
+    filter_values: Callable | None = None
 
 
 _REGISTRY: dict[str, ConnectorSpec] = {}
@@ -32,3 +39,11 @@ def get(kind: str) -> ConnectorSpec:
 
 def capabilities():
     return {name: sorted(spec.capabilities) for name, spec in sorted(_REGISTRY.items())}
+
+
+def resolve(kind: str | None = None) -> ConnectorSpec:
+    """Resolve a server-registered connector; legacy rows default to SQL Server."""
+    from app.connectors.sqlserver_adapter import install
+    if 'sqlserver' not in _REGISTRY:
+        install()
+    return get(kind or 'sqlserver')
