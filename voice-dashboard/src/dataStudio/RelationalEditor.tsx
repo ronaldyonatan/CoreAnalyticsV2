@@ -1,3 +1,4 @@
+import { UniverseFormSection } from '../design-system/components/universe';
 import { AGGREGATIONS, JOIN_STEPS, WINDOW_FUNCTIONS, outputPorts } from './relationalPreview';
 import type { Config, Utility } from './UtilityDraft';
 export default function RelationalEditor({ kind, config, columns, rightColumns, inputs, onChange }: { kind: Utility; config: Config; columns: { name: string; type: string }[]; rightColumns: { name: string; type: string }[]; inputs: string[]; onChange: (config: Config) => void }) {
@@ -10,7 +11,7 @@ export default function RelationalEditor({ kind, config, columns, rightColumns, 
   const field = (label: string, key: string, fallback = '') => <label><span>{label}</span><input maxLength={128} value={values[key] ?? fallback} onChange={event => set(key, event.target.value)} /></label>;
   const select = (label: string, key: string, options: string[], fallback = options[0]) => <label><span>{label}</span><select value={values[key] ?? fallback} onChange={event => set(key, event.target.value)}>{options.map(value => <option key={value}>{value}</option>)}</select></label>;
   const choices = (label: string, key: string) => <div className="utility-drop"><strong>{label}</strong>{columns.map(column => <label key={column.name}><input type="checkbox" checked={(values[key] ?? '').split('\n').includes(column.name)} onChange={event => { const current = (values[key] ?? '').split('\n').filter(Boolean); set(key, (event.target.checked ? [...current, column.name] : current.filter(name => name !== column.name)).join('\n')); }} />{column.name}</label>)}</div>;
-  return <div className="utility-draft relational-editor"><p>Preview Spark aktif. Sampel dibatasi 50 baris per sumber dan per node, maksimal 30 kolom.</p>
+  return <UniverseFormSection className="utility-draft relational-editor"><p>Preview Spark aktif. Sampel dibatasi 50 baris per sumber dan per node, maksimal 30 kolom.</p>
     {JOIN_STEPS.includes(kind) && <p>Hubungkan input ke port <strong>Left</strong> dan <strong>Right</strong>. Left: {inputs[0] || 'belum terhubung'} · Right: {inputs[1] || 'belum terhubung'}.</p>}
     {kind === 'Remove Duplicates' && <>{choices('Kunci unik (kosong = seluruh kolom)', 'keys')}{select('Sensitivitas huruf', 'case', ['sensitive', 'insensitive'])}<p>Baris pertama dalam sampel dipertahankan. NULL dianggap sama untuk kunci deduplikasi.</p></>}
     {kind === 'Split Filter' && <>
@@ -39,5 +40,5 @@ export default function RelationalEditor({ kind, config, columns, rightColumns, 
       {kind === 'Dynamic Unpivot' ? choices('Kolom identitas yang dipertahankan', 'keep') : <>{rows.map(row => <div className="utility-draft-row" key={row.id}><label><span>Kolom sumber</span>{pick(row.column, value => change(row.id, { column: value }))}</label><label><span>Label hasil</span><input maxLength={128} value={row.output} onChange={event => change(row.id, { output: event.target.value })} placeholder={row.column} /></label><button type="button" onClick={() => remove(row.id)}>Hapus kolom</button></div>)}<button type="button" disabled={rows.length >= 30} onClick={add}>＋ Tambah kolom</button></>}
       <p>Nilai hasil unpivot berupa teks. Kolom yang tidak di-unpivot dipertahankan sebagai identitas baris.</p>
     </>}
-  </div>;
+  </UniverseFormSection>;
 }

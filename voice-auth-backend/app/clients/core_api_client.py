@@ -702,6 +702,8 @@ class CoreApiClient:
     def create_studio_connection(self, *, user_id: str, record: dict):
         return self._post_mode("CoreStudioConnectionCreate", {
             "UserID": str(user_id),
+            "ConnectionType": record.get("connector_type", "sqlserver").upper(),
+            "AuthType": "PASSWORD" if record.get("connector_type") == "postgresql" else "SQL_LOGIN",
             "ConnectionName": record["connection_name"],
             "ServerHost": record["server_host"],
             "ServerPort": record.get("server_port", 1433),
@@ -713,6 +715,22 @@ class CoreApiClient:
             "TrustServerCertificate": record.get("trust_server_certificate", False),
             "ConnectionTimeoutSeconds": record.get("connection_timeout_seconds", 10),
         })
+
+    def update_studio_connection(self, *, user_id: str, connection_id: str, record: dict):
+        payload = {
+            'UserID': str(user_id), 'ConnectionID': str(connection_id),
+            'ConnectionType': record['connector_type'].upper(),
+            'ConnectionName': record['connection_name'],
+            'ServerHost': record['server_host'], 'ServerPort': record['server_port'],
+            'DatabaseName': record['database_name'], 'LoginUsername': record['login_username'],
+            'EncryptTransport': record['encrypt_transport'],
+            'TrustServerCertificate': record['trust_server_certificate'],
+            'ConnectionTimeoutSeconds': record['connection_timeout_seconds'],
+        }
+        if 'encrypted_password_base64' in record:
+            payload['EncryptedPasswordBase64'] = record['encrypted_password_base64']
+            payload['EncryptionKeyVersion'] = record['encryption_key_version']
+        return self._post_mode('CoreStudioConnectionUpdate', payload)
 
     def set_studio_connection_active(self, *, user_id: str, connection_id: str, active: bool):
         return self._post_mode("CoreStudioConnectionSetActive", {

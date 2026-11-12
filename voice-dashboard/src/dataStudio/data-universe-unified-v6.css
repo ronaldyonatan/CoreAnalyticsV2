@@ -1,0 +1,74 @@
+/* CoreAnalytics Data Universe V6 — scoped design layer.
+   All colors inherit the active theme's --core-* tokens.
+   The approved Datasets catalog, its custom pickers, and clock menu are untouched. */
+.studio-window[data-aurora-deck] {
+  --du6-ink: var(--core-text);
+  --du6-muted: var(--core-text-secondary, var(--core-text-muted));
+  --du6-accent: var(--core-primary);
+  --du6-line: color-mix(in srgb, var(--core-border) 73%, transparent);
+  --du6-sheet: color-mix(in srgb, var(--core-surface-strong) 96%, var(--core-bg) 4%);
+  --du6-glass: color-mix(in srgb, var(--core-panel) 86%, transparent);
+  --du6-soft: color-mix(in srgb, var(--core-primary) 7%, var(--core-surface) 93%);
+}
+/* Shared module headings: Connections, Scheduler, ETL, Charts, Explorer. */
+.studio-window[data-aurora-deck] :is(.connections-header,.ca-scheduler-top,.studio-etl-hero,.studio-etl-detail-header,.ca-chart-library-header,.explorer-page>.datasets-header) {
+  position:relative;
+  border-color:var(--du6-line);
+  background:linear-gradient(105deg,color-mix(in srgb,var(--du6-accent) 8%,var(--core-panel) 92%),color-mix(in srgb,var(--core-panel) 85%,transparent));
+  border-radius:16px;
+  box-shadow:inset 3px 0 0 color-mix(in srgb,var(--du6-accent) 75%,transparent);
+}
+.studio-window[data-aurora-deck] :is(.connections-header,.ca-scheduler-top,.studio-etl-hero,.studio-etl-detail-header) :is(h1,h2),
+.studio-window[data-aurora-deck] .connection-form-heading h2 {color:var(--du6-ink);letter-spacing:-.025em}
+.studio-window[data-aurora-deck] :is(.connections-overline,.studio-etl-kicker,.connection-section-label,.ca-chart-section-eyebrow){color:var(--du6-accent);letter-spacing:.12em}
+/* Form consistency: only existing Data Studio module form classes; no global input reset. */
+.studio-window[data-aurora-deck] :is(.connection-form,.ca-scheduler-form,.connection-catalog,.studio-etl-overview,.ca-scheduler-section){
+  border-color:var(--du6-line);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--du6-accent) 4%,var(--core-panel) 96%),var(--du6-glass));
+  box-shadow:0 12px 32px color-mix(in srgb,var(--core-bg) 15%,transparent);
+}
+.studio-window[data-aurora-deck] :is(.connection-form,.connection-catalog,.ca-scheduler-form){border-radius:16px}
+.studio-window[data-aurora-deck] :is(.connection-form-section,.connection-security,.ca-scheduler-section-heading){border-color:var(--du6-line)}
+.studio-window[data-aurora-deck] :is(.connection-field,.ca-scheduler-form) :is(input:not([type=checkbox]):not([type=radio]),select,textarea),
+.studio-window[data-aurora-deck] .ca-chart-setting-control :is(input,select),
+.studio-window[data-aurora-deck] .ca-chart-prop-check input[type=number] {
+  background:var(--du6-sheet);
+  color:var(--du6-ink);
+  border-color:var(--du6-line);
+  border-radius:10px;
+  box-shadow:none;
+}
+.studio-window[data-aurora-deck] :is(.connection-field,.ca-scheduler-form,.ca-chart-setting-control) :is(input,select,textarea):focus-visible {
+  outline:2px solid color-mix(in srgb,var(--du6-accent) 65%,transparent);
+  outline-offset:2px;
+}
+/* Native option menus must be opaque, including in transparent themes. */
+.studio-window[data-aurora-deck] :is(.connection-field,.ca-scheduler-form,.ca-chart-setting-control) select option {
+  background:var(--core-surface-strong);
+  color:var(--core-text);
+}
+/* Selected items are washes, not hard outlines. */
+.studio-window[data-aurora-deck] :is(.connection-catalog-filter,.connection-catalog-item,.studio-etl-catalog-item,.ca-scheduler-select-target)[aria-selected=true],
+.studio-window[data-aurora-deck] :is(.connection-catalog-filter,.connection-catalog-item,.studio-etl-catalog-item,.ca-scheduler-select-target).is-selected {
+  background:linear-gradient(90deg,color-mix(in srgb,var(--du6-accent) 17%,var(--core-panel) 83%),color-mix(in srgb,var(--du6-accent) 3%,var(--core-panel) 97%));
+  border-color:transparent;
+  box-shadow:inset 3px 0 0 var(--du6-accent);
+}
+/* ETL and Scheduler catalog entries inherit the approved lightweight row language. */
+.studio-window[data-aurora-deck] :is(.studio-etl-catalog-item,.ca-scheduler-table-wrap tbody tr,.connections-table tbody tr){
+  transition:background-color .12s ease;
+}
+.studio-window[data-aurora-deck] :is(.studio-etl-catalog-item,.ca-scheduler-table-wrap tbody tr,.connections-table tbody tr):hover {
+  background:color-mix(in srgb,var(--du6-accent) 7%,transparent);
+}
+/* Buttons: respect semantic primary and danger variants. */
+.studio-window[data-aurora-deck] :is(.connections-button,.ca-scheduler-actions button,.ca-scheduler-row-actions button,.connection-catalog-filter) {
+  border-radius:10px;
+  transition:background-color .12s ease,border-color .12s ease;
+}
+.studio-window[data-aurora-deck] :is(button,input,select,textarea):disabled {cursor:not-allowed}
+/* No decorative animations for reduced-motion / static performance profiles. */
+@media (prefers-reduced-motion:reduce){.studio-window[data-aurora-deck] :is(.studio-etl-catalog-item,.connections-button,.ca-scheduler-actions button){transition:none}}
+@media(max-width:720px){
+ .studio-window[data-aurora-deck] :is(.connections-header,.ca-scheduler-top,.studio-etl-hero,.studio-etl-detail-header){border-radius:12px}
+}

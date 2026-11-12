@@ -1,0 +1,69 @@
+/* Dataset-level actions and embedded schedule editor, inheriting all active JEC themes. */
+.studio-window-content .datasets-catalog-list > li.datasets-row-shell {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 46px;
+  align-items:center;
+  gap:7px;
+}
+.studio-window-content .datasets-row-shell .datasets-catalog-row {
+  min-width:0;
+  grid-template-columns:34px minmax(90px,1fr) minmax(63px,75px) 75px 54px 12px;
+}
+.studio-window-content .datasets-row-actions {display:flex;min-width:0;width:46px;gap:4px;align-items:center;justify-content:flex-end}
+.studio-window-content .datasets-row-actions button {
+  border:1px solid color-mix(in srgb,currentColor 24%,transparent);
+  border-radius:7px;
+  padding:7px 8px;
+  background:color-mix(in srgb,currentColor 7%,transparent);
+  color:inherit;
+  font-size:11px;
+  font-weight:650;
+  cursor:pointer;
+  white-space:nowrap;
+  min-height:33px;
+}
+.studio-window-content .datasets-row-actions button:hover:not(:disabled),
+.studio-window-content .datasets-row-actions button:focus-visible {background:color-mix(in srgb,currentColor 15%,transparent);outline-offset:2px}
+.studio-window-content .datasets-row-actions button:disabled {opacity:.45;cursor:default}
+@media(max-width:1380px){
+  .studio-window-content .datasets-row-shell .datasets-catalog-row {grid-template-columns:32px minmax(95px,1fr) 66px 48px 12px;gap:7px}
+  .studio-window-content .datasets-row-shell .datasets-catalog-row>.ca-catalog-metadata:nth-child(4){display:none}
+}
+@media(max-width:1060px){
+  .studio-window-content .datasets-row-shell .datasets-catalog-row {grid-template-columns:32px minmax(70px,1fr) 54px 12px;gap:7px}
+  .studio-window-content .datasets-row-shell .datasets-catalog-row>.ca-catalog-metadata {display:none}
+  .studio-window-content .datasets-row-actions .datasets-action-word {display:none}
+  .studio-window-content .datasets-row-actions button {padding:7px 9px}
+}
+@media(max-width:580px){
+  .studio-window-content .datasets-row-shell .datasets-catalog-row {grid-template-columns:30px minmax(0,1fr) 12px;gap:5px}
+  .studio-window-content .datasets-row-shell .datasets-catalog-row>.datasets-mode-label {display:none}
+  .studio-window-content .datasets-row-actions {gap:2px}
+  .studio-window-content .datasets-row-actions button {padding:7px}
+}
+.datasets-schedule-overlay {
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(2,10,22,.74);
+  backdrop-filter:blur(6px);
+}
+.datasets-schedule-dialog {
+  width:min(850px,100%);
+  max-height:min(90dvh,900px);
+  overflow:auto;
+  color:inherit;
+  background:var(--surface-card,var(--surface-primary,var(--studio-surface,#172737)));
+  border:1px solid color-mix(in srgb,currentColor 25%,transparent);
+  border-radius:16px;
+  box-shadow:0 28px 95px rgba(0,0,0,.44);
+}
+.datasets-schedule-dialog .ca-scheduler {padding:8px 14px;}
+.datasets-schedule-dialog .ca-scheduler-form {margin:0;border:none;background:transparent;}
+.datasets-schedule-dialog .ca-scheduler-target {grid-column:1/-1;display:flex;gap:6px;flex-direction:column;padding:10px 12px;border-radius:9px;background:color-mix(in srgb,currentColor 7%,transparent)}
+.datasets-schedule-dialog .ca-scheduler-target small {font-weight:400;opacity:.75}
+@media(max-width:560px){.datasets-schedule-overlay{padding:8px}.datasets-schedule-dialog{max-height:96dvh}}

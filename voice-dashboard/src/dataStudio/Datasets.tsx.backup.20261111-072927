@@ -1,0 +1,179 @@
+import './dataset-overview.css';
+import { loadDatasetCatalog, datasetSource, datasetKind, DATASET_KIND_INFO } from './datasetCatalog';
+import type { DatasetKind } from './datasetCatalog';
+import type { CatalogDataset as Dataset } from './datasetCatalog';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import SearchPicker from './SearchPicker';
+
+type Connection = { connection_id: string; connection_name: string; database_name: string; is_active: boolean; connector_type?: string; connection_type?: string };
+type Source = { schema: string; name: string; type: string };
+type Mode = 'DIRECT' | 'STORED';
+const BASE = '/voice-api/api/studio/datasets';
+function csrf() { const item = document.cookie.split('; ').find(value => value.startsWith('core_csrf=')); return item ? decodeURIComponent(item.slice(10)) : ''; }
+async function api(url: string, signal?: AbortSignal, body?: unknown) {
+  const response = await fetch(url, { method: body ? 'POST' : 'GET', credentials: 'include', cache: 'no-store', signal, headers: body ? { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() } : {}, body: body ? JSON.stringify(body) : undefined });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || result.success === false) throw new Error(result.code || `HTTP_${response.status}`);
+  return result.data;
+}
+// Use distinct icon silhouettes; colors inherit existing theme tokens with fallbacks.
+const kindAppearance: Record<DatasetKind, { color: string; background: string }> = {
+  direct: { color: 'var(--studio-info, var(--color-info, #35b8e6))', background: 'color-mix(in srgb, var(--studio-info, var(--color-info, #35b8e6)) 12%, transparent)' },
+  stored: { color: 'var(--studio-success, var(--color-success, #44b8a0))', background: 'color-mix(in srgb, var(--studio-success, var(--color-success, #44b8a0)) 12%, transparent)' },
+  etl: { color: 'var(--studio-accent, var(--color-accent, #a995ef))', background: 'color-mix(in srgb, var(--studio-accent, var(--color-accent, #a995ef)) 12%, transparent)' },
+};
+function DatasetKindIcon({ kind }: { kind: DatasetKind }) {
+  const props = { width: 21, height: 21, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true as const };
+  if (kind === 'direct') return <svg {...props}><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/><path d="M16 10l3-3m-3 0h3v3"/></svg>;
+  if (kind === 'stored') return <svg {...props}><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 13h18M7 16h.01M11 16h.01M8 8h8"/></svg>;
+  return <svg {...props}><rect x="2" y="3" width="7" height="6" rx="1.5"/><rect x="15" y="3" width="7" height="6" rx="1.5"/><rect x="8.5" y="16" width="7" height="6" rx="1.5"/><path d="M5.5 9v3h6.5v4M18.5 9v3H12"/></svg>;
+}
+function DatabaseSourceIcon({ type }: { type: string }) {
+  const normalized = type.trim().toLowerCase();
+  if (normalized === 'postgresql' || normalized === 'postgres') {
+    // Distinct elephant-inspired silhouette, not a copied brand asset.
+    return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 11V7a8 8 0 0 1 16 0v7c0 2-1 3-3 3h-2"/><path d="M8 13v5c0 2 1 3 3 3s3-1 3-3v-7"/><path d="M14 15c2 0 3 1 3 3M6 8h.01M18 8h.01"/><path d="M4 14c-2 0-2 3 0 4h3"/></svg>;
+  }
+  if (normalized === 'sqlserver' || normalized === 'sql_server' || normalized === 'mssql') {
+    return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 7c0-2 4-4 9-4s9 2 9 4-4 4-9 4-9-2-9-4Z"/><path d="M3 7v10c0 2 4 4 9 4s9-2 9-4V7M3 12c0 2 4 4 9 4s9-2 9-4"/><path d="M9 7h6"/></svg>;
+  }
+  return <DatasetKindIcon kind="direct" />;
+}
+function DatasetKindMark({ dataset }: { dataset: Dataset }) {
+  const kind = datasetKind(dataset);
+  const info = DATASET_KIND_INFO[kind];
+  const style = kindAppearance[kind];
+  const connector = dataset.connector_type || dataset.connection_type || '';
+  const sourceLabel = kind === 'direct' && connector ? `${connector.toUpperCase()} · ${info.tooltip}` : info.tooltip;
+  return <span title={sourceLabel} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 35, height: 35, flexShrink: 0, borderRadius: 11, color: style.color, background: style.background, border: '1px solid color-mix(in srgb, currentColor 20%, transparent)' }}>{kind === 'direct' ? <DatabaseSourceIcon type={connector} /> : <DatasetKindIcon kind={kind}/>}</span>;
+}
+function DatasetKindBadge({ dataset }: { dataset: Dataset }) {
+  const kind = datasetKind(dataset);
+  const info = DATASET_KIND_INFO[kind];
+  return <span className="datasets-mode-label" title={info.tooltip} style={{ color: kindAppearance[kind].color, fontWeight: 700, whiteSpace: 'nowrap', letterSpacing: '.07em' }}>{info.label}</span>;
+}
+
+export default function Datasets({ onExplore }: { onExplore: (datasetId: string, parquet?:boolean) => void }) {
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
+  const [creating, setCreating] = useState(false);
+  const [query, setQuery] = useState('');
+  const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
+  const [connection, setConnection] = useState('');
+  const [sources, setSources] = useState<Source[]>([]);
+  const [sourceIndex, setSourceIndex] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [mode, setMode] = useState<Mode>('DIRECT');
+  const [loading, setLoading] = useState(true);
+  const [sourceLoading, setSourceLoading] = useState(false);
+  const [sourceError, setSourceError] = useState('');
+  const [sourceAttempt, setSourceAttempt] = useState(0);
+  const [sourceSearch, setSourceSearch] = useState('');
+  const [sourceHasMore, setSourceHasMore] = useState(false);
+  const moreController = useRef<AbortController | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [catalogNotices,setCatalogNotices]=useState<string[]>([]);
+  const [catalogError, setCatalogError] = useState('');
+  const [connectionError, setConnectionError] = useState('');
+  const [notice, setNotice] = useState('');
+  const reload = useCallback(async (signal?: AbortSignal) => {
+    setLoading(true);
+    try {
+      const [connectionRows, datasetRows] = await Promise.all([api('/voice-api/api/studio/connections', signal), loadDatasetCatalog(signal)]);
+      if (signal?.aborted) return;
+      const rows = Array.isArray(connectionRows) ? connectionRows : connectionRows?.data;
+      setConnections(Array.isArray(rows) ? rows.filter((row: Connection) => row.is_active) : []);
+      const activeConnections = Array.isArray(rows) ? rows : [];
+      const typesByConnection = new Map<string, string>(activeConnections.map((item: Connection) => [String(item.connection_id).toLowerCase(), item.connector_type || item.connection_type || '']));
+      setDatasets(datasetRows.items.map(item => ({ ...item, connector_type: item.connector_type || item.connection_type || typesByConnection.get(String(item.connection_id || '').toLowerCase()) || '' })));setCatalogNotices(datasetRows.notices);
+      setCatalogError('');setConnectionError('');
+    } finally { if (!signal?.aborted) setLoading(false); }
+  }, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.allSettled([api('/voice-api/api/studio/connections', controller.signal), loadDatasetCatalog(controller.signal)]).then(([connectionsResult, datasetsResult]) => {
+      if (controller.signal.aborted) return;
+      if (connectionsResult.status === 'fulfilled') {
+        const connectionRows = connectionsResult.value;
+        const rows = Array.isArray(connectionRows) ? connectionRows : connectionRows?.data;
+        setConnections(Array.isArray(rows) ? rows.filter((row: Connection) => row.is_active) : []);
+      } else setConnectionError('Daftar koneksi tidak dapat dimuat. Periksa layanan Connections dan sesi login.');
+      if (datasetsResult.status === 'fulfilled') {
+        const connectionRows = connectionsResult.status === 'fulfilled' ? connectionsResult.value : [];
+        const availableConnections: Connection[] = Array.isArray(connectionRows) ? connectionRows : (Array.isArray(connectionRows?.data) ? connectionRows.data : []);
+        const typesByConnection = new Map<string, string>(availableConnections.map(item => [String(item.connection_id).toLowerCase(), item.connector_type || item.connection_type || '']));
+        setDatasets(datasetsResult.value.items.map(item => ({ ...item, connector_type: item.connector_type || item.connection_type || typesByConnection.get(String(item.connection_id || '').toLowerCase()) || '' })));setCatalogNotices(datasetsResult.value.notices);
+      } else setCatalogError('Katalog dataset belum dapat dimuat. Periksa backend, migrasi dataset, dan mode BEAM.');
+    }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [reload]);
+  useEffect(() => {
+    const controller = new AbortController();
+    if (!connection) return () => controller.abort();
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({ q: sourceSearch, offset: '0', limit: '50' });
+      api(`${BASE}/sources/${encodeURIComponent(connection)}?${params}`, controller.signal).then(result => { setSources(Array.isArray(result?.items) ? result.items : []); setSourceHasMore(result?.has_more === true); }).catch(err => { if (!controller.signal.aborted) setSourceError(err instanceof Error ? err.message : 'DATASET_SOURCE_UNAVAILABLE'); }).finally(() => { if (!controller.signal.aborted) setSourceLoading(false); });
+    }, 250);
+    return () => { window.clearTimeout(timer); controller.abort(); moreController.current?.abort(); };
+  }, [connection, sourceAttempt, sourceSearch]);
+  async function loadMoreSources() {
+    if (!connection || sourceLoading || !sourceHasMore) return;
+    setSourceLoading(true);
+    const controller = new AbortController();
+    moreController.current = controller;
+    try {
+      const params = new URLSearchParams({ q: sourceSearch, offset: String(sources.length), limit: '50' });
+      const result = await api(`${BASE}/sources/${encodeURIComponent(connection)}?${params}`, controller.signal);
+      if (controller.signal.aborted) return;
+      setSources(previous => [...previous, ...(Array.isArray(result?.items) ? result.items : [])]);
+      setSourceHasMore(result?.has_more === true);
+    } catch (err) { if (!controller.signal.aborted) setSourceError(err instanceof Error ? err.message : 'DATASET_SOURCE_UNAVAILABLE'); }
+    finally { if (!controller.signal.aborted) setSourceLoading(false); if (moreController.current === controller) moreController.current = null; }
+  }
+  async function save(event: React.FormEvent) {
+    event.preventDefault();
+    const source = sources[Number(sourceIndex)];
+    if (!source || !name.trim() || mode !== 'DIRECT') return;
+    setBusy(true); setError(''); setNotice('');
+    try {
+      await api(BASE, undefined, { connection_id: connection, dataset_name: name.trim(), description: description.trim(), source_schema: source.schema, source_name: source.name, source_type: source.type, access_mode: mode });
+      await reload(); setName(''); setDescription(''); setSourceIndex(''); setCreating(false); setNotice('Dataset Direct berhasil disimpan.');
+    } catch (err) { setError(err instanceof Error ? err.message : 'DATASET_CREATE_UNAVAILABLE'); }
+    finally { setBusy(false); }
+  }
+  const filtered = datasets.filter(item => [item.dataset_name, item.connection_name, item.source_schema, item.source_name].some(value => String(value ?? '').toLowerCase().includes(query.trim().toLowerCase())));
+  return <section className="datasets-page" aria-labelledby="datasets-title">
+    <header className="datasets-header"><div><span className="datasets-eyebrow">DATA STUDIO / DATASETS</span><h1 id="datasets-title">{creating ? 'Create dataset' : 'Dataset catalog'}<span>.</span></h1><p>{creating ? 'Hubungkan sumber data untuk analisis dan dashboard CoreAnalytics.' : 'Temukan dan kelola sumber data yang siap digunakan.'}</p></div><button type="button" className="datasets-action" onClick={() => { setCreating(value => !value); setSelectedDataset(null); setError(''); setNotice(''); }}>{creating ? '← Kembali ke katalog' : '+ Create dataset'}</button></header>
+    {error && <p className="datasets-message" role="alert">Permintaan tidak dapat diselesaikan: {error}. Pastikan migrasi dataset dan mode BEAM telah tersedia.</p>}
+    {creating && connectionError && <p className="datasets-message" role="alert">{connectionError}</p>}
+    {creating && catalogError && <p className="datasets-message" role="status">{catalogError} Pilihan koneksi tetap dapat dilihat jika layanan Connections tersedia.</p>}
+    {!creating && catalogNotices.map(notice=><p key={notice} className="datasets-message" role="status">{notice}</p>)}
+    {notice && <p className="datasets-message" role="status">{notice}</p>}
+    {!creating ? <div className="datasets-catalog">
+      <div className="datasets-catalog-heading"><div><span className="datasets-eyebrow">YOUR DATA ASSETS</span><h2>Registered datasets <span className="datasets-count">{loading ? '—' : datasets.length}</span></h2><p>Pilih dataset untuk melihat informasi sumber dan mode aksesnya.</p></div></div>
+      <label className="datasets-search"><span aria-hidden="true">⌕</span><span className="connections-sr-only">Cari dataset</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Cari nama dataset, koneksi, atau sumber" /></label>
+      {loading ? <div className="studio-loading" role="status" aria-live="polite"><span className="studio-loading-spinner" aria-hidden="true" /><strong>Memuat dataset…</strong><span>Mengambil katalog dataset dan daftar koneksi.</span></div> : catalogError ? <div className="datasets-empty" role="alert">{catalogError}</div> : !datasets.length ? <div className="datasets-empty"><strong>Belum ada dataset</strong><p>Buat dataset pertama dari koneksi yang sudah tersedia.</p><button type="button" className="datasets-action" onClick={() => setCreating(true)}>+ Create dataset</button></div> : !filtered.length ? <div className="datasets-empty">Tidak ada dataset yang cocok dengan pencarian.</div> : <div className="datasets-catalog-grid"><ul className="datasets-catalog-list">{filtered.map(item => <li key={item.dataset_id}><button type="button" className={`datasets-catalog-row${selectedDataset?.dataset_id === item.dataset_id ? ' is-selected' : ''}`} onClick={() => setSelectedDataset(item)} aria-pressed={selectedDataset?.dataset_id === item.dataset_id}><DatasetKindMark dataset={item} /><span className="datasets-catalog-name"><strong>{item.dataset_name}</strong><small>{datasetSource(item)}</small></span><span className="ca-catalog-metadata"><small>Rows</small><strong>{item.row_count == null ? '—' : item.row_count.toLocaleString('id-ID')}</strong></span><span className="ca-catalog-metadata"><small>Dibuat pada</small><strong>{item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '—'}</strong></span><DatasetKindBadge dataset={item} /><span aria-hidden="true">↗</span></button></li>)}</ul><aside className="datasets-detail">{selectedDataset ? <><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}><span className="datasets-eyebrow">DATASET DETAILS</span><button type="button" className="datasets-action datasets-open-explorer" style={{ flexShrink: 0, minHeight: 32, padding: '6px 11px', whiteSpace: 'nowrap' }} onClick={() => onExplore(selectedDataset.dataset_id, selectedDataset.access_mode === 'PARQUET')}>Lihat data ↗</button></div><h2>{selectedDataset.dataset_name}</h2><dl><dt>{selectedDataset.access_mode==='PARQUET' ? 'Pipeline':'Connection'}</dt><dd>{selectedDataset.connection_name}</dd><dt>Source</dt><dd>{selectedDataset.access_mode==='PARQUET' ? selectedDataset.source_name:`${selectedDataset.source_schema}.${selectedDataset.source_name}`}</dd><dt>Jenis dataset</dt><dd>{DATASET_KIND_INFO[datasetKind(selectedDataset)].label} · {DATASET_KIND_INFO[datasetKind(selectedDataset)].detail}</dd><dt>Access mode</dt><dd>{selectedDataset.access_mode === 'DIRECT' ? 'Direct access' : selectedDataset.access_mode}</dd><dt>Status</dt><dd>{selectedDataset.storage_status}</dd><dt>Owner</dt><dd>{selectedDataset.owner_name || 'Belum tersedia'}</dd><dt>Cards</dt><dd>Belum tersedia</dd><dt>Tags</dt><dd>Belum tersedia</dd>{selectedDataset.run_id && <><dt>Run ID</dt><dd className="ca-id">{selectedDataset.run_id}</dd></>}{selectedDataset.row_count !== undefined && <><dt>Jumlah baris</dt><dd>{selectedDataset.row_count.toLocaleString('id-ID')}</dd></>}</dl></> : <><span className="datasets-eyebrow">DATASET DETAILS</span><h2>Pilih dataset</h2><p>Informasi dataset yang dipilih akan ditampilkan di sini.</p></>}</aside></div>}
+    </div> : <form onSubmit={save} className="datasets-layout">
+      <div className="datasets-main">
+        <div className="datasets-section-heading"><span>01 / SOURCE</span><h2>Pilih sumber data</h2><p>Mulai dengan koneksi aktif, lalu pilih tabel atau view yang tersedia.</p></div>
+        <div className="datasets-fields-grid">
+        <SearchPicker label="Connection" placeholder={loading ? 'Memuat koneksi…' : 'Cari koneksi aktif'} value={connection} options={connections.map(item => ({ value: item.connection_id, label: `${item.connection_name} · ${item.database_name}` }))} onSelect={value => { setConnection(value); setSourceLoading(Boolean(value)); setSources([]); setSourceIndex(''); setSourceSearch(''); setSourceHasMore(false); setSourceError(''); setError(''); }} disabled={loading} />
+        {!loading && !connections.length && !connectionError && <p className="datasets-message">Belum ada koneksi aktif. Tambahkan atau aktifkan koneksi melalui Connections.</p>}
+        <SearchPicker key={connection} label="Tabel atau view" placeholder={!connection ? 'Pilih koneksi terlebih dahulu' : 'Cari schema, tabel, atau view'} value={sourceIndex} options={sources.map((item, index) => ({ value: String(index), label: `${item.schema}.${item.name}`, detail: item.type === 'VIEW' ? 'View' : 'Table' }))} onSelect={setSourceIndex} onSearch={value => { if (value !== sourceSearch) { setSourceSearch(value); setSources([]); setSourceHasMore(false); setSourceError(''); setSourceLoading(true); } }} disabled={!connection || !!sourceError} loading={sourceLoading} hasMore={sourceHasMore} onMore={() => void loadMoreSources()} />
+        {sourceError && <div className="datasets-source-error" role="alert"><span>{sourceError === 'DATASET_CONNECTION_METADATA_UNAVAILABLE' ? 'Metadata koneksi belum tersedia dari BEAM. Periksa apakah mode dataset sudah diterapkan dan koneksi masih aktif.' : sourceError === 'HTTP_404' ? 'Endpoint dataset belum tersedia. Pastikan backend yang terbaru sudah dijalankan.' : `Daftar tabel belum dapat dimuat (${sourceError}). Periksa layanan dataset, kebijakan jaringan, dan akses akun SQL.`}</span><button type="button" onClick={() => { setSourceError(''); setSourceLoading(true); setSourceAttempt(value => value + 1); }}>Coba lagi</button></div>}
+        {connection && !sourceLoading && !sourceError && !sources.length && <p className="datasets-source-error">{sourceSearch ? 'Tidak ada tabel atau view yang cocok dengan pencarian.' : 'Tidak ada tabel atau view yang terlihat oleh akun SQL pada database ini.'}</p>}
+        <label className="datasets-field">Nama dataset<input required maxLength={150} value={name} onChange={event => setName(event.target.value)} placeholder="Contoh: Pendapatan cabang" /></label>
+        <label className="datasets-field">Deskripsi (opsional)<input maxLength={1000} value={description} onChange={event => setDescription(event.target.value)} placeholder="Kegunaan dataset" /></label>
+        </div>
+        <div className="datasets-section-heading"><span>02 / ACCESS MODE</span><h2>Bagaimana data digunakan?</h2><p>Pilih cara dataset mengakses data sesuai kebutuhan.</p></div>
+        <div className="datasets-modes" role="radiogroup" aria-label="Mode akses dataset">
+          <label className={`datasets-mode ${mode === 'DIRECT' ? 'is-selected' : ''}`}><input type="radio" name="dataset-mode" checked={mode === 'DIRECT'} onChange={() => setMode('DIRECT')} /><span className="datasets-mode-icon" aria-hidden="true">↗</span><span><strong>Direct access</strong><small>Mengakses sumber saat data dibutuhkan.</small></span></label>
+          <label className={`datasets-mode ${mode === 'STORED' ? 'is-selected' : ''}`}><input type="radio" name="dataset-mode" checked={mode === 'STORED'} onChange={() => setMode('STORED')} /><span className="datasets-mode-icon" aria-hidden="true">◈</span><span><strong>Store in CoreAnalytics</strong><small>Hasil pipeline disimpan sebagai Parquet.</small></span></label>
+        </div>
+      </div>
+      <aside className="datasets-aside"><span className="datasets-eyebrow">DATASET SETUP</span><h2>{mode === 'DIRECT' ? 'Direct access' : 'Parquet storage'}</h2><p>{mode === 'DIRECT' ? 'Definisi dataset disimpan; data dibaca langsung dari sumber saat Anda membukanya.' : 'Penyimpanan Parquet dibuat melalui Output Dataset pada pipeline. Hasil job yang berhasil muncul otomatis di katalog.'}</p><div className="datasets-aside-line" /><strong>{mode === 'DIRECT' ? 'Direct dataset' : 'Belum tersedia'}</strong><p>{mode === 'DIRECT' ? 'Dataset dapat dibuka melalui Data Explorer; data tetap berada di sumber.' : 'Gunakan ETL & Pipelines untuk membuat hasil Parquet; formulir ini membuat sumber Direct.'}</p><button type="submit" disabled={busy || mode !== 'DIRECT' || !connection || sourceIndex === '' || !name.trim()}>{busy ? 'Menyimpan…' : 'Save dataset'}</button></aside>
+    </form>}
+  </section>;
+}

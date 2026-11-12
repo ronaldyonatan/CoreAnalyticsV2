@@ -6,6 +6,8 @@ import Datasets from './Datasets';
 import ChartLibrary from './ChartLibrary';
 import DataExplorer from './DataExplorer';
 import ETLWorkspace from './ETLWorkspace';
+import Scheduler from './Scheduler';
+import type {ScheduleTarget} from './Scheduler';
 import { LoginAtmosphere } from '../LoginPortal';
 import { ComponentStyles } from '../design-system/ComponentStyles';
 import DataStudioOverview from './DataStudioOverview';
@@ -13,6 +15,8 @@ import { STUDIO_MODULES } from './modules';
 import StudioIcon from './StudioIcon';
 import type { StudioModule, StudioModuleId } from './modules';
 import './data-studio-executive.css';
+import './data-universe-unified-v6.css';
+import '../design-system/components/universe/universe.css';
 
 function ComingSoon({ module }: { module: StudioModule }) {
   return <div className="studio-placeholder"><span className="studio-placeholder-icon"><StudioIcon module={module} /></span><span className="studio-placeholder-badge">COMING SOON</span><h1>{module.label}</h1><p>{module.description}. This module is planned for a future Data Studio release.</p></div>;
@@ -23,6 +27,7 @@ export default function DataStudioWorkspace() {
   const [connectionsOpened, setConnectionsOpened] = useState(false);
   const [explorerDataset, setExplorerDataset] = useState('');
   const [explorerParquet,setExplorerParquet]=useState(false);
+  const [schedulerFocus,setSchedulerFocus]=useState<ScheduleTarget|null>(null);
   const [fullPage, setFullPage] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -106,6 +111,7 @@ export default function DataStudioWorkspace() {
       originRectRef.current = origin?.getBoundingClientRect() ?? openerRef.current?.getBoundingClientRect() ?? null;
       if (id === 'connections') setConnectionsOpened(true);
       if (id === 'explorer') {setExplorerDataset('');setExplorerParquet(false);}
+      if (id === 'scheduler') setSchedulerFocus(null);
     }
     setSelected(id);
   };
@@ -125,16 +131,17 @@ export default function DataStudioWorkspace() {
       <ComponentStyles name="login-gateway" /><LoginAtmosphere paused={selected !== 'overview'} /><DataStudioOverview onSelect={selectModule} paused={selected !== 'overview'} />
     </main>
     <div className="studio-window-overlay" hidden={selected === 'overview'}>
-      <div className="studio-window" role="dialog" aria-modal="true" aria-labelledby="studio-window-title" ref={dialogRef} onKeyDown={handleDialogKeyDown}>
+      <div className="studio-window" data-aurora-deck="v5" role="dialog" aria-modal="true" aria-labelledby="studio-window-title" ref={dialogRef} onKeyDown={handleDialogKeyDown}>
         <header className="studio-window-header"><div className="studio-window-heading"><span className="studio-window-glyph" aria-hidden="true"><StudioIcon module={current} /></span><h2 id="studio-window-title">{current.label}</h2></div><button ref={closeRef} type="button" className="studio-window-close" aria-label="Tutup dan kembali ke Command Center" onClick={() => selectModule('overview')}><span aria-hidden="true">×</span></button></header>
         <div className="studio-window-content">
           {connectionsOpened && <div className="studio-connections" hidden={selected !== 'connections'}><Connections active={selected === 'connections'} /></div>}
           {selected === 'charts' && <ChartLibrary />}
-          {selected === 'datasets' && <Datasets onExplore={(datasetId,parquet=false) => { setExplorerDataset(datasetId);setExplorerParquet(parquet); originRectRef.current = null; setSelected('explorer'); }} />}
+          {selected === 'datasets' && <Datasets onExplore={(datasetId,parquet=false) => { setExplorerDataset(datasetId);setExplorerParquet(parquet); originRectRef.current = null; setSelected('explorer'); }} onSchedulerDetails={target=>{setSchedulerFocus(target);originRectRef.current=null;setSelected('scheduler');}} />}
           {selected === 'explorer' && <DataExplorer initialDatasetId={explorerDataset} initialParquet={explorerParquet} onBackToDatasets={() => { originRectRef.current = null; setExplorerDataset(''); setExplorerParquet(false); setSelected('datasets'); }} />}
-          {selected === 'pipelines' && <ETLWorkspace onExplore={id=>{setExplorerDataset(id);setExplorerParquet(true);originRectRef.current=null;setSelected('explorer');}} onExploreSource={(id,isParquet)=>{setExplorerDataset(id);setExplorerParquet(isParquet);originRectRef.current=null;setSelected('explorer');}} />}
-          {selected === 'jobs' && <ETLWorkspace initialSection="history" onExplore={id=>{setExplorerDataset(id);setExplorerParquet(true);originRectRef.current=null;setSelected('explorer');}} onExploreSource={(id,isParquet)=>{setExplorerDataset(id);setExplorerParquet(isParquet);originRectRef.current=null;setSelected('explorer');}} />}
-          {current.status === 'planned' && selected !== 'datasets' && selected !== 'explorer' && selected !== 'pipelines' && selected !== 'jobs' && <ComingSoon module={current} />}
+          {selected === 'pipelines' && <ETLWorkspace onSchedulerDetails={target=>{setSchedulerFocus(target);originRectRef.current=null;setSelected('scheduler');}} onExplore={id=>{setExplorerDataset(id);setExplorerParquet(true);originRectRef.current=null;setSelected('explorer');}} onExploreSource={(id,isParquet)=>{setExplorerDataset(id);setExplorerParquet(isParquet);originRectRef.current=null;setSelected('explorer');}} />}
+          {selected === 'scheduler' && <Scheduler focusTarget={schedulerFocus} onPreviewDataset={(id,parquet)=>{setExplorerDataset(id);setExplorerParquet(parquet);originRectRef.current=null;setSelected('explorer');}} />}
+          {selected === 'jobs' && <ETLWorkspace onSchedulerDetails={target=>{setSchedulerFocus(target);originRectRef.current=null;setSelected('scheduler');}} initialSection="history" onExplore={id=>{setExplorerDataset(id);setExplorerParquet(true);originRectRef.current=null;setSelected('explorer');}} onExploreSource={(id,isParquet)=>{setExplorerDataset(id);setExplorerParquet(isParquet);originRectRef.current=null;setSelected('explorer');}} />}
+          {current.status === 'planned' && selected !== 'datasets' && selected !== 'explorer' && selected !== 'pipelines' && selected !== 'scheduler' && selected !== 'jobs' && <ComingSoon module={current} />}
         </div>
       </div>
     </div>

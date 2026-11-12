@@ -1,3 +1,4 @@
+import { UniverseFormSection } from '../design-system/components/universe';
 import { useState } from 'react';
 import SearchPicker from './SearchPicker';
 import { CAST_TYPES, UTILITY_PREVIEW_STEPS } from './utilityPreview';
@@ -19,7 +20,7 @@ export default function UtilityDraft({ kind, config, columns, onChange }: Props)
   const remove = (id: string) => onChange({ ...config, rows: rows.filter(row => row.id !== id) });
   const input = (label: string, key = label) => <label><span>{label}</span><input value={values[key] ?? defaults[label] ?? ''} onChange={event => setValue(key, event.target.value)} /></label>;
   const pick = (label: string, value: string, change: (value: string) => void) => <SearchPicker label={label} placeholder="Cari kolom" value={value} options={columns.map(column => ({ value: column.name, label: column.name, detail: column.type }))} onSelect={change} />;
-  return <div className="utility-draft"><p>{UTILITY_PREVIEW_STEPS.includes(kind) ? 'Preview Spark aktif pada sampel maksimal 50 baris. Konfigurasi dan output belum disimpan.' : 'Rancangan konfigurasi. Belum disimpan dan belum dapat dijalankan pada preview Spark.'}</p>
+  return <UniverseFormSection className="utility-draft"><p>{UTILITY_PREVIEW_STEPS.includes(kind) ? 'Preview Spark aktif pada sampel maksimal 50 baris. Konfigurasi dan output belum disimpan.' : 'Rancangan konfigurasi. Belum disimpan dan belum dapat dijalankan pada preview Spark.'}</p>
     {['Add Constants', 'Alter Columns', 'Duplicate Column', 'Order'].includes(kind) && <>
       {rows.map((row, index) => <div className="utility-draft-row" key={row.id}><strong>{index + 1}</strong>
         {kind === 'Add Constants' ? <><label><span>Nama kolom baru</span><input value={row.output} onChange={e => setRow(row.id, { output: e.target.value })} /></label><label><span>Tipe data</span><select value={row.kind} onChange={e => setRow(row.id, { kind: e.target.value })}><option value="">Pilih tipe</option>{types.map(type => <option key={type}>{type}</option>)}</select></label><label><span>Nilai konstan</span><input placeholder="Nilai" value={row.value} onChange={e => setRow(row.id, { value: e.target.value })} /></label></> : <>{pick('Kolom sumber', row.column, value => setRow(row.id, { column: value }))}{kind === 'Order' ? <label><span>Urutan</span><select value={row.kind || 'Ascending'} onChange={e => setRow(row.id, { kind: e.target.value })}><option>Ascending</option><option>Descending</option></select></label> : <label><span>{kind === 'Duplicate Column' ? 'Nama kolom tujuan' : 'Nama baru'}</span><input value={row.output} onChange={e => setRow(row.id, { output: e.target.value })} /></label>}{kind === 'Order' && <label><span>Tipe pengurutan</span><select value={row.value || 'Text'} onChange={e => setRow(row.id, { value: e.target.value })}><option>Text</option><option>Number</option><option>Date</option></select></label>}{kind === 'Alter Columns' && <label><span>Cast data type</span><select value={row.kind} onChange={e => setRow(row.id, { kind: e.target.value })}><option value="">Tidak berubah</option>{types.map(type => <option key={type}>{type}</option>)}</select></label>}</>}
@@ -56,6 +57,6 @@ export default function UtilityDraft({ kind, config, columns, onChange }: Props)
 
     {kind === 'Meta Select' && <><p>Pilih kolom melalui metadata input. Konfigurasi disimpan di node ini. Pola * berarti semua karakter; ? berarti satu karakter.</p><label><span>Pola nama kolom</span><input maxLength={128} value={values.pattern ?? '*'} onChange={event => setValue('pattern', event.target.value)} /></label><div className="utility-drop"><strong>Batasi pada kolom berikut (kosong = semua)</strong>{columns.map(column => <label key={column.name}><input type="checkbox" checked={(values.columns ?? '').split('\n').includes(column.name)} onChange={event => { const selected = (values.columns ?? '').split('\n').filter(Boolean); setValue('columns', (event.target.checked ? [...selected, column.name] : selected.filter(name => name !== column.name)).join('\n')); }} />{column.name} · {column.type}</label>)}</div></>}
 
-  </div>;
+  </UniverseFormSection>;
 }
 export type { Utility, Config };

@@ -1,0 +1,12 @@
+.ca-storage-delete-trigger{border-color:color-mix(in srgb,var(--studio-danger,#fa7474) 50%,transparent)!important;color:var(--studio-danger,#fa7474)!important}
+.ca-storage-delete-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)}
+.ca-storage-delete-dialog{width:min(520px,100%);padding:22px;border-radius:14px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);box-shadow:0 24px 70px rgba(0,0,0,.45);background:var(--surface-card,var(--surface-primary,var(--studio-surface,#172737)));color:var(--core-text,#fff);display:flex;flex-direction:column;gap:11px}
+.ca-storage-delete-dialog h3{font-size:21px;margin:0}.ca-storage-delete-dialog p{font-size:13px;margin:0;line-height:1.5}
+.ca-storage-delete-dialog label{font-size:13px;margin-top:6px}.ca-storage-delete-warning{color:var(--studio-danger,#fa7474)}
+.ca-storage-delete-dialog input{color:inherit;background:color-mix(in srgb,currentColor 5%,transparent);border:1px solid color-mix(in srgb,currentColor 32%,transparent);border-radius:8px;padding:11px;font-size:14px}
+.ca-storage-delete-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:8px;flex-wrap:wrap}
+.ca-storage-delete-actions button{color:inherit;background:transparent;border:1px solid color-mix(in srgb,currentColor 30%,transparent);border-radius:7px;min-height:36px;padding:8px 14px;cursor:pointer}
+.ca-storage-delete-actions .ca-storage-delete-danger{background:#b32632;border-color:#b32632;color:#fff;font-weight:700}
+.ca-storage-delete-actions button:disabled{cursor:not-allowed;opacity:.45}
+
+.ca-storage-delete-reason{font-size:11px;opacity:.75;max-width:270px;overflow-wrap:anywhere}.ca-storage-delete-trigger:disabled{opacity:.55;cursor:not-allowed}

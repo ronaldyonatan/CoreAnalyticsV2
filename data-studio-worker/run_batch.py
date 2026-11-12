@@ -30,6 +30,11 @@ def run(request,spark=None):
         if jdbc:
             if not Path(jdbc).is_absolute() or not Path(jdbc).is_file():raise BatchError('JDBC_DRIVER_NOT_CONFIGURED')
             builder=builder.config('spark.jars',jdbc)
+        postgres_jdbc=os.environ.get('STUDIO_POSTGRESQL_JDBC_JAR')
+        if postgres_jdbc:
+            if not Path(postgres_jdbc).is_absolute() or not Path(postgres_jdbc).is_file():raise BatchError('JDBC_DRIVER_NOT_CONFIGURED')
+            jars=[x for x in (jdbc,postgres_jdbc) if x]
+            builder=builder.config('spark.jars',','.join(jars))
         spark=builder.getOrCreate()
     try:
         frames=read_sources(spark,request['sources'],root)

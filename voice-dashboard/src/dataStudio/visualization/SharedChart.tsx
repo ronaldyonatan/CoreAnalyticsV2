@@ -105,7 +105,7 @@ export function SharedChart({ kind, rows, title = '', height = 370, properties }
                 {p?.showDataLabels && <LabelList dataKey={key} position="top" formatter={valueFormatter} fontSize={axisFont} fill={muted} />}
               </Line>
             : <Bar key={key} dataKey={key} name={names[index]} fill={kind === 'variance' ? positiveColor : colors[index % colors.length]} isAnimationActive={false}>
-                {kind === 'variance' && data.map((row, rowIndex) => <Cell key={rowIndex} fill={typeof row[key] === 'number' && row[key] < 0 ? negativeColor : positiveColor} />)}
+                {kind === 'variance' && data.map((row, rowIndex) => <Cell key={rowIndex} fill={typeof (row as Record<string, unknown>)[key] === 'number' && Number((row as Record<string, unknown>)[key]) < 0 ? negativeColor : positiveColor} />)}
                 {p?.showDataLabels && <LabelList dataKey={key} position={horizontal ? 'right' : 'top'} formatter={valueFormatter} fontSize={axisFont} fill={muted} />}
               </Bar>)}
         </C></ResponsiveContainer>

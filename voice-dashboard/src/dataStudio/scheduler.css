@@ -1,0 +1,68 @@
+/* Phase 3.1: self-contained Scheduler styles; inherit active CoreAnalytics theme. */
+.ca-scheduler { padding: clamp(12px,2vw,24px); color:inherit; max-width:1500px; margin:0 auto; }
+.ca-scheduler-top {display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.ca-scheduler-top h2{font-size:clamp(19px,2vw,24px);margin:5px 0}
+.ca-scheduler-top p{font-size:13px;opacity:.78;margin:0}
+.ca-scheduler-actions,.ca-scheduler-form-actions,.ca-scheduler-row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ca-scheduler button{min-height:34px;border:1px solid color-mix(in srgb,currentColor 25%,transparent);color:inherit;background:color-mix(in srgb,currentColor 8%,transparent);border-radius:7px;padding:7px 12px;cursor:pointer;font-weight:600}
+.ca-scheduler button:hover:not(:disabled){background:color-mix(in srgb,currentColor 15%,transparent)}
+.ca-scheduler button:disabled{opacity:.4;cursor:not-allowed}
+.ca-scheduler .ca-scheduler-primary{background:#11c5d8;color:#05242d;border-color:#11c5d8}
+.ca-scheduler .ca-scheduler-primary:hover:not(:disabled){background:#39d6e7}
+.ca-scheduler-section,.ca-scheduler-form{border:1px solid color-mix(in srgb,currentColor 18%,transparent);background:color-mix(in srgb,currentColor 4%,transparent);border-radius:10px;margin:14px 0;padding:15px}
+.ca-scheduler-section h3{font-size:14px;margin:0 0 12px}.ca-scheduler-section h3 small{opacity:.6;font-weight:400}
+.ca-scheduler-section p,.ca-scheduler-note{font-size:12px;opacity:.76}
+.ca-scheduler-table-wrap{width:100%;overflow:auto}
+.ca-scheduler table{width:100%;border-collapse:collapse;text-align:left;font-size:12px}
+.ca-scheduler th{padding:10px 12px;white-space:nowrap;opacity:.65;font-size:11px}
+.ca-scheduler td{padding:11px 12px;border-top:1px solid color-mix(in srgb,currentColor 12%,transparent);vertical-align:middle}
+.ca-scheduler td small{display:block;opacity:.65;font-size:11px;overflow-wrap:anywhere;margin-top:4px}
+.ca-scheduler td strong{font-weight:650}
+.ca-scheduler-state{display:inline-block;padding:4px 8px;border-radius:5px;font-size:11px;font-weight:700;background:color-mix(in srgb,currentColor 13%,transparent)}
+.ca-scheduler-state.on{color:#40d0ae;background:color-mix(in srgb,#40d0ae 13%,transparent)}
+.ca-scheduler-state.off{opacity:.75}
+.ca-scheduler-form-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ca-scheduler-form-heading h3{font-size:15px;margin:0 0 13px}
+.ca-scheduler-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ca-scheduler-fields label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600}
+.ca-scheduler-fields :is(select,input:not([type=checkbox])){font:inherit;color:inherit;background:color-mix(in srgb,currentColor 6%,transparent);border:1px solid color-mix(in srgb,currentColor 24%,transparent);border-radius:7px;min-height:36px;padding:7px 9px;width:100%;min-width:0}
+.ca-scheduler-fields select option{background:var(--core-surface-strong,#193343);color:var(--core-text,#fff)}
+.ca-scheduler-fields label small{opacity:.65;font-weight:400}
+.ca-scheduler-fields label.ca-scheduler-check{flex-direction:row;align-items:center;gap:8px}
+.ca-scheduler-form-actions{justify-content:flex-end;margin-top:16px}
+.ca-scheduler-message{padding:10px;border-radius:7px;border:1px solid color-mix(in srgb,currentColor 22%,transparent);font-size:12px}
+.ca-scheduler-run{font-family:ui-monospace,monospace}
+@media(max-width:850px){.ca-scheduler-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.ca-scheduler-fields{grid-template-columns:1fr}.ca-scheduler{padding:9px}.ca-scheduler table{min-width:650px}}
+/* Recurrence v2: multi-select weekdays and anchored daily repetitions. */
+.ca-scheduler-fields fieldset.ca-weekdays,.ca-scheduler-fields fieldset.ca-repeat-daily{grid-column:1/-1;min-width:0;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:9px;padding:12px;margin:0}
+.ca-scheduler-fields fieldset legend{padding:0 6px;font-size:12px;font-weight:700}
+.ca-scheduler-fields fieldset small{display:block;font-size:11px;opacity:.72;margin-top:6px;font-weight:400}
+.ca-weekday-grid{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:5px}
+.ca-weekday-grid label{display:inline-flex!important;align-items:center;justify-content:center;flex-direction:row!important;padding:8px 10px;min-width:48px;border-radius:8px;border:1px solid color-mix(in srgb,currentColor 28%,transparent);background:color-mix(in srgb,currentColor 6%,transparent);cursor:pointer;font-size:12px}
+.ca-weekday-grid label.is-active{background:color-mix(in srgb,var(--studio-accent,#18c5d9) 25%,transparent);border-color:var(--studio-accent,#18c5d9);color:var(--text-primary,#fff)}
+.ca-weekday-grid input{width:13px;height:13px;accent-color:var(--studio-accent,#18c5d9)}
+.ca-repeat-line{display:flex;align-items:center;gap:9px;margin-top:9px;font-size:12px}
+.ca-repeat-line input{max-width:105px}.ca-repeat-line select{max-width:130px}
+.ca-scheduler-focus-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ca-scheduler-focus-head h3{font-size:20px;margin:4px 0}.ca-scheduler-focus-head small{opacity:.7;font-size:11px}
+.ca-scheduler-focus-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}
+.ca-scheduler-focus-stats>div{background:color-mix(in srgb,currentColor 6%,transparent);border-radius:9px;border:1px solid color-mix(in srgb,currentColor 16%,transparent);padding:10px;min-width:0}
+.ca-scheduler-focus-stats small{display:block;font-size:11px;opacity:.67;margin-bottom:5px}.ca-scheduler-focus-stats strong{font-size:13px;overflow-wrap:anywhere}
+.ca-scheduler-focus-actions{display:flex;gap:8px;flex-wrap:wrap}.ca-scheduler-focus h4{margin:14px 0 6px;font-size:13px}
+@media(max-width:650px){.ca-scheduler-focus-stats{grid-template-columns:1fr}}
+
+/* Job monitor 3.2: full schedule table + right-side history. */
+.ca-scheduler-monitor-layout{display:grid;grid-template-columns:minmax(0,1.48fr) minmax(390px,1fr);gap:12px;align-items:start}
+.ca-scheduler-monitor-layout>.ca-scheduler-section{min-width:0;margin:5px 0}
+.ca-scheduler-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ca-scheduler-section-heading h3{margin:0}
+.ca-scheduler-section-heading p{margin:5px 0 12px}
+.ca-scheduler-select-target{display:flex;flex-direction:column;gap:4px;text-align:left!important;background:transparent!important;padding:5px!important;border:0!important;min-height:0!important;max-width:250px}
+.ca-scheduler-select-target small{opacity:.7;margin:0!important}
+.ca-scheduler-schedule-panel tr.is-selected{background:color-mix(in srgb,var(--studio-accent,#18c5d9) 12%,transparent)}
+.ca-scheduler-selected-foot{margin-top:12px;padding:10px;border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:8px;display:flex;flex-direction:column;gap:8px;font-size:12px}
+.ca-scheduler-monitor-layout .ca-scheduler-row-actions{gap:5px;flex-wrap:nowrap}
+.ca-scheduler-monitor-layout .ca-scheduler-row-actions button{padding:6px 9px;white-space:nowrap}
+@media(max-width:1240px){.ca-scheduler-monitor-layout{grid-template-columns:minmax(0,1fr)}.ca-scheduler-history-panel{max-width:100%}}
+@media(max-width:600px){.ca-scheduler-monitor-layout{gap:4px}.ca-scheduler-schedule-panel table{min-width:620px}}

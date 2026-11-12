@@ -1,0 +1,591 @@
+/* CoreAnalytics Unified Components — V9
+   Datasets V5.2 remains the visual reference. Every token resolves from the active theme.
+   Scope layout primitives to Data Studio; do not restyle legacy dashboards or management. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) {
+  --universe-ink:var(--core-text);
+  --universe-muted:var(--core-text-secondary,var(--core-text-muted));
+  --universe-accent:var(--core-primary);
+  --universe-rule:color-mix(in srgb,var(--core-border) 68%,transparent);
+  --universe-panel:var(--core-panel);
+  --universe-control:var(--core-surface-strong,var(--core-control));
+  --universe-selected:linear-gradient(90deg,
+    color-mix(in srgb,var(--universe-accent) 13%,var(--universe-panel) 87%),
+    color-mix(in srgb,var(--universe-accent) 2%,var(--universe-panel) 98%));
+}
+/* Same compact headline across module catalogs, details and previews. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-header:not(.studio-window-header):not(.studio-workspace-header) {
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  min-height:76px;padding:15px 18px;
+  border:1px solid var(--universe-rule);border-radius:14px;
+  background:linear-gradient(100deg,
+    color-mix(in srgb,var(--universe-accent) 5%,var(--universe-panel) 95%),
+    var(--universe-panel));
+  box-shadow:none;min-width:0;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-header:not(.studio-window-header):not(.studio-workspace-header) :is(h1,h2){color:var(--universe-ink);font-size:clamp(19px,1.7vw,25px);line-height:1.2;letter-spacing:-.025em;margin:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-header:not(.studio-window-header):not(.studio-workspace-header) p{color:var(--universe-muted);font-size:12px;margin:5px 0 0}
+/* Search, filter, action and configuration toolbars. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 0;min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-toolbar :is(input:not([type=checkbox]):not([type=radio]),select){min-height:36px;border-radius:9px;background:var(--universe-control);color:var(--universe-ink);border:1px solid var(--universe-rule)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.universe-toolbar,.universe-form,.universe-field,.universe-form-section) select option{background:var(--core-surface-strong);color:var(--universe-ink)}
+/* Consistent table header, row height, separators, hover and selection. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-table{width:100%;border-collapse:separate;border-spacing:0;color:var(--universe-ink)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-table thead th{font-size:11px;letter-spacing:.055em;font-weight:650;color:var(--universe-muted);border-bottom:1px solid var(--universe-rule)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-table tbody :is(td,th){border-bottom:1px solid var(--universe-rule);vertical-align:middle}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-table tbody tr:hover{background:color-mix(in srgb,var(--universe-accent) 6%,transparent)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-table tbody tr:is([aria-selected="true"],.is-selected,[data-selected="true"]){background:var(--universe-selected);box-shadow:none;outline:0}
+/* Catalog rows are real buttons: preserve callbacks, keyboard access and route selection. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.universe-catalog-row,.universe-catalog-button){color:var(--universe-ink);min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--universe-rule)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-button{font:inherit;text-align:left;cursor:pointer;box-shadow:none;transition:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.universe-catalog-row,.universe-catalog-button):hover{background:color-mix(in srgb,var(--universe-accent) 6%,transparent)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.universe-catalog-row,.universe-catalog-button):is(.is-selected,[aria-selected="true"],[aria-pressed="true"],[data-selected="true"]){background:var(--universe-selected);border-color:var(--universe-rule);outline:0;box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-button:focus-visible{outline:2px solid var(--core-primary-strong,var(--universe-accent));outline-offset:2px}
+/* Inspector and panels: no double glow or detached visual islands. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-inspector{min-width:0;border:1px solid var(--universe-rule);border-radius:14px;background:var(--universe-panel);box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-panel{min-width:0;border:1px solid var(--universe-rule);border-radius:14px;background:linear-gradient(130deg,color-mix(in srgb,var(--universe-accent) 4%,var(--universe-panel) 96%),var(--universe-panel));box-shadow:none}
+/* The form contract is deliberately structural: no reset of application validations. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-form{color:var(--universe-ink)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-form-section{padding:14px 0;border-bottom:1px solid var(--universe-rule);color:var(--universe-ink);box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-form-section:last-child{border-bottom:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.universe-form,.universe-form-section,.universe-field) :is(input:not([type=checkbox]):not([type=radio]),select,textarea){border-radius:9px;border-color:var(--universe-rule);color:var(--universe-ink);background:var(--universe-control);box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.universe-field,.universe-form,.universe-form-section) :is(input,select,textarea):focus-visible{outline:2px solid var(--core-primary-strong,var(--universe-accent));outline-offset:1px}
+/* Tabbed views inherit the same compact selection treatment. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-tabs{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-tabs>button:is(.is-active,.active,[aria-current="page"],[aria-selected="true"]){background:var(--universe-selected);border-color:var(--universe-rule);box-shadow:none}
+/* Floating menus are portal-safe and theme-driven; dataset filter dialogs are not shrunk. */
+.universe-quick-menu{width:min(248px,calc(100vw - 24px));padding:8px;border:1px solid var(--core-border);border-radius:12px;background:var(--core-surface-strong);color:var(--core-text);box-shadow:0 12px 28px rgba(0,0,0,.16)}
+.universe-quick-menu button{min-height:36px}
+.universe-panel.explorer-filter-panel{background:var(--core-surface-strong);color:var(--core-text);border:1px solid var(--core-border);border-radius:12px}
+
+/* One-column catalog shape, including connection sources, pipeline runs and chart library. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list{display:grid;grid-template-columns:minmax(0,1fr);gap:0;min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list>.universe-panel{
+  border-radius:0;border-width:0 0 1px;background:transparent;
+  padding:12px 14px;box-shadow:none;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .universe-catalog-button{
+  border-radius:0;border-width:0 0 1px;border-color:var(--universe-rule);
+  padding:12px 14px;background:transparent;min-height:50px;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .universe-catalog-button:hover{
+  background:color-mix(in srgb,var(--universe-accent) 6%,transparent);
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .studio-etl-catalog-item{
+  background:transparent!important;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .ca-etl-row-shell{
+  border-bottom:1px solid var(--universe-rule);
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .ca-chart-card-icon{
+  width:44px;height:44px;flex:0 0 44px;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .ca-chart-card-actions{flex-direction:row;flex-wrap:wrap}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-list .studio-etl-catalog-item:hover{background:color-mix(in srgb,var(--universe-accent) 6%,transparent)!important}
+/* Source/catalog pickers and inspector content use the approved quiet surfaces. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.connection-form,.connection-catalog,.ca-scheduler-form){
+  border-radius:14px;border-color:var(--universe-rule);
+  background:var(--universe-panel);box-shadow:none;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) :is(.connections-overline,.studio-etl-kicker,.connection-section-label,.ca-chart-section-eyebrow){
+  color:var(--universe-accent);letter-spacing:.1em;
+}
+
+@media(max-width:760px){
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-header:not(.studio-window-header):not(.studio-workspace-header){align-items:flex-start;flex-direction:column;padding:14px;min-height:0}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-toolbar{gap:8px}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-inspector{max-width:100%}
+}
+@media(prefers-reduced-motion:reduce){:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-catalog-button{transition:none}}
+/* V10: single shared catalog experience. Datasets V5.2 remains untouched.
+   Layout, structure, selected states are identical in Connections and ETL.
+   All colors resolve from active CoreAnalytics theme tokens. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) {
+  --u10-accent:var(--core-primary-strong,var(--core-primary));
+  --u10-ink:var(--core-text);
+  --u10-muted:var(--core-text-secondary,var(--core-text-muted));
+  --u10-panel:var(--core-panel,var(--core-surface));
+  --u10-control:var(--core-surface-strong,var(--core-control));
+  --u10-border:color-mix(in srgb,var(--core-border) 74%,transparent);
+  --u10-wash:color-mix(in srgb,var(--core-primary) 7%,var(--u10-panel) 93%);
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-header.universe-toolbar {
+  position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  min-height:112px;margin:0 0 15px;padding:19px 24px;flex-wrap:wrap;
+  border:0;border-bottom:1px solid var(--u10-border);border-radius:0 16px 2px 2px;
+  background:linear-gradient(103deg,color-mix(in srgb,var(--core-primary) 9%,var(--u10-panel)),color-mix(in srgb,var(--u10-panel) 85%,transparent) 72%,transparent);
+  box-shadow:none;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-header::before {
+  content:"";position:absolute;left:0;top:19px;bottom:19px;width:2px;border-radius:2px;
+  background:linear-gradient(to bottom,transparent,var(--u10-accent),transparent);
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-heading {display:flex;align-items:center;gap:13px;flex-wrap:wrap;min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-heading-mark{width:46px;flex:0 0 46px;text-align:center;font-size:19px;color:var(--u10-accent)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-heading h1{margin:0;color:var(--u10-ink);font-size:clamp(22px,2vw,31px);font-weight:750;letter-spacing:-.04em;line-height:1.2;display:flex;gap:10px;align-items:center}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-count{font-size:11px;letter-spacing:0;line-height:1;padding:5px 7px;border-radius:7px;color:var(--u10-accent);border:1px solid color-mix(in srgb,var(--u10-accent) 38%,transparent)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-hint{color:var(--u10-muted);font-size:12px;letter-spacing:0;white-space:normal}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-actions{display:flex;align-items:center;gap:9px;margin-left:auto}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-action{cursor:pointer;font:inherit;font-size:12px;font-weight:650;min-height:36px;padding:8px 13px;border-radius:9px;border:1px solid var(--core-border-strong,var(--u10-border));background:var(--u10-control);color:var(--u10-ink);box-shadow:none;white-space:nowrap}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-action.is-primary{background:var(--core-primary);color:var(--core-on-primary,#071a23);border-color:transparent}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-action:disabled{opacity:.46;cursor:not-allowed}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-filters.universe-toolbar{padding:9px 0 12px;margin:0 0 8px;display:flex;align-items:center;gap:9px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-filters .connections-search{flex:1;min-width:200px;width:auto;max-width:none;background:var(--u10-control);border:1px solid var(--u10-border);border-radius:10px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-filters .connections-search input{width:100%;min-height:37px;border:0;background:transparent;box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-filters .connections-filter{min-width:155px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-filters .connections-filter select{width:100%;min-height:39px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-grid{display:grid;grid-template-columns:minmax(0,1.95fr) minmax(290px,1fr);gap:clamp(14px,1.9vw,26px);align-items:start;min-width:0;margin-top:6px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-list{display:grid;align-content:start;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-shell{position:relative;display:flex;align-items:center;min-width:0;border:0;border-radius:9px;background:linear-gradient(90deg,color-mix(in srgb,var(--u10-control) 65%,transparent),color-mix(in srgb,var(--u10-panel) 30%,transparent) 70%,transparent)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-shell:has(.u-dataset-entry.is-selected){background:linear-gradient(90deg,color-mix(in srgb,var(--core-primary) 13%,var(--u10-panel)),color-mix(in srgb,var(--core-primary) 2%,var(--u10-panel)) 75%,transparent)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-shell:hover{background:var(--u10-wash)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry.u-dataset-entry{border:0;border-radius:9px;background:transparent!important;box-shadow:none!important;outline:0;cursor:pointer;display:flex;align-items:center;gap:12px;min-width:0;min-height:67px;flex:1;padding:10px 12px;text-align:left;color:var(--u10-ink);font:inherit;transition:none;}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry:focus-visible{outline:2px solid var(--u10-accent);outline-offset:2px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-mark{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:11px;border:1px solid color-mix(in srgb,var(--core-primary) 29%,transparent);background:color-mix(in srgb,var(--core-primary) 9%,var(--u10-control));color:var(--core-primary);font-size:19px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-mark svg{width:22px;height:22px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-name{display:flex;flex:1 1 180px;min-width:0;flex-direction:column;gap:3px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-name strong{font-size:13px;font-weight:690;letter-spacing:.015em;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-name small{font-size:10.5px;color:var(--u10-muted);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-meta{flex:0 1 128px;min-width:70px;display:flex;flex-direction:column;gap:3px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-meta small{font-size:10px;color:var(--u10-muted)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-meta strong{font-size:11px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-badge{flex:0 0 auto;color:var(--core-primary);font-size:10px;font-weight:750;letter-spacing:.07em}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-arrow{flex:0 0 12px;font-size:14px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-badge.is-active{color:var(--core-success,#2da98c)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-badge.is-inactive{color:var(--u10-muted)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-tools{flex:0 0 auto;padding-right:8px;display:flex;align-items:center;justify-content:center}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector.universe-inspector{width:100%;min-height:325px;padding:26px 23px;border-radius:17px;background:linear-gradient(130deg,color-mix(in srgb,var(--core-primary) 4%,var(--u10-panel)),color-mix(in srgb,var(--u10-panel) 92%,transparent));border:1px solid color-mix(in srgb,var(--core-border) 48%,transparent);box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;min-height:290px;gap:10px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-symbol{display:grid;place-items:center;margin:0 auto 7px;width:72px;height:72px;border-radius:50%;border:1px solid color-mix(in srgb,var(--core-primary) 33%,transparent);background:color-mix(in srgb,var(--core-primary) 5%,var(--u10-panel));font-size:28px;color:var(--core-primary)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-kicker{font-size:10px;letter-spacing:.2em;font-weight:750;color:var(--core-primary)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector :is(h2){color:var(--u10-ink);font-size:clamp(17px,1.6vw,22px);margin:4px 0 0;font-weight:700;letter-spacing:-.03em;overflow-wrap:anywhere}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector p{color:var(--u10-muted);font-size:12px;line-height:1.65;max-width:260px;margin:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-title{display:flex;align-items:center;gap:12px;margin:19px 0 21px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-title .u-dataset-inspector-symbol{flex:0 0 47px;width:47px;height:47px;font-size:19px;margin:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-title p{margin-top:4px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-detail dl{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-detail dl>div{min-width:0;border-top:1px solid var(--u10-border);padding:10px 2px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-detail dt{font-size:10px;letter-spacing:.08em;color:var(--u10-muted);margin-bottom:6px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-detail dd{margin:0;color:var(--u10-ink);font-weight:650;font-size:12px;overflow-wrap:anywhere}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:15px;border-top:1px solid var(--u10-border)}
+/* Neutralise obsolete V9 chart single-list overrides. Use the former thumbnail-gallery
+   interaction and render the SVG/chart preview at real preview scale. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-gallery.ca-chart-list{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))!important;gap:14px!important;margin:4px 0 0!important;align-items:stretch}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card.ca-chart-card{display:flex;flex-direction:column;align-items:stretch;gap:9px;min-height:218px;padding:13px;border:1px solid var(--u10-border)!important;border-radius:13px!important;background:color-mix(in srgb,var(--core-primary) 3%,var(--u10-panel))!important;box-shadow:none!important}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-card-icon{display:grid;place-items:center;flex:0 0 102px;width:100%!important;height:102px!important;background:color-mix(in srgb,var(--core-primary) 7%,var(--u10-panel));border-radius:9px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-thumb{height:86px;max-width:190px;width:min(90%,190px)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-card-copy{flex:0 0 auto;gap:4px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-card-copy strong{font-size:14px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-card-copy small{font-size:11px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-card-actions{display:flex;flex-direction:row;gap:8px;flex-wrap:wrap;margin-top:auto}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-card .ca-chart-card-actions button{min-height:31px;border-radius:8px;padding:7px 10px;font-size:11px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-chart-library .ca-chart-library-view{padding:8px 10px 15px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-chart-library-intro.u-dataset-filters{margin:0 0 12px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-chart-library-search{width:min(430px,100%);min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-chart-library-search input{min-height:39px;padding:8px 12px;width:100%}
+@media (max-width:940px){
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-grid{grid-template-columns:minmax(0,1fr)}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector.universe-inspector{min-height:220px}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-inspector-empty{min-height:170px}
+}
+@media (max-width:590px){
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-header.universe-toolbar{padding:15px;min-height:0}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-heading-mark{width:25px;flex-basis:25px}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-hint{display:none}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-actions{width:100%;justify-content:flex-end}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-meta{display:none}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-thumbnail-gallery.ca-chart-list{grid-template-columns:1fr!important}
+}
+
+/* V11: source-icon parity + Scheduler's real Datasets catalog layout.
+   All structural colors inherit current CoreAnalytics theme; no theme-specific CSS. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-dataset-entry-mark:has(.universe-database-mark){
+  width:40px;height:40px;flex-basis:40px;border:0;background:none;border-radius:0;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .universe-database-mark{box-sizing:border-box}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .u-dataset-header{margin-bottom:14px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-filters{padding:9px 0 12px;gap:9px;margin-bottom:9px;flex-wrap:wrap}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-search{flex:1 1 250px;min-width:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-search input{width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--u10-border);border-radius:10px;background:var(--u10-control);color:var(--u10-ink);font:inherit;font-size:12px;box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-filter{flex:0 1 160px;min-width:115px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-filter select{width:100%;min-height:40px;padding:7px 11px;border:1px solid var(--u10-border);border-radius:10px;background:var(--u10-control);color:var(--u10-ink);font:inherit;font-size:12px;box-shadow:none}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-catalog .u-dataset-entry-mark{color:var(--core-primary);font-size:19px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-catalog .u-dataset-entry-meta:first-of-type{flex-basis:155px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-catalog-message{font-size:13px;line-height:1.6;padding:24px;color:var(--u10-muted)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-history-area{min-width:0;margin:23px 0 0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-history-area .ca-job-monitor{
+  background:linear-gradient(130deg,color-mix(in srgb,var(--core-primary) 4%,var(--u10-panel)),var(--u10-panel));
+  border:1px solid var(--u10-border);border-radius:15px;padding:18px 20px;box-shadow:none;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-history-area .ca-job-monitor-list{border-color:var(--u10-border)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-history-area .ca-job-monitor-item.is-selected{
+  background:linear-gradient(90deg,color-mix(in srgb,var(--core-primary) 13%,var(--u10-panel)),color-mix(in srgb,var(--core-primary) 2%,var(--u10-panel)))!important;
+}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-form{border:1px solid var(--u10-border);border-radius:14px;background:var(--u10-panel);padding:16px 20px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-form-heading{border-bottom:1px solid var(--u10-border);padding-bottom:10px;margin-bottom:13px}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-form-heading h3{font-size:18px;margin:0}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-fields{padding:0;border:0;background:transparent}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-fields select option{background:var(--core-surface-strong);color:var(--core-text)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-primary{background:var(--core-primary);color:var(--core-on-primary,#071a23);border-color:transparent}
+@media(max-width:760px){
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-filter{flex:1 1 130px}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler .ca-scheduler-filters .ca-scheduler-clear{margin-left:auto}
+ :is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .ca-scheduler-history-area .ca-job-monitor{padding:12px}
+}
+
+/* V11 slim refresh control shared by all Data Universe pages. */
+.studio-window .universe-refresh-icon {
+  position:relative; display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; min-width:34px; min-height:34px;
+  padding:0 !important; margin:0; border:0 !important; border-radius:8px;
+  background:transparent !important; box-shadow:none !important;
+  color:var(--universe-accent,var(--core-primary,currentColor)) !important;
+  font-size:20px; line-height:1; cursor:pointer;
+}
+.studio-window .universe-refresh-icon:hover:not(:disabled) { background:color-mix(in srgb,currentColor 8%,transparent) !important; }
+.studio-window .universe-refresh-icon:focus-visible {outline:2px solid currentColor;outline-offset:2px}
+.studio-window .universe-refresh-icon:disabled {opacity:.4;cursor:not-allowed}
+.studio-window .universe-refresh-icon::after {
+  content:attr(data-tooltip); position:absolute; top:calc(100% + 8px); left:50%;
+  transform:translateX(-50%); pointer-events:none; white-space:nowrap;
+  background:var(--core-surface-strong,#162439); color:var(--core-text,#fff);
+  border:1px solid var(--core-border,#39536c); border-radius:7px;
+  padding:6px 10px; font-size:12px; font-weight:500; line-height:1.25;
+  opacity:0; visibility:hidden; z-index:1000; transition:opacity .12s ease,visibility 0s linear .12s;
+}
+.studio-window .universe-refresh-icon:hover::after {
+  opacity:1; visibility:visible; transition:opacity .12s ease 2s,visibility 0s linear 2s;
+}
+.studio-window .universe-refresh-icon:focus-visible::after {opacity:1;visibility:visible;transition:none}
+@media(prefers-reduced-motion:reduce){.studio-window .universe-refresh-icon::after{transition:none}.studio-window .universe-refresh-icon:hover::after{animation:universe-refresh-tooltip-appear 0s 2s both;opacity:0;visibility:hidden}@keyframes universe-refresh-tooltip-appear{to{opacity:1;visibility:visible}}}
+
+
+/* V11.4 — unified catalogue action row: Datasets is the approved design reference.
+   Scoped to Data Universe catalogue headers; does not affect folder tabs, dialogs or editors. */
+:is(.studio-window,[data-core-ui="unified"]) :is(
+  .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+  .u-dataset-header .u-dataset-actions
+) {
+  display:flex; align-items:center; justify-content:flex-end;
+  gap:9px; flex-wrap:nowrap; min-width:0; margin-left:auto;
+}
+:is(.studio-window,[data-core-ui="unified"]) :is(
+  .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+  .u-dataset-header .u-dataset-actions
+) > button:not(.universe-refresh-icon) {
+  box-sizing:border-box; display:inline-flex; align-items:center; justify-content:center;
+  flex:0 0 auto; width:auto; min-width:0; height:38px; min-height:38px !important;
+  margin:0; padding:0 13px !important; border-radius:9px !important;
+  font-family:inherit; font-size:12px !important; font-weight:700 !important;
+  line-height:1.1; letter-spacing:0; white-space:nowrap; text-decoration:none;
+  box-shadow:none !important;
+}
+:is(.studio-window,[data-core-ui="unified"]) :is(
+  .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+  .u-dataset-header .u-dataset-actions
+) > :is(.datasets-catalog-create,.is-primary) {
+  background:var(--core-primary) !important;
+  border:1px solid transparent !important;
+  color:var(--core-on-primary,#071a23) !important;
+}
+:is(.studio-window,[data-core-ui="unified"]) :is(
+  .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+  .u-dataset-header .u-dataset-actions
+) > button.universe-refresh-icon {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px !important; height:38px !important;
+  min-width:38px !important; min-height:38px !important;
+  flex:0 0 38px; margin:0; padding:0 !important;
+  border:0 !important; border-radius:8px;
+  background:transparent !important; box-shadow:none !important;
+  color:var(--core-primary) !important;
+  font-size:0 !important; line-height:1;
+}
+/* Hide the font glyph across all pages so only one consistent SVG icon is visible. */
+:is(.studio-window,[data-core-ui="unified"]) button.universe-refresh-icon { font-size:0 !important; }
+/* Shared vector mark avoids font-specific ↻ variations; the actual button keeps an aria-label. */
+:is(.studio-window,[data-core-ui="unified"]) button.universe-refresh-icon::before {
+  content:""; display:block; width:19px; height:19px; flex:0 0 19px;
+  background-color:currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M20 7v5h-5M4 17v-5h5M6.1 9a7 7 0 0 1 12-2.1L20 12M4 12l1.9 3.1A7 7 0 0 0 18 15'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M20 7v5h-5M4 17v-5h5M6.1 9a7 7 0 0 1 12-2.1L20 12M4 12l1.9 3.1A7 7 0 0 0 18 15'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+:is(.studio-window,[data-core-ui="unified"]) button.universe-refresh-icon:hover:not(:disabled) {
+  background:color-mix(in srgb,var(--core-primary) 7%,transparent) !important;
+}
+:is(.studio-window,[data-core-ui="unified"]) :is(
+  .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+  .u-dataset-header .u-dataset-actions
+) > button:focus-visible {
+  outline:2px solid var(--core-primary); outline-offset:2px;
+}
+@media(max-width:640px){
+  :is(.studio-window,[data-core-ui="unified"]) :is(
+    .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+    .u-dataset-header .u-dataset-actions
+  ){ flex-wrap:wrap; justify-content:flex-end; }
+  :is(.studio-window,[data-core-ui="unified"]) :is(
+    .datasets-page .datasets-catalog-heading .datasets-catalog-actions,
+    .u-dataset-header .u-dataset-actions
+  ) > button:not(.universe-refresh-icon){height:36px;min-height:36px !important;padding:0 11px !important;font-size:11px !important}
+}
+
+/* CoreAnalytics V14 — Precision Facet Glass (FINAL / Data Universe)
+   A quiet asymmetric cut, satin/metallic hairline, no capsules, discs or rails.
+   Text actions only; utility icons, tab chrome, filters, rows, backend untouched.
+   Inherits the eight active themes via --core-* tokens. */
+.studio-window {
+  --u-facet-accent: var(--core-primary);
+  --u-facet-ink: var(--core-text);
+  --u-facet-muted-ink: var(--core-text);
+  --u-facet-hairline: color-mix(in srgb, var(--core-border-strong, var(--core-border)) 70%, var(--core-primary) 30%);
+  --u-facet-secondary-top: color-mix(in srgb, var(--core-primary) 7%, var(--core-surface-strong) 93%);
+  --u-facet-secondary-bottom: color-mix(in srgb, var(--core-primary) 2%, var(--core-surface-strong) 98%);
+  --u-facet-primary-top: color-mix(in srgb, var(--core-primary) 68%, white 32%);
+  --u-facet-primary-bottom: color-mix(in srgb, var(--core-primary-soft, var(--core-primary)) 76%, white 24%);
+  --u-facet-danger: var(--core-danger-text, #a33e54);
+}
+
+/* Explicitly scoped to existing text-action containers. Never apply to
+   navigation tabs, dataset rows, chart thumbs, select/search controls, or
+   icon-only refresh / close / clock controls. */
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action,
+  .datasets-catalog-actions > button.datasets-action,
+  .u-dataset-inspector-actions > button.u-dataset-action,
+  .datasets-detail .ca-dataset-detail-actions > button.datasets-action,
+  .connections-button,
+  .connection-form-footer > div > button,
+  .ca-scheduler-form-actions > button,
+  .u-thumbnail-card .ca-chart-card-actions > button,
+  .ca-chart-add-filter,
+  .datasets-create-save-dock > button,
+  .studio-etl-overview-grid article > button
+):not(.universe-refresh-icon):not(.datasets-catalog-refresh):not([data-tooltip="Muat ulang"]):not([aria-label="Muat ulang"]) {
+  box-sizing: border-box !important;
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  min-height: 36px !important;
+  height: auto;
+  width: auto;
+  min-width: 0;
+  padding: 8px 14px !important;
+  margin: 0 !important;
+  /* A short angled cut at top-right, never a capsule. */
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  border-radius: 8px !important;
+  border: 1px solid var(--u-facet-hairline) !important;
+  background: linear-gradient(120deg, rgba(255,255,255,.11), transparent 34%) padding-box,
+              linear-gradient(170deg, var(--u-facet-secondary-top), var(--u-facet-secondary-bottom)) padding-box !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 20%, transparent),
+              inset 0 -1px 0 color-mix(in srgb, var(--core-text) 4%, transparent) !important;
+  color: var(--u-facet-muted-ink) !important;
+  text-shadow: none !important;
+  font-family: inherit;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  line-height: 1.2;
+  letter-spacing: .008em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, filter .12s ease !important;
+}
+
+/* Main action: elegant satin accent, dark ink for consistent readability. */
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action.is-primary,
+  .datasets-catalog-actions > button.datasets-catalog-create,
+  .u-dataset-inspector-actions > button.u-dataset-action.is-primary,
+  .datasets-detail .ca-dataset-detail-actions > button.datasets-open-explorer,
+  .connections-button-primary,
+  .ca-scheduler-form-actions > button.ca-scheduler-primary,
+  .datasets-create-save-dock > button
+) {
+  --u-facet-hairline: color-mix(in srgb, var(--core-primary) 63%, white 37%);
+  color: #092a37 !important;
+  background: linear-gradient(112deg, rgba(255,255,255,.26), transparent 47%) padding-box,
+              linear-gradient(125deg, var(--u-facet-primary-top), var(--u-facet-primary-bottom)) padding-box !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.43),
+              inset 0 -1px 0 rgba(0,0,0,.08) !important;
+  font-weight: 720 !important;
+}
+
+/* Old V13's pseudo-icon lens must never reappear. Preserve real JSX icons. */
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action.is-primary,
+  .datasets-catalog-actions > button.datasets-catalog-create,
+  .u-dataset-inspector-actions > button.u-dataset-action.is-primary,
+  .connections-button-primary,
+  .ca-scheduler-form-actions > button.ca-scheduler-primary,
+  .datasets-create-save-dock > button
+)::before { content: none !important; display: none !important; }
+
+/* V12 connected rail / pseudo-decoration is removed by the installer.
+   For action buttons only, do not allow a leftover underline pseudo-element. */
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action,
+  .datasets-catalog-actions > button.datasets-action,
+  .u-dataset-inspector-actions > button.u-dataset-action,
+  .datasets-detail .ca-dataset-detail-actions > button.datasets-action,
+  .connections-button,
+  .ca-scheduler-form-actions > button,
+  .u-thumbnail-card .ca-chart-card-actions > button
+):not(.universe-refresh-icon)::after { content: none !important; display: none !important; }
+
+/* Danger is deliberately understated until hover; not a red filled slab. */
+.studio-window :is(
+  .datasets-detail .ca-dataset-detail-actions > button.ca-storage-delete-trigger,
+  .u-thumbnail-card .ca-chart-card-actions > button:last-child
+) {
+  --u-facet-hairline: color-mix(in srgb, var(--core-danger-border, var(--u-facet-danger)) 80%, var(--core-border) 20%);
+  color: var(--u-facet-danger) !important;
+  background: linear-gradient(160deg,
+     color-mix(in srgb, var(--u-facet-danger) 6%, var(--core-surface-strong) 94%),
+     var(--core-surface-strong)) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 12%, transparent) !important;
+}
+
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action,
+  .datasets-catalog-actions > button.datasets-action,
+  .u-dataset-inspector-actions > button.u-dataset-action,
+  .datasets-detail .ca-dataset-detail-actions > button.datasets-action,
+  .connections-button,.connection-form-footer > div > button,
+  .ca-scheduler-form-actions > button,.u-thumbnail-card .ca-chart-card-actions > button,
+  .ca-chart-add-filter,.datasets-create-save-dock > button,
+  .studio-etl-overview-grid article > button
+):not(.universe-refresh-icon):not(.datasets-catalog-refresh):hover:not(:disabled) {
+  filter: brightness(1.055);
+  border-color: var(--core-primary) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 27%, transparent) !important;
+}
+.studio-window :is(
+  .datasets-detail .ca-dataset-detail-actions > button.ca-storage-delete-trigger,
+  .u-thumbnail-card .ca-chart-card-actions > button:last-child
+):hover:not(:disabled) {
+  border-color: var(--u-facet-danger) !important;
+  filter: brightness(1.035);
+}
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action,
+  .datasets-catalog-actions > button.datasets-action,
+  .u-dataset-inspector-actions > button.u-dataset-action,
+  .datasets-detail .ca-dataset-detail-actions > button.datasets-action,
+  .connections-button,.connection-form-footer > div > button,
+  .ca-scheduler-form-actions > button,.u-thumbnail-card .ca-chart-card-actions > button,
+  .ca-chart-add-filter,.datasets-create-save-dock > button,
+  .studio-etl-overview-grid article > button
+):not(.universe-refresh-icon):focus-visible {
+  outline: 2px solid var(--core-primary) !important;
+  outline-offset: -3px;
+}
+.studio-window :is(
+  .u-dataset-actions > button.u-dataset-action,
+  .datasets-catalog-actions > button.datasets-action,
+  .u-dataset-inspector-actions > button.u-dataset-action,
+  .datasets-detail .ca-dataset-detail-actions > button.datasets-action,
+  .connections-button,.ca-scheduler-form-actions > button,
+  .u-thumbnail-card .ca-chart-card-actions > button
+):disabled { opacity: .48; cursor: not-allowed; filter: saturate(.5); }
+
+/* Icons such as refresh remain frame-free; their original tooltip stays intact. */
+.studio-window :is(button.universe-refresh-icon,button.datasets-catalog-refresh,button[aria-label="Muat ulang"]) {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
+  padding: 6px !important;
+  min-width: 30px;
+  min-height: 30px;
+}
+@media (max-width: 680px) {
+  .studio-window :is(.u-dataset-actions,.datasets-catalog-actions,.u-dataset-inspector-actions){ flex-wrap:wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-window :is(.u-dataset-action,.datasets-action,.connections-button){ transition:none !important; }
+}
+/* V14.1 — explicit hierarchy. Primary must visibly dominate, while secondary
+   stays glass. High-specificity targets resolve V5/V11.4 legacy !important rules.
+   This is contained in the existing V14 block; not a second theme or rail layer. */
+.studio-window {
+  --u-facet-primary-strong-top: color-mix(in srgb, var(--core-primary) 73%, white 27%);
+  --u-facet-primary-strong-bottom: color-mix(in srgb, var(--core-primary) 82%, white 18%);
+  --u-facet-primary-contrast: #08232f;
+  --u-facet-success-ink: var(--core-success-text, #187b61);
+  --u-facet-warning-ink: color-mix(in srgb, var(--core-text) 35%, #db9830 65%);
+}
+
+/* 1: Primary / Create / Open: visibly filled in all themes. */
+:is(.studio-window[data-aurora-deck], .studio-window) :is(
+  .u-dataset-header .u-dataset-actions > button.u-dataset-action.is-primary,
+  .datasets-page .datasets-catalog-heading .datasets-catalog-actions > button.datasets-catalog-create,
+  .u-dataset-inspector .u-dataset-inspector-actions > button.u-dataset-action.is-primary,
+  .datasets-page-catalog .ca-dataset-detail-actions > button.datasets-action.datasets-open-explorer,
+  button.connections-button-primary,
+  .ca-scheduler-form-actions > button.ca-scheduler-primary,
+  .datasets-create-save-dock > button
+):not(:disabled) {
+  border-color: color-mix(in srgb, var(--core-primary) 85%, white 15%) !important;
+  background: linear-gradient(145deg, var(--u-facet-primary-strong-top), var(--u-facet-primary-strong-bottom)) !important;
+  color: var(--u-facet-primary-contrast) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.43), 0 2px 10px color-mix(in srgb, var(--core-primary) 13%, transparent) !important;
+  font-weight: 750 !important;
+}
+
+/* 2: Secondary / Edit / Details: low-emphasis, separate from primary fill. */
+:is(.studio-window[data-aurora-deck], .studio-window) :is(
+  .u-dataset-inspector .u-dataset-inspector-actions > button.u-dataset-action:not(.is-primary):not(.is-run):not(.is-success):not(.is-warning):not(.is-danger),
+  .datasets-page-catalog .ca-dataset-detail-actions > button.datasets-action:not(.datasets-open-explorer):not(.ca-storage-delete-trigger),
+  .ca-scheduler-form-actions > button:not(.ca-scheduler-primary)
+):not(:disabled) {
+  border-color: var(--u-facet-hairline) !important;
+  background: linear-gradient(160deg, var(--u-facet-secondary-top), var(--u-facet-secondary-bottom)) !important;
+  color: var(--core-text) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 17%, transparent) !important;
+  font-weight: 650 !important;
+}
+
+/* 3: Execute / Enable: success glass, never as bright as primary fill. */
+:is(.studio-window[data-aurora-deck], .studio-window) :is(
+  .u-dataset-inspector-actions > button.u-dataset-action.is-run,
+  .u-dataset-inspector-actions > button.u-dataset-action.is-success
+):not(:disabled) {
+  border-color: color-mix(in srgb, var(--u-facet-success-ink) 59%, var(--core-border) 41%) !important;
+  background: color-mix(in srgb, var(--u-facet-success-ink) 10%, var(--core-surface-strong) 90%) !important;
+  color: var(--u-facet-success-ink) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 13%, transparent) !important;
+}
+
+/* 4: Pause: a quiet amber warning, distinct from execute and delete. */
+:is(.studio-window[data-aurora-deck], .studio-window)
+.u-dataset-inspector-actions > button.u-dataset-action.is-warning:not(:disabled) {
+  border-color: color-mix(in srgb, var(--u-facet-warning-ink) 57%, var(--core-border) 43%) !important;
+  background: color-mix(in srgb, var(--u-facet-warning-ink) 10%, var(--core-surface-strong) 90%) !important;
+  color: var(--u-facet-warning-ink) !important;
+}
+
+/* 5: Delete / Deactivate: subtle coral outline, never mistaken for primary. */
+:is(.studio-window[data-aurora-deck], .studio-window) :is(
+  .datasets-page-catalog .ca-dataset-detail-actions > button.datasets-action.ca-storage-delete-trigger,
+  .u-dataset-inspector-actions > button.u-dataset-action.is-danger,
+  .u-thumbnail-card .ca-chart-card-actions > button:last-child
+):not(:disabled) {
+  border-color: color-mix(in srgb, var(--u-facet-danger) 65%, var(--core-border) 35%) !important;
+  background: color-mix(in srgb, var(--u-facet-danger) 9%, var(--core-surface-strong) 91%) !important;
+  color: var(--u-facet-danger) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 10%, transparent) !important;
+}
+
+/* Preserve the invisible rail rule on icon-only refresh, clock and close.
+   These controls never inherit a primary/secondary/danger surface. */
+
+/* End CoreAnalytics V14 — Precision Facet Glass */

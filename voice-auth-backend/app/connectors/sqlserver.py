@@ -99,15 +99,16 @@ def _configured_networks(mode: str):
         raise SqlTargetPolicyError('SQL_NETWORK_POLICY_INVALID', 503) from None
 
 
-def _validate_port(port: int) -> None:
+def _validate_port(port: int, *, policy_env: str = 'STUDIO_SQL_ALLOWED_PORTS', default: str = '1433') -> None:
     # Explicit deployment-wide opt-in for user-supplied SQL Server ports.
-    if os.getenv('STUDIO_SQL_ALLOWED_PORTS', '1433').strip() == '*':
+    raw_ports = os.getenv(policy_env, default).strip()
+    if raw_ports == '*':
         if type(port) is not int or not 1 <= port <= 65535:
             raise SqlTargetPolicyError('SQL_PORT_OR_TIMEOUT_INVALID')
         return
     try:
         allowed = {int(value.strip()) for value in
-                   os.getenv('STUDIO_SQL_ALLOWED_PORTS', '1433').split(',') if value.strip()}
+                   raw_ports.split(',') if value.strip()}
     except ValueError:
         raise SqlTargetPolicyError('SQL_PORT_POLICY_INVALID', 503) from None
     if not allowed or any(value < 1 or value > 65535 for value in allowed):
@@ -134,7 +135,9 @@ def _is_local_address(address, port: int) -> bool:
         return False
 
 
-def validate_sqlserver_host(host: str, port: int = 1433) -> tuple[str, str]:
+def validate_sqlserver_host(host: str, port: int = 1433, *,
+                            port_policy_env: str = 'STUDIO_SQL_ALLOWED_PORTS',
+                            default_ports: str = '1433') -> tuple[str, str]:
     """Return (original host, pinned resolved IP), or reject unsafe destinations.
 
     Resolves DNS before connecting and never forwards a hostname to the ODBC
@@ -146,7 +149,7 @@ def validate_sqlserver_host(host: str, port: int = 1433) -> tuple[str, str]:
     if mode not in ('dynamic', 'allowlist'):
         raise SqlTargetPolicyError('SQL_HOST_POLICY_INVALID', 503)
     networks = _configured_networks(mode)
-    _validate_port(port)
+    _validate_port(port, policy_env=port_policy_env, default=default_ports)
     if mode == 'allowlist':
         allowed = {part.strip().lower() for part in os.getenv('STUDIO_ALLOWED_SQL_HOSTS', '').split(',') if part.strip()}
         if not allowed or host.lower() not in allowed:

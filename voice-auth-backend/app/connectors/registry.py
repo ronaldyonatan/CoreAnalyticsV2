@@ -46,4 +46,7 @@ def resolve(kind: str | None = None) -> ConnectorSpec:
     from app.connectors.sqlserver_adapter import install
     if 'sqlserver' not in _REGISTRY:
         install()
+    from app.connectors.postgresql_adapter import install as install_postgresql
+    if 'postgresql' not in _REGISTRY:
+        install_postgresql()
     return get(kind or 'sqlserver')

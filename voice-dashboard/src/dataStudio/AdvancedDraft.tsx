@@ -1,3 +1,4 @@
+import { UniverseFormSection } from '../design-system/components/universe';
 import SearchPicker from './SearchPicker';
 import type { Config, Utility } from './UtilityDraft';
 
@@ -16,7 +17,7 @@ export default function AdvancedDraft({ kind, config, columns, onChange }: Props
   const columnList = (label: string, key: string) => <div className="utility-drop"><strong>{label}</strong>{columns.length ? columns.map(c => <label key={c.name}><input type="checkbox" checked={selected(key).includes(c.name)} onChange={e => set(key, (e.target.checked ? [...selected(key), c.name] : selected(key).filter(v => v !== c.name)).join('\n'))} />{c.name} <small>{c.type}</small></label>) : <p>Hubungkan sumber untuk melihat kolom.</p>}</div>;
   const noModel = <label><span>Model</span><select disabled><option>Model belum tersedia</option></select></label>;
   const noInputs = <><label><span>Input pelatihan</span><select disabled><option>Belum tersedia</option></select></label><label><span>Input prediksi</span><select disabled><option>Belum tersedia</option></select></label></>;
-  return <div className="utility-draft"><p>Rancangan konfigurasi · belum disimpan dan belum dapat dijalankan pada preview.</p>
+  return <UniverseFormSection className="utility-draft"><p>Rancangan konfigurasi · belum disimpan dan belum dapat dijalankan pada preview.</p>
     {kind === 'Group By' && <>{columnList('1 · Kolom pengelompokan', 'groups')}<p>2–3 · Kolom hasil dan agregasi</p>{rows.map((r, i) => <div className="utility-draft-row" key={r.id}><label><span>Nama hasil {i + 1}</span><input value={r.output} onChange={e => changeRow(r.id, { output: e.target.value })} /></label><label><span>Agregasi / formula</span><input value={r.value} onChange={e => changeRow(r.id, { value: e.target.value })} placeholder="SUM(kolom)" /></label><button type="button" onClick={() => remove(r.id)} aria-label="Hapus agregasi">×</button></div>)}<button type="button" onClick={() => add('aggregate')}>＋ Tambah agregasi</button></>}
     {kind === 'Rank & Window' && <><p>1 · Fungsi rank atau window</p>{rows.map((r, i) => <div className="utility-draft-row" key={r.id}><label><span>Nama hasil {i + 1}</span><input value={r.output} onChange={e => changeRow(r.id, { output: e.target.value })} /></label><label><span>Fungsi</span><input value={r.value} onChange={e => changeRow(r.id, { value: e.target.value })} /></label><button type="button" onClick={() => remove(r.id)} aria-label="Hapus fungsi">×</button></div>)}<button type="button" onClick={() => add('function')}>＋ Tambah fungsi</button><div className="pipelines-filter-steps">{pick('2 · Kolom urutan', 'order')}{select('3 · Arah urutan', 'direction', ['Ascending', 'Descending'])}</div>{columnList('4 · Kolom partisi (opsional)', 'partition')}</>}
     {kind === 'Dynamic Unpivot' && <>{columnList('1 · Kolom yang tidak di-unpivot', 'keep')}<div className="pipelines-filter-steps">{field('2 · Nama kolom label', 'label')}{field('3 · Nama kolom nilai', 'value')}</div></>}
@@ -29,5 +30,5 @@ export default function AdvancedDraft({ kind, config, columns, onChange }: Props
     {kind === 'Forecasting' && <div className="pipelines-filter-steps">{pick('Kolom waktu', 'time')}{pick('Kolom yang diprediksi', 'target')}{field('Prediction band (1–99)', 'band', '95')}{field('Jumlah tanggal baru', 'periods', '5')}{field('Baris sebelumnya (opsional)', 'history')}{field('Nama kolom prediksi', 'output', 'prediction')}{field('Nama batas atas', 'upper', 'prediction upper')}{field('Nama batas bawah', 'lower', 'prediction lower')}{field('Observasi per periode', 'frequency', '1')}</div>}
     {kind === 'Multivariate Outliers' && <>{columnList('Kolom untuk mendeteksi outlier', 'features')}<div className="pipelines-filter-steps">{field('Nama kolom hasil', 'output', 'outlier')}{field('Quantile cutoff', 'cutoff', '0.95')}</div></>}
     {kind === 'Outlier Detection' && <div className="pipelines-filter-steps">{pick('Kolom sumber', 'source')}{field('Nama kolom hasil', 'output', 'outlier')}{field('Deviation cutoff', 'cutoff', '2')}{select('Algoritma', 'algorithm', ['Standard Deviation', 'Mean Absolute Deviation'])}</div>}
-  </div>;
+  </UniverseFormSection>;
 }

@@ -1,3 +1,5 @@
+import { UniverseRefreshButton } from '../design-system/components/universe/UniverseRefreshButton';
+import { UniverseTable, UniverseInspector, UniverseToolbar, UniverseField, UniverseFormSection, UniverseCatalogHeader } from '../design-system/components/universe';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { createPortal } from 'react-dom';
@@ -243,9 +245,9 @@ export default function ChartLibrary() {
     updateProp('fullscreen3d', view === '3d');
   };
   const toggle = (key: keyof ChartProperties, label: string) => <label className="ca-chart-prop-check"><span>{label}</span><input type="checkbox" checked={Boolean(props[key])} onChange={e => updateProp(key, e.target.checked as never)} /></label>;
-  const textField = (key: keyof ChartProperties, label: string) => <label className="ca-chart-setting-control"><span>{label}</span><input maxLength={100} value={String(props[key])} onChange={e => updateProp(key, e.target.value as never)} /></label>;
-  const numberField = (key: keyof ChartProperties, label: string, min: number, max: number) => <label className="ca-chart-setting-control"><span>{label}</span><input type="number" min={min} max={max} value={Number(props[key])} onChange={e => updateProp(key, Math.round(Math.max(min,Math.min(max,Number(e.target.value)||min))) as never)} /></label>;
-  const choice = (key: keyof ChartProperties, label: string, choices: Array<[string | number,string]>) => <label className="ca-chart-setting-control"><span>{label}</span><select value={String(props[key])} onChange={e => updateProp(key, (typeof choices[0][0] === 'number' ? Number(e.target.value) : e.target.value) as never)}>{choices.map(([value,name]) => <option key={value} value={value}>{name}</option>)}</select></label>;
+  const textField = (key: keyof ChartProperties, label: string) => <UniverseField className="ca-chart-setting-control"><span>{label}</span><input maxLength={100} value={String(props[key])} onChange={e => updateProp(key, e.target.value as never)} /></UniverseField>;
+  const numberField = (key: keyof ChartProperties, label: string, min: number, max: number) => <UniverseField className="ca-chart-setting-control"><span>{label}</span><input type="number" min={min} max={max} value={Number(props[key])} onChange={e => updateProp(key, Math.round(Math.max(min,Math.min(max,Number(e.target.value)||min))) as never)} /></UniverseField>;
+  const choice = (key: keyof ChartProperties, label: string, choices: Array<[string | number,string]>) => <UniverseField className="ca-chart-setting-control"><span>{label}</span><select value={String(props[key])} onChange={e => updateProp(key, (typeof choices[0][0] === 'number' ? Number(e.target.value) : e.target.value) as never)}>{choices.map(([value,name]) => <option key={value} value={value}>{name}</option>)}</select></UniverseField>;
   const chart3DReady = isChart3DSupported(config.chart_type);
   useEffect(() => {
     if (!fullCanvas) return;
@@ -625,48 +627,27 @@ export default function ChartLibrary() {
 
   return (
     <section className={`ca-chart-library${working === 'analyzer' ? ' is-analyzer' : ''}`}>
-      <header className="ca-chart-header">
-        <div className="ca-chart-heading">
-          <span className="ca-chart-kicker">DATA STUDIO / VISUALIZATION</span>
-          <h1>{working === 'library' ? 'Chart Library' : 'Data Vision'}</h1>
-        </div>
-        <div className="ca-chart-actions">
-          {working === 'analyzer' && (
-            <button type="button" className="ca-chart-ghost" onClick={() => { setFullCanvas(false); setWorking('library'); }}>
-              ← Chart Library
-            </button>
-          )}
-          <button
-            type="button"
-            className="primary"
-            disabled={busy || (working === 'analyzer' && (queryBusy || !validResults))}
-            onClick={working === 'library' ? openNew : () => void save()}
-          >
-            {working === 'library' ? '+ Chart baru' : '▣ Simpan chart'}
-          </button>
-        </div>
-      </header>
-
+      <UniverseCatalogHeader title={working === 'library' ? 'Chart Library' : 'Data Vision'} count={working === 'library' ? (libraryLoading ? '—' : charts.length) : undefined} hint="Katalog visualisasi" actions={<>
+        {working === 'analyzer' && <button type="button" className="u-dataset-action" onClick={() => {setFullCanvas(false);setWorking('library');}}>← Chart Library</button>}
+        {/* V11.4: catalogue reload */}
+        {working === 'library' && <UniverseRefreshButton
+          disabled={libraryLoading || busy}
+          onClick={() => {
+            setError('');
+            setLibraryLoading(true);
+            void reload().finally(() => setLibraryLoading(false));
+          }}
+        />}
+        <button type="button" className="u-dataset-action is-primary" disabled={busy || (working === 'analyzer' && (queryBusy || !validResults))} onClick={working === 'library' ? openNew : () => void save()}>{working === 'library' ? '+ Chart baru' : '▣ Simpan chart'}</button>
+      </>}/>
       {!libraryLoading && error && <p role="alert" className="ca-chart-error">{error}</p>}
       {message && <p role="status" className="ca-chart-message">{message}</p>}
 
       {working === 'library' ? (
         <div className="ca-chart-library-view">
-          <div className="ca-chart-library-intro">
-            <div>
-              <span className="ca-chart-section-eyebrow">REUSABLE VISUALIZATIONS</span>
-              <h2>Semua chart</h2>
-              <p>Buat dan kelola chart Recharts berbasis dataset untuk Dashboard Designer.</p>
-            </div>
-            <label className="ca-chart-library-search">
-              <span className="ca-chart-sr-only">Cari chart</span>
-              <input
-                value={chartSearch}
-                onChange={event => setChartSearch(event.target.value)}
-                placeholder="⌕  Cari chart..."
-              />
-            </label>
-          </div>
+          <UniverseToolbar className="ca-chart-library-intro u-dataset-filters">
+            <label className="ca-chart-library-search"><span className="ca-chart-sr-only">Cari chart</span><input value={chartSearch} onChange={event => setChartSearch(event.target.value)} placeholder="⌕  Cari chart…" /></label>
+          </UniverseToolbar>
           {catalogNotices.map(notice => <p key={notice} className="ca-chart-catalog-notice" role="status">{notice}</p>)}
           {libraryLoading ? (
             <div className="ca-chart-empty ca-chart-library-empty" role="status" aria-live="polite">
@@ -675,9 +656,9 @@ export default function ChartLibrary() {
               <p>Mengambil chart tersimpan dan katalog dataset.</p>
             </div>
           ) : visibleCharts.length ? (
-            <div className="ca-chart-list">
+            <div className="ca-chart-list u-thumbnail-gallery">
               {visibleCharts.map(chart => (
-                <article key={chart.chart_id} className="ca-chart-card">
+                <article key={chart.chart_id} className="ca-chart-card u-thumbnail-card">
                   <div className="ca-chart-card-icon"><ChartThumbnail kind={chart.config.chart_type} /></div>
                   <div className="ca-chart-card-copy">
                     <strong>{chart.name}</strong>
@@ -701,7 +682,7 @@ export default function ChartLibrary() {
         </div>
       ) : (
         <div className="ca-chart-analyzer-shell">
-          <div className="ca-chart-commandbar" role="toolbar" aria-label="Toolbar Chart Analyzer">
+          <UniverseToolbar className="ca-chart-commandbar" role="toolbar" aria-label="Toolbar Chart Analyzer">
             <div className="ca-chart-command-group">
               <button type="button" className="ca-chart-command" onClick={() => datasetPickerRef.current?.focus()}>
                 <span className="ca-chart-command-icon">▤</span><span>DATASET</span>
@@ -726,7 +707,7 @@ export default function ChartLibrary() {
                   : !ready ? 'Lengkapi data grafik' : validResults ? '✓ Preview otomatis' : 'Menyiapkan preview…'}
               </span>
             </div>
-          </div>
+          </UniverseToolbar>
 
           <div className="ca-chart-shelf" aria-label="Konfigurasi data chart">
             <label className="ca-chart-name-field">
@@ -770,7 +751,7 @@ export default function ChartLibrary() {
 
           {CHART_HINTS[config.chart_type] && <p className="ca-chart-kind-hint">{CHART_HINTS[config.chart_type]}</p>}
           <div className={`ca-chart-body${showSettings ? '' : ' hide-settings'}${showChartTypes ? '' : ' hide-types'}`}>
-            <aside className="ca-chart-fields" aria-label="Daftar kolom dataset">
+            <UniverseInspector className="ca-chart-fields" aria-label="Daftar kolom dataset">
               <div className="ca-chart-pane-heading">
                 <strong>DataSet</strong>
                 <span>{config.dataset_kind}</span>
@@ -825,17 +806,17 @@ export default function ChartLibrary() {
                 {!visibleColumns.length && <p className="ca-chart-field-empty">{columns.length ? 'Kolom tidak ditemukan.' : 'Pilih dataset untuk memuat kolom.'}</p>}
               </div>
               <div className="ca-chart-fields-foot">Drag & drop kolom ke bar konfigurasi di atas.</div>
-            </aside>
+            </UniverseInspector>
 
             {showSettings && (
-              <aside className="ca-chart-settings" aria-label="Pengaturan chart">
+              <UniverseInspector className="ca-chart-settings" aria-label="Pengaturan chart">
                 <div className="ca-chart-pane-heading">
                   <strong>{activeTools === 'filter' ? 'Filters & Sort' : 'Chart Properties'}</strong>
                   <button type="button" className="ca-chart-pane-close" aria-label="Sembunyikan pengaturan" onClick={() => setShowSettings(false)}>×</button>
                 </div>
                 {activeTools === 'filter' ? (
                   <div className="ca-chart-settings-scroll">
-                    <div className="ca-chart-setting-section">
+                    <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Filters</strong><span>{config.filters.length}/8</span></div>
                       <div className="ca-chart-filter-list">
                         {config.filters.map((filter, index) => (
@@ -856,49 +837,49 @@ export default function ChartLibrary() {
                         {!config.filters.length && <div className="ca-chart-drop-hint">Belum ada filter. Tambahkan filter untuk membatasi data dari sumber.</div>}
                         <button type="button" className="ca-chart-add-filter" disabled={config.filters.length >= 8 || !columns.length} onClick={() => setField('filters', [...config.filters, { column: columns[0]?.name || '', operator: 'eq', value: '' }])}>+ Tambah filter</button>
                       </div>
-                    </div>
-                    {dateColumns.length > 0 && <div className="ca-chart-setting-section">
+                    </UniverseFormSection>
+                    {dateColumns.length > 0 && <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Analisis periode</strong></div>
-                      <label className="ca-chart-setting-control"><span>Kolom tanggal</span>
+                      <UniverseField className="ca-chart-setting-control"><span>Kolom tanggal</span>
                         <select value={dateColumn} onChange={event => setDateColumn(event.target.value)}>
                           <option value="">Pilih kolom tanggal</option>
                           {dateColumns.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                         </select>
-                      </label>
-                      <label className="ca-chart-setting-control"><span>Dari tanggal</span><input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} /></label>
-                      <label className="ca-chart-setting-control"><span>Sampai tanggal</span><input type="date" min={dateFrom || undefined} value={dateTo} onChange={e => setDateTo(e.target.value)} /></label>
+                      </UniverseField>
+                      <UniverseField className="ca-chart-setting-control"><span>Dari tanggal</span><input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} /></UniverseField>
+                      <UniverseField className="ca-chart-setting-control"><span>Sampai tanggal</span><input type="date" min={dateFrom || undefined} value={dateTo} onChange={e => setDateTo(e.target.value)} /></UniverseField>
                       <button type="button" className="ca-chart-add-filter" disabled={!dateColumn || (!dateFrom && !dateTo) || Boolean(dateFrom && dateTo && dateFrom > dateTo)} onClick={applyDateRange}>Terapkan rentang tanggal</button>
                       <small>Rentang tanggal menjadi filter dataset dan memicu refresh otomatis.</small>
-                    </div>}
-                    <div className="ca-chart-setting-section">
+                    </UniverseFormSection>}
+                    <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Sorting</strong></div>
-                      <label className="ca-chart-setting-control">
+                      <UniverseField className="ca-chart-setting-control">
                         <span>Urutan grafik</span>
                         <select value={config.sort} disabled={config.chart_type === 'pareto' || ORDERED_CHARTS.includes(config.chart_type)} onChange={event => setField('sort', event.target.value as ChartConfig['sort'])}>
                           {SORT_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
                         </select>
-                      </label>
-                    </div>
-                    <div className="ca-chart-setting-section">
+                      </UniverseField>
+                    </UniverseFormSection>
+                    <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Limit rows</strong></div>
-                      <label className="ca-chart-setting-control">
+                      <UniverseField className="ca-chart-setting-control">
                         <span>Top N (maks. 250)</span>
                         <input type="number" min={1} max={250} value={config.limit} onChange={event => setField('limit', Math.min(250, Math.max(1, Number(event.target.value) || 1)))} />
-                      </label>
-                    </div>
+                      </UniverseField>
+                    </UniverseFormSection>
                   </div>
                 ) : (
                   <div className="ca-chart-settings-scroll">
-                    <div className="ca-chart-setting-section">
+                    <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>General</strong></div>
-                      <label className="ca-chart-setting-control"><span>Judul chart</span><input value={name} onChange={event => setName(event.target.value)} maxLength={150} /></label>
-                    </div>
-                    <div className="ca-chart-setting-section">
+                      <UniverseField className="ca-chart-setting-control"><span>Judul chart</span><input value={name} onChange={event => setName(event.target.value)} maxLength={150} /></UniverseField>
+                    </UniverseFormSection>
+                    <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Data mapping</strong></div>
-                      <label className="ca-chart-setting-control"><span>Jenis grafik</span><select value={config.chart_type} onChange={event => setChartType(event.target.value as ChartKind)}>{CHART_KINDS.map(kind => <option key={kind.value} value={kind.value}>{kind.name}</option>)}</select></label>
-                      <label className="ca-chart-setting-control"><span>Agregasi</span><select value={config.aggregation} onChange={event => setField('aggregation', event.target.value as ChartConfig['aggregation'])}>{AGGREGATIONS.map(agg => <option key={agg} value={agg}>{agg.toUpperCase()}</option>)}</select></label>
-                    </div>
-                    <div className="ca-chart-setting-section">
+                      <UniverseField className="ca-chart-setting-control"><span>Jenis grafik</span><select value={config.chart_type} onChange={event => setChartType(event.target.value as ChartKind)}>{CHART_KINDS.map(kind => <option key={kind.value} value={kind.value}>{kind.name}</option>)}</select></UniverseField>
+                      <UniverseField className="ca-chart-setting-control"><span>Agregasi</span><select value={config.aggregation} onChange={event => setField('aggregation', event.target.value as ChartConfig['aggregation'])}>{AGGREGATIONS.map(agg => <option key={agg} value={agg}>{agg.toUpperCase()}</option>)}</select></UniverseField>
+                    </UniverseFormSection>
+                    <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Chart Properties</strong><button type="button" onClick={() => updateProp('showGrid', true)}>Reset grid</button></div>
                       <div className="ca-chart-property-tabs">{['General', ...(ANALYTICAL_CHARTS.includes(config.chart_type) ? ['Variasi Analitik'] : []), 'Axes & Grid','Hover Text','Number Format','Legend & Labels','Full Size','Layar Penuh 3D'].map(tab => <button type="button" key={tab} className={propertyTab === tab ? 'is-selected' : ''} onClick={() => setPropertyTab(tab)}>{tab} ›</button>)}</div>
                       <div className="ca-chart-property-controls">
@@ -917,23 +898,23 @@ export default function ChartLibrary() {
                             <small>Kategori pertama tidak memiliki pembanding. Persentase tidak dihitung jika nilai sebelumnya nol atau kosong.</small>
                           </>}
                           {config.chart_type === 'combo' && <>
-                            <label className="ca-chart-setting-control"><span>Kelompok untuk garis</span>
+                            <UniverseField className="ca-chart-setting-control"><span>Kelompok untuk garis</span>
                               <select value={props.comboLineSeries} disabled={!validResults} onChange={event => updateProp('comboLineSeries', event.target.value)}>
                                 <option value="">Otomatis: kelompok terakhir</option>
                                 {props.comboLineSeries && !resultSeries.includes(props.comboLineSeries) && <option value={props.comboLineSeries}>Tidak ada dalam hasil: {props.comboLineSeries}</option>}
                                 {resultSeries.map(series => <option key={series} value={series}>{series}</option>)}
                               </select>
-                            </label>
+                            </UniverseField>
                             <small>Semua kelompok memakai measure, agregasi, dan skala yang sama. Kelompok selain garis menjadi batang.</small>
                           </>}
                           {config.chart_type === 'slope' && <>
-                            {(['slopeStart', 'slopeEnd'] as const).map(key => <label key={key} className="ca-chart-setting-control"><span>{key === 'slopeStart' ? 'Kategori awal' : 'Kategori akhir'}</span>
+                            {(['slopeStart', 'slopeEnd'] as const).map(key => <UniverseField key={key} className="ca-chart-setting-control"><span>{key === 'slopeStart' ? 'Kategori awal' : 'Kategori akhir'}</span>
                               <select value={props[key]} disabled={!validResults} onChange={event => updateProp(key, event.target.value)}>
                                 <option value="">{key === 'slopeStart' ? 'Kategori pertama pada hasil' : 'Kategori terakhir pada hasil'}</option>
                                 {props[key] && !resultCategories.includes(props[key]) && <option value={props[key]}>Tidak ada dalam hasil: {props[key]}</option>}
                                 {resultCategories.map(category => <option key={category} value={category}>{category}</option>)}
                               </select>
-                            </label>)}
+                            </UniverseField>)}
                             <small>Hanya Series yang mempunyai nilai pada kedua kategori yang dibandingkan; pilih dua kategori berbeda.</small>
                           </>}
                           {config.chart_type === 'progress' && <>
@@ -969,10 +950,10 @@ export default function ChartLibrary() {
                           {!chart3DReady && <small className="ca-chart-3d-note">Jenis grafik ini belum punya tampilan 3D, sehingga tetap 2D saat fullscreen.</small>}
                         </>}
                       </div>
-                    </div>
+                    </UniverseFormSection>
                   </div>
                 )}
-              </aside>
+              </UniverseInspector>
             )}
 
             <main className="ca-chart-main">
@@ -984,7 +965,7 @@ export default function ChartLibrary() {
             )}
 
             {showChartTypes && (
-              <aside className="ca-chart-types" aria-label="Galeri jenis grafik">
+              <UniverseInspector className="ca-chart-types" aria-label="Galeri jenis grafik">
                 <div className="ca-chart-pane-heading">
                   <strong>Chart types</strong>
                   <button type="button" className="ca-chart-pane-close" onClick={() => setShowChartTypes(false)} aria-label="Sembunyikan galeri">×</button>
@@ -1011,7 +992,7 @@ export default function ChartLibrary() {
                     </section>
                   ))}
                 </div>
-              </aside>
+              </UniverseInspector>
             )}
           </div>
 
@@ -1025,7 +1006,7 @@ export default function ChartLibrary() {
             {showTable && (
               validResults ? (
                 <div className="ca-chart-table">
-                  <table>
+                  <UniverseTable>
                     <thead><tr><th>#</th><th>Dimension</th><th>Series</th><th>Value</th></tr></thead>
                     <tbody>
                       {validResults.rows.map((row, index) => (
@@ -1037,7 +1018,7 @@ export default function ChartLibrary() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </UniverseTable>
                 </div>
               ) : (
                 <div className="ca-chart-table-placeholder">{queryBusy ? 'Sedang memuat data agregasi…' : 'Lengkapi konfigurasi untuk menampilkan data otomatis.'}</div>

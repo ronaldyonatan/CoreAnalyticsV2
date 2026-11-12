@@ -1,3 +1,4 @@
+import { UniverseFormSection } from '../design-system/components/universe';
 import type { TextData, TextRule } from './textPreview';
 import { compileText } from './textPreview';
 
@@ -13,7 +14,7 @@ export default function TextTransformEditor({ data, columns, onChange }: {
     catch { return columns; }
   };
   const delimiter = data.textDelimiter ?? (data.label === 'Split Column' ? ',' : '');
-  return <div className="text-node-config">
+  return <UniverseFormSection className="text-node-config">
     <p>Preview Spark aktif. Hasil teks maksimal 256 karakter per nilai; konfigurasi dan hasil belum disimpan.</p>
     {data.label === 'Combine Columns' && <>
       <div className="pipelines-filter-steps">
@@ -73,5 +74,5 @@ export default function TextTransformEditor({ data, columns, onChange }: {
       <p>{data.label === 'String Operations' ? 'Gunakan nama kolom sumber sebagai nama hasil untuk mengganti kolom tersebut. Nama baru menambahkan kolom.' : 'Aturan dijalankan berurutan dan mengganti nilai pada kolom sumber.'} NULL tetap NULL.</p>
       {data.label === 'Text Formatting' && <p>Angka dibersihkan sebelum format huruf diterapkan. Capitalize first letter hanya mengubah karakter pertama; huruf selanjutnya tetap.</p>}
     </>}
-  </div>;
+  </UniverseFormSection>;
 }

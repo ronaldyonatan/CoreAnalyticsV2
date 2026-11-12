@@ -1,3 +1,4 @@
+import { UniverseFormSection } from '../design-system/components/universe';
 import { CAST_TYPES } from './utilityPreview';
 import type { UtilityData } from './utilityPreview';
 import type { Config } from './UtilityDraft';
@@ -5,7 +6,7 @@ export default function ScriptingEditor({ data, columns, ready, onRefresh, onCha
   const config = data.utilityConfig ?? {}, values = config.values ?? {}, rows = config.rows ?? [], python = data.label === 'Python Script';
   const change = (id: string, value: Partial<(typeof rows)[number]>) => onChange({ ...config, rows: rows.map(row => row.id === id ? { ...row, ...value } : row) });
   const useInput = () => onChange({ ...config, rows: columns.map(column => ({ id: crypto.randomUUID(), output: column.name, kind: 'Text', column: '', value: '' })) });
-  return <div className="utility-draft scripting-editor">
+  return <UniverseFormSection className="utility-draft scripting-editor">
     <p role="status">{ready === null ? 'Memeriksa runtime scripting…' : ready ? 'Runtime siap untuk preview.' : 'Runtime scripting belum siap. Jalankan layanan scripting lalu periksa kembali.'} <button type="button" onClick={onRefresh}>Periksa runtime</button></p>
     <p>{python ? 'Input tersedia sebagai pandas DataFrame: input dan df. pandas (pd) dan numpy (np) sudah tersedia.' : 'Input tersedia sebagai data.frame: input dan df. Gunakan fungsi base R; jsonlite juga tersedia.'} Simpan hasil sebagai <strong>output</strong>, dengan nama dan urutan kolom sesuai konfigurasi di bawah.</p>
     <p>Sampel maksimal 50 baris, 30 kolom, 256 karakter per nilai. Waktu eksekusi script maksimal 8 detik. Hasil dikembalikan ke Spark untuk node berikutnya.</p>
@@ -15,5 +16,5 @@ export default function ScriptingEditor({ data, columns, ready, onRefresh, onCha
     {rows.map((row, index) => <div className="utility-draft-row" key={row.id}><label><span>Nama kolom hasil {index + 1}</span><input maxLength={128} value={row.output} onChange={event => change(row.id, { output: event.target.value })} /></label><label><span>Tipe hasil</span><select value={row.kind || 'Text'} onChange={event => change(row.id, { kind: event.target.value })}>{CAST_TYPES.map(kind => <option key={kind}>{kind}</option>)}</select></label><button type="button" aria-label={`Hapus kolom hasil ${index + 1}`} onClick={() => onChange({ ...config, rows: rows.filter(item => item.id !== row.id) })}>×</button></div>)}
     <button type="button" disabled={rows.length >= 30} onClick={() => onChange({ ...config, rows: [...rows, { id: crypto.randomUUID(), output: '', kind: 'Text', column: '', value: '' }] })}>＋ Tambah kolom hasil</button>
     <p>Print/cat ditampilkan pada Log scripting. Script berjalan pada runtime terpisah tanpa akses jaringan dan file project. Paket yang tersedia disiapkan oleh administrator; pemasangan paket dari script tidak tersedia.</p>
-  </div>;
+  </UniverseFormSection>;
 }

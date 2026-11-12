@@ -1,0 +1,15 @@
+/* V14.2 — ETL catalog: icon-only status, borderless clock, no redundant arrow. */
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .u-dataset-entry-arrow{display:none!important}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .u-dataset-entry-badge{min-width:19px;display:inline-flex;align-items:center;justify-content:center}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-status-icon{display:inline-grid;place-items:center;width:20px;height:22px;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;padding:0!important;font-size:17px;line-height:1;font-weight:750;cursor:help;color:var(--core-text-muted,var(--u10-muted,currentColor))}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-status-icon.status-succeeded{color:var(--core-success-text,#36bc95)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-status-icon.status-failed{color:var(--core-danger-text,#ee8796)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-status-icon.status-running{color:var(--core-primary,#58cbe0)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-status-icon.status-queued{color:var(--core-warning-text,#d5ad69)}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-trigger,
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-trigger:hover,
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-trigger:focus-visible{width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important;padding:5px!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:var(--core-primary,var(--studio-accent,#32c7df))!important}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-trigger:hover:not(:disabled),
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-trigger[aria-expanded="true"]{background:color-mix(in srgb,var(--core-primary,#32c7df) 11%,transparent)!important}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-trigger:focus-visible{outline:2px solid var(--core-primary,#32c7df)!important;outline-offset:2px!important}
+:is(.studio-window[data-aurora-deck],[data-core-ui="unified"]) .u-etl-entry-shell .ca-clock-caret{display:none!important}

@@ -1,0 +1,37 @@
+/* Shared compact, theme-aware controls across Datasets and ETL. */
+.ca-sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.ca-catalog-filter-bar{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap;margin:8px 0 12px}
+.ca-catalog-query{display:flex;align-items:center;gap:8px;flex:1 1 275px;min-width:180px;border:1px solid color-mix(in srgb,currentColor 23%,transparent);background:color-mix(in srgb,currentColor 4%,transparent);border-radius:9px;padding:0 10px;min-height:35px}
+.ca-catalog-query input{border:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important;width:100%;min-height:32px!important;padding:5px 0!important;font:inherit;font-size:12px!important;outline:none!important}
+.ca-catalog-filter-icon{display:flex;justify-content:center;align-items:center;width:33px;height:33px;border-radius:8px;border:1px solid color-mix(in srgb,currentColor 20%,transparent);opacity:.75}
+.ca-catalog-filter-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ca-catalog-filter-select select{min-height:33px;padding:5px 20px 5px 10px;background:color-mix(in srgb,currentColor 7%,transparent);color:inherit;border:1px solid color-mix(in srgb,currentColor 25%,transparent);border-radius:8px;font-size:11px;max-width:155px;cursor:pointer}
+.ca-catalog-filter-select select option{background:#193040;color:#fff}
+.ca-catalog-filter-select.is-active select{border-color:var(--studio-accent,#32c7df);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--studio-accent,#32c7df) 16%,transparent)}
+.ca-catalog-clear{min-height:32px;padding:6px 9px;border:1px solid color-mix(in srgb,currentColor 22%,transparent);background:transparent;color:inherit;border-radius:7px;font-size:11px;cursor:pointer}
+.ca-clock-wrap{display:inline-flex;position:relative;align-items:center;justify-content:center;flex-shrink:0}
+.ca-clock-trigger{display:inline-flex!important;align-items:center!important;gap:3px!important;justify-content:center!important;width:43px!important;height:34px!important;min-height:34px!important;padding:4px!important;border:1px solid color-mix(in srgb,currentColor 25%,transparent)!important;border-radius:8px!important;color:inherit!important;background:color-mix(in srgb,currentColor 7%,transparent)!important;cursor:pointer!important}
+.ca-clock-trigger:hover:not(:disabled),.ca-clock-trigger:focus-visible{border-color:var(--studio-accent,#32c7df)!important;outline-offset:2px}
+.ca-clock-trigger.is-scheduled{color:var(--studio-accent,#32c7df)!important;border-color:color-mix(in srgb,var(--studio-accent,#32c7df) 50%,transparent)!important}
+.ca-clock-trigger:disabled{opacity:.5;cursor:not-allowed!important}
+.ca-clock-caret{font-size:11px;line-height:1;opacity:.75}
+.ca-clock-menu{position:fixed;z-index:2147483600;width:228px;max-width:calc(100vw - 16px);padding:6px;background:var(--surface-card,var(--studio-surface,#122534));color:var(--text-primary,#edf9ff);border:1px solid color-mix(in srgb,currentColor 24%,transparent);border-radius:11px;box-shadow:0 17px 56px rgba(0,0,0,.55);font-size:12px;box-sizing:border-box}
+.ca-clock-title{padding:7px 9px 8px;color:var(--text-secondary,#b4cbd5);font-size:10px;border-bottom:1px solid color-mix(in srgb,currentColor 13%,transparent);margin-bottom:3px;overflow-wrap:anywhere}
+.ca-clock-title strong{display:block;color:var(--text-primary,#fff);margin-top:2px;font-size:12px}
+.ca-clock-menu>button{display:flex;align-items:center;gap:10px;width:100%;min-height:32px;border:0;background:transparent;text-align:left;padding:6px 10px;border-radius:6px;color:inherit;font-size:12px;cursor:pointer}
+.ca-clock-menu>button:hover:not(:disabled),.ca-clock-menu>button:focus-visible{background:color-mix(in srgb,currentColor 12%,transparent)}
+.ca-clock-menu>button:disabled{opacity:.45;cursor:not-allowed}
+.ca-clock-foot{border-top:1px solid color-mix(in srgb,currentColor 16%,transparent);margin-top:5px;padding:9px 9px 6px;display:flex;flex-direction:column;gap:2px;font-size:11px}
+.ca-clock-foot span{opacity:.7}.ca-clock-foot strong{font-weight:600}.ca-clock-error{display:block;color:#ff9ca7;padding:5px 10px}
+@media(max-width:680px){.ca-catalog-query{flex-basis:100%}.ca-catalog-filter-controls{width:100%}.ca-catalog-filter-select select{max-width:140px}}
+/* ETL rows keep the existing overview button as the primary clickable surface. */
+.ca-etl-row-shell{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0}
+.ca-etl-row-shell .studio-etl-catalog-item{min-width:0;width:100%}
+.ca-etl-row-shell .ca-clock-wrap{margin-right:2px}
+.ca-etl-catalog-refresh{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:-4px 0 9px;opacity:.9;font-size:11px}
+.ca-etl-catalog-refresh button{min-height:30px;border:1px solid color-mix(in srgb,currentColor 23%,transparent);border-radius:7px;background:transparent;color:inherit;padding:5px 10px;cursor:pointer}
+/* Align Datasets search + filters below the compact title/actions line. */
+.studio-window-content .datasets-catalog-heading-compact{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.studio-window-content .datasets-catalog-heading-compact .datasets-catalog-actions{margin-left:auto}
+.studio-window-content .datasets-row-actions{min-width:43px}
+@media(max-width:650px){.ca-etl-row-shell{gap:3px}.ca-etl-catalog-refresh{justify-content:space-between}}

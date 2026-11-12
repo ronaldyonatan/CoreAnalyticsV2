@@ -2,7 +2,8 @@
 import copy
 import uuid
 from app.connectors.sqlserver import validate_target
-from app.connectors.registry import get
+from app.connectors.registry import resolve
+from app.connectors.postgresql_adapter import PostgreSQLTarget
 from app.connectors.sqlserver_adapter import install as install_sqlserver_adapter
 
 install_sqlserver_adapter()
@@ -38,6 +39,26 @@ def bind_run(owner,run_id,graph,definitions,target_resolver):
         target=target_resolver(owner,metadata['connection_id'])
         # Existing metadata has no connector type; treat it as SQL Server.
         # Future connector types must be explicitly stored and allowlisted.
-        kind=metadata.get('connector_type') or 'sqlserver'
-        sources.append(get(kind).bind_source(source,metadata,target,validate_target))
+        kind=str(metadata.get('connector_type') or metadata.get('connection_type') or ('postgresql' if isinstance(target, PostgreSQLTarget) else 'sqlserver')).strip().lower()
+        spec=resolve(kind)
+        if spec.validate_target is None:raise ValueError('CONNECTOR_UNSUPPORTED')
+        sources.append(spec.bind_source(source,metadata,target,spec.validate_target))
     return {'run_id':run_id,'sources':sources,'nodes':copy.deepcopy(graph['nodes']),'outputs':copy.deepcopy(graph['outputs'])}
+
+
+def bind_stored_ingest(owner, run_id, graph, definitions, target_resolver):
+    """Isolated STORED ingestion binding. Pipeline bind_run remains DIRECT-only."""
+    validate_batch_graph(graph)
+    if len(graph['sources']) != 1 or graph['sources'][0].get('kind') != 'dataset' or graph['nodes'] or len(graph['outputs']) != 1:
+        raise ValueError('INGEST_BIND_FAILED')
+    identifier = str(uuid.UUID(graph['sources'][0]['dataset_id']))
+    metadata = definitions.get(identifier)
+    if not metadata or metadata.get('access_mode') != 'STORED':
+        raise ValueError('INGEST_BIND_FAILED')
+    target = target_resolver(owner, metadata['connection_id'])
+    kind = 'postgresql' if isinstance(target, PostgreSQLTarget) else 'sqlserver'
+    spec = resolve(kind)
+    if spec.validate_target is None:
+        raise ValueError('INGEST_BIND_FAILED')
+    source = spec.bind_source(graph['sources'][0], metadata, target, spec.validate_target)
+    return {'run_id': run_id, 'sources': [source], 'nodes': [], 'outputs': copy.deepcopy(graph['outputs'])}

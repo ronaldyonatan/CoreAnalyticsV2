@@ -1,4 +1,4 @@
-"""Dataset metadata and bounded SQL Server discovery. No arbitrary SQL."""
+"""Dataset metadata and bounded connector discovery. No arbitrary SQL."""
 import base64
 import uuid
 from flask import Blueprint, jsonify, request
@@ -12,20 +12,26 @@ from app.connectors.registry import resolve
 def _connector(kind=None):
     return resolve(kind)
 
+def _connector_for_target(target):
+    # The decrypted target carries its connector identity; do not trust dataset rows
+    # to always contain connector_type (legacy SQL Server metadata may omit it).
+    from app.connectors.postgresql_adapter import PostgreSQLTarget
+    return _connector('postgresql' if isinstance(target, PostgreSQLTarget) else 'sqlserver')
+
 def list_sqlserver_objects(target, query='', offset=0, limit=50):
-    return _connector().browse(target, query, offset, limit)
+    return _connector_for_target(target).browse(target, query, offset, limit)
 
 def sqlserver_object_exists(target, source):
-    return _connector().object_exists(target, source)
+    return _connector_for_target(target).object_exists(target, source)
 
 def preview_sqlserver_object(target, source, page=1, filters=None, sort=None):
-    return _connector().preview(target, source, page, filters, sort)
+    return _connector_for_target(target).preview(target, source, page, filters, sort)
 
 def dataset_filter_values(target, source, column, search, offset, filters):
-    return _connector().filter_values(target, source, column, search, offset, filters)
+    return _connector_for_target(target).filter_values(target, source, column, search, offset, filters)
 
 def _dataset_connector(row):
-    return _connector(row.get('connector_type') or 'sqlserver')
+    return _connector(str(row.get('connector_type') or row.get('connection_type') or 'sqlserver').strip().lower())
 
 studio_datasets_bp = Blueprint('studio_datasets', __name__, url_prefix='/api/studio/datasets')
 
@@ -213,10 +219,20 @@ def _target(user_id, connection_id):
     if not rows or not rows[0].get('encrypted_password_base64'):
         raise ValueError('CONNECTION_UNAVAILABLE')
     row = rows[0]
+    # Temporary diagnostic: metadata keys only, never log encrypted secrets or passwords.
+    print('DATASET CONNECTION METADATA:', {
+        'connector_type': row.get('connector_type'),
+        'connection_type': row.get('connection_type'),
+        'connection_name': row.get('connection_name'),
+        'server_port': row.get('server_port'),
+        'available_keys': list(row.keys()),
+    }, flush=True)
     if row.get('encryption_key_version') != 1:
         raise ValueError('CONNECTION_KEY_VERSION_UNSUPPORTED')
     password = _cipher().decrypt(base64.b64decode(row['encrypted_password_base64'], validate=True)).decode('utf-8')
-    return _connector(row.get('connector_type') or 'sqlserver').make_target({**row, 'server_port': int(row['server_port'] or 1433), 'password': password, 'connection_timeout_seconds': int(row['connection_timeout_seconds'] or 10)})
+    kind = str(row.get('connector_type') or row.get('connection_type') or 'sqlserver').strip().lower()
+    default_port = 5432 if kind == 'postgresql' else 1433
+    return _connector(kind).make_target({**row, 'server_port': int(row['server_port'] or default_port), 'password': password, 'connection_timeout_seconds': int(row['connection_timeout_seconds'] or 10)})
 
 
 @studio_datasets_bp.get('/sources/<uuid:connection_id>')
@@ -235,18 +251,22 @@ def sources(connection_id):
     except ValueError as exc:
         return _spark_error(exc)
     except Exception:
+        import traceback
+        traceback.print_exc()
         return jsonify(success=False, code='DATASET_SOURCE_UNAVAILABLE'), 503
 
 
 @studio_datasets_bp.get('')
 def list_datasets():
     try:
-        rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': _principal()}))
+        user = _principal()
+        rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': user}))
         if rows and rows[0].get('success') in (False, 0):
             raise RuntimeError('Dataset metadata unavailable')
         if len(rows) == 1 and rows[0].get('code') == 'DATASET_LIST_EMPTY' and rows[0].get('success') in (True, 1):
             rows = []
-        return jsonify(success=True, data=rows)
+        from app.services.studio_stored_preview import enrich_catalog
+        return jsonify(success=True, data=enrich_catalog(user, rows))
     except PermissionError as exc:
         return _error(exc)
     except Exception:
@@ -261,6 +281,19 @@ def preview_dataset(dataset_id):
         row = next((item for item in rows if str(item.get('dataset_id', '')).lower() == str(dataset_id)), None)
         if not row:
             return jsonify(success=False, code='DATASET_NOT_FOUND'), 404
+        if row.get('access_mode') == 'STORED':
+            if request.method != 'GET':
+                raise ValueError('STORED_PREVIEW_READ_ONLY')
+            if set(request.args) - {'page'} or len(request.args.getlist('page')) > 1:
+                raise ValueError('DATASET_PAGE_INVALID')
+            raw_page = request.args.get('page', '1')
+            if not raw_page.isascii() or not raw_page.isdecimal() or len(raw_page) > 10:
+                raise ValueError('DATASET_PAGE_INVALID')
+            from app.services.studio_stored_preview import stored_page
+            result = stored_page(user, row, int(raw_page))
+            response = jsonify(success=True, data=result)
+            response.headers['Cache-Control'] = 'no-store'
+            return response
         if row.get('access_mode') != 'DIRECT':
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
         _dataset_connector(row)
@@ -335,12 +368,12 @@ def create_dataset():
             if not isinstance(body[name], str) or len(body[name]) > limit or (name != 'description' and not body[name].strip()):
                 raise ValueError('DATASET_INPUT_INVALID')
         uuid.UUID(body['connection_id'])
-        if body['access_mode'] != 'DIRECT':
+        if body['access_mode'] not in ('DIRECT', 'STORED'):
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
         source = {'schema': body['source_schema'], 'name': body['source_name'], 'type': body['source_type']}
         if not sqlserver_object_exists(_target(user, body['connection_id']), source):
             raise ValueError('DATASET_SOURCE_INVALID')
-        result = _rows(core_api._post_mode('CoreStudioDatasetCreate', {'UserID': user, 'ConnectionID': body['connection_id'], 'DatasetName': body['dataset_name'].strip(), 'Description': body['description'].strip(), 'SourceSchema': source['schema'], 'SourceName': source['name'], 'SourceType': source['type']}))
+        result = _rows(core_api._post_mode('CoreStudioStoredDatasetCreate' if body['access_mode'] == 'STORED' else 'CoreStudioDatasetCreate', {'UserID': user, 'ConnectionID': body['connection_id'], 'DatasetName': body['dataset_name'].strip(), 'Description': body['description'].strip(), 'SourceSchema': source['schema'], 'SourceName': source['name'], 'SourceType': source['type']}))
         if not result or result[0].get('code') != 'DATASET_CREATED' or result[0].get('success') not in (True, 1):
             raise ValueError('DATASET_CREATE_FAILED')
         return jsonify(success=True, data=result[0]), 201
@@ -350,3 +383,36 @@ def create_dataset():
         return _spark_error(exc)
     except Exception:
         return jsonify(success=False, code='DATASET_CREATE_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.post('/<uuid:dataset_id>/ingest')
+def submit_stored_ingest(dataset_id):
+    try:
+        user = _principal()
+        _mutating()
+        from app.services.studio_dataset_ingest import submit
+        # Server generates idempotency key, not supplied by browser.
+        result = submit(user, str(dataset_id), str(uuid.uuid4()))
+        return jsonify(success=True, data=result), 202
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return _spark_error(exc)
+    except Exception:
+        return jsonify(success=False, code='INGEST_METADATA_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.get('/ingest/jobs')
+def stored_ingest_jobs():
+    try:
+        user = _principal()
+        from app.services.studio_dataset_ingest import jobs
+        response = jsonify(success=True, data=jobs(user))
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return _spark_error(exc)
+    except Exception:
+        return jsonify(success=False, code='INGEST_METADATA_UNAVAILABLE'), 503

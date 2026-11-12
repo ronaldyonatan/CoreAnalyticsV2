@@ -436,48 +436,61 @@
 }
 
 
-/* Command Center / original radial style: five staggered rows, left 1/3/5 and right 2/4.
-   Scoped to opt-in stage, so dataset and popup layouts remain unchanged. */
-.studio-command-stage.studio-command-stage--left3-right2 {
+/* Data Universe / orbital stagger: intentionally asymmetric card positions inspired
+   by the original 4-left / 3-right command center. Six distinct modules remain;
+   Data Explorer and Job History are already accessible inside their respective modules.
+   Static geometry only (no floating/jumping animation). Does not touch dataset dialogs. */
+.studio-command-stage.studio-command-stage--left3-right3 {
   position: relative;
   min-height: 560px;
   height: min(68vh, 650px);
   display: block;
+  isolation: isolate;
 }
-.studio-command-stage--left3-right2 .studio-network {
+.studio-command-stage--left3-right3 .studio-network {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
 }
-.studio-command-stage--left3-right2 .studio-command-card {
+.studio-command-stage--left3-right3 .studio-command-card {
   position: absolute !important;
   bottom: auto !important;
   right: auto !important;
   margin: 0 !important;
-  width: 25% !important;
   max-width: 370px;
   min-width: 0;
   transform: translateY(-50%) !important;
   z-index: 2;
 }
-.studio-command-stage--left3-right2 .studio-command-card--connections {
-  left: 3% !important; top: 10% !important;
+/* Offsets and widths vary deliberately: loose rhythm, never an aligned 3x3 table. */
+.studio-command-stage--left3-right3 .studio-command-card--connections {
+  left: 4% !important; top: 18% !important; width: 24% !important;
 }
-.studio-command-stage--left3-right2 .studio-command-card--datasets {
-  left: 3% !important; top: 50% !important;
+.studio-command-stage--left3-right3 .studio-command-card--datasets {
+  left: 5% !important; top: 45% !important; width: 25% !important;
 }
-.studio-command-stage--left3-right2 .studio-command-card--pipelines {
-  left: 3% !important; top: 90% !important;
+.studio-command-stage--left3-right3 .studio-command-card--pipelines {
+  left: 2% !important; top: 80% !important; width: 26% !important;
 }
-.studio-command-stage--left3-right2 .studio-command-card--charts {
-  left: 72% !important; top: 30% !important;
+.studio-command-stage--left3-right3 .studio-command-card--charts {
+  left: 72.5% !important; top: 24% !important; width: 24% !important;
 }
-.studio-command-stage--left3-right2 .studio-command-card--designer {
-  left: 72% !important; top: 70% !important;
+.studio-command-stage--left3-right3 .studio-command-card--designer {
+  left: 70.5% !important; top: 57% !important; width: 25% !important;
 }
-.studio-command-stage--left3-right2 .studio-orb-area {
+.studio-command-stage--left3-right3 .studio-command-card--scheduler {
+  left: 73% !important; top: 85% !important; width: 24% !important;
+}
+.studio-command-stage--left3-right3 :is(.studio-command-card--scheduler,.studio-command-card--charts,.studio-command-card--designer) {
+  background: linear-gradient(260deg, color-mix(in srgb,var(--core-panel) 78%,transparent), color-mix(in srgb,var(--core-panel) 30%,transparent) 75%,transparent);
+}
+.studio-command-stage--left3-right3 :is(.studio-command-card--scheduler,.studio-command-card--charts,.studio-command-card--designer)::before {
+  left: auto;
+  right: 0;
+}
+.studio-command-stage--left3-right3 .studio-orb-area {
   position: absolute !important;
   left: 50% !important;
   top: 50% !important;
@@ -488,8 +501,9 @@
   max-width: 480px;
   z-index: 1;
 }
+/* Narrow layouts prioritize readable cards, unclipped labels and touch targets. */
 @media (max-width: 1080px) {
-  .studio-command-stage.studio-command-stage--left3-right2 {
+  .studio-command-stage.studio-command-stage--left3-right3 {
     display: grid;
     grid-template-columns: repeat(2,minmax(0,1fr));
     gap: 12px;
@@ -497,24 +511,29 @@
     min-height: 0;
     padding: 10px;
   }
-  .studio-command-stage--left3-right2 .studio-network {display:none}
-  .studio-command-stage--left3-right2 .studio-orb-area {
+  .studio-command-stage--left3-right3 .studio-network {display:none}
+  .studio-command-stage--left3-right3 .studio-orb-area {
     position: relative !important;
-    left: auto !important; top: auto !important;
+    left: auto !important;
+    top: auto !important;
     transform: none !important;
     grid-column: 1 / -1;
     grid-row: 1;
     width: min(100%, 390px);
-    justify-self:center;
+    justify-self: center;
   }
-  .studio-command-stage--left3-right2 .studio-command-card {
+  .studio-command-stage--left3-right3 .studio-command-card {
     position: relative !important;
-    left: auto !important; top: auto !important;
+    left: auto !important;
+    top: auto !important;
     transform: none !important;
     width: 100% !important;
     max-width: none;
+    min-height: 86px;
   }
 }
 @media (max-width: 600px) {
-  .studio-command-stage.studio-command-stage--left3-right2 {grid-template-columns:minmax(0,1fr)}
+  .studio-command-stage.studio-command-stage--left3-right3 {
+    grid-template-columns: minmax(0,1fr);
+  }
 }

@@ -1,0 +1,366 @@
+/* Aurora Command Deck V5.2 — Unified Experience.
+ * A focused, theme-aware extension of V5.1. Approved Dataset Catalog stays unchanged.
+ * No animations or transforms. No fixed cyan/red hex colors.
+ */
+.studio-window[data-aurora-deck="v5"] .datasets-page.datasets-page-create {
+  --ds52-accent: var(--core-primary-strong, var(--core-primary));
+  --ds52-line: var(--core-border);
+  --ds52-ink: var(--core-text);
+  --ds52-muted: var(--core-text-secondary);
+  --ds52-panel: color-mix(in srgb, var(--core-bg) 90%, var(--core-primary) 10%);
+  --ds52-control: color-mix(in srgb, var(--core-bg) 94%, var(--core-primary) 6%);
+  padding: 12px clamp(14px, 1.65vw, 26px) 22px !important;
+  color: var(--ds52-ink);
+  background-image:
+    radial-gradient(ellipse 46% 220px at 12% 0%, color-mix(in srgb, var(--ds52-accent) 7%, transparent), transparent 82%),
+    radial-gradient(ellipse 40% 270px at 100% 66%, color-mix(in srgb, var(--ds52-accent) 4%, transparent), transparent 82%);
+  background-repeat: no-repeat;
+}
+/* Same hierarchy as the approved catalog header; no competing page title. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center !important;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  padding: 19px 24px 21px !important;
+  margin: 0 0 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds52-line) 70%, transparent) !important;
+  border-radius: 0 14px 3px 3px !important;
+  background: linear-gradient(103deg,
+    color-mix(in srgb, var(--ds52-accent) 8%, var(--core-panel)),
+    color-mix(in srgb, var(--core-panel) 80%, transparent) 68%,
+    transparent) !important;
+  box-shadow: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 18px; bottom: 18px;
+  width: 2px; border-radius: 8px;
+  background: linear-gradient(180deg, transparent, var(--ds52-accent), transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading .datasets-catalog-identity {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; min-width: 0;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading .datasets-catalog-identity::before {
+  content: '◈'; font-size: 23px; color: var(--ds52-accent); line-height: 1;
+  width: 40px; text-align: center;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--ds52-accent) 19%, transparent));
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading h1 {
+  margin: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 720; font-size: clamp(24px, 2.3vw, 34px) !important;
+  line-height: 1.14; letter-spacing: -.045em;
+  color: var(--ds52-ink);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading .datasets-count {
+  font: 700 10px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--ds52-accent); letter-spacing: .08em;
+  vertical-align: middle; border: 1px solid color-mix(in srgb, var(--ds52-accent) 30%, transparent);
+  border-radius: 7px; padding: 5px 7px; margin-left: 2px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading .datasets-catalog-hint {
+  color: var(--ds52-muted); font-size: 12px; font-weight: 480; letter-spacing: .01em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-back {
+  color: var(--ds52-ink) !important;
+  background: var(--core-control) !important;
+  border: 1px solid color-mix(in srgb, var(--ds52-line) 80%, transparent) !important;
+  border-radius: 10px !important;
+  min-height: 38px; padding: 8px 13px !important;
+  font: 600 12px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-back:hover {
+  border-color: var(--ds52-accent) !important;
+  background: color-mix(in srgb, var(--core-bg) 86%, var(--ds52-accent) 14%) !important;
+}
+/* Form + inspector: float on one workspace surface rather than two oversized cards. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(270px, 0.8fr);
+  align-items: start;
+  gap: clamp(16px, 2vw, 28px);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout > .datasets-create-main {
+  min-width: 0; position: relative; z-index: 3;
+  padding: 0 4px 12px 0 !important;
+  border: 0 !important; border-radius: 0 !important;
+  background: none !important; box-shadow: none !important;
+  overflow: visible;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step {
+  min-width: 0; position: relative; overflow: visible;
+  padding: 14px 13px 18px 15px;
+  border: 0; border-bottom: 1px solid color-mix(in srgb, var(--ds52-line) 70%, transparent);
+  background: transparent;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-source {
+  z-index: 5;
+  background: linear-gradient(96deg,
+    color-mix(in srgb, var(--ds52-accent) 5%, transparent),
+    transparent 80%);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-identity { z-index: 3; }
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-mode {
+  z-index: 1; border-bottom: 0; padding-bottom: 14px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-header {
+  display: flex; align-items: start; gap: 13px; margin-bottom: 14px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-number {
+  display: block; flex: 0 0 23px; padding-top: 5px;
+  color: var(--ds52-accent); font-size: 10px; font-weight: 750; letter-spacing: .12em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-header h2 {
+  margin: 0 0 3px; color: var(--ds52-ink);
+  font: 650 16px/1.35 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -.025em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step-header p {
+  margin: 0; color: var(--ds52-muted); font-size: 11.5px; line-height: 1.5;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-fields {
+  position: relative; display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 13px 15px !important; padding-left: 36px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step > .datasets-message,
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step > .datasets-source-error {
+  margin-left: 36px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout :is(.datasets-picker,.datasets-field) {
+  color: var(--ds52-muted); font-size: 11px; font-weight: 600;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout :is(.datasets-picker-control input,.datasets-field input) {
+  min-height: 42px !important; height: 42px !important;
+  background: var(--ds52-control) !important;
+  border-radius: 9px !important;
+  border: 1px solid color-mix(in srgb, var(--ds52-line) 80%, transparent) !important;
+  color: var(--ds52-ink) !important;
+  font-size: 12px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout :is(.datasets-picker-control input,.datasets-field input):focus {
+  border-color: var(--ds52-accent) !important;
+  outline: 1px solid var(--ds52-accent) !important;
+  outline-offset: 1px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-picker-menu {
+  z-index: 150 !important;
+  background: var(--ds52-panel) !important; /* opaque: --core-bg is solid */
+  box-shadow: 0 14px 32px #0003 !important;
+  border-radius: 10px !important;
+  max-height: min(275px, 38vh);
+  overflow-y: auto;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-picker-menu [role="option"] {
+  min-height: 37px; padding: 8px 10px; font-weight: 550; font-size: 12px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-modes {
+  padding-left: 36px; gap: 12px;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-mode,
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-mode.is-selected {
+  min-height: 72px !important;
+  padding: 12px 13px !important;
+  gap: 10px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--core-surface-strong) 68%, transparent),
+    color-mix(in srgb, var(--core-panel) 42%, transparent)) !important;
+  border: 0 !important; border-radius: 9px !important;
+  box-shadow: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-mode.is-selected {
+  background: linear-gradient(93deg,
+    color-mix(in srgb, var(--ds52-accent) 23%, var(--core-surface-strong)),
+    color-mix(in srgb, var(--ds52-accent) 5%, var(--core-panel)) 76%,
+    transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-mode.is-selected::before {
+  inset: 11px auto 11px 0; width: 2px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-mode strong {
+  font: 650 12px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color: var(--ds52-ink);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-mode small {font-size: 10.5px; line-height: 1.45; margin-top: 4px;}
+/* Inspector shares the same lightweight visual language as the dataset catalog. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout > .datasets-create-inspector {
+  position: sticky; top: 5px; z-index: 2;
+  min-width: 0; padding: 18px 20px 20px !important;
+  border: 1px solid color-mix(in srgb, var(--ds52-line) 55%, transparent) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(155deg,
+    color-mix(in srgb, var(--ds52-accent) 7%, var(--core-panel)),
+    color-mix(in srgb, var(--core-surface-strong) 72%, var(--core-bg)) 65%) !important;
+  box-shadow: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-inspector-kicker {
+  display: flex; align-items: center; gap: 9px;
+  color: var(--ds52-accent); font-size: 10px;
+  font-weight: 720; letter-spacing: .12em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-inspector-kicker span {
+  font-size: 20px; letter-spacing: 0; line-height: 1;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-preview {
+  padding: 20px 0 17px; margin-bottom: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds52-line) 65%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-preview-label {
+  display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .13em;
+  color: var(--ds52-muted); margin-bottom: 7px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-preview h2 {
+  margin: 0 0 7px;
+  color: var(--ds52-ink);
+  font: 690 clamp(18px,1.8vw,23px)/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  overflow-wrap: anywhere; letter-spacing: -.03em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-preview p {
+  color: var(--ds52-muted); margin: 0; font-size: 11.5px; line-height: 1.6;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-specs {margin: 4px 0 0; padding: 0;}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-specs > div {
+  display: flex; gap: 12px; align-items: baseline;
+  justify-content: space-between; padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds52-line) 45%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-specs dt {
+  flex: none; margin: 0; font-size: 10px; color: var(--ds52-muted);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-specs dd {
+  margin: 0; color: var(--ds52-ink); font-size: 11.5px;
+  font-weight: 640; text-align: right; overflow-wrap: anywhere; min-width: 0;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-specs .datasets-create-mode-value {
+  color: var(--ds52-accent); letter-spacing: .06em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-mode-note {
+  margin-top: 15px; color: var(--ds52-muted); font-size: 11.5px; line-height: 1.6;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-save-dock {
+  display: grid; gap: 8px; margin-top: 18px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-save-dock button[type="submit"] {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 0; padding: 12px;
+  width: 100%; min-height: 43px;
+  border-radius: 9px; border: 1px solid var(--ds52-accent);
+  background: var(--ds52-accent); color: var(--core-bg);
+  font: 680 12px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  cursor: pointer;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-save-dock button[type="submit"]:disabled {
+  background: var(--ds52-control); border-color: var(--ds52-line);
+  color: var(--core-text-muted); opacity: .85; cursor: not-allowed;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-save-dock small {
+  color: var(--ds52-muted); font-size: 10px; line-height: 1.5;
+  text-align: center;
+}
+/* QUICK MENU: the portal lives under document.body and carries data-theme explicitly. */
+.ca-clock-menu.ca-clock-menu-aurora.ca-clock-menu-refined.ca-clock-menu-compact {
+  --cm52-accent: var(--core-primary-strong, var(--core-primary));
+  --cm52-ink: var(--core-text);
+  --cm52-muted: var(--core-text-secondary);
+  --cm52-surface: color-mix(in srgb, var(--core-bg) 91%, var(--core-primary) 9%);
+  width: 248px !important;
+  max-width: calc(100vw - 16px);
+  padding: 7px !important;
+  border-radius: 13px !important;
+  border: 1px solid color-mix(in srgb, var(--core-border) 75%, transparent) !important;
+  background: var(--cm52-surface) !important;
+  color: var(--cm52-ink) !important;
+  box-shadow: 0 15px 33px #0003, 0 3px 9px #0001 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+.ca-clock-menu-compact .ca-clock-compact-head {
+  display: flex; align-items: start; justify-content: space-between;
+  gap: 8px; padding: 7px 8px 8px;
+}
+.ca-clock-menu-compact .ca-clock-compact-title { min-width: 0; display: grid; gap: 3px; }
+.ca-clock-menu-compact .ca-clock-compact-title strong {
+  color: var(--cm52-ink); font-size: 12.5px; font-weight: 690;
+  line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ca-clock-menu-compact .ca-clock-compact-title small {
+  color: var(--cm52-muted); font-size: 10px; font-weight: 450;
+}
+.ca-clock-menu-compact .ca-clock-compact-status {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 6px; margin-top: 1px; border-radius: 6px;
+  background: color-mix(in srgb, var(--core-border) 26%, var(--cm52-surface));
+  color: var(--cm52-muted); font-size: 9px; font-weight: 650;
+}
+.ca-clock-menu-compact .ca-clock-compact-status::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+}
+.ca-clock-menu-compact .ca-clock-compact-status.is-on {
+  color: var(--core-success-text, var(--cm52-accent));
+  background: color-mix(in srgb, var(--core-success-surface, var(--cm52-surface)) 48%, var(--cm52-surface));
+}
+.ca-clock-menu-compact .ca-clock-action-list { gap: 1px; }
+.ca-clock-menu-compact .ca-clock-action-list > button {
+  min-height: 35px; padding: 7px 9px;
+  gap: 10px; border-radius: 7px;
+  color: var(--cm52-ink); font-size: 11.5px; font-weight: 500;
+}
+.ca-clock-menu-compact .ca-clock-action-list > button > svg {width: 15px; height: 15px; color: var(--cm52-muted);}
+.ca-clock-menu-compact .ca-clock-action-list > button:first-child > svg { color: var(--cm52-accent); }
+.ca-clock-menu-compact .ca-clock-action-list > button:is(:hover,:focus-visible):not(:disabled) {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--cm52-accent) 13%, var(--cm52-surface)),
+    color-mix(in srgb, var(--cm52-accent) 3%, var(--cm52-surface)));
+}
+.ca-clock-menu-compact .ca-clock-action-list > button:focus-visible {
+  outline: 1px solid var(--cm52-accent) !important; outline-offset: -2px;
+  box-shadow: none;
+}
+.ca-clock-menu-compact .ca-clock-foot.ca-clock-compact-foot {
+  display: flex; justify-content: space-between; gap: 9px; align-items: baseline;
+  margin: 5px 4px 0; padding: 9px 3px 3px;
+  border-top: 1px solid color-mix(in srgb, var(--core-border) 58%, transparent);
+}
+.ca-clock-menu-compact .ca-clock-compact-foot > span {font-size: 9px; color: var(--cm52-muted);}
+.ca-clock-menu-compact .ca-clock-compact-foot > strong {
+  min-width: 0; font-size: 10px; font-weight: 550; text-align: right;
+  color: var(--cm52-ink);
+}
+.ca-clock-menu-compact .ca-clock-error { display: block; padding: 5px 8px; font-size: 10px; }
+@media (max-width: 1020px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(230px, .75fr);
+  }
+}
+@media (max-width: 780px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout {
+    grid-template-columns: minmax(0,1fr);
+  }
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-layout > .datasets-create-inspector {
+    position: static;
+  }
+}
+@media (max-width: 540px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading {
+    padding: 16px 14px !important;
+  }
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-command-heading .datasets-catalog-hint {display: none;}
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-fields,
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-modes {
+    grid-template-columns: minmax(0,1fr); padding-left: 0;
+  }
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step > .datasets-message,
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step > .datasets-source-error {margin-left: 0;}
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create .datasets-create-step {padding-inline: 3px;}
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page-create *,
+  .ca-clock-menu-compact * {animation: none !important; transition: none !important;}
+}

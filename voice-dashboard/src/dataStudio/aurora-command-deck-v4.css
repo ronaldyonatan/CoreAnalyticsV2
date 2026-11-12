@@ -1,0 +1,32 @@
+/* Aurora Command Deck V4 — refined, theme-driven and motion-light. Requires V3. */
+.studio-window-content .datasets-page-catalog .datasets-catalog-heading{background:linear-gradient(115deg,color-mix(in srgb,var(--deck-accent) 9%,var(--deck-surface)),var(--deck-surface) 72%)!important;border:0!important;border-bottom:1px solid color-mix(in srgb,var(--deck-accent) 32%,transparent)!important;border-radius:16px 16px 5px 5px!important;box-shadow:none!important;padding:19px 22px!important;min-height:96px!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-heading::before{width:3px!important;opacity:.65!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-identity::before{background:none!important;border:0!important;box-shadow:none!important;width:30px!important;height:34px!important;font-size:26px!important;filter:drop-shadow(0 0 9px color-mix(in srgb,var(--deck-accent) 30%,transparent))}
+.studio-window-content .datasets-page-catalog .datasets-catalog-identity h1{font-weight:730!important;letter-spacing:-.045em!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-hint{opacity:.72}
+.studio-window-content .datasets-page-catalog .datasets-catalog-list{gap:5px!important;padding:3px 6px 12px 0!important}
+.studio-window-content .datasets-page-catalog .datasets-row-shell{border-radius:11px!important;border:1px solid transparent!important;background:linear-gradient(90deg,color-mix(in srgb,var(--deck-raised) 74%,transparent),color-mix(in srgb,var(--deck-surface) 60%,transparent))!important;box-shadow:none!important;transform:none!important;transition:background .12s ease,border-color .12s ease!important}
+.studio-window-content .datasets-page-catalog .datasets-row-shell:hover{transform:none!important;box-shadow:none!important;background:color-mix(in srgb,var(--deck-accent) 7%,var(--deck-raised))!important}
+.studio-window-content .datasets-page-catalog .datasets-row-shell:has(.datasets-catalog-row.is-selected){background:linear-gradient(90deg,color-mix(in srgb,var(--deck-accent) 12%,var(--deck-raised)),var(--deck-raised))!important;border-color:color-mix(in srgb,var(--deck-accent) 25%,transparent)!important;box-shadow:inset 2px 0 var(--deck-accent)!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-row{min-height:61px!important;padding:9px 13px!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-name strong{font-size:14px!important;font-weight:680!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-name small{font-size:11px!important;opacity:.78!important}
+/* Clock action: no box in any theme; focus and hover remain accessible. */
+.studio-window-content .datasets-page-catalog .ca-clock-trigger,
+.studio-window-content .datasets-page-catalog .datasets-row-actions .ca-clock-trigger{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:50%!important;min-width:35px!important;width:35px!important;height:35px!important;padding:5px!important;color:var(--deck-muted)!important;transition:color .12s ease,background .12s ease!important}
+.studio-window-content .datasets-page-catalog .ca-clock-trigger:hover:not(:disabled),
+.studio-window-content .datasets-page-catalog .ca-clock-trigger[aria-expanded="true"]{background:color-mix(in srgb,var(--deck-accent) 10%,transparent)!important;color:var(--deck-accent)!important}
+.studio-window-content .datasets-page-catalog .ca-clock-trigger.is-scheduled{color:var(--deck-accent)!important}
+.studio-window-content .datasets-page-catalog .ca-clock-trigger:focus-visible{outline:2px solid var(--deck-accent)!important;outline-offset:2px!important}
+.studio-window-content .datasets-page-catalog .ca-clock-caret{opacity:.6!important;font-size:10px!important}
+/* Quiet toolbar: input borders are subtle until active. */
+.studio-window-content .datasets-page-catalog .ca-catalog-filter-select select,
+.studio-window-content .datasets-page-catalog .datasets-catalog-search input{border-color:color-mix(in srgb,var(--deck-line) 46%,transparent)!important;background:color-mix(in srgb,var(--deck-raised) 60%,transparent)!important}
+.studio-window-content .datasets-page-catalog :is(input,select):focus{border-color:var(--deck-accent)!important}
+/* Inspector: one strong surface rather than nested neon outlines. */
+.studio-window-content .datasets-page-catalog .datasets-detail{border:1px solid color-mix(in srgb,var(--deck-line) 75%,transparent)!important;border-radius:19px!important;background:linear-gradient(155deg,color-mix(in srgb,var(--deck-accent) 7%,var(--deck-raised)),var(--deck-surface) 66%)!important;box-shadow:0 15px 38px color-mix(in srgb,#000 12%,transparent)!important}
+.studio-window-content .datasets-page-catalog .deck-metric{border:1px solid color-mix(in srgb,var(--deck-line) 40%,transparent)!important;border-radius:12px!important;background:color-mix(in srgb,var(--deck-raised) 64%,transparent)!important;box-shadow:none!important}
+.studio-window-content .datasets-page-catalog .deck-inspector-symbol{background:none!important;border:0!important;width:28px!important;height:32px!important;border-radius:0!important}
+.studio-window-content .datasets-page-catalog .deck-empty-symbol{font-size:48px!important;opacity:.85!important}
+@media(prefers-reduced-motion:reduce){.studio-window-content .datasets-page-catalog *{transition:none!important}}
+@media(max-width:600px){.studio-window-content .datasets-page-catalog .datasets-catalog-heading{padding:15px!important;min-height:auto!important}}

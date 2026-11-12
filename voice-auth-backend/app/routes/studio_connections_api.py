@@ -27,21 +27,22 @@ def _error(exc):
     return jsonify(success=False, code=code), (401 if code == 'AUTH_REQUIRED' else 403)
 
 
-def _body():
+def _body(*, editing=False):
     body = request.get_json(silent=True)
     if not isinstance(body, dict):
         raise ValueError('JSON_OBJECT_REQUIRED')
     allowed = {'connector_type', 'connection_name', 'server_host', 'server_port', 'database_name', 'login_username', 'password', 'encrypt_transport', 'trust_server_certificate', 'connection_timeout_seconds'}
     if set(body) - allowed:
         raise ValueError('UNKNOWN_FIELDS')
-    if body.get('connector_type', 'sqlserver') != 'sqlserver':
+    kind = body.get('connector_type', 'sqlserver')
+    if kind not in ('sqlserver', 'postgresql'):
         raise ValueError('CONNECTOR_UNSUPPORTED')
     for key, limit in (('connection_name',150),('server_host',255),('database_name',128),('login_username',255)):
         if not isinstance(body.get(key), str) or not body[key].strip() or len(body[key]) > limit:
             raise ValueError('INVALID_' + key.upper())
-    if not isinstance(body.get('password'), str) or not body['password'] or len(body['password']) > 1024:
+    if (not editing or body.get('password')) and (not isinstance(body.get('password'), str) or not body['password'] or len(body['password']) > 1024):
         raise ValueError('INVALID_PASSWORD')
-    for key, default, low, high in (('server_port',1433,1,65535),('connection_timeout_seconds',10,1,60)):
+    for key, default, low, high in (('server_port',5432 if kind == 'postgresql' else 1433,1,65535),('connection_timeout_seconds',10,1,60)):
         val = body.get(key, default)
         if type(val) is not int or not low <= val <= high:
             raise ValueError('INVALID_' + key.upper())
@@ -50,9 +51,7 @@ def _body():
             raise ValueError('INVALID_BOOLEAN')
     if body.get('trust_server_certificate', False) and os.getenv('STUDIO_ALLOW_UNTRUSTED_CERT','false').lower() != 'true':
         raise ValueError('UNTRUSTED_CERT_DISABLED')
-    # Existing metadata RPC only accepts SQL Server fields. Do not persist an
-    # unsupported connector_type until the BEAM schema is migrated.
-    body.pop('connector_type', None)
+    body['connector_type'] = kind
     return body
 
 
@@ -61,14 +60,15 @@ def _mutating():
         raise PermissionError('CSRF_ORIGIN_REJECTED')
 
 
-def _sql_target(body):
-    return resolve('sqlserver').make_target(body)
+def _target(body):
+    return resolve(body.get('connector_type', 'sqlserver')).make_target(body)
 
 
 @studio_connections_bp.get('/connector-capabilities')
 def connector_capabilities():
     try:
         _principal()
+        resolve('postgresql')
         return jsonify(success=True, data=capabilities())
     except PermissionError as exc:
         return _error(exc)
@@ -90,7 +90,7 @@ def create_connection():
         user_id = _principal()
         _mutating()
         body = _body()
-        resolve('sqlserver').validate_target(_sql_target(body))
+        resolve(body['connector_type']).validate_target(_target(body))
         return jsonify(success=True, data=store.create_connection(user_id, body)), 201
     except PermissionError as exc:
         return _error(exc)
@@ -124,10 +124,34 @@ def test_connection():
         _mutating()
         body = _body()
         # Test and Save use the same central network/port/TLS policy.
-        return jsonify(resolve('sqlserver').test_connection(_sql_target(body)))
+        return jsonify(resolve(body['connector_type']).test_connection(_target(body)))
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
         return jsonify(success=False, code=str(exc)), getattr(exc, 'http_status', 400)
     except Exception:
         return jsonify(success=False, code='CONNECTION_TEST_UNAVAILABLE'), 503
+
+@studio_connections_bp.patch('/<uuid:connection_id>')
+def edit_connection(connection_id):
+    try:
+        user_id = _principal()
+        _mutating()
+        body = _body(editing=True)
+        existing = next((x for x in store.list_connections(user_id) if str(x.get('connection_id', '')).lower() == str(connection_id).lower()), None)
+        if not existing:
+            raise ValueError('STUDIO_CONNECTION_NOT_FOUND')
+        if body['connector_type'].upper() != existing['connection_type'].upper():
+            raise ValueError('CONNECTOR_TYPE_IMMUTABLE')
+        # Validate network policy for edited endpoints even if password is unchanged.
+        validation_body = {**body, 'password': body.get('password') or 'UNCHANGED_SECRET'}
+        resolve(body['connector_type']).validate_target(_target(validation_body))
+        if not body.get('password'):
+            body.pop('password', None)
+        return jsonify(success=True, data=store.update_connection(user_id, str(connection_id), body))
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return jsonify(success=False, code=str(exc)), getattr(exc, 'http_status', 400)
+    except Exception:
+        return jsonify(success=False, code='METADATA_UNAVAILABLE'), 503

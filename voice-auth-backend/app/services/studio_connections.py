@@ -45,3 +45,12 @@ def create_connection(user_id, body):
 
 def set_connection_active(user_id, connection_id, active):
     return _success(core_api.set_studio_connection_active(user_id=user_id, connection_id=connection_id, active=active), 'STUDIO_CONNECTION_STATUS_UPDATED')
+
+
+def update_connection(user_id, connection_id, body):
+    payload = {k: v for k, v in body.items() if k != 'password'}
+    if body.get('password'):
+        secret = _cipher().encrypt(body['password'].encode('utf-8'))
+        payload['encrypted_password_base64'] = base64.b64encode(secret).decode('ascii')
+        payload['encryption_key_version'] = 1
+    return _success(core_api.update_studio_connection(user_id=user_id, connection_id=connection_id, record=payload), 'STUDIO_CONNECTION_UPDATED')

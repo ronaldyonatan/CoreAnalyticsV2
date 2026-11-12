@@ -1,3 +1,4 @@
+import {  UniverseHeader , UniverseInspector } from '../design-system/components/universe';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PipelineDocument } from './pipelineMetadata';
 import { loadDatasetCatalog } from './datasetCatalog';
@@ -117,10 +118,10 @@ export default function PipelineLineage({document,outputs,version,pipelineName =
   const reset=()=>{setZoom(1);if(viewport.current){viewport.current.scrollLeft=0;viewport.current.scrollTop=0;}};
   if(!(document.nodes||[]).length)return <section className="ca-lineage"><p>Belum ada graph pipeline tersimpan untuk versi ini.</p></section>;
   return <section className="ca-lineage ca-lineage-v2" aria-label="Data lineage end-to-end">
-    <header className="ca-lineage-topbar">
+    <UniverseHeader className="ca-lineage-topbar">
       <div><span className="ca-lineage-kicker">DATA LINEAGE · V{version}</span><h3>Source → ETL → Output → Downstream</h3></div>
       <div className="ca-lineage-tools"><button type="button" className={expanded?'is-active':''} onClick={()=>{setExpanded(v=>!v);setSelected(null);setZoom(1);}}>{expanded?'Ringkas ETL':'Detail transformasi'}</button><button type="button" aria-label="Perkecil diagram" onClick={()=>setZoom(v=>Math.max(.6,+(v-.15).toFixed(2)))}>−</button><span>{Math.round(zoom*100)}%</span><button type="button" aria-label="Perbesar diagram" onClick={()=>setZoom(v=>Math.min(1.6,+(v+.15).toFixed(2)))}>+</button><button type="button" onClick={reset}>Reset</button></div>
-    </header>
+    </UniverseHeader>
     {notice&&<p className="ca-lineage-note">{notice}</p>}
     <div className="ca-lineage-viewport" ref={viewport} tabIndex={0} aria-label="Diagram lineage; geser untuk menampilkan seluruh alur">
       <div className="ca-lineage-scaled" style={{width:graph.width*zoom,height:graph.height*zoom}}>
@@ -131,6 +132,6 @@ export default function PipelineLineage({document,outputs,version,pipelineName =
         </div>
       </div>
     </div>
-    {focus&&<aside className="ca-lineage-node-detail"><div><span>{focus.kind.toUpperCase()}</span><strong>{focus.title}</strong><small>{focus.subtitle}</small></div><div className="ca-lineage-node-actions">{navigable(focus)&&<button type="button" onClick={()=>navigate(focus)}>{focus.kind==='source'?'Buka dataset':focus.kind==='output'?'Lihat hasil': 'Buka Canvas'} ↗</button>}{focus.kind==='downstream'&&<small>Relasi lintas dataset, view, atau chart belum tersedia dari API. Tidak ada relasi yang diasumsikan.</small>}<button type="button" onClick={()=>setSelected(null)}>Tutup</button></div></aside>}
+    {focus&&<UniverseInspector className="ca-lineage-node-detail"><div><span>{focus.kind.toUpperCase()}</span><strong>{focus.title}</strong><small>{focus.subtitle}</small></div><div className="ca-lineage-node-actions">{navigable(focus)&&<button type="button" onClick={()=>navigate(focus)}>{focus.kind==='source'?'Buka dataset':focus.kind==='output'?'Lihat hasil': 'Buka Canvas'} ↗</button>}{focus.kind==='downstream'&&<small>Relasi lintas dataset, view, atau chart belum tersedia dari API. Tidak ada relasi yang diasumsikan.</small>}<button type="button" onClick={()=>setSelected(null)}>Tutup</button></div></UniverseInspector>}
   </section>;
 }

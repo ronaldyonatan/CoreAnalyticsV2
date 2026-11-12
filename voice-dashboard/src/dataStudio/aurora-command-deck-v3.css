@@ -1,0 +1,72 @@
+/* Aurora Command Deck V3 — scoped to Datasets catalog; active theme supplies colors. */
+.studio-window-content .datasets-page-catalog{
+ --deck-accent:var(--core-primary-strong,var(--core-primary,var(--studio-accent,#27b8cf)));
+ --deck-text:var(--core-text,var(--text-primary,inherit));
+ --deck-muted:var(--core-text-secondary,var(--text-secondary,inherit));
+ --deck-surface:var(--core-panel,var(--surface-card,var(--surface-primary,transparent)));
+ --deck-raised:var(--core-surface-strong,var(--surface-card,var(--deck-surface)));
+ --deck-line:var(--core-border,color-mix(in srgb,currentColor 14%,transparent));
+ isolation:isolate;position:relative;color:var(--deck-text);
+}
+.studio-window-content .datasets-page-catalog::before{
+ content:'';position:absolute;inset:-30px -20px auto; height:320px;pointer-events:none;z-index:-1;
+ background:radial-gradient(ellipse at 18% 12%,color-mix(in srgb,var(--deck-accent) 13%,transparent),transparent 62%),radial-gradient(ellipse at 83% 70%,color-mix(in srgb,var(--deck-accent) 7%,transparent),transparent 64%);
+}
+/* Command header: open, asymmetric, light rather than a giant outlined box */
+.studio-window-content .datasets-page-catalog .datasets-catalog-heading{
+ position:relative;min-height:105px;display:flex;align-items:center;gap:20px;padding:18px 24px 18px 26px!important;
+ border:0!important;border-bottom:1px solid color-mix(in srgb,var(--deck-accent) 22%,var(--deck-line))!important;
+ border-radius:20px 20px 8px 8px!important;
+ background:linear-gradient(110deg,color-mix(in srgb,var(--deck-accent) 13%,var(--deck-surface)),color-mix(in srgb,var(--deck-surface) 94%,transparent) 62%,var(--deck-surface))!important;
+ box-shadow:0 15px 40px color-mix(in srgb,#000 12%,transparent),inset 0 1px 0 color-mix(in srgb,var(--deck-text) 9%,transparent)!important;
+}
+.studio-window-content .datasets-page-catalog .datasets-catalog-heading::before{content:'';position:absolute;left:0;top:19px;bottom:19px;width:4px;border-radius:4px;background:var(--deck-accent);box-shadow:0 0 20px color-mix(in srgb,var(--deck-accent) 38%,transparent)}
+.studio-window-content .datasets-page-catalog .datasets-catalog-identity{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0}
+.studio-window-content .datasets-page-catalog .datasets-catalog-identity::before{content:'◈';display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:18px;font-size:30px;color:var(--deck-accent);background:linear-gradient(145deg,color-mix(in srgb,var(--deck-accent) 21%,var(--deck-raised)),var(--deck-surface));box-shadow:0 9px 22px color-mix(in srgb,#000 12%,transparent),inset 0 1px 0 color-mix(in srgb,var(--deck-text) 12%,transparent)}
+.studio-window-content .datasets-page-catalog .datasets-catalog-identity h1{font-size:clamp(24px,2.3vw,34px);letter-spacing:-.045em;line-height:1.1;font-weight:780;margin:0}
+.studio-window-content .datasets-page-catalog .datasets-catalog-hint{color:var(--deck-muted);font-size:12px;letter-spacing:.035em}
+.studio-window-content .datasets-page-catalog .datasets-catalog-actions{gap:9px}
+.studio-window-content .datasets-page-catalog .datasets-catalog-create{box-shadow:0 7px 20px color-mix(in srgb,var(--deck-accent) 19%,transparent)}
+/* Filters: reduce visual chrome, accent only on focus */
+.studio-window-content .datasets-page-catalog .ca-catalog-filter-select select,
+.studio-window-content .datasets-page-catalog .datasets-catalog-search input{border:1px solid color-mix(in srgb,var(--deck-line) 80%,transparent)!important;background:color-mix(in srgb,var(--deck-raised) 75%,transparent)!important;border-radius:12px!important;color:var(--deck-text)}
+.studio-window-content .datasets-page-catalog :is(input,select,button):focus-visible{outline:2px solid var(--deck-accent);outline-offset:2px}
+/* Catalog: distinct layers, gentle rhythm, meaningful selected state */
+.studio-window-content .datasets-page-catalog .datasets-catalog-grid{gap:clamp(16px,1.8vw,28px)!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-list{gap:8px!important;padding:5px 7px 10px 3px!important}
+.studio-window-content .datasets-page-catalog .datasets-row-shell{
+ position:relative;border:1px solid transparent!important;border-radius:15px!important;
+ background:linear-gradient(112deg,color-mix(in srgb,var(--deck-raised) 93%,transparent),color-mix(in srgb,var(--deck-surface) 84%,transparent))!important;
+ box-shadow:inset 0 1px 0 color-mix(in srgb,var(--deck-text) 5%,transparent),0 3px 10px color-mix(in srgb,#000 6%,transparent)!important;
+ transition:background .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+.studio-window-content .datasets-page-catalog .datasets-row-shell:hover{transform:translateY(-1px);background:color-mix(in srgb,var(--deck-accent) 8%,var(--deck-raised))!important;box-shadow:0 9px 20px color-mix(in srgb,#000 12%,transparent)!important}
+.studio-window-content .datasets-page-catalog .datasets-row-shell:has(.datasets-catalog-row.is-selected){background:linear-gradient(110deg,color-mix(in srgb,var(--deck-accent) 16%,var(--deck-raised)),var(--deck-raised))!important;border-color:color-mix(in srgb,var(--deck-accent) 34%,var(--deck-line))!important;box-shadow:inset 3px 0 0 var(--deck-accent),0 10px 24px color-mix(in srgb,#000 12%,transparent)!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-row{min-height:58px!important;padding:9px 13px!important}
+.studio-window-content .datasets-page-catalog .datasets-catalog-name strong{font-size:13px;letter-spacing:.01em}
+.studio-window-content .datasets-page-catalog .datasets-catalog-name small{color:var(--deck-muted);opacity:.86}
+/* Inspector becomes the second visual anchor. Independent scrolling remains intact. */
+.studio-window-content .datasets-page-catalog .datasets-detail{border:1px solid color-mix(in srgb,var(--deck-accent) 24%,var(--deck-line))!important;border-radius:22px!important;background:linear-gradient(155deg,color-mix(in srgb,var(--deck-accent) 10%,var(--deck-raised)),var(--deck-surface) 64%)!important;box-shadow:0 22px 46px color-mix(in srgb,#000 17%,transparent),inset 0 1px 0 color-mix(in srgb,var(--deck-text) 8%,transparent)!important}
+.studio-window-content .datasets-page-catalog .datasets-detail>.ca-dataset-detail-header{padding:18px!important;background:linear-gradient(120deg,color-mix(in srgb,var(--deck-accent) 12%,var(--deck-raised)),var(--deck-raised))!important;border-bottom:1px solid color-mix(in srgb,var(--deck-line) 65%,transparent)!important}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body{padding:18px!important}
+.studio-window-content .datasets-page-catalog .deck-inspector-kicker{font-size:10px;letter-spacing:.2em;font-weight:750;color:var(--deck-accent);margin:0 0 10px}
+.studio-window-content .datasets-page-catalog .deck-inspector-title{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.studio-window-content .datasets-page-catalog .deck-inspector-symbol{width:42px;height:42px;display:grid;place-items:center;flex:none;border-radius:14px;background:color-mix(in srgb,var(--deck-accent) 16%,var(--deck-raised));color:var(--deck-accent);font-size:22px}
+.studio-window-content .datasets-page-catalog .deck-inspector-title h2{margin:0!important;font-size:19px!important;overflow-wrap:anywhere}
+.studio-window-content .datasets-page-catalog .deck-inspector-title small{color:var(--deck-muted);font-size:11px}
+.studio-window-content .datasets-page-catalog .deck-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.studio-window-content .datasets-page-catalog .deck-metric{min-width:0;padding:13px 12px;border-radius:15px;background:color-mix(in srgb,var(--deck-raised) 85%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--deck-text) 6%,transparent)}
+.studio-window-content .datasets-page-catalog .deck-metric span{display:block;font-size:10px;letter-spacing:.08em;color:var(--deck-muted);margin-bottom:7px}
+.studio-window-content .datasets-page-catalog .deck-metric strong{display:block;font-size:17px;font-weight:750;line-height:1.3;overflow-wrap:anywhere}
+.studio-window-content .datasets-page-catalog .deck-metric strong.deck-status{font-size:12px;color:var(--deck-accent)}
+.studio-window-content .datasets-page-catalog .deck-inspector-section{margin:0 0 10px;font-size:10px;letter-spacing:.16em;font-weight:750;color:var(--deck-muted)}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body dl{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px 12px!important}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body dt{color:var(--deck-muted)!important}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body dd{color:var(--deck-text)!important}
+.studio-window-content .datasets-page-catalog .deck-empty{min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:25px;gap:10px}
+.studio-window-content .datasets-page-catalog .deck-empty-symbol{font-size:44px;line-height:1;color:var(--deck-accent);filter:drop-shadow(0 6px 12px color-mix(in srgb,var(--deck-accent) 22%,transparent))}
+.studio-window-content .datasets-page-catalog .deck-empty h2{margin:0;font-size:20px}
+.studio-window-content .datasets-page-catalog .deck-empty p{margin:0;color:var(--deck-muted);font-size:12px;max-width:245px}
+@media(max-width:900px){.studio-window-content .datasets-page-catalog .datasets-catalog-heading{padding:15px!important;min-height:auto}.studio-window-content .datasets-page-catalog .datasets-catalog-identity::before{width:40px;height:40px;font-size:23px}.studio-window-content .datasets-page-catalog .datasets-catalog-grid{gap:12px!important}}
+@media(max-width:600px){.studio-window-content .datasets-page-catalog .datasets-catalog-heading{flex-wrap:wrap}.studio-window-content .datasets-page-catalog .datasets-catalog-actions{width:100%;justify-content:flex-start}.studio-window-content .datasets-page-catalog .ca-dataset-detail-body dl{grid-template-columns:1fr!important}.studio-window-content .datasets-page-catalog .deck-metrics{gap:7px}}
+@media(prefers-reduced-motion:reduce){.studio-window-content .datasets-page-catalog .datasets-row-shell{transition:none!important;transform:none!important}}

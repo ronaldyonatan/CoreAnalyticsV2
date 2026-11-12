@@ -1,0 +1,13 @@
+
+/* Primary actions: use the active CoreAnalytics theme accent */
+.studio-window-content .datasets-page-catalog
+.ca-dataset-detail-actions > .datasets-action:not(.ca-storage-delete-trigger) {
+  background: var(--studio-accent, #38bdf8) !important;
+  color: var(--accent-contrast, #071827) !important;
+  border-color: transparent !important;
+}
+
+.studio-window-content .datasets-page-catalog
+.ca-dataset-detail-actions > .datasets-action:not(.ca-storage-delete-trigger):hover {
+  filter: brightness(1.1);
+}

@@ -1,0 +1,21 @@
+/* Floating portal menu: carry active theme onto the portal itself. */
+.ca-clock-menu-aurora {
+ --av2-accent:var(--core-primary-strong,var(--core-primary,#20b8d3));
+ --av2-text:var(--core-text,#eaf5fa);
+ --av2-muted:var(--core-text-secondary,#a9c2ce);
+ --av2-panel:var(--core-surface-strong,var(--core-panel,#142b39));
+ --av2-line:var(--core-border,color-mix(in srgb,var(--av2-text) 20%,transparent));
+ width:252px;max-width:calc(100vw - 16px);padding:9px;
+ color:var(--av2-text);background:var(--av2-panel);
+ border:1px solid color-mix(in srgb,var(--av2-accent) 30%,var(--av2-line));
+ border-radius:15px;box-shadow:0 24px 70px rgba(0,0,0,.29),inset 0 1px 0 color-mix(in srgb,var(--av2-text) 9%,transparent);
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);font-size:13px;
+}
+.ca-clock-menu-aurora .ca-clock-title{padding:9px 11px 11px;color:var(--av2-muted);border-bottom-color:var(--av2-line);font-size:11px;letter-spacing:.035em}
+.ca-clock-menu-aurora .ca-clock-title strong{color:var(--av2-text);font-size:14px;margin-top:5px;letter-spacing:0}
+.ca-clock-menu-aurora>button{min-height:39px;border-radius:9px;padding:9px 11px;font-size:13px;gap:12px;color:var(--av2-text)}
+.ca-clock-menu-aurora>button:hover:not(:disabled),.ca-clock-menu-aurora>button:focus-visible{background:color-mix(in srgb,var(--av2-accent) 13%,var(--av2-panel));outline:1px solid color-mix(in srgb,var(--av2-accent) 35%,transparent);outline-offset:-1px}
+.ca-clock-menu-aurora .ca-clock-foot{border-top-color:var(--av2-line);padding:12px 11px 7px;color:var(--av2-muted);gap:4px}
+.ca-clock-menu-aurora .ca-clock-foot strong{color:var(--av2-text);font-size:12px}
+.ca-clock-menu-aurora .ca-clock-error{color:var(--core-danger-text,#d85c66)}
+@media(prefers-reduced-motion:reduce){.ca-clock-menu-aurora *{transition:none!important;animation:none!important}}

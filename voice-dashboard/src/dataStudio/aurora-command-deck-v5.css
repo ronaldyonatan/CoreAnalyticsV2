@@ -1,0 +1,589 @@
+/*
+ * Aurora Command Deck V5 — Elegant Futuristic / Quiet Cinematic
+ * 2026-11-11. Shared visual language for Datasets, Connections and Scheduler.
+ * Scope: Data Studio modal only. All colors inherit the active CoreAnalytics theme.
+ * No animation, no data/API changes, no absolute-positioned controls.
+ */
+.studio-window[data-aurora-deck="v5"] {
+  --v5-accent: var(--core-primary-strong, var(--core-primary, #27b8cf));
+  --v5-accent-soft: var(--core-primary, var(--v5-accent));
+  --v5-ink: var(--core-text, inherit);
+  --v5-muted: var(--core-text-secondary, inherit);
+  --v5-faint: var(--core-text-muted, var(--v5-muted));
+  --v5-base: var(--core-bg, transparent);
+  --v5-panel: var(--core-panel, var(--core-surface-strong, transparent));
+  --v5-surface: var(--core-surface-strong, var(--v5-panel));
+  --v5-rule: var(--core-border, color-mix(in srgb, currentColor 14%, transparent));
+  --v5-danger: var(--core-danger-text, var(--studio-danger, #e66d75));
+  --v5-glow: color-mix(in srgb, var(--v5-accent) 16%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content :is(button, input, select):focus-visible {
+  outline: 2px solid var(--v5-accent) !important;
+  outline-offset: 3px;
+}
+/* Ambient light stays behind content: no animated textures or expensive filters. */
+.studio-window[data-aurora-deck="v5"] .studio-window-content :is(.datasets-page-catalog, .connections-page, .ca-scheduler:not(.ca-scheduler-embedded)) {
+  color: var(--v5-ink);
+  background-image:
+    radial-gradient(ellipse 53% 240px at 15% -35px, color-mix(in srgb, var(--v5-accent) 11%, transparent), transparent 76%),
+    radial-gradient(ellipse 45% 320px at 100% 72%, color-mix(in srgb, var(--v5-accent-soft) 6%, transparent), transparent 77%);
+  background-repeat: no-repeat;
+}
+/* Type system: UI labels read as wayfinding, not body text. */
+.studio-window[data-aurora-deck="v5"] .studio-window-content :is(.datasets-catalog-heading, .connections-header, .ca-scheduler-top) h1,
+.studio-window[data-aurora-deck="v5"] .studio-window-content .ca-scheduler-top h2 {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 720 !important;
+  letter-spacing: -.04em;
+  line-height: 1.12;
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content :is(.datasets-catalog-hint, .connections-heading p, .ca-scheduler-top p) {
+  color: var(--v5-muted) !important;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+/* Header: calm, open composition with a single point of light. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-heading {
+  background: linear-gradient(103deg,
+    color-mix(in srgb, var(--v5-accent) 8%, var(--v5-panel)),
+    color-mix(in srgb, var(--v5-panel) 87%, transparent) 69%,
+    transparent) !important;
+  border: 0 !important;
+  border-radius: 0 16px 2px 2px !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--v5-rule) 68%, transparent) !important;
+  box-shadow: none !important;
+  padding: 20px 24px 22px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-heading::before {
+  opacity: .7 !important;
+  background: linear-gradient(to bottom, transparent, var(--v5-accent), transparent) !important;
+  width: 2px !important;
+  top: 18px !important;
+  bottom: 18px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-identity::before {
+  color: var(--v5-accent);
+  filter: drop-shadow(0 0 8px var(--v5-glow));
+  opacity: .86;
+  font-size: 23px !important;
+  width: 33px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-count,
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-count {
+  border-color: color-mix(in srgb, var(--v5-accent) 36%, transparent);
+  color: var(--v5-accent);
+}
+/* Filters look like instruments rather than individual framed cards. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-search input,
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-catalog-filter-select select,
+.studio-window[data-aurora-deck="v5"] .connections-page :is(.connections-search, .connections-filter) {
+  color: var(--v5-ink) !important;
+  background: color-mix(in srgb, var(--v5-surface) 66%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--v5-rule) 58%, transparent) !important;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+}
+/* Datasets: fade the selection into the surrounding surface. No double outlines. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-list {
+  border: 0 !important;
+  gap: 3px !important;
+  padding: 3px 8px 12px 0 !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell,
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell:hover {
+  border: 0 !important;
+  border-radius: 9px !important;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--v5-surface) 67%, transparent),
+    color-mix(in srgb, var(--v5-panel) 35%, transparent) 72%,
+    transparent) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell {
+  position: relative;
+  isolation: isolate;
+}
+/* V1 focus-within outline caused the double selection frame after mouse clicks. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell:focus-within {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell::before {
+  content: "";
+  position: absolute;
+  inset: 5px auto 5px 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--v5-accent);
+  opacity: 0;
+  pointer-events: none;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell:hover {
+  background: linear-gradient(92deg,
+    color-mix(in srgb, var(--v5-accent) 8%, var(--v5-surface)),
+    color-mix(in srgb, var(--v5-surface) 45%, transparent) 69%,
+    transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell:has(>.datasets-catalog-row.is-selected) {
+  border: 0 !important;
+  background: linear-gradient(92deg,
+    color-mix(in srgb, var(--v5-accent) 29%, var(--v5-surface)) 0%,
+    color-mix(in srgb, var(--v5-accent) 13%, var(--v5-panel)) 42%,
+    color-mix(in srgb, var(--v5-panel) 45%, transparent) 84%,
+    transparent 100%) !important;
+  box-shadow: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-row-shell:has(>.datasets-catalog-row.is-selected)::before {
+  opacity: 1;
+  box-shadow: 0 0 14px var(--v5-glow);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-row,
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-row:hover,
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-row.is-selected {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  box-shadow: none !important;
+  outline: none;
+  transform: none !important;
+  padding-block: 10px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-row:focus-visible {
+  outline: 2px solid var(--v5-accent) !important;
+  outline-offset: -2px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-row.is-selected :is(.datasets-catalog-name strong, .ca-catalog-metadata strong) {
+  color: var(--v5-ink);
+  font-weight: 760;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-row.is-selected .datasets-catalog-icon {
+  border-color: transparent !important;
+  background: color-mix(in srgb, var(--v5-accent) 13%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-clock-trigger,
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-clock-trigger:hover {
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+}
+/* Inspector: a gradient-powered information surface, no heavy outer card. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-detail {
+  display: flex !important;
+  flex-direction: column !important;
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--v5-accent) 13%, var(--v5-panel)),
+    color-mix(in srgb, var(--v5-panel) 89%, transparent) 37%,
+    color-mix(in srgb, var(--v5-surface) 92%, transparent)) !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--v5-ink) 7%, transparent),
+    -14px 22px 42px color-mix(in srgb, var(--v5-base) 23%, transparent) !important;
+  overflow: hidden;
+}
+/* Buttons become a quiet bottom command dock; independent body scroll stays intact. */
+.studio-window[data-aurora-deck="v5"] .datasets-detail:has(.deck-inspector-title) > .ca-dataset-detail-body {
+  order: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 19px 20px 18px !important;
+  overflow-y: auto !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-detail:has(.deck-inspector-title) > .ca-dataset-detail-header {
+  order: 1;
+  flex: 0 0 auto;
+  padding: 14px 18px 16px !important;
+  background: linear-gradient(0deg,
+    color-mix(in srgb, var(--v5-surface) 92%, transparent),
+    color-mix(in srgb, var(--v5-panel) 85%, transparent)) !important;
+  border: 0 !important;
+  border-top: 1px solid color-mix(in srgb, var(--v5-rule) 70%, transparent) !important;
+  box-shadow: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-kicker {
+  margin-bottom: 11px;
+  color: var(--v5-accent);
+  font-size: 10px;
+  letter-spacing: .19em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-title {
+  position: relative;
+  padding: 5px 0 20px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--v5-rule) 56%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-title::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: -12px;
+  width: 75px;
+  height: 75px;
+  border: 1px solid color-mix(in srgb, var(--v5-accent) 23%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    color-mix(in srgb, var(--v5-accent) 24%, transparent) 0 4px,
+    transparent 5px 100%);
+  box-shadow: inset 0 0 0 10px color-mix(in srgb, var(--v5-accent) 4%, transparent);
+  opacity: .7;
+  pointer-events: none;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-title h2 {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(21px, 2vw, 27px) !important;
+  letter-spacing: -.04em;
+  padding-right: 45px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-title small {
+  color: var(--v5-muted);
+  font-size: 11px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-symbol {
+  display: none !important;
+}
+/* Metric blocks read like a single instrument panel, not four separate cards. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metrics {
+  gap: 0 !important;
+  margin: 0 0 20px !important;
+  border: 0;
+  background: linear-gradient(100deg,
+    color-mix(in srgb, var(--v5-accent) 7%, transparent), transparent 80%);
+  border-radius: 15px;
+  padding: 10px 4px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 13px 14px !important;
+  min-width: 0;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric:nth-child(odd) {
+  border-right: 1px solid color-mix(in srgb, var(--v5-rule) 56%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric:nth-child(-n+2) {
+  border-bottom: 1px solid color-mix(in srgb, var(--v5-rule) 56%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric span {
+  color: var(--v5-muted) !important;
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric strong {
+  color: var(--v5-ink);
+  font-size: 15px;
+  font-weight: 710;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric:first-child strong {
+  font-size: clamp(24px, 2.7vw, 32px);
+  letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metric strong.deck-status {
+  color: var(--v5-accent);
+  font-size: 13px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-inspector-section {
+  color: var(--v5-faint);
+  letter-spacing: .15em;
+  margin-bottom: 9px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-body dl {
+  row-gap: 2px !important;
+  column-gap: 20px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-body dt {
+  color: var(--v5-muted) !important;
+  opacity: 1 !important;
+  font-size: 10px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-body dd {
+  color: var(--v5-ink) !important;
+  font-size: 12px;
+  margin-bottom: 6px !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-actions > .datasets-eyebrow {
+  color: var(--v5-muted);
+  opacity: .8;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-actions > .datasets-action {
+  border: 1px solid color-mix(in srgb, var(--v5-rule) 68%, transparent) !important;
+  border-radius: 11px !important;
+  background: color-mix(in srgb, var(--v5-surface) 64%, transparent) !important;
+  box-shadow: none !important;
+  font-weight: 690;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-actions > .datasets-open-explorer:not(:disabled) {
+  background: var(--v5-accent) !important;
+  color: var(--core-on-primary, var(--core-bg, #082630)) !important;
+  border-color: var(--v5-accent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-actions > .ca-storage-delete-trigger {
+  color: var(--v5-danger) !important;
+  background: transparent !important;
+  border: 0 !important;
+  min-height: 30px !important;
+  font-size: 11px;
+  box-shadow: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .ca-dataset-detail-actions > .ca-storage-delete-trigger:not(:disabled):hover {
+  background: color-mix(in srgb, var(--v5-danger) 7%, transparent) !important;
+}
+/* An ambient empty state, not a giant empty bordered box. */
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-detail:not(:has(.deck-inspector-title)) {
+  background: radial-gradient(ellipse at 50% 38%, color-mix(in srgb, var(--v5-accent) 11%, transparent), transparent 72%),
+    color-mix(in srgb, var(--v5-panel) 75%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-empty-symbol {
+  display: grid;
+  place-items: center;
+  width: 83px;
+  height: 83px;
+  border: 1px solid color-mix(in srgb, var(--v5-accent) 27%, transparent);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 11px color-mix(in srgb, var(--v5-accent) 5%, transparent), 0 0 34px var(--v5-glow);
+  font-size: 39px !important;
+}
+/* Connections — a network instrument, not an unrelated admin table. */
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-header {
+  position: relative;
+  margin-bottom: 16px !important;
+  padding: 14px 18px 20px !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--v5-rule) 75%, transparent);
+  background: linear-gradient(102deg, color-mix(in srgb, var(--v5-accent) 7%, var(--v5-panel)), transparent 75%);
+  border-radius: 0 15px 0 0;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 19px;
+  width: 2px;
+  background: linear-gradient(transparent, var(--v5-accent), transparent);
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-heading h1 {
+  font-size: clamp(24px, 2.3vw, 32px) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-overview {
+  border: 0 !important;
+  border-radius: 17px !important;
+  background: linear-gradient(110deg,
+    color-mix(in srgb, var(--v5-accent) 12%, var(--v5-panel)),
+    color-mix(in srgb, var(--v5-surface) 74%, transparent) 72%) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--v5-ink) 6%, transparent) !important;
+  overflow: hidden;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-overview::before {
+  background: linear-gradient(transparent, var(--v5-accent), transparent);
+  width: 2px;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-overview-icon {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--v5-accent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-overview-icon svg {
+  width: 25px !important;
+  height: 25px !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-metric {
+  border-left-color: color-mix(in srgb, var(--v5-rule) 56%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-metric strong {
+  font-size: clamp(23px, 2.2vw, 29px) !important;
+  color: var(--v5-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -.04em;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-list-heading h2 {
+  color: var(--v5-ink);
+  font-size: 20px;
+  letter-spacing: -.035em;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table-scroll {
+  border: 0 !important;
+  border-radius: 15px !important;
+  background: color-mix(in srgb, var(--v5-panel) 84%, transparent) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--v5-ink) 7%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table thead th {
+  background: color-mix(in srgb, var(--v5-accent) 5%, var(--v5-panel)) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--v5-rule) 67%, transparent) !important;
+  color: var(--v5-muted);
+  font-size: 10px;
+  letter-spacing: .09em;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table tbody tr {
+  background: transparent;
+  transition: none !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table tbody tr:hover {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--v5-accent) 13%, var(--v5-panel)),
+    color-mix(in srgb, var(--v5-panel) 75%, transparent) 80%) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table td,
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table tbody th {
+  border-bottom-color: color-mix(in srgb, var(--v5-rule) 53%, transparent) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connections-table-name {
+  color: var(--v5-ink);
+  font-size: 13px;
+  font-weight: 750;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connection-catalog,
+.studio-window[data-aurora-deck="v5"] .connections-page .connection-form {
+  border: 0 !important;
+  border-radius: 17px !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--v5-ink) 7%, transparent) !important;
+  background: linear-gradient(130deg, color-mix(in srgb, var(--v5-accent) 7%, var(--v5-panel)), var(--v5-surface)) !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connection-catalog-item {
+  background: color-mix(in srgb, var(--v5-surface) 82%, transparent) !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+}
+.studio-window[data-aurora-deck="v5"] .connections-page .connection-catalog-item:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--v5-accent) 22%, transparent) !important;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--v5-accent) 11%, var(--v5-panel)), var(--v5-surface)) !important;
+}
+/* Scheduler — two complementary command surfaces, shared style but distinct content. */
+.studio-window[data-aurora-deck="v5"] .ca-scheduler:not(.ca-scheduler-embedded) {
+  max-width: none;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler:not(.ca-scheduler-embedded) .ca-scheduler-top {
+  position: relative;
+  padding: 15px 20px 22px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--v5-rule) 70%, transparent);
+  background: linear-gradient(105deg, color-mix(in srgb, var(--v5-accent) 8%, var(--v5-panel)), transparent 74%);
+  border-radius: 0 16px 0 0;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler:not(.ca-scheduler-embedded) .ca-scheduler-top::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  bottom: 18px;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(transparent, var(--v5-accent), transparent);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler-top h2 {
+  font-size: clamp(24px, 2.25vw, 32px) !important;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler button {
+  border-radius: 9px;
+  color: var(--v5-ink);
+  border-color: color-mix(in srgb, var(--v5-rule) 66%, transparent);
+  background: color-mix(in srgb, var(--v5-surface) 70%, transparent);
+  box-shadow: none;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--v5-accent) 10%, var(--v5-surface));
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-primary {
+  border-color: var(--v5-accent) !important;
+  background: var(--v5-accent) !important;
+  color: var(--core-on-primary, var(--v5-base, #082630)) !important;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler :is(.ca-scheduler-section, .ca-scheduler-form) {
+  border: 0 !important;
+  border-radius: 18px !important;
+  background: linear-gradient(142deg,
+    color-mix(in srgb, var(--v5-accent) 7%, var(--v5-panel)),
+    color-mix(in srgb, var(--v5-surface) 88%, transparent) 65%) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--v5-ink) 6%, transparent) !important;
+  padding: 19px !important;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-section-heading h3 {
+  font-size: 17px;
+  letter-spacing: -.03em;
+  color: var(--v5-ink);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-section-heading p {
+  color: var(--v5-muted);
+  opacity: 1;
+  line-height: 1.55;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-table-wrap {
+  border-radius: 12px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--v5-panel) 65%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler th {
+  color: var(--v5-muted);
+  opacity: 1;
+  background: color-mix(in srgb, var(--v5-accent) 4%, var(--v5-panel));
+  font-size: 10px;
+  letter-spacing: .07em;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler td {
+  border-top-color: color-mix(in srgb, var(--v5-rule) 54%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-schedule-panel tr.is-selected {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--v5-accent) 21%, var(--v5-panel)) 0%,
+    color-mix(in srgb, var(--v5-accent) 7%, var(--v5-panel)) 54%,
+    transparent) !important;
+  box-shadow: inset 2px 0 var(--v5-accent);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-select-target {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--v5-ink);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler :is(.ca-scheduler-selected-foot, .ca-scheduler-focus-stats > div) {
+  background: color-mix(in srgb, var(--v5-accent) 6%, var(--v5-panel));
+  border-color: color-mix(in srgb, var(--v5-rule) 55%, transparent);
+  border-radius: 12px;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-fields :is(input:not([type=checkbox]), select) {
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--v5-surface) 72%, transparent);
+  border-color: color-mix(in srgb, var(--v5-rule) 66%, transparent);
+  color: var(--v5-ink);
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-fields select option {
+  background: var(--v5-surface);
+  color: var(--v5-ink);
+}
+/* Semantic states remain legible on light and dark themes. */
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-state.on {
+  color: var(--core-success-text, var(--v5-accent)) !important;
+  background: var(--core-success-surface, color-mix(in srgb, var(--v5-accent) 9%, transparent)) !important;
+}
+.studio-window[data-aurora-deck="v5"] .ca-scheduler .ca-scheduler-state.off {
+  color: var(--v5-muted) !important;
+}
+/* Match focus and viewport constraints, keep native scrolling and readable sizes. */
+@media (max-width: 900px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-detail {
+    box-shadow: none !important;
+  }
+  .studio-window[data-aurora-deck="v5"] .datasets-detail:has(.deck-inspector-title) > .ca-dataset-detail-body {
+    padding: 15px !important;
+  }
+}
+@media (max-width: 600px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page-catalog .datasets-catalog-heading {
+    padding: 15px !important;
+  }
+  .studio-window[data-aurora-deck="v5"] .datasets-page-catalog .deck-metrics {
+    padding: 4px 0;
+  }
+  .studio-window[data-aurora-deck="v5"] .connections-page .connections-header,
+  .studio-window[data-aurora-deck="v5"] .ca-scheduler:not(.ca-scheduler-embedded) .ca-scheduler-top {
+    padding: 13px 14px 17px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-window[data-aurora-deck="v5"] .studio-window-content :is(.datasets-row-shell, .connections-table tr, .connection-catalog-item) {
+    transition: none !important;
+    animation: none !important;
+  }
+}

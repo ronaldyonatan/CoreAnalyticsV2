@@ -1,0 +1,339 @@
+/* Aurora Command Deck V5.1 — Create Dataset / Scheduler Floating Menu refinement.
+   Uses opaque background blends to protect text contrast across all eight themes.
+   Does not modify the already-approved Datasets catalog. */
+.studio-window[data-aurora-deck="v5"] .datasets-page:not(.datasets-page-catalog) {
+  --ds51-accent: var(--core-primary-strong);
+  --ds51-ink: var(--core-text);
+  --ds51-muted: var(--core-text-secondary);
+  --ds51-rule: var(--core-border);
+  --ds51-solid: color-mix(in srgb, var(--core-bg) 87%, var(--core-primary) 13%);
+  --ds51-control: color-mix(in srgb, var(--core-bg) 94%, var(--core-primary) 6%);
+  --ds51-hover: color-mix(in srgb, var(--core-bg) 81%, var(--core-primary) 19%);
+  position: relative;
+  isolation: isolate;
+  color: var(--ds51-ink);
+  padding: clamp(18px, 2.2vw, 32px);
+}
+/* Clean creation heading: stronger information hierarchy without a second card. */
+.studio-window[data-aurora-deck="v5"] .datasets-create-header {
+  margin: 0 0 26px !important;
+  padding: 7px 0 22px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds51-rule) 65%, transparent);
+  align-items: center;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-create-header h1 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: clamp(28px, 2.7vw, 38px) !important;
+  font-weight: 740;
+  letter-spacing: -.045em;
+  line-height: 1.16;
+  margin: 7px 0 !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-create-header p {
+  font-size: 13px;
+  line-height: 1.55;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-create-header .datasets-action {
+  border-radius: 999px;
+  color: var(--ds51-ink);
+  background: var(--ds51-control);
+  border-color: color-mix(in srgb, var(--ds51-rule) 75%, transparent);
+  min-height: 38px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-create-header .datasets-action:hover {
+  border-color: var(--ds51-accent);
+  background: var(--ds51-hover);
+}
+/* Main writing surface: ambient light but opaque enough to prevent bleed-through. */
+.studio-window[data-aurora-deck="v5"] .datasets-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 302px);
+  gap: clamp(16px, 1.6vw, 24px);
+  align-items: start;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout > .datasets-main {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  overflow: visible;
+  padding: clamp(20px, 2.5vw, 32px) !important;
+  border-radius: 19px;
+  border: 1px solid color-mix(in srgb, var(--ds51-rule) 60%, transparent);
+  background: linear-gradient(115deg,
+    color-mix(in srgb, var(--ds51-accent) 7%, var(--ds51-solid)),
+    var(--ds51-solid) 50%,
+    color-mix(in srgb, var(--ds51-solid) 91%, var(--core-bg)));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ds51-ink) 7%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-section-heading { margin-bottom: 18px !important; }
+.studio-window[data-aurora-deck="v5"] .datasets-section-heading:not(:first-child) {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in srgb, var(--ds51-rule) 55%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-section-heading > span { font-size: 10px; letter-spacing: .19em; }
+.studio-window[data-aurora-deck="v5"] .datasets-section-heading h2 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -.025em;
+  font-weight: 670;
+  font-size: clamp(19px, 1.65vw, 23px);
+  margin: 7px 0;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-section-heading p { font-size: 12px; max-width: 680px; }
+.studio-window[data-aurora-deck="v5"] .datasets-fields-grid {
+  position: relative;
+  z-index: 1;
+  gap: 20px 18px !important;
+  align-items: start;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout :is(.datasets-picker,.datasets-field) {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ds51-muted);
+  font-weight: 600;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout :is(.datasets-picker-control input,.datasets-field input) {
+  width: 100%;
+  min-height: 46px !important;
+  height: 46px !important;
+  border-radius: 11px !important;
+  padding-inline: 14px;
+  background: var(--ds51-control) !important;
+  border: 1px solid color-mix(in srgb, var(--ds51-rule) 80%, transparent) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ds51-ink) 5%, transparent);
+  color: var(--ds51-ink) !important;
+  font: 500 13px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout :is(.datasets-picker-control input,.datasets-field input)::placeholder {
+  color: var(--core-text-muted) !important;
+  opacity: .94;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker:focus-within { z-index: 100; }
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-control input:focus,
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-field input:focus {
+  border-color: var(--ds51-accent) !important;
+  outline: 1px solid color-mix(in srgb, var(--ds51-accent) 60%, transparent) !important;
+  outline-offset: 2px;
+}
+/* CRITICAL: menu cannot inherit semi-transparent theme card values.
+   --core-bg is solid for the 8 supported themes; blend with accent preserves opacity. */
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-menu {
+  z-index: 110 !important;
+  top: calc(100% + 3px);
+  max-height: min(300px, 42vh);
+  overflow-y: auto;
+  padding: 7px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ds51-accent) 30%, var(--ds51-rule));
+  background: var(--ds51-solid) !important;
+  color: var(--ds51-ink) !important;
+  box-shadow: 0 20px 54px color-mix(in srgb, var(--core-bg) 45%, transparent), 0 8px 24px #0003;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  isolation: isolate;
+  opacity: 1 !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-menu [role="option"] {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  color: var(--ds51-ink) !important;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  opacity: 1;
+  font-size: 12px;
+  font-weight: 560;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-menu [role="option"]:is(:hover,.is-active,[aria-selected="true"]) {
+  background: linear-gradient(92deg, color-mix(in srgb, var(--ds51-accent) 18%, var(--ds51-solid)), var(--ds51-hover));
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-menu [role="option"][aria-selected="true"] {
+  box-shadow: inset 2px 0 var(--ds51-accent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-menu [role="option"] small {
+  color: var(--ds51-muted) !important;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-layout .datasets-picker-menu p { color: var(--ds51-muted) !important; }
+/* Selected access mode: gradient flow without nested cyan frames. */
+.studio-window[data-aurora-deck="v5"] .datasets-modes { gap: 12px; }
+.studio-window[data-aurora-deck="v5"] .datasets-mode,
+.studio-window[data-aurora-deck="v5"] .datasets-mode.is-selected {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 91px;
+  border-radius: 13px;
+  padding: 16px 17px;
+  border: 1px solid color-mix(in srgb, var(--ds51-rule) 58%, transparent);
+  background: linear-gradient(105deg, var(--ds51-control), var(--ds51-solid));
+  box-shadow: none;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-mode.is-selected {
+  border-color: color-mix(in srgb, var(--ds51-rule) 75%, transparent);
+  background: linear-gradient(100deg,
+    color-mix(in srgb, var(--ds51-accent) 25%, var(--ds51-solid)),
+    color-mix(in srgb, var(--ds51-accent) 6%, var(--ds51-solid)) 77%);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-mode.is-selected::before {
+  content: ''; position: absolute; inset: 9px auto 9px 0; width: 3px;
+  border-radius: 4px; background: var(--ds51-accent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-mode strong { font-size: 13px; color: var(--ds51-ink); }
+.studio-window[data-aurora-deck="v5"] .datasets-mode small { font-size: 11px; margin-top: 6px; }
+/* Right-side explanation: design language follows the new form, not a detached info box. */
+.studio-window[data-aurora-deck="v5"] .datasets-layout > .datasets-aside {
+  z-index: 1;
+  position: sticky;
+  top: 8px;
+  padding: 28px 25px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--ds51-rule) 60%, transparent);
+  background: linear-gradient(155deg,
+    color-mix(in srgb, var(--ds51-accent) 13%, var(--ds51-solid)),
+    var(--ds51-solid) 65%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ds51-ink) 5%, transparent);
+}
+.studio-window[data-aurora-deck="v5"] .datasets-aside h2 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -.035em;
+  font-size: 25px;
+  font-weight: 680;
+  margin: 10px 0;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-aside p { font-size: 12px; line-height: 1.7; }
+.studio-window[data-aurora-deck="v5"] .datasets-aside-line {
+  background: linear-gradient(90deg, var(--ds51-accent), transparent);
+  opacity: .5;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-aside button[type="submit"] {
+  border-radius: 11px;
+  min-height: 45px;
+  background: var(--ds51-accent);
+  color: var(--core-bg);
+  border: 1px solid var(--ds51-accent);
+  font-size: 13px;
+}
+.studio-window[data-aurora-deck="v5"] .datasets-aside button[type="submit"]:disabled {
+  background: var(--ds51-control);
+  color: var(--core-text-muted);
+  border-color: color-mix(in srgb, var(--ds51-rule) 60%, transparent);
+  opacity: .75;
+}
+@media (max-width: 950px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-layout { grid-template-columns: minmax(0,1fr) 255px; }
+  .studio-window[data-aurora-deck="v5"] .datasets-layout > .datasets-main { padding: 21px !important; }
+}
+@media (max-width: 760px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-layout { grid-template-columns: minmax(0,1fr); }
+  .studio-window[data-aurora-deck="v5"] .datasets-layout > .datasets-aside { position: static; }
+  .studio-window[data-aurora-deck="v5"] .datasets-fields-grid { grid-template-columns: 1fr; }
+  .studio-window[data-aurora-deck="v5"] .datasets-create-header { align-items: flex-start; }
+}
+@media (max-width: 500px) {
+  .studio-window[data-aurora-deck="v5"] .datasets-modes { grid-template-columns: 1fr; }
+  .studio-window[data-aurora-deck="v5"] .datasets-layout > .datasets-main { padding: 16px !important; }
+  .studio-window[data-aurora-deck="v5"] .datasets-layout > .datasets-aside { padding: 20px; }
+}
+/* PORTAL MENU: scoped via a dedicated class, so it also works outside the modal DOM. */
+.ca-clock-menu.ca-clock-menu-aurora.ca-clock-menu-refined {
+  --cm51-accent: var(--core-primary-strong);
+  --cm51-ink: var(--core-text);
+  --cm51-muted: var(--core-text-secondary);
+  --cm51-solid: color-mix(in srgb, var(--core-bg) 88%, var(--core-primary) 12%);
+  --cm51-soft: color-mix(in srgb, var(--core-bg) 83%, var(--core-primary) 17%);
+  box-sizing: border-box;
+  width: 286px;
+  max-width: calc(100vw - 20px);
+  max-height: calc(100vh - 18px);
+  overflow-y: auto;
+  padding: 8px !important;
+  border-radius: 17px !important;
+  border: 1px solid color-mix(in srgb, var(--cm51-accent) 25%, var(--core-border)) !important;
+  background: var(--cm51-solid) !important;
+  color: var(--cm51-ink) !important;
+  box-shadow: 0 24px 56px #0005, 0 4px 12px #0002 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+}
+.ca-clock-menu-refined .ca-clock-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 12px 15px;
+  border-bottom: 1px solid color-mix(in srgb, var(--core-border) 65%, transparent);
+  margin-bottom: 7px;
+}
+.ca-clock-menu-refined .ca-clock-head-icon {
+  display: grid; place-items: center;
+  flex: 0 0 35px; width: 35px; height: 35px;
+  border-radius: 50%;
+  color: var(--cm51-accent);
+  background: color-mix(in srgb, var(--cm51-accent) 11%, var(--cm51-solid));
+}
+.ca-clock-menu-refined .ca-clock-head-main { min-width: 0; flex: 1; }
+.ca-clock-menu-refined .ca-clock-head-main > span {
+  display: block; color: var(--cm51-muted); font-size: 10px;
+  letter-spacing: .10em; text-transform: uppercase; font-weight: 650;
+}
+.ca-clock-menu-refined .ca-clock-head-main > strong {
+  display: block; margin-top: 5px; color: var(--cm51-ink);
+  font-size: 15px; font-weight: 680; line-height: 1.25;
+  overflow-wrap: anywhere; letter-spacing: -.02em;
+}
+.ca-clock-menu-refined .ca-clock-live {
+  margin: 0 12px 9px;
+  padding: 3px 8px; display: inline-flex; gap: 6px; align-items: center;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--cm51-accent) 9%, var(--cm51-solid));
+  color: var(--cm51-muted); font-size: 10px; letter-spacing: .02em;
+}
+.ca-clock-menu-refined .ca-clock-live::before {
+  content: ''; width: 5px; height: 5px; flex: none;
+  border-radius: 50%; background: currentColor;
+}
+.ca-clock-menu-refined .ca-clock-live.is-on { color: var(--core-success-text, var(--cm51-accent)); }
+.ca-clock-menu-refined .ca-clock-action-list { display: grid; gap: 2px; }
+.ca-clock-menu-refined .ca-clock-action-list > button {
+  display: flex; align-items: center; width: 100%; min-height: 43px;
+  gap: 11px; padding: 9px 12px; border: 0; border-radius: 9px;
+  color: var(--cm51-ink); background: transparent;
+  cursor: pointer; font-size: 12.5px; text-align: left;
+}
+.ca-clock-menu-refined .ca-clock-action-list > button > svg {
+  flex: none; width: 16px; height: 16px;
+  color: var(--cm51-muted);
+}
+.ca-clock-menu-refined .ca-clock-action-list > button:first-child > svg { color: var(--cm51-accent); }
+.ca-clock-menu-refined .ca-clock-action-list > button:is(:hover,:focus-visible):not(:disabled) {
+  background: linear-gradient(92deg,
+    color-mix(in srgb, var(--cm51-accent) 15%, var(--cm51-solid)),
+    var(--cm51-soft));
+  outline: none;
+}
+.ca-clock-menu-refined .ca-clock-action-list > button:focus-visible {
+  box-shadow: inset 2px 0 var(--cm51-accent);
+}
+.ca-clock-menu-refined .ca-clock-action-list > button:disabled { opacity: .42; cursor: not-allowed; }
+.ca-clock-menu-refined .ca-clock-foot {
+  display: flex; flex-direction: row; justify-content: space-between;
+  align-items: baseline; gap: 10px;
+  margin: 9px 5px 0; padding: 13px 7px 9px;
+  border-top: 1px solid color-mix(in srgb, var(--core-border) 60%, transparent);
+}
+.ca-clock-menu-refined .ca-clock-foot > span {
+  color: var(--cm51-muted); font-size: 10px;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.ca-clock-menu-refined .ca-clock-foot > strong {
+  color: var(--cm51-ink); font-size: 11px;
+  font-weight: 590; text-align: right;
+}
+.ca-clock-menu-refined .ca-clock-error { color: var(--core-danger-text, #f08086); }
+@media (prefers-reduced-motion: reduce) {
+  .studio-window[data-aurora-deck="v5"] .datasets-page:not(.datasets-page-catalog) *,
+  .ca-clock-menu-refined * { animation: none !important; transition: none !important; }
+}

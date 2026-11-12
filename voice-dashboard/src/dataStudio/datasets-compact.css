@@ -1,0 +1,34 @@
+/* Datasets catalog: single compact toolbar instead of two tall, repeated headers.
+   Scoped to the catalog only; the creation form, Data Explorer, other themes
+   and other Data Studio modules keep their existing layouts. */
+.datasets-page.datasets-page-catalog { padding: 12px clamp(12px, 1.65vw, 24px) 22px; }
+.datasets-page .datasets-catalog-heading.datasets-catalog-heading-compact {
+  display: grid; grid-template-columns: minmax(160px, auto) minmax(180px, 1fr) auto;
+  align-items: center; gap: 12px; margin: 0 0 12px;
+}
+.datasets-page .datasets-catalog-identity { min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 10px; row-gap: 2px; }
+.datasets-page .datasets-catalog-identity h1 { margin: 0; color: var(--core-text); font-size: clamp(18px, 1.5vw, 23px); letter-spacing: -.025em; line-height: 1.3; }
+.datasets-page .datasets-catalog-hint { font-size: 11px; color: var(--core-text-secondary); white-space: nowrap; }
+.datasets-page .datasets-catalog-search { min-width: 0; height: 37px; }
+.datasets-page .datasets-catalog-search input { min-width: 0; height: 35px; font-size: 12px; }
+.datasets-page .datasets-catalog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+.datasets-page .datasets-catalog-actions .datasets-action { min-height: 37px; padding: 7px 11px; }
+.datasets-page .datasets-catalog-refresh { background: var(--core-control); color: var(--core-text); border-color: var(--core-border-strong); }
+.datasets-page .datasets-catalog-refresh:hover:not(:disabled) { color: var(--core-text); background: var(--core-panel); border-color: var(--core-primary-strong); }
+.datasets-page .datasets-catalog-refresh:disabled { cursor: default; opacity: .55; }
+.datasets-page .datasets-catalog-grid { margin-top: 6px; }
+.datasets-page .datasets-create-header { margin-bottom: 18px; }
+.datasets-page .datasets-create-header h1 { margin: 4px 0; font-size: clamp(21px, 2vw, 28px); }
+@media (max-width: 980px) {
+  .datasets-page .datasets-catalog-heading.datasets-catalog-heading-compact { grid-template-columns: minmax(0, 1fr) auto; gap: 9px; }
+  .datasets-page .datasets-catalog-search { grid-column: 1 / -1; grid-row: 2; }
+  .datasets-page .datasets-catalog-actions { grid-column: 2; grid-row: 1; }
+}
+@media (max-width: 560px) {
+  .datasets-page.datasets-page-catalog { padding: 10px 12px 18px; }
+  .datasets-page .datasets-catalog-hint { display: none; }
+  .datasets-page .datasets-catalog-identity h1 { font-size: 19px; }
+  .datasets-page .datasets-catalog-actions .datasets-action { min-height: 35px; padding: 6px 9px; font-size: 11px; }
+  .datasets-page .datasets-catalog-refresh span { display: none; }
+  .datasets-page .datasets-catalog-refresh { min-width: 37px; }
+}

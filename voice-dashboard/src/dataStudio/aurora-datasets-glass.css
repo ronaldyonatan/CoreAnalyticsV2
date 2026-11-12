@@ -1,0 +1,56 @@
+/* Aurora Glass Workspace — additive, catalog-only, theme-token driven. */
+.studio-window-content .datasets-page-catalog {
+  --ag-accent: var(--core-primary-strong,var(--core-primary,var(--studio-accent,#38bcd3)));
+  --ag-ink: var(--core-text,inherit);
+  --ag-muted: var(--core-text-secondary,var(--core-text,inherit));
+  --ag-panel: var(--core-panel,var(--surface-card,transparent));
+  --ag-control: var(--core-control,var(--surface-primary,transparent));
+  --ag-line: var(--core-border-strong,color-mix(in srgb,currentColor 22%,transparent));
+  color:var(--ag-ink);
+}
+.studio-window-content .datasets-page-catalog .datasets-catalog-heading {
+  position:relative; padding:clamp(12px,1.3vw,20px)!important;
+  border:1px solid color-mix(in srgb,var(--ag-accent) 33%,var(--ag-line));
+  border-radius:16px;
+  background:linear-gradient(115deg,color-mix(in srgb,var(--ag-accent) 10%,var(--ag-panel)),var(--ag-panel) 65%);
+  box-shadow:0 12px 28px color-mix(in srgb,#000 13%,transparent),inset 0 1px 0 color-mix(in srgb,var(--ag-accent) 18%,transparent);
+}
+.studio-window-content .datasets-page-catalog .datasets-catalog-heading::before {
+  content:'';position:absolute;inset:0 auto 0 0;width:3px;border-radius:16px 0 0 16px;background:var(--ag-accent);pointer-events:none;
+}
+.studio-window-content .datasets-page-catalog .datasets-catalog-identity h1 {font-size:clamp(21px,1.8vw,27px);font-weight:750;letter-spacing:-.035em;color:var(--ag-ink)}
+.studio-window-content .datasets-page-catalog .datasets-catalog-hint {color:var(--ag-muted);opacity:.85}
+.studio-window-content .datasets-page-catalog .datasets-count {border-color:color-mix(in srgb,var(--ag-accent) 55%,transparent);color:var(--ag-accent);background:color-mix(in srgb,var(--ag-accent) 10%,transparent)}
+.studio-window-content .datasets-page-catalog .datasets-catalog-search input,
+.studio-window-content .datasets-page-catalog select {background:var(--ag-control);color:var(--ag-ink);border-color:var(--ag-line);border-radius:10px}
+.studio-window-content .datasets-page-catalog :is(input,select,button):focus-visible {outline:2px solid var(--ag-accent);outline-offset:2px}
+.studio-window-content .datasets-page-catalog .datasets-catalog-grid {gap:clamp(12px,1.3vw,20px)}
+.studio-window-content .datasets-page-catalog .datasets-row-shell {
+  border:1px solid color-mix(in srgb,var(--ag-line) 65%,transparent);
+  border-radius:12px;
+  background:linear-gradient(125deg,color-mix(in srgb,var(--ag-accent) 5%,var(--ag-panel)),var(--ag-panel));
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--ag-ink) 5%,transparent);
+}
+.studio-window-content .datasets-page-catalog .datasets-row-shell:hover {border-color:color-mix(in srgb,var(--ag-accent) 62%,var(--ag-line));background:color-mix(in srgb,var(--ag-accent) 9%,var(--ag-panel))}
+.studio-window-content .datasets-page-catalog .datasets-row-shell:focus-within {outline:1px solid var(--ag-accent);outline-offset:1px}
+.studio-window-content .datasets-page-catalog .datasets-catalog-name {font-weight:700;color:var(--ag-ink)}
+.studio-window-content .datasets-page-catalog .datasets-detail {
+  border:1px solid color-mix(in srgb,var(--ag-accent) 40%,var(--ag-line));border-radius:15px;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--ag-accent) 8%,var(--ag-panel)),var(--ag-panel) 70%);
+  box-shadow:0 12px 28px color-mix(in srgb,#000 12%,transparent);
+}
+.studio-window-content .datasets-page-catalog .datasets-detail>.ca-dataset-detail-header {
+  background:linear-gradient(115deg,color-mix(in srgb,var(--ag-accent) 11%,var(--ag-panel)),var(--ag-panel));
+  border-bottom:1px solid color-mix(in srgb,var(--ag-accent) 24%,var(--ag-line));
+}
+.studio-window-content .datasets-page-catalog .datasets-eyebrow {color:var(--ag-accent);font-weight:750;letter-spacing:.13em}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body {color:var(--ag-ink)}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body dt {color:var(--ag-muted);opacity:1}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-body dd {color:var(--ag-ink)}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-actions>.datasets-action:not(.ca-storage-delete-trigger) {
+  border-radius:9px;border-color:color-mix(in srgb,var(--ag-accent) 30%,var(--ag-line));
+}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-actions>.datasets-action:disabled {opacity:.58;cursor:not-allowed}
+.studio-window-content .datasets-page-catalog :is(.datasets-catalog-list,.ca-dataset-detail-body) {scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ag-accent) 45%,transparent) transparent}
+@media(max-width:900px){.studio-window-content .datasets-page-catalog .datasets-catalog-heading{padding:12px!important}}
+@media(prefers-reduced-motion:reduce){.studio-window-content .datasets-page-catalog *{transition:none!important;animation:none!important}}

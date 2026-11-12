@@ -1,3 +1,4 @@
+import { UniverseFormSection } from '../design-system/components/universe';
 import { compileUtility } from './utilityPreview';
 import type { Calculation, UtilityData } from './utilityPreview';
 export default function DateNumberEditor({ data, columns, onChange }: { data: UtilityData; columns: { name: string; type: string }[]; onChange: (rules: Calculation[]) => void }) {
@@ -6,7 +7,7 @@ export default function DateNumberEditor({ data, columns, onChange }: { data: Ut
   const options = date ? ['Subtract from date', 'Add to date', 'Difference between dates', 'Year of date', 'Quarter of date', 'Month of date', 'Day of year', 'Day of month', 'Day of week', 'Week of year'] : ['addition', 'subtraction', 'multiplication', 'division', 'power', 'ceiling', 'floor'];
   const labels: Record<string, string> = { addition: 'Addition', subtraction: 'Subtraction', multiplication: 'Multiplication', division: 'Division', power: 'Power', ceiling: 'Ceiling', floor: 'Floor' };
   const ruleColumns = (index: number) => { if (!index) return columns; try { return (compileUtility({ ...data, calculations: rules.slice(0, index) }, columns.map(column => column.name)).columns ?? []).map(name => ({ name, type: 'sample' })); } catch { return columns; } };
-  return <div className="text-node-config"><p>Preview Spark aktif. Nilai angka/tanggal tidak valid dan pembagian nol menghasilkan NULL. Tanggal memakai YYYY-MM-DD.</p>
+  return <UniverseFormSection className="text-node-config"><p>Preview Spark aktif. Nilai angka/tanggal tidak valid dan pembagian nol menghasilkan NULL. Tanggal memakai YYYY-MM-DD.</p>
     {rules.map((rule, index) => {
       const binary = date ? ['Subtract from date', 'Add to date', 'Difference between dates'].includes(rule.operation) : !['ceiling', 'floor'].includes(rule.operation);
       const available = ruleColumns(index);
@@ -25,5 +26,5 @@ export default function DateNumberEditor({ data, columns, onChange }: { data: Ut
     })}
     <button type="button" disabled={rules.length >= 30} onClick={() => onChange([...rules, { id: crypto.randomUUID(), output: '', operation: date ? 'Year of date' : 'addition', leftKind: 'column', left: '', rightKind: 'value', right: '', unit: 'days' }])}>＋ Tambah operasi</button>
     {date && <p>Difference between dates menghasilkan tanggal pertama dikurangi tanggal kedua dalam hari. Day of week: Minggu=1 sampai Sabtu=7. Week of year mengikuti ISO. Pergeseran tanggal menerima bilangan bulat; tanggal akhir bulan disesuaikan.</p>}
-  </div>;
+  </UniverseFormSection>;
 }
