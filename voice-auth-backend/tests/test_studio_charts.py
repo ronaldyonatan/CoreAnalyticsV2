@@ -195,7 +195,7 @@ class ExtendedChartSpecTests(unittest.TestCase):
         return spec
 
     def test_extended_ids_accept_both_dataset_kinds(self):
-        self.assertEqual(len(studio_chart_query.CHART_TYPES), 30)
+        self.assertTrue(set(self.chart_types).issubset(studio_chart_query.CHART_TYPES))
         for chart_type in self.chart_types:
             for dataset_kind in self.dataset_kinds:
                 with self.subTest(chart_type=chart_type, dataset_kind=dataset_kind):
@@ -480,6 +480,13 @@ class ExtendedChartSpecTests(unittest.TestCase):
 
 
 class ChartServiceTests(unittest.TestCase):
+    def setUp(self):
+        # Authorized business fixtures; denial tests are separate.
+        auth = patch('app.services.studio_object_access.require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
+        auth = patch.object(studio_charts, 'require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
+
     def test_list_accepts_empty_json_without_error(self):
         with patch.object(studio_charts.core_api, '_post_mode', return_value=beam({'success': True, 'code': 'CHART_LIST', 'items_json': '[]'})):
             self.assertEqual(studio_charts.list_charts(USER), [])
@@ -582,6 +589,10 @@ class ChartServiceTests(unittest.TestCase):
 
 class ChartApiTests(unittest.TestCase):
     def setUp(self):
+        auth = patch.object(api, 'require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
+        auth = patch.object(studio_charts, 'require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
         app = Flask(__name__)
         app.register_blueprint(api.studio_charts_bp)
         self.client = app.test_client()

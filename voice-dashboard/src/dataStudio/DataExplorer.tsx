@@ -1,6 +1,9 @@
 import { UniverseHeader, UniverseTable, UniverseTabs, UniverseInspector, UniverseCatalogButton, UniverseToolbar } from '../design-system/components/universe';
 import './dataset-overview.css';
 import ParquetStorageDelete from './ParquetStorageDelete';
+import OwnershipPicker from './OwnershipPicker';
+import './ownership-picker.css';
+import './ownership-ui-fix.css';
 import { loadDatasetCatalog, parquetPreviewUrl } from './datasetCatalog';
 import type { CatalogDataset as Dataset } from './datasetCatalog';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -88,7 +91,7 @@ export default function DataExplorer({ initialDatasetId = '', initialParquet = f
       <div className="ca-compact-stats" aria-label="Ringkasan dataset">
         <span><small>Rows</small><strong>{selected?.row_count == null ? '—' : selected.row_count.toLocaleString('id-ID')}</strong></span>
         <span><small>Cards</small><strong>—</strong></span>
-        <span><small>Owner</small><strong>{selected?.owner_name || '—'}</strong></span>
+        <span className="ca-explorer-ownership"><small>Owner / Access</small>{selected && <OwnershipPicker key={selected.access_mode === 'PARQUET' && selected.pipeline_id ? selected.pipeline_id : selected.dataset_id} objectType={selected.access_mode === 'PARQUET' && selected.pipeline_id ? 'PIPELINE' : 'DATASET'} objectId={selected.access_mode === 'PARQUET' && selected.pipeline_id ? selected.pipeline_id : selected.dataset_id} fallbackOwner={selected.owner_name}/>}</span>
         <span><small>{readOnly ? 'Output dibuat' : 'Dibuat'}</small><strong>{selected?.created_at ? new Date(selected.created_at).toLocaleDateString('id-ID') : '—'}</strong></span>
       </div>
     </div>}
@@ -101,9 +104,10 @@ export default function DataExplorer({ initialDatasetId = '', initialParquet = f
         <span><small>Source</small><strong>{selected ? `${selected.source_schema}.${selected.source_name}` : '—'}</strong></span>
         <span><small>Run ID / Folder</small><strong className="ca-compact-mono" title={selected?.run_id ?? ''}>{selected?.run_id ?? (readOnly ? '—' : 'Direct SQL')}</strong></span>
         {selected?.run_id && <button type="button" className="ca-compact-copy" onClick={() => navigator.clipboard?.writeText(selected.run_id!)}>Copy ID</button>}
-        {selected && selected.access_mode !== 'DIRECT' && <ParquetStorageDelete dataset={selected} onDeleted={async () => { const result = await loadDatasetCatalog(); setDatasets(result.items); setCatalogNotices(result.notices); setPreview(null); setTab('overview'); setError(''); }} />}
+
         <button type="button" className="datasets-action ca-compact-view" onClick={openData}>Lihat data →</button>
       </div>
+      {selected.access_mode !== 'DIRECT' && <details className="ca-explorer-storage-actions"><summary>Storage actions <span>Penghapusan output Parquet</span></summary><div className="ca-explorer-storage-danger"><p>Menghapus file output Parquet, bukan definisi dataset atau tabel sumber.</p><ParquetStorageDelete dataset={selected} onDeleted={async () => { const result = await loadDatasetCatalog(); setDatasets(result.items); setCatalogNotices(result.notices); setPreview(null); setTab('overview'); setError(''); }}/></div></details>}
       <details className="ca-compact-details" open>
         <summary>Detail teknis &amp; storage <span>Run ID, Output Version, tags, path</span></summary>
         <div className="ca-overview-columns"><div className="ca-overview-panel"><h3>Source &amp; metadata</h3><dl>

@@ -10,8 +10,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 stub = types.ModuleType('app.services.studio_dataset_ingest')
 stub.job = lambda *args, **kwargs: None
 stub.jobs = lambda *args, **kwargs: []
-sys.modules['app.services.studio_dataset_ingest'] = stub
-from app.services import studio_stored_preview as sp
+with patch.dict(sys.modules, {'app.services.studio_dataset_ingest': stub}):
+    from app.services import studio_stored_preview as sp
 
 DATASET = 'c8355667-4044-4d24-a334-f8d4f88d0c9f'
 RUN = '8f443942-73c2-4149-aaff-b159e2a3bfbf'

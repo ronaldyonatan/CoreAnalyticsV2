@@ -1,5 +1,5 @@
 /** Shared Chart Library contract. Existing dashboards can migrate via adapters. */
-export type ChartKind = 'column' | 'bar' | 'line' | 'area' | 'stacked' | 'grouped' | 'pie' | 'donut' | 'kpi' | 'table' | 'composed' | 'treemap' | 'radial' | 'lollipop' | 'waterfall' | 'waffle' | 'funnel' | 'bullet' | 'stacked100' | 'area100' | 'heatmap' | 'radar' | 'pareto' | 'step' | 'cumulative_line' | 'cumulative_bar' | 'variance' | 'slope' | 'combo' | 'progress';
+export type ChartKind = 'filter_dropdown' | 'filter_date' | 'column' | 'bar' | 'line' | 'area' | 'stacked' | 'grouped' | 'pie' | 'donut' | 'kpi' | 'table' | 'composed' | 'treemap' | 'radial' | 'lollipop' | 'waterfall' | 'waffle' | 'funnel' | 'bullet' | 'stacked100' | 'area100' | 'heatmap' | 'radar' | 'pareto' | 'step' | 'cumulative_line' | 'cumulative_bar' | 'variance' | 'slope' | 'combo' | 'progress';
 export type ChartAggregation = 'count' | 'sum' | 'avg' | 'min' | 'max';
 export type ChartFilterOperator = 'eq' | 'neq' | 'contains' | 'gt' | 'gte' | 'lt' | 'lte';
 export type ChartFilter = { column: string; operator: ChartFilterOperator; value: string };
@@ -60,6 +60,7 @@ export type SavedChart = {
   config: ChartConfig;
 };
 export const CHART_KINDS: Array<{ value: ChartKind; name: string }> = [
+  { value: 'filter_dropdown', name: 'Filter · Dropdown' }, { value: 'filter_date', name: 'Filter · Tanggal' },
   { value: 'column', name: 'Column' }, { value: 'bar', name: 'Horizontal Bar' },
   { value: 'line', name: 'Line' }, { value: 'area', name: 'Area' },
   { value: 'grouped', name: 'Grouped Bar' }, { value: 'stacked', name: 'Stacked Bar' },

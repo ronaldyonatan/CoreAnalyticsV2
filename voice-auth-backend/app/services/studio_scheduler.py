@@ -1,4 +1,5 @@
 """Unified scheduler metadata via existing private BEAM Core API (never executes Spark in Flask)."""
+from app.services.studio_object_access import require_access, visible_rows
 import json
 import re
 import uuid
@@ -50,11 +51,11 @@ def status(owner):
 
 
 def list_schedules(owner):
-    return json.loads(_rpc('List', owner).get('items_json') or '[]')
+    return visible_rows(owner, 'SCHEDULE', json.loads(_rpc('List', owner).get('items_json') or '[]'), 'schedule_id')
 
 
 def history(owner):
-    return json.loads(_rpc('History', owner).get('items_json') or '[]')
+    return visible_rows(owner, 'SCHEDULE', json.loads(_rpc('History', owner).get('items_json') or '[]'), 'schedule_id')
 
 
 def save(owner, body):
@@ -99,6 +100,11 @@ def save(owner, body):
                 raise SchedulerError('SCHEDULER_INPUT_INVALID')
         elif weekday is not None or monthday is not None or mask is not None:
             raise SchedulerError('SCHEDULER_INPUT_INVALID')
+    _uuid(body['target_id'])
+    _uuid(body['schedule_id'], optional=True)
+    if body['schedule_id'] is not None:
+        require_access(owner, 'SCHEDULE', body['schedule_id'], 'edit')
+    require_access(owner, 'PIPELINE' if target_type == 'PIPELINE' else 'DATASET', body['target_id'], 'execute')
     return _rpc('Save', owner, ScheduleID=_uuid(body['schedule_id'], optional=True), ScheduleName=name.strip(),
                 TargetType=target_type, TargetID=_uuid(body['target_id']), PipelineVersion=ver,
                 Frequency=frequency, IntervalMinutes=interval, TimeOfDay=clock, WeekDay=weekday,
@@ -109,4 +115,5 @@ def save(owner, body):
 def toggle(owner, schedule_id, enabled):
     if type(enabled) is not bool:
         raise SchedulerError('SCHEDULER_INPUT_INVALID')
+    require_access(owner, 'SCHEDULE', schedule_id, 'edit')
     return _rpc('Toggle', owner, ScheduleID=_uuid(schedule_id), Enabled=enabled)

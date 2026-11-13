@@ -1,4 +1,5 @@
 """Owner-scoped pipeline metadata; no source credentials enter saved documents."""
+from app.services.studio_object_access import require_access, visible_rows
 import copy
 import json
 import math
@@ -71,27 +72,50 @@ class PipelineStore:
         if row.get('metadata_ready') and row.get('uuid_transport_version')!=1:
             raise PipelineError('PIPELINE_UUID_TRANSPORT_REQUIRED',503)
         return row
-    def list(self,owner):return json.loads(self.call('List',owner).get('items_json') or '[]')
+    def list(self,owner):return visible_rows(owner, 'PIPELINE', json.loads(self.call('List',owner).get('items_json') or '[]'), 'pipeline_id')
     def get(self,owner,pipeline_id,version=None):
+        require_access(owner, 'PIPELINE', pipeline_id)
         row=self.call('Get',owner,PipelineID=identifier(pipeline_id),Version=version)
         return {**{k:v for k,v in row.items() if k not in ('success','code','graph_json')},'document':validate_document(json.loads(row['graph_json']))}
     def save(self,owner,name,document,pipeline_id=None,expected_version=0):
         if not isinstance(name,str) or not name.strip() or len(name)>150 or type(expected_version)is not int or not 0<=expected_version<=2**31-2:raise PipelineError('PIPELINE_INPUT_INVALID')
+        if pipeline_id:require_access(owner, 'PIPELINE', pipeline_id, 'edit')
         document=validate_document(document)
+        self.authorize_sources(owner, document.get('graph'))
         # Check the deployed transport contract before committing any new version.
         self.status(owner)
         return self.call('Save',owner,PipelineID=identifier(pipeline_id) if pipeline_id else None,PipelineName=name.strip(),ExpectedVersion=expected_version,GraphJSON=json.dumps(document,ensure_ascii=False,allow_nan=False))
     def submit(self,owner,pipeline_id,version,request_id):
         if type(version)is not int or not 1<=version<=2**31-1:raise PipelineError('PIPELINE_VERSION_INVALID')
+        require_access(owner, 'PIPELINE', pipeline_id, 'execute')
         saved=self.get(owner,pipeline_id,version)
+        self.authorize_sources(owner, saved['document'].get('graph'))
         if saved['document']['graph'] is None:raise PipelineError('PIPELINE_NOT_READY',409)
         validate_batch_graph(saved['document']['graph'])
         return self.call('Submit',owner,PipelineID=pipeline_id,Version=version,RequestID=identifier(request_id))
-    def outputs(self,owner):return json.loads(self.call('Outputs',owner).get('items_json') or '[]')
-    def output(self,owner,output_id):return self.call('Output',owner,OutputVersionID=identifier(output_id))
-    def jobs(self,owner):return json.loads(self.call('Jobs',owner).get('items_json') or '[]')
-    def job(self,owner,run_id):return self.call('Job',owner,RunID=identifier(run_id))
-    def cancel(self,owner,run_id):return self.call('Cancel',owner,RunID=identifier(run_id))
+    def authorize_sources(self, owner, graph):
+        if graph is None:return
+        for source in graph['sources']:
+            if source['kind'] == 'dataset':
+                require_access(owner, 'DATASET', source['dataset_id'])
+
+    def outputs(self,owner):
+        return visible_rows(owner, 'PIPELINE', json.loads(self.call('Outputs',owner).get('items_json') or '[]'), 'pipeline_id')
+    def output(self,owner,output_id):
+        row=self.call('Output',owner,OutputVersionID=identifier(output_id))
+        run = self.job(owner, row.get('run_id'))
+        row['pipeline_id'] = run['pipeline_id']
+        return row
+    def jobs(self,owner):
+        return visible_rows(owner, 'PIPELINE', json.loads(self.call('Jobs',owner).get('items_json') or '[]'), 'pipeline_id')
+    def job(self,owner,run_id):
+        row=self.call('Job',owner,RunID=identifier(run_id))
+        require_access(owner, 'PIPELINE', row.get('pipeline_id'))
+        return row
+    def cancel(self,owner,run_id):
+        row=self.job(owner,run_id)
+        require_access(owner, 'PIPELINE', row.get('pipeline_id'), 'execute')
+        return self.call('Cancel',owner,RunID=identifier(run_id))
     def claim(self,worker_id):return self.call('Claim',WorkerID=identifier(worker_id))
     def heartbeat(self,worker_id,run_id):return self.call('Heartbeat',WorkerID=identifier(worker_id),RunID=identifier(run_id))
     def complete(self,worker_id,run_id,status,outputs=None,error_code=None):

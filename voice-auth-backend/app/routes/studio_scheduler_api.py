@@ -1,4 +1,6 @@
 """Owner-scoped scheduler UI; no background jobs run inside the HTTP process."""
+from app.services.studio_object_access import AccessError
+
 from functools import wraps
 from flask import Blueprint, jsonify, request
 from app.routes.studio_connections_api import _principal, _mutating, _error
@@ -18,6 +20,8 @@ def endpoint(fn):
             resp = jsonify(success=True, data=result)
             resp.headers['Cache-Control'] = 'no-store'
             return resp
+        except AccessError as exc:
+            return jsonify(success=False, code=str(exc)), exc.status
         except PermissionError as exc:
             return _error(exc)
         except scheduler.SchedulerError as exc:

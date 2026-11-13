@@ -15,7 +15,7 @@ TEXT_TYPES = frozenset({'char','varchar','nchar','nvarchar','uniqueidentifier'})
 DATE_TYPES = frozenset({'date','datetime','datetime2','smalldatetime','datetimeoffset'})
 ALLOWED_TYPES = NUMERIC_TYPES | TEXT_TYPES | DATE_TYPES
 AGGREGATIONS = frozenset({'count', 'sum', 'avg', 'min', 'max'})
-CHART_TYPES = frozenset({'bar','column','line','area','pie','donut','table','kpi','stacked','grouped','composed','treemap','radial','lollipop','waterfall','waffle','funnel','bullet','stacked100','area100','heatmap','radar','pareto','step','cumulative_line','cumulative_bar','variance','slope','combo','progress'})
+CHART_TYPES = frozenset({'filter_dropdown','filter_date','bar','column','line','area','pie','donut','table','kpi','stacked','grouped','composed','treemap','radial','lollipop','waterfall','waffle','funnel','bullet','stacked100','area100','heatmap','radar','pareto','step','cumulative_line','cumulative_bar','variance','slope','combo','progress'})
 ORDERED_CHART_TYPES = frozenset({'cumulative_line','cumulative_bar','variance','slope'})
 FILTER_OPERATORS = frozenset({'eq','neq','contains','gt','gte','lt','lte'})
 
@@ -38,6 +38,8 @@ def parse_chart_spec(value):
         raise ChartQueryError('CHART_QUERY_INVALID')
     if any(not isinstance(value.get(field,''),str) or len(value.get(field,''))>128 for field in ('dimension','measure','series')):
         raise ChartQueryError('CHART_QUERY_INVALID')
+    if value['chart_type'] in ('filter_dropdown','filter_date') and (value['aggregation'] != 'count' or value.get('measure') or value.get('series')):
+        raise ChartQueryError('CHART_FILTER_CARD_CONFIG_INVALID')
     if value['aggregation'] != 'count' and not value.get('measure'):
         raise ChartQueryError('CHART_MEASURE_REQUIRED')
     if value['chart_type'] != 'kpi' and not value['dimension']:
@@ -103,6 +105,8 @@ def build_direct_query(spec, source, columns):
     """Compile a single parameterized SQL Server SELECT from trusted schema metadata."""
     by_name = {row['name']:row['type'].lower() for row in columns if row['type'].lower() in ALLOWED_TYPES}
     dim = spec['dimension']; metric = spec['measure']; series = spec['series']
+    if spec['chart_type'] == 'filter_date' and by_name.get(dim) not in DATE_TYPES:
+        raise ChartQueryError('CHART_FILTER_DATE_COLUMN_INVALID')
     if dim and dim not in by_name or series and series not in by_name:
         raise ChartQueryError('CHART_COLUMN_NOT_FOUND')
     if metric and metric not in by_name:
@@ -151,7 +155,7 @@ def build_direct_query(spec, source, columns):
     ordering={'value_desc':'metric_value DESC','value_asc':'metric_value ASC',
               'dimension_asc':'dimension_value ASC','dimension_desc':'dimension_value DESC'}[spec['sort']]
     ordering+=', dimension_value ASC, series_value ASC' if not ordering.startswith('dimension_value') else ', series_value ASC'
-    sql=(f'SELECT TOP ({spec["limit"]}) '+', '.join(select)+f' FROM {identifier(source["schema"])}.{identifier(source["name"])}'
+    sql=(f'SELECT TOP ({spec["limit"] + (1 if spec["chart_type"] == "filter_dropdown" else 0)}) '+', '.join(select)+f' FROM {identifier(source["schema"])}.{identifier(source["name"])}'
          +clause+group_by+f' ORDER BY {ordering}')
     return sql,params
 

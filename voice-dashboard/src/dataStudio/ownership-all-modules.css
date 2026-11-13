@@ -1,0 +1,44 @@
+/* Phase 2D.6 — reusable ownership cells in Data Studio catalogs. */
+.studio-ownership-grid-cell {display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;padding:0 10px;min-width:55px;position:relative;z-index:2}
+.u-dataset-entry-shell {display:flex;align-items:center;min-width:0}
+.u-dataset-entry-shell > :first-child {flex:1;min-width:0}
+.studio-ownership-grid-cell .ownership-trigger,.studio-ownership-dataset .ownership-trigger,.studio-ownership-chart .ownership-trigger {border:0;background:transparent;padding:2px 4px;min-height:30px;box-shadow:none}
+.studio-ownership-grid-cell .ownership-trigger:hover,.studio-ownership-dataset .ownership-trigger:hover,.studio-ownership-chart .ownership-trigger:hover {background:var(--core-control-hover,rgba(50,150,170,.15))}
+.studio-ownership-grid-cell .ownership-control,.studio-ownership-dataset .ownership-control,.studio-ownership-chart .ownership-control {display:inline-flex}
+.studio-ownership-inspector {display:flex;align-items:center;justify-content:space-between;gap:10px;flex-basis:100%;min-width:0;width:100%;margin:4px 0 12px;padding:6px 0;border-bottom:1px solid var(--core-border,rgba(120,170,180,.15))}
+.studio-ownership-inspector>span {font-size:10px;letter-spacing:.1em;opacity:.75}
+.studio-ownership-chart {display:flex;justify-content:flex-end;margin:4px 0}
+.studio-ownership-dataset {display:flex;align-items:center;justify-content:center;flex:0 0 76px;min-width:60px;position:relative;z-index:2}
+.datasets-catalog-list .studio-ownership-dataset {align-self:center}
+@media(max-width:760px){.studio-ownership-grid-cell {padding:0 4px;min-width:40px}.studio-ownership-dataset{flex-basis:45px;min-width:40px}.studio-ownership-grid-cell .ownership-plus,.studio-ownership-dataset .ownership-plus {display:none}}
+
+.studio-owner-inline{display:inline-flex;min-width:27px;min-height:29px;align-items:center;justify-content:center}
+.studio-owner-loading,.studio-owner-unavailable{font-size:12px;opacity:.45}
+.datasets-row-shell>.datasets-catalog-row {flex:1;min-width:0}
+.datasets-row-shell>.studio-ownership-dataset{order:2}
+.datasets-row-shell>.datasets-row-actions{order:3}
+.studio-ownership-chart .studio-owner-inline {justify-content:flex-end}
+
+/* Phase 2D.6.1: three separate fixed tracks; preserve Scheduler clock on the same row. */
+.studio-window-content .datasets-catalog-list > li.datasets-row-shell.datasets-row-shell {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 38px 46px;
+  align-items:center;
+  gap:5px;
+}
+.studio-window-content .datasets-row-shell > .datasets-catalog-row {grid-column:1;min-width:0;width:100%}
+.studio-window-content .datasets-row-shell > .studio-ownership-dataset {grid-column:2;min-width:0;width:38px;flex:initial;padding:0;align-self:center;justify-self:center}
+.studio-window-content .datasets-row-shell > .datasets-row-actions {grid-column:3;min-width:0;width:46px;flex:initial;align-self:center;justify-self:center}
+.studio-ownership-grid-cell .ownership-plus,.studio-ownership-dataset .ownership-plus,.studio-ownership-chart .ownership-plus {display:none!important}
+
+/* Phase 2D.6.1: three separate fixed tracks; preserve Scheduler clock on the same row. */
+.studio-window-content .datasets-catalog-list > li.datasets-row-shell {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 38px 46px;
+  align-items:center;
+  gap:5px;
+}
+.studio-window-content .datasets-row-shell > .datasets-catalog-row {grid-column:1;min-width:0;width:100%}
+.studio-window-content .datasets-row-shell > .studio-ownership-dataset {grid-column:2;min-width:0;width:38px;flex:initial;padding:0;align-self:center;justify-self:center}
+.studio-window-content .datasets-row-shell > .datasets-row-actions {grid-column:3;min-width:0;width:46px;flex:initial;align-self:center;justify-self:center}
+.studio-ownership-grid-cell .ownership-plus,.studio-ownership-dataset .ownership-plus,.studio-ownership-chart .ownership-plus {display:none!important}

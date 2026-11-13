@@ -41,6 +41,8 @@ def aggregate_parquet(artifact_dir:Path, spec:dict):
         limit=spec.get('limit',30)
         if type(limit)!=int or not 1<=limit<=250:raise ValueError('CHART_LIMIT_INVALID')
         if spec.get('chart_type')!='kpi' and not dim:raise ValueError('CHART_DIMENSION_REQUIRED')
+        if spec.get('chart_type')=='filter_date' and not cols.get(dim,'').startswith(('DATE','TIMESTAMP')):
+            raise ValueError('CHART_FILTER_DATE_COLUMN_INVALID')
         selects=[f'CAST({q(dim)} AS VARCHAR) AS dimension_value' if dim else "'Total' AS dimension_value",
                  f'CAST({q(series)} AS VARCHAR) AS series_value' if series else 'CAST(NULL AS VARCHAR) AS series_value']
         selects.append('COUNT(*) AS metric_value' if agg=='count' else f'{AGGS[agg]}({q(measure)}) AS metric_value')

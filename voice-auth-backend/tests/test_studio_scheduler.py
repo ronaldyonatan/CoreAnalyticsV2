@@ -20,6 +20,10 @@ class SchedulerTests(unittest.TestCase):
         }):
             cls.scheduler = importlib.import_module('app.services.studio_scheduler')
 
+    def setUp(self):
+        auth = patch.object(self.scheduler, 'require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
+
     def form(self, **updates):
         result = dict(schedule_id=None, schedule_name='Finance pagi', target_type='STORED',
                       target_id='c8355667-4044-4d24-a334-f8d4f88d0c9f', pipeline_version=None,

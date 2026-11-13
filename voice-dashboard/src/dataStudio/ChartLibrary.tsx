@@ -1,3 +1,6 @@
+import OwnershipGrid from './OwnershipGrid';
+import './ownership-all-modules.css';
+import OwnershipPicker from './OwnershipPicker';
 import { UniverseRefreshButton } from '../design-system/components/universe/UniverseRefreshButton';
 import { UniverseTable, UniverseInspector, UniverseToolbar, UniverseField, UniverseFormSection, UniverseCatalogHeader } from '../design-system/components/universe';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,6 +34,7 @@ const OPERATORS: Array<{ value: ChartFilterOperator; label: string }> = [
 ];
 
 const CHART_GROUPS: Array<{ name: string; kinds: ChartKind[] }> = [
+  { name: 'Filter Cards', kinds: ['filter_dropdown', 'filter_date'] },
   { name: 'Besaran & Peringkat', kinds: ['column', 'bar', 'grouped', 'lollipop', 'pareto'] },
   { name: 'Perjalanan Nilai', kinds: ['line', 'step', 'area', 'cumulative_line', 'cumulative_bar', 'variance', 'waterfall'] },
   { name: 'Profil & Perbandingan', kinds: ['radar', 'slope', 'combo', 'composed'] },
@@ -42,6 +46,8 @@ const ORDERED_CHARTS: ChartKind[] = ['cumulative_line', 'cumulative_bar', 'varia
 const ANALYTICAL_CHARTS: ChartKind[] = [...ORDERED_CHARTS, 'combo', 'progress'];
 
 const CHART_HINTS: Partial<Record<ChartKind, string>> = {
+  filter_dropdown: 'Pilih kolom kategori. Target filter diatur nanti di Dashboard Designer.',
+  filter_date: 'Pilih kolom tanggal. Target filter diatur nanti di Dashboard Designer.',
   stacked100: 'Pilih Category dan Series. Nilai non-negatif dinormalisasi menjadi 100% per kategori dari series hasil query (Top N).',
   area100: 'Pilih Category dan Series. Persentase area dihitung per kategori dari series hasil query (Top N); gunakan urutan kategori untuk tren.',
   heatmap: 'Category menjadi kolom, Series menjadi baris, dan Value menentukan intensitas warna. Sel tanpa nilai dibedakan dari nilai nol.',
@@ -97,6 +103,7 @@ function ChartThumbnail({ kind }: { kind: ChartKind }) {
   const line = kind === 'line' || kind === 'area';
   return (
     <svg className="ca-chart-thumb" viewBox="0 0 64 42" fill="none" aria-hidden="true">
+      {(kind === 'filter_dropdown' || kind === 'filter_date') && <><rect x="6" y="8" width="52" height="27" rx="5" stroke="currentColor" strokeWidth="2" /><path d={kind === 'filter_dropdown' ? 'M42 19l5 5 5-5M12 21h23' : 'M15 13v-4m27 4v-4M12 18h39M16 23h5m5 0h5m5 0h5m-25 5h5m5 0h5'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></>}
       {kind === 'column' && (
         <>
           <path d="M5 37H60" stroke="currentColor" opacity=".22" />
@@ -205,6 +212,9 @@ export default function ChartLibrary() {
   const [working, setWorking] = useState<'library' | 'analyzer'>('library');
   const [fieldSearch, setFieldSearch] = useState('');
   const [chartSearch, setChartSearch] = useState('');
+  const [typeSearch, setTypeSearch] = useState('');
+  const [openTypeGroups, setOpenTypeGroups] = useState<string[]>([CHART_GROUPS[0].name]);
+  const [closedSearchGroups, setClosedSearchGroups] = useState<string[]>([]);
   const [showTable, setShowTable] = useState(true);
   const [showSettings, setShowSettings] = useState(true);
   const [showChartTypes, setShowChartTypes] = useState(true);
@@ -222,6 +232,8 @@ export default function ChartLibrary() {
       : query;
   }, [config]);
   const signature = JSON.stringify(querySpec);
+  const isFilterCard = config.chart_type === 'filter_dropdown' || config.chart_type === 'filter_date';
+  const isDateColumn = (type: string) => /^(date|datetime|datetime2|smalldatetime|datetimeoffset|timestamp)(?:\b|\()/i.test(type);
   const ready = Boolean(config.dataset_id && (config.chart_type === 'kpi' || config.dimension)
     && (config.aggregation === 'count' || config.measure)
     && (!['grouped','stacked','stacked100','area100','heatmap','combo'].includes(config.chart_type) || config.series)
@@ -230,6 +242,7 @@ export default function ChartLibrary() {
     && (!ORDERED_CHARTS.includes(config.chart_type) || config.sort === 'dimension_asc')
     && (config.chart_type !== 'progress' || props.gaugeTarget > 0)
     && (!config.series || config.series !== config.dimension)
+    && (config.chart_type !== 'filter_date' || columns.some(c => c.name === config.dimension && isDateColumn(c.type)))
     && columns.length > 0
     && (!config.dimension || columns.some(c => c.name === config.dimension))
     && (!config.measure || columns.some(c => c.name === config.measure))
@@ -330,14 +343,22 @@ export default function ChartLibrary() {
   const visibleCharts = charts.filter(chart => chart.name.toLowerCase().includes(chartSearch.toLowerCase()));
   const activeDataset = catalog.find(dataset => dataset.dataset_id === config.dataset_id);
   const chartLabel = CHART_KINDS.find(kind => kind.value === config.chart_type)?.name || config.chart_type;
+  const typeSearchTerm = typeSearch.trim().toLocaleLowerCase();
+  const visibleTypeGroups = CHART_GROUPS.map(group => ({
+    ...group,
+    kinds: group.kinds.filter(kind => !typeSearchTerm || group.name.toLocaleLowerCase().includes(typeSearchTerm)
+      || (CHART_KINDS.find(item => item.value === kind)?.name || kind).toLocaleLowerCase().includes(typeSearchTerm)),
+  })).filter(group => group.kinds.length > 0);
 
   const setChartType = (kind: ChartKind) => {
     setConfig(previous => ({
       ...previous,
       chart_type: kind,
-      dimension: kind === 'kpi' ? '' : previous.dimension,
-      series: ['pie', 'donut', 'kpi', 'pareto', 'progress'].includes(kind) ? '' : previous.series,
-      sort: kind === 'pareto' ? 'value_desc' : ORDERED_CHARTS.includes(kind) ? 'dimension_asc' : previous.sort,
+      dimension: kind === 'kpi' || (kind === 'filter_date' && !columns.some(c => c.name === previous.dimension && isDateColumn(c.type))) ? '' : previous.dimension,
+      measure: kind.startsWith('filter_') ? '' : previous.measure,
+      aggregation: kind.startsWith('filter_') ? 'count' : previous.aggregation,
+      series: kind.startsWith('filter_') || ['pie', 'donut', 'kpi', 'pareto', 'progress'].includes(kind) ? '' : previous.series,
+      sort: kind.startsWith('filter_') ? 'dimension_asc' : kind === 'pareto' ? 'value_desc' : ORDERED_CHARTS.includes(kind) ? 'dimension_asc' : previous.sort,
     }));
     if (ANALYTICAL_CHARTS.includes(kind)) {
       setActiveTools('properties');
@@ -360,6 +381,7 @@ export default function ChartLibrary() {
     const row = catalog.find(dataset => dataset.dataset_id === id);
     setConfig({
       ...emptyConfig(),
+      ...(isFilterCard ? { chart_type: config.chart_type, sort: 'dimension_asc' as const } : {}),
       dataset_id: id,
       dataset_kind: row?.access_mode === 'PARQUET' ? 'PARQUET' : 'DIRECT',
     });
@@ -478,7 +500,10 @@ export default function ChartLibrary() {
           setResults(null);
           setQuerySignature('');
           setMessage('');
-          setError(err instanceof Error ? err.message : 'CHART_QUERY_FAILED');
+          const code = err instanceof Error ? err.message : 'CHART_QUERY_FAILED';
+          setError(isFilterCard && code === 'CHART_QUERY_INVALID'
+            ? 'Backend belum menerima jenis filter ini. Pastikan backend versi terbaru sudah dimuat ulang, lalu coba lagi.'
+            : code);
         })
         .finally(() => { if (!controller.signal.aborted) setQueryBusy(false); });
     }, 450);
@@ -538,6 +563,8 @@ export default function ChartLibrary() {
     event.preventDefault();
     const label = event.dataTransfer.getData('text/plain') || dragged;
     if (!columns.some(column => column.name === label)) return;
+    if (isFilterCard && field !== 'dimension') return;
+    if (config.chart_type === 'filter_date' && !columns.some(c => c.name === label && isDateColumn(c.type))) return;
     if (field === 'measure' && !isNumeric(label)) return;
     if (field === 'series' && ['pie', 'donut', 'kpi', 'pareto', 'progress'].includes(config.chart_type)) return;
     setField(field, label);
@@ -546,6 +573,7 @@ export default function ChartLibrary() {
 
   const dropAggregation = (event: DragEvent) => {
     event.preventDefault();
+    if (isFilterCard) return;
     const label = event.dataTransfer.getData('text/plain') || dragged;
     if (!isNumeric(label)) return;
     setConfig(previous => ({
@@ -612,10 +640,10 @@ export default function ChartLibrary() {
         </div>
       )}
       <div className="ca-chart-canvas ca-chart-preview-container" aria-busy={queryBusy}>
-        {validResults && (fullCanvas && fullscreenView === '3d' && chart3DReady
+        {validResults && (isFilterCard ? <div className="ca-filter-card-preview"><label><span>{config.dimension}</span>{config.chart_type === 'filter_dropdown' ? <select key={signature} defaultValue=""><option value="">Pilih {config.dimension}</option>{validResults.rows.map((row, index) => <option key={index} value={row.dimension}>{row.dimension}</option>)}</select> : <div className="ca-filter-date-fields"><input type="date" aria-label="Tanggal awal" /><span>hingga</span><input type="date" aria-label="Tanggal akhir" /></div>}</label><small>Preview saja. Target filter diatur di Dashboard Designer.{config.chart_type === 'filter_dropdown' && validResults.truncated ? ' Daftar preview dibatasi.' : ''}</small></div> : fullCanvas && fullscreenView === '3d' && chart3DReady
           ? <Chart3DFullscreen kind={config.chart_type} rows={validResults.rows} title={name} height={Math.max(540, props.chartHeight)} properties={props} />
           : <SharedChart kind={config.chart_type} rows={validResults.rows} title={name} height={fullCanvas ? Math.max(540, props.chartHeight) : props.chartHeight} properties={props} />)}
-        {!validResults && !queryBusy && <div className="chart-empty">{ready ? 'Menyiapkan preview otomatis…' : 'Pilih dataset dan lengkapi field grafik.'}</div>}
+        {!validResults && !queryBusy && <div className="chart-empty">{error ? 'Preview belum tersedia. Periksa pesan di atas.' : ready ? 'Menyiapkan preview otomatis…' : 'Pilih dataset dan lengkapi field grafik.'}</div>}
         {queryBusy && <div className="ca-chart-loading-overlay" role="status"><span className="ca-chart-spinner ca-chart-spinner-large" /><strong>Memproses data grafik</strong><small>Agregasi seluruh dataset sedang berjalan…</small></div>}
       </div>
       <div className="ca-chart-plot-foot">
@@ -664,6 +692,7 @@ export default function ChartLibrary() {
                     <strong>{chart.name}</strong>
                     <small>{CHART_KINDS.find(kind => kind.value === chart.config.chart_type)?.name || chart.config.chart_type} · {chart.config.dataset_kind} · V{chart.version}</small>
                   </div>
+                  <div className="studio-ownership-chart"><OwnershipGrid objectType="CHART" objectId={chart.chart_id}/></div>
                   <div className="ca-chart-card-actions">
                     <button type="button" onClick={() => void openSaved(chart.chart_id)}>Buka Analyzer</button>
                     <button type="button" disabled={busy} onClick={() => void remove(chart.chart_id)}>Hapus</button>
@@ -715,13 +744,13 @@ export default function ChartLibrary() {
               <input value={name} maxLength={150} onChange={event => setName(event.target.value)} aria-label="Nama chart" />
             </label>
             <label className={`ca-chart-data-slot${config.dimension ? ' is-filled' : ''}`} onDragOver={event => event.preventDefault()} onDrop={dropField('dimension')}>
-              <span>CATEGORY / X</span>
+              <span>{isFilterCard ? 'FILTER FIELD' : 'CATEGORY / X'}</span>
               <select value={config.dimension} onChange={event => setField('dimension', event.target.value)} aria-label="Dimension">
                 <option value="">{config.chart_type === 'kpi' ? 'Opsional' : 'Seret kolom di sini'}</option>
-                {columns.map(column => <option key={column.name} value={column.name}>{column.name}</option>)}
+                {columns.filter(column => config.chart_type !== 'filter_date' || isDateColumn(column.type)).map(column => <option key={column.name} value={column.name}>{column.name}</option>)}
               </select>
             </label>
-            <label className={`ca-chart-data-slot is-measure${config.measure ? ' is-filled' : ''}`} onDragOver={event => event.preventDefault()} onDrop={dropField('measure')}>
+            {!isFilterCard && <><label className={`ca-chart-data-slot is-measure${config.measure ? ' is-filled' : ''}`} onDragOver={event => event.preventDefault()} onDrop={dropField('measure')}>
               <span>VALUE / Y</span>
               <select value={config.measure} onChange={event => setField('measure', event.target.value)} aria-label="Measure">
                 <option value="">{config.aggregation === 'count' ? 'Hitung baris' : 'Seret kolom di sini'}</option>
@@ -743,6 +772,7 @@ export default function ChartLibrary() {
                 ))}
               </select>
             </label>
+            </>}
             <div className="ca-chart-shelf-type" title="Jenis visualisasi aktif">
               <span>CHART</span>
               <strong>{chartLabel}</strong>
@@ -877,7 +907,7 @@ export default function ChartLibrary() {
                     <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Data mapping</strong></div>
                       <UniverseField className="ca-chart-setting-control"><span>Jenis grafik</span><select value={config.chart_type} onChange={event => setChartType(event.target.value as ChartKind)}>{CHART_KINDS.map(kind => <option key={kind.value} value={kind.value}>{kind.name}</option>)}</select></UniverseField>
-                      <UniverseField className="ca-chart-setting-control"><span>Agregasi</span><select value={config.aggregation} onChange={event => setField('aggregation', event.target.value as ChartConfig['aggregation'])}>{AGGREGATIONS.map(agg => <option key={agg} value={agg}>{agg.toUpperCase()}</option>)}</select></UniverseField>
+                      {!isFilterCard && <UniverseField className="ca-chart-setting-control"><span>Agregasi</span><select value={config.aggregation} onChange={event => setField('aggregation', event.target.value as ChartConfig['aggregation'])}>{AGGREGATIONS.map(agg => <option key={agg} value={agg}>{agg.toUpperCase()}</option>)}</select></UniverseField>}
                     </UniverseFormSection>
                     <UniverseFormSection className="ca-chart-setting-section">
                       <div className="ca-chart-setting-heading"><strong>Chart Properties</strong><button type="button" onClick={() => updateProp('showGrid', true)}>Reset grid</button></div>
@@ -970,11 +1000,23 @@ export default function ChartLibrary() {
                   <strong>Chart types</strong>
                   <button type="button" className="ca-chart-pane-close" onClick={() => setShowChartTypes(false)} aria-label="Sembunyikan galeri">×</button>
                 </div>
+                <div className="ca-chart-type-search">
+                  <input type="search" value={typeSearch} onChange={event => { setTypeSearch(event.target.value); setClosedSearchGroups([]); }} placeholder="Cari jenis chart..." aria-label="Cari jenis chart" />
+                </div>
                 <div className="ca-chart-chart-picker">
-                  {CHART_GROUPS.map(group => (
+                  {visibleTypeGroups.length === 0 && <p className="ca-chart-type-no-results">Jenis chart tidak ditemukan.</p>}
+                  {visibleTypeGroups.map(group => (
                     <section key={group.name} className="ca-chart-type-group">
-                      <h3>{group.name}</h3>
-                      <div className="ca-chart-type-grid">
+                      <h3><button type="button" className="ca-chart-type-group-toggle" aria-expanded={typeSearchTerm ? !closedSearchGroups.includes(group.name) : openTypeGroups.includes(group.name)} onClick={() => {
+                        if (typeSearchTerm) {
+                          setClosedSearchGroups(groups => groups.includes(group.name) ? groups.filter(name => name !== group.name) : [...groups, group.name]);
+                          return;
+                        }
+                        setOpenTypeGroups(groups => groups.includes(group.name) ? groups.filter(name => name !== group.name) : [...groups, group.name]);
+                      }}>
+                        <span>{group.name}</span><span aria-hidden="true">{(typeSearchTerm ? !closedSearchGroups.includes(group.name) : openTypeGroups.includes(group.name)) ? '−' : '+'}</span>
+                      </button></h3>
+                      {(typeSearchTerm ? !closedSearchGroups.includes(group.name) : openTypeGroups.includes(group.name)) && <div className="ca-chart-type-grid">
                         {group.kinds.map(kind => (
                           <button
                             key={kind}
@@ -988,7 +1030,7 @@ export default function ChartLibrary() {
                             <span>{CHART_KINDS.find(item => item.value === kind)?.name || kind}</span>
                           </button>
                         ))}
-                      </div>
+                      </div>}
                     </section>
                   ))}
                 </div>

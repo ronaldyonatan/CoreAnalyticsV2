@@ -1,3 +1,6 @@
+import OwnershipGrid from './OwnershipGrid';
+import './ownership-all-modules.css';
+import OwnershipPicker from './OwnershipPicker';
 import { UniverseToolbar, UniversePanel, UniverseFormSection, UniverseCatalogHeader, UniverseCatalogSplit, UniverseCatalogEntry, UniverseCatalogInspector, UniverseInspectorDetails } from '../design-system/components/universe';
 import { useEffect, useState } from 'react';
 import { loadDatasetCatalog } from './datasetCatalog';
@@ -189,6 +192,7 @@ export default function Scheduler({target,focusTarget,onClose,onSaved,onPreviewD
               metadata={[{label:'Frekuensi',value:displayFrequency(s)},{label:'Berikutnya',value:s.enabled?date(s.next_run_at):'—'}]}
               badge={<span className={'u-dataset-badge '+(s.enabled?'is-active':'is-inactive')}>{s.enabled?'ACTIVE':'PAUSED'}</span>}
               selected={selectedKey===key} onClick={()=>setSelectedKey(previous=>previous===key?null:key)}/>
+            <div className="studio-ownership-grid-cell"><OwnershipGrid objectType="SCHEDULE" objectId={s.schedule_id}/></div>
           </div>;
         }):<div className="ca-scheduler-catalog-message">Tidak ada jadwal yang sesuai dengan pencarian atau filter.</div>
       } inspector={<UniverseCatalogInspector emptyHeading="Explore your schedules" emptyDescription="Pilih jadwal di sebelah kiri untuk melihat konfigurasi, waktu eksekusi, dan tindakan yang tersedia.">
@@ -199,7 +203,7 @@ export default function Scheduler({target,focusTarget,onClose,onSaved,onPreviewD
             {label:'BERIKUTNYA',value:selectedSchedule.enabled?date(selectedSchedule.next_run_at):'Dijeda'},
             {label:'LAST RUN',value:date(selectedSchedule.last_run_at)},
             ...(selectedSchedule.pipeline_version?[{label:'PIPELINE VERSION',value:`v${selectedSchedule.pipeline_version}`}]:[])]}
-          actions={<>
+          actions={<><div className="studio-ownership-inspector"><span>OWNER / ACCESS</span><OwnershipPicker objectType="SCHEDULE" objectId={selectedSchedule.schedule_id}/></div>
             <button type="button" className="u-dataset-action" disabled={busy} onClick={()=>edit(selectedSchedule)}>Edit jadwal</button>
             <button type="button" className={selectedSchedule.enabled ? "u-dataset-action is-warning" : "u-dataset-action is-success"} disabled={busy} onClick={()=>void toggle(selectedSchedule)}>{selectedSchedule.enabled?'Jeda jadwal':'Aktifkan jadwal'}</button>
             {previewDatasets.map(item=><button key={item.dataset_id} type="button" className="u-dataset-action" disabled={!onPreviewDataset||item.storage_status!=='READY'} onClick={()=>onPreviewDataset?.(item.dataset_id,item.access_mode==='PARQUET')}>Preview {item.dataset_name} ↗</button>)}

@@ -2,6 +2,7 @@
 
 No browser SQL, filesystem paths or connection credentials are accepted.
 """
+from app.services.studio_object_access import AccessError, require_access
 import json
 import traceback
 import uuid
@@ -23,6 +24,7 @@ def _json(result,status=200):
 
 
 def _error_response(exc):
+    if isinstance(exc,AccessError):return jsonify(success=False,code=str(exc)),exc.status
     if isinstance(exc,PermissionError):return _error(exc)
     if isinstance(exc,(ChartError,ChartQueryError,PipelineError,ValueError)):
         code=str(exc)
@@ -49,6 +51,7 @@ def endpoint(fn):
 
 def authorized_dataset(user,dataset_id,kind):
     if kind=='DIRECT':
+        require_access(user, 'DATASET', dataset_id)
         records=_rows(core_api._post_mode('CoreStudioDatasetList',{'UserID':user}))
         row=next((row for row in records if str(row.get('dataset_id','')).lower()==str(dataset_id).lower() and row.get('access_mode')=='DIRECT'),None)
         if not row:raise ChartError('CHART_DATASET_NOT_FOUND',404)
@@ -114,11 +117,14 @@ def columns(user,dataset_id):
     kind=request.args.get('kind','DIRECT')
     row=authorized_dataset(user,str(dataset_id),kind)
     if kind=='DIRECT':
-        from app.connectors.sqlserver import open_readonly_connection,_dataset_columns
+        from app.connectors.postgresql_adapter import PostgreSQLTarget, _connect, _object_metadata
+        from app.connectors.sqlserver import open_readonly_connection, _dataset_columns
         from contextlib import closing
-        with closing(open_readonly_connection(_target(user,row['connection_id']))) as cn:
+        target = _target(user,row['connection_id'],dataset_id=row['dataset_id'])
+        postgres = isinstance(target, PostgreSQLTarget)
+        with closing((_connect if postgres else open_readonly_connection)(target)) as cn:
             cursor=cn.cursor()
-            _,fields,_=_dataset_columns(cursor,{'schema':row['source_schema'],'name':row['source_name'],'type':row['source_type']})
+            _,fields,_=(_object_metadata if postgres else _dataset_columns)(cursor,{'schema':row['source_schema'],'name':row['source_name'],'type':row['source_type']})
     else:
         try:
             fields=json.loads(row['schema_json'])['fields']
@@ -133,7 +139,19 @@ def query(user):
     spec,row=validate_spec(user,request.get_json(silent=True))
     if spec['dataset_kind']=='PARQUET':
         return _json(execute_parquet_chart(user, row, spec))
-    from app.connectors.sqlserver import SqlTargetPolicyError
-    result=execute_direct_chart(_target(user,row['connection_id']),
+    from app.connectors.postgresql_adapter import PostgreSQLTarget
+    target = _target(user,row['connection_id'],dataset_id=row['dataset_id'])
+    if isinstance(target, PostgreSQLTarget):
+        from app.services.studio_chart_postgresql import execute_postgresql_chart
+        execute_chart = execute_postgresql_chart
+    else:
+        execute_chart = execute_direct_chart
+    result=execute_chart(target,
             {'schema':row['source_schema'],'name':row['source_name'],'type':row['source_type']},spec)
     return _json(result)
+
+
+@studio_charts_bp.after_request
+def prevent_private_cache(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response

@@ -105,7 +105,7 @@ class DatasetApiTests(unittest.TestCase):
             discover.assert_not_called()
 
     def test_direct_save_checks_source_and_creates_definition(self):
-        with patch.object(api, '_principal', return_value='user'), patch.object(api, '_mutating'), patch.object(api, '_target', return_value='source'), patch.object(api, 'sqlserver_object_exists', return_value=True), patch.object(api.core_api, '_post_mode', return_value={'data': [{'success': True, 'code': 'DATASET_CREATED'}]}) as call:
+        with patch('app.services.studio_object_access.require_access', return_value='OWNER'), patch.object(api, '_principal', return_value='user'), patch.object(api, '_mutating'), patch.object(api, '_target', return_value='source'), patch.object(api, 'sqlserver_object_exists', return_value=True), patch.object(api.core_api, '_post_mode', return_value={'data': [{'success': True, 'code': 'DATASET_CREATED'}]}) as call:
             response = self.client.post('/api/studio/datasets', json=self.body)
             self.assertEqual(response.status_code, 201)
             self.assertEqual(call.call_args.args[1]['SourceName'], 'Revenue')

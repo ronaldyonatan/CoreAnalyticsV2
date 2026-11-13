@@ -1,0 +1,114 @@
+PIPELINE_JOB_FAILED {"run_id": "22222222-2222-4222-8222-222222222222", "stage": "AUTHORIZE", "code": "BATCH_ACCESS_CHECK_FAILED"}
+PIPELINE_JOB_FAILED {"run_id": "0347b4dd-be23-47d7-a0fc-825f096c456f", "stage": "AUTHORIZE", "code": "DATA_STUDIO_FORBIDDEN"}
+PIPELINE_JOB_FAILED {"run_id": "e0dd79ff-1f90-4994-a7c6-cd94c39dabc8", "stage": "EXECUTE", "code": "BATCH_TIMEOUT"}
+PIPELINE_JOB_FAILED {"run_id": "ee939762-2599-491b-86ab-7f7f6c156632", "stage": "REGISTER_OUTPUT", "code": "BATCH_MANIFEST_MISSING"}
+PIPELINE_JOB_FAILED {"run_id": "dee543d9-387a-4156-9b58-e464b649d7ba", "stage": "RECOVER", "code": "BATCH_RECOVERY_REQUIRED"}
+PIPELINE_JOB_FAILED {"run_id": "76c80806-dfa0-4d2b-bb28-268280acc638", "stage": "RECOVER", "code": "BATCH_MANIFEST_INVALID"}
+PIPELINE_JOB_FAILED {"run_id": "0d849159-9a57-4166-8f8f-eb5b98d2fe61", "stage": "BIND_SOURCE", "code": "UNTRUSTED_CERT_DISABLED"}
+...................................ss.E..............................................................F......F....F.F..F......F.FssssssFF....................s.......................................sss..........................
+======================================================================
+ERROR: test_bound_sources_use_policy_pinned_ip_and_do_not_modify_saved_graph (test_studio_batch_bindings.BatchBindingsTests.test_bound_sources_use_policy_pinned_ip_and_do_not_modify_saved_graph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_batch_bindings.py", line 29, in test_bound_sources_use_policy_pinned_ip_and_do_not_modify_saved_graph
+    bound=batch.bind_run('user',str(uuid.uuid4()),request,metadata,lambda owner,connection:target)
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/app/services/studio_batch_bindings.py", line 45, in bind_run
+    sources.append(spec.bind_source(source,metadata,target,spec.validate_target))
+                   ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/app/connectors/sqlserver_adapter.py", line 7, in bind_source
+    hostname, address = validate_target(target)
+                        ~~~~~~~~~~~~~~~^^^^^^^^
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/app/connectors/sqlserver.py", line 214, in validate_target
+    return validate_sqlserver_host(target.host, target.port)
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/app/connectors/sqlserver.py", line 165, in validate_sqlserver_host
+    raise SqlTargetPolicyError('SQL_HOST_UNRESOLVABLE') from None
+app.connectors.sqlserver.SqlTargetPolicyError: SQL_HOST_UNRESOLVABLE
+
+======================================================================
+FAIL: test_unknown_connector_is_rejected_without_import (test_studio_connector_registry.ConnectorRegistryTests.test_unknown_connector_is_rejected_without_import) (kind='postgresql')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_connector_registry.py", line 17, in test_unknown_connector_is_rejected_without_import
+    with self.subTest(kind=kind), self.assertRaisesRegex(ValueError, 'CONNECTOR_UNSUPPORTED'):
+                                  ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_filtered_preview_requires_csrf (test_studio_datasets.DatasetApiTests.test_filtered_preview_requires_csrf)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_datasets.py", line 253, in test_filtered_preview_requires_csrf
+    self.assertEqual(response.status_code, 403)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 403
+
+======================================================================
+FAIL: test_missing_beam_metadata_has_actionable_error (test_studio_datasets.DatasetApiTests.test_missing_beam_metadata_has_actionable_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_datasets.py", line 103, in test_missing_beam_metadata_has_actionable_error
+    self.assertEqual(response.status_code, 503)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 503
+
+======================================================================
+FAIL: test_preview_denies_missing_dataset_before_connecting (test_studio_datasets.DatasetApiTests.test_preview_denies_missing_dataset_before_connecting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_datasets.py", line 142, in test_preview_denies_missing_dataset_before_connecting
+    self.assertEqual(self.client.get('/api/studio/datasets/' + CONNECTION + '/preview').status_code, 404)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 404
+
+======================================================================
+FAIL: test_preview_is_scoped_to_existing_authorized_dataset (test_studio_datasets.DatasetApiTests.test_preview_is_scoped_to_existing_authorized_dataset)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_datasets.py", line 136, in test_preview_is_scoped_to_existing_authorized_dataset
+    self.assertEqual(response.status_code, 200)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 200
+
+======================================================================
+FAIL: test_spark_preview_reads_only_authorized_dataset (test_studio_datasets.DatasetApiTests.test_spark_preview_reads_only_authorized_dataset)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_datasets.py", line 49, in test_spark_preview_reads_only_authorized_dataset
+    self.assertEqual(response.status_code, 200)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 200
+
+======================================================================
+FAIL: test_store_is_not_falsely_reported_as_created (test_studio_datasets.DatasetApiTests.test_store_is_not_falsely_reported_as_created)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_datasets.py", line 118, in test_store_is_not_falsely_reported_as_created
+    self.assertEqual(response.json['code'], 'DATASET_STORAGE_NOT_AVAILABLE')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'SQL_PORT_OR_TIMEOUT_INVALID' != 'DATASET_STORAGE_NOT_AVAILABLE'
+- SQL_PORT_OR_TIMEOUT_INVALID
++ DATASET_STORAGE_NOT_AVAILABLE
+
+
+======================================================================
+FAIL: test_all_dataset_sources_are_authorized_before_any_connection (test_studio_graph_preview.GraphApiTests.test_all_dataset_sources_are_authorized_before_any_connection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_graph_preview.py", line 38, in test_all_dataset_sources_are_authorized_before_any_connection
+    self.assertEqual(response.status_code, 404); target.assert_not_called()
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 404
+
+======================================================================
+FAIL: test_direct_source_sampling_is_bounded_and_authenticated (test_studio_graph_preview.GraphApiTests.test_direct_source_sampling_is_bounded_and_authenticated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ronaldyonatan/CoreAnalyticsV2/voice-auth-backend/tests/test_studio_graph_preview.py", line 45, in test_direct_source_sampling_is_bounded_and_authenticated
+    self.assertEqual(response.status_code, 200); self.assertTrue(response.json['data']['has_more']); self.assertTrue(response.json['data']['outputs'][0]['has_more'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 400 != 200
+
+----------------------------------------------------------------------
+Ran 225 tests in 1.729s
+
+FAILED (failures=9, errors=1, skipped=12)

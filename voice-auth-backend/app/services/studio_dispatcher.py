@@ -91,10 +91,14 @@ def bind(owner,run_id,graph,heartbeat=None):
     from app.services.studio_connections import _rows
     if heartbeat:heartbeat()
     rows=_rows(core_api._post_mode('CoreStudioDatasetList',{'UserID':owner})) if any(s['kind']=='dataset' for s in graph['sources']) else []
+    from app.services.studio_object_access import visible_rows
+    rows = visible_rows(owner, 'DATASET', rows, 'dataset_id')
     definitions={str(row['dataset_id']).lower():row for row in rows if row.get('dataset_id')}
     def target(user,connection):
         if heartbeat:heartbeat()
-        result=_target(user,connection)
+        dataset = next((row for row in definitions.values() if str(row.get('connection_id','')).lower() == str(connection).lower()), None)
+        if dataset is None:raise PermissionError('DATASET_NOT_FOUND')
+        result=_target(user,connection,dataset_id=dataset['dataset_id'])
         if heartbeat:heartbeat()
         return result
     return bind_run(owner,run_id,graph,definitions,target)
@@ -130,6 +134,8 @@ class Dispatcher:
             if graph is None:raise ValueError('PIPELINE_NOT_READY')
             phase='AUTHORIZE'
             self.authorize(job['requested_by'])
+            from app.services.studio_object_access import require_access
+            require_access(job['requested_by'], 'PIPELINE', job.get('pipeline_id'), 'execute')
             if job.get('cancel_requested'):
                 self.store.complete(self.worker_id,run_id,'CANCELLED');return True
             phase='RECOVER'

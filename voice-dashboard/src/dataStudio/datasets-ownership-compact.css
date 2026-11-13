@@ -1,0 +1,12 @@
+/* Phase 2D.5.2: actions distinguish data view, schedule, destructive storage. */
+.studio-window-content .datasets-page-catalog .datasets-ownership-panel{margin:6px 0 12px;gap:0}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-actions{margin:12px 0;border:1px solid color-mix(in srgb,currentColor 17%,transparent);border-radius:10px;overflow:visible}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-actions>summary{cursor:pointer;padding:10px 12px;font-size:12px;font-weight:650}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-actions>summary span{font-size:10px;opacity:.6;font-weight:400;margin-left:7px}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-danger{padding:11px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent);display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-danger p{margin:0;font-size:11px;line-height:1.45;opacity:.75;flex:1 1 100%}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-danger .ca-storage-delete-trigger{margin:0!important;width:auto!important;min-height:34px;padding:7px 12px!important;border:1px solid color-mix(in srgb,var(--studio-danger,#e46c72) 50%,transparent)!important;background:transparent!important;color:var(--studio-danger,#e46c72)!important;border-radius:8px;box-shadow:none!important}
+.studio-window-content .datasets-page-catalog .datasets-inspector-storage-danger .ca-storage-delete-reason{flex:1 1 100%;font-size:10px;opacity:.7}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-actions{align-items:stretch}
+.studio-window-content .datasets-page-catalog .ca-dataset-detail-actions>.datasets-action{min-width:0}
+@media(max-width:540px){.studio-window-content .datasets-page-catalog .datasets-inspector-storage-actions>summary span{display:none}}

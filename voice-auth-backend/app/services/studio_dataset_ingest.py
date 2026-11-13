@@ -1,4 +1,5 @@
 """Direct-ingest metadata RPC; deliberately does not start Spark yet."""
+from app.services.studio_object_access import require_access, visible_rows
 import json
 import uuid
 from app.clients.core_api_client import core_api
@@ -31,10 +32,13 @@ def call(action,user,**kwargs):
     return rows[0]
 
 def submit(user,dataset_id,request_id):
+    require_access(user, 'DATASET', dataset_id, 'execute')
     return call('Submit',user,DatasetID=_id(dataset_id),RequestID=_id(request_id))
 
 def jobs(user):
-    return json.loads(call('Jobs',user).get('items_json') or '[]')
+    return visible_rows(user, 'DATASET', json.loads(call('Jobs',user).get('items_json') or '[]'), 'dataset_id')
 
 def job(user,run_id):
-    return call('Job',user,RunID=_id(run_id))
+    row = call('Job',user,RunID=_id(run_id))
+    require_access(user, 'DATASET', row.get('dataset_id'))
+    return row

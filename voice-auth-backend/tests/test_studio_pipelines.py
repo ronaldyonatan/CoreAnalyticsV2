@@ -21,6 +21,10 @@ def document():
 
 
 class PipelineMetadataTests(unittest.TestCase):
+    def setUp(self):
+        auth = patch.object(metadata, 'require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
+
     def test_sql_guid_casing_is_normalized(self):
         value=str(uuid.uuid4())
         self.assertEqual(metadata.identifier(value.upper()),value)
@@ -120,6 +124,8 @@ class PipelineMetadataTests(unittest.TestCase):
 
 class DispatcherTests(unittest.TestCase):
     def setUp(self):
+        auth = patch('app.services.studio_object_access.require_access', return_value='OWNER')
+        auth.start(); self.addCleanup(auth.stop)
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.root=Path(self.temp.name)
         self.run_id=str(uuid.uuid4());self.doc=document();self.job={'has_job':True,'run_id':self.run_id,'requested_by':'owner','graph_json':json.dumps(self.doc)}
         self.store=Mock();self.store.claim.return_value=self.job;self.store.heartbeat.return_value={'cancel_requested':False}

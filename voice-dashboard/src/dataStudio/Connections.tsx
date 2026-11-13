@@ -1,3 +1,6 @@
+import OwnershipGrid from './OwnershipGrid';
+import './ownership-all-modules.css';
+import OwnershipPicker from './OwnershipPicker';
 import { UniverseHeader, UniverseToolbar, UniverseForm, UniverseFormSection, UniverseField, UniverseCatalogButton, UniverseCatalogList, UniverseCatalogHeader, UniverseCatalogSplit, UniverseCatalogEntry, UniverseCatalogInspector, UniverseInspectorDetails, UniverseDatabaseMark, UniverseDatabaseSourceIcon } from '../design-system/components/universe';
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 
@@ -129,10 +132,11 @@ export default function Connections({ active = true }: { active?: boolean }) {
             <UniverseCatalogEntry mark={<UniverseDatabaseMark type={item.connection_type} title={item.connection_type}/>} title={item.connection_name} subtitle={`${item.connection_type === 'SQLSERVER' ? 'SQL Server' : item.connection_type} · ${item.server_host}:${item.server_port}`}
               metadata={[{label:'Database',value:item.database_name}]} badge={<span className={'u-dataset-badge '+(item.is_active?'is-active':'is-inactive')}>{item.is_active?'ACTIVE':'INACTIVE'}</span>}
               selected={item.connection_id===selectedConnectionId} onClick={()=>setSelectedConnectionId(item.connection_id)}/>
+            <div className="studio-ownership-grid-cell"><OwnershipGrid objectType="CONNECTION" objectId={item.connection_id}/></div>
           </div>)} inspector={<UniverseCatalogInspector emptyHeading="Explore your connections" emptyDescription="Pilih koneksi di sebelah kiri untuk melihat konfigurasi, status, dan tindakan yang tersedia.">
             {selectedConnection && <UniverseInspectorDetails eyebrow="DATA INTELLIGENCE / CONNECTION" title={selectedConnection.connection_name} subtitle={`${selectedConnection.connection_type} · ${selectedConnection.is_active?'Active':'Inactive'}`}
               fields={[{label:'DATABASE',value:selectedConnection.database_name},{label:'SERVER',value:`${selectedConnection.server_host}:${selectedConnection.server_port}`},{label:'USERNAME',value:selectedConnection.login_username},{label:'SECURITY',value:selectedConnection.encrypt_transport?'Transport encrypted':'Standard transport'}]}
-              actions={<><button type="button" className="u-dataset-action" disabled={busy} onClick={()=>startEdit(selectedConnection)}>Edit Connection</button><button type="button" className={selectedConnection.is_active ? "u-dataset-action is-danger" : "u-dataset-action is-success"} disabled={busy} onClick={()=>void toggle(selectedConnection)}>{selectedConnection.is_active?'Deactivate':'Activate'}</button></>}/>} 
+              actions={<><div className="studio-ownership-inspector"><span>OWNER / ACCESS</span><OwnershipPicker objectType="CONNECTION" objectId={selectedConnection.connection_id}/></div><button type="button" className="u-dataset-action" disabled={busy} onClick={()=>startEdit(selectedConnection)}>Edit Connection</button><button type="button" className={selectedConnection.is_active ? "u-dataset-action is-danger" : "u-dataset-action is-success"} disabled={busy} onClick={()=>void toggle(selectedConnection)}>{selectedConnection.is_active?'Deactivate':'Activate'}</button></>}/>} 
           </UniverseCatalogInspector>}/>
         }
       </>}

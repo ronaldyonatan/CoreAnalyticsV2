@@ -1,4 +1,6 @@
 """Pipeline persistence and durable job submission; long jobs never run inside Flask requests."""
+from app.services.studio_object_access import AccessError
+
 from flask import Blueprint,jsonify,request
 from app.routes.studio_connections_api import _principal,_mutating,_error
 from app.services.studio_pipelines import pipeline_store,PipelineError
@@ -15,6 +17,7 @@ def endpoint(fn):
             if request.method!='GET':_mutating()
             result=fn(owner,*args,**kwargs)
             response=jsonify(success=True,data=result);response.headers['Cache-Control']='no-store';return response
+        except AccessError as exc:return jsonify(success=False,code=str(exc)),exc.status
         except PermissionError as exc:return _error(exc)
         except ValueError as exc:
             import re

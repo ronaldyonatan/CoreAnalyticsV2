@@ -33,6 +33,24 @@ def dataset_filter_values(target, source, column, search, offset, filters):
 def _dataset_connector(row):
     return _connector(str(row.get('connector_type') or row.get('connection_type') or 'sqlserver').strip().lower())
 
+# Phase 2D.4: server-side, fail-closed ownership checks via signed BEAM RPC.
+# This is a DEV candidate; all other Data Studio endpoints still require review.
+from app.services.studio_object_access import execute as _access_execute, AccessError
+
+
+def _require_object_access(user, kind, object_id, *, write=False):
+    from app.services.studio_object_access import require_access
+    return require_access(user, kind, object_id, 'execute' if write else 'read')
+
+
+def _visible_datasets(user, rows):
+    from app.services.studio_object_access import visible_rows
+    return visible_rows(user, 'DATASET', rows, 'dataset_id')
+
+
+def _access_error(exc):
+    return jsonify(success=False, code=str(exc)), exc.status
+
 studio_datasets_bp = Blueprint('studio_datasets', __name__, url_prefix='/api/studio/datasets')
 
 
@@ -55,6 +73,8 @@ def science_models():
         response = jsonify(success=True, data=data)
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -74,6 +94,8 @@ def ai_runtime():
         response = jsonify(success=True, data=result)
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except Exception:
@@ -88,6 +110,8 @@ def script_runtime():
         response = jsonify(success=True, data=scripting_status())
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except Exception:
@@ -109,7 +133,7 @@ def preview_graph_spark():
         definitions = {}
         if any(source['kind'] == 'dataset' for source in body['sources']):
             rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': user}))
-            definitions = {str(row.get('dataset_id', '')).lower(): row for row in rows}
+            definitions = {str(row.get('dataset_id', '')).lower(): row for row in _visible_datasets(user, rows)}
             # Authorize every dataset before opening any source connection.
             for source in body['sources']:
                 if source['kind'] != 'dataset': continue
@@ -124,7 +148,7 @@ def preview_graph_spark():
                 row = definitions[str(uuid.UUID(source['dataset_id']))]
                 _dataset_connector(row)
                 selected = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
-                sample = preview_sqlserver_object(_target(user, row['connection_id']), selected, 1, {}, None)
+                sample = preview_sqlserver_object(_target(user, row['connection_id'], dataset_id=row['dataset_id']), selected, 1, {}, None)
                 samples.append({'id': source['id'], 'columns': [column['name'] for column in sample['preview_columns']], 'rows': sample['rows']})
                 has_more = has_more or sample['has_more']
         from app.services.studio_spark_preview import spark_graph_preview
@@ -134,6 +158,8 @@ def preview_graph_spark():
         response = jsonify(success=True, data=result)
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -164,6 +190,8 @@ def preview_fixed_spark():
         response = jsonify(success=True, data={**spark_preview(sample, body['steps']), 'has_more': False})
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -186,6 +214,7 @@ def preview_dataset_spark(dataset_id):
         body['steps'] = resolve_steps(user, body['steps'])
         rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': user}))
         row = next((item for item in rows if str(item.get('dataset_id', '')).lower() == str(dataset_id)), None)
+        _require_object_access(user, 'DATASET', dataset_id)
         if not row:
             return jsonify(success=False, code='DATASET_NOT_FOUND'), 404
         if row.get('access_mode') != 'DIRECT':
@@ -193,12 +222,14 @@ def preview_dataset_spark(dataset_id):
         from app.services.studio_spark_preview import spark_preview
         _dataset_connector(row)
         source = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
-        sample = preview_sqlserver_object(_target(user, row['connection_id']), source, 1, body['filters'], None)
+        sample = preview_sqlserver_object(_target(user, row['connection_id'], dataset_id=row['dataset_id']), source, 1, body['filters'], None)
         result = spark_preview(sample, body['steps'])
         result['has_more'] = sample['has_more']
         response = jsonify(success=True, data=result)
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -211,22 +242,22 @@ class DatasetMetadataUnavailable(ValueError):
     http_status = 503
 
 
-def _target(user_id, connection_id):
-    response = core_api._post_mode('CoreStudioConnectionGetSecret', {'UserID': user_id, 'ConnectionID': connection_id})
+def _target(user_id, connection_id, *, dataset_id=None):
+    if dataset_id is None:
+        _require_object_access(user_id, 'CONNECTION', connection_id)
+    else:
+        _require_object_access(user_id, 'DATASET', dataset_id)
+    payload = {'UserID': user_id, 'ConnectionID': connection_id}
+    if dataset_id is not None:
+        # SQL 029 verifies the actual dataset -> connection relationship.
+        payload['DatasetID'] = str(dataset_id)
+    response = core_api._post_mode('CoreStudioConnectionGetSecret', payload)
     if not isinstance(response, dict) or response.get('data') is None:
         raise DatasetMetadataUnavailable('DATASET_CONNECTION_METADATA_UNAVAILABLE')
     rows = _rows(response)
     if not rows or not rows[0].get('encrypted_password_base64'):
         raise ValueError('CONNECTION_UNAVAILABLE')
     row = rows[0]
-    # Temporary diagnostic: metadata keys only, never log encrypted secrets or passwords.
-    print('DATASET CONNECTION METADATA:', {
-        'connector_type': row.get('connector_type'),
-        'connection_type': row.get('connection_type'),
-        'connection_name': row.get('connection_name'),
-        'server_port': row.get('server_port'),
-        'available_keys': list(row.keys()),
-    }, flush=True)
     if row.get('encryption_key_version') != 1:
         raise ValueError('CONNECTION_KEY_VERSION_UNSUPPORTED')
     password = _cipher().decrypt(base64.b64decode(row['encrypted_password_base64'], validate=True)).decode('utf-8')
@@ -246,6 +277,8 @@ def sources(connection_id):
         except ValueError:
             raise ValueError('DATASET_SEARCH_INVALID') from None
         return jsonify(success=True, data=list_sqlserver_objects(_target(user, str(connection_id)), query, offset, limit))
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -266,7 +299,9 @@ def list_datasets():
         if len(rows) == 1 and rows[0].get('code') == 'DATASET_LIST_EMPTY' and rows[0].get('success') in (True, 1):
             rows = []
         from app.services.studio_stored_preview import enrich_catalog
-        return jsonify(success=True, data=enrich_catalog(user, rows))
+        return jsonify(success=True, data=enrich_catalog(user, _visible_datasets(user, rows)))
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except Exception:
@@ -279,6 +314,7 @@ def preview_dataset(dataset_id):
         user = _principal()
         rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': user}))
         row = next((item for item in rows if str(item.get('dataset_id', '')).lower() == str(dataset_id)), None)
+        _require_object_access(user, 'DATASET', dataset_id)
         if not row:
             return jsonify(success=False, code='DATASET_NOT_FOUND'), 404
         if row.get('access_mode') == 'STORED':
@@ -315,10 +351,12 @@ def preview_dataset(dataset_id):
                 raise ValueError('DATASET_PAGE_INVALID') from None
         if not 1 <= page <= 42949672:
             raise ValueError('DATASET_PAGE_INVALID')
-        result = preview_sqlserver_object(_target(user, row['connection_id']), source, page, filters, sort)
+        result = preview_sqlserver_object(_target(user, row['connection_id'], dataset_id=row['dataset_id']), source, page, filters, sort)
         response = jsonify(success=True, data=result)
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -337,16 +375,19 @@ def filter_values(dataset_id):
             raise ValueError('DATASET_FILTER_INVALID')
         rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': user}))
         row = next((item for item in rows if str(item.get('dataset_id', '')).lower() == str(dataset_id)), None)
+        _require_object_access(user, 'DATASET', dataset_id)
         if not row:
             return jsonify(success=False, code='DATASET_NOT_FOUND'), 404
         if row.get('access_mode') != 'DIRECT':
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
         _dataset_connector(row)
         source = {'schema': row['source_schema'], 'name': row['source_name'], 'type': row['source_type']}
-        result = dataset_filter_values(_target(user, row['connection_id']), source, body['column'], body['search'], body['offset'], body['filters'])
+        result = dataset_filter_values(_target(user, row['connection_id'], dataset_id=row['dataset_id']), source, body['column'], body['search'], body['offset'], body['filters'])
         response = jsonify(success=True, data=result)
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -370,6 +411,8 @@ def create_dataset():
         uuid.UUID(body['connection_id'])
         if body['access_mode'] not in ('DIRECT', 'STORED'):
             raise ValueError('DATASET_STORAGE_NOT_AVAILABLE')
+        from app.services.studio_object_access import require_access
+        require_access(user, 'CONNECTION', body['connection_id'], 'edit')
         source = {'schema': body['source_schema'], 'name': body['source_name'], 'type': body['source_type']}
         if not sqlserver_object_exists(_target(user, body['connection_id']), source):
             raise ValueError('DATASET_SOURCE_INVALID')
@@ -377,6 +420,8 @@ def create_dataset():
         if not result or result[0].get('code') != 'DATASET_CREATED' or result[0].get('success') not in (True, 1):
             raise ValueError('DATASET_CREATE_FAILED')
         return jsonify(success=True, data=result[0]), 201
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -392,8 +437,11 @@ def submit_stored_ingest(dataset_id):
         _mutating()
         from app.services.studio_dataset_ingest import submit
         # Server generates idempotency key, not supplied by browser.
+        _require_object_access(user, 'DATASET', dataset_id, write=True)
         result = submit(user, str(dataset_id), str(uuid.uuid4()))
         return jsonify(success=True, data=result), 202
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -410,9 +458,17 @@ def stored_ingest_jobs():
         response = jsonify(success=True, data=jobs(user))
         response.headers['Cache-Control'] = 'no-store'
         return response
+    except AccessError as exc:
+        return _access_error(exc)
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
         return _spark_error(exc)
     except Exception:
         return jsonify(success=False, code='INGEST_METADATA_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.after_request
+def prevent_private_cache(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response

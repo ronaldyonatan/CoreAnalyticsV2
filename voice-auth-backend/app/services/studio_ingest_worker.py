@@ -49,6 +49,8 @@ def bind_source(owner, run_id, dataset_id):
     from app.services.studio_connections import _rows
     from app.routes.studio_datasets_api import _target
     from app.services.studio_batch_bindings import bind_stored_ingest
+    from app.services.studio_object_access import require_access
+    require_access(owner, 'DATASET', dataset_id, 'execute')
     rows = _rows(core_api._post_mode('CoreStudioDatasetList', {'UserID': owner}))
     metadata = next((r for r in rows if str(r.get('dataset_id', '')).lower() == dataset_id), None)
     if metadata is None or metadata.get('access_mode') != 'STORED':
@@ -57,7 +59,7 @@ def bind_source(owner, run_id, dataset_id):
              'nodes': [],
              'outputs': [{'id': 'output', 'name': 'Dataset', 'input': {'node': 'source', 'port': 'main'}}]}
     definitions = {dataset_id: metadata}
-    return bind_stored_ingest(owner, run_id, graph, definitions, _target)
+    return bind_stored_ingest(owner, run_id, graph, definitions, lambda actor, connection: _target(actor, connection, dataset_id=dataset_id))
 
 
 def verify_output(root, run_id):

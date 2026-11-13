@@ -1,4 +1,6 @@
 """Authenticated Data Studio Connections endpoints, register blueprint in server.py."""
+from app.services.studio_object_access import AccessError
+
 import os
 from flask import Blueprint, jsonify, request
 from app.services.session_security import current_session, valid_csrf
@@ -70,6 +72,8 @@ def connector_capabilities():
         _principal()
         resolve('postgresql')
         return jsonify(success=True, data=capabilities())
+    except AccessError as exc:
+        return jsonify(success=False, code=str(exc)), exc.status
     except PermissionError as exc:
         return _error(exc)
 
@@ -78,6 +82,8 @@ def connector_capabilities():
 def list_connections():
     try:
         return jsonify(success=True, data=store.list_connections(_principal()))
+    except AccessError as exc:
+        return jsonify(success=False, code=str(exc)), exc.status
     except PermissionError as exc:
         return _error(exc)
     except Exception:
@@ -92,6 +98,8 @@ def create_connection():
         body = _body()
         resolve(body['connector_type']).validate_target(_target(body))
         return jsonify(success=True, data=store.create_connection(user_id, body)), 201
+    except AccessError as exc:
+        return jsonify(success=False, code=str(exc)), exc.status
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -109,6 +117,8 @@ def set_active(connection_id):
         if not isinstance(body, dict) or set(body) != {'is_active'} or type(body['is_active']) is not bool:
             raise ValueError('INVALID_STATUS')
         return jsonify(success=True, data=store.set_connection_active(user_id, str(connection_id), body['is_active']))
+    except AccessError as exc:
+        return jsonify(success=False, code=str(exc)), exc.status
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -125,6 +135,8 @@ def test_connection():
         body = _body()
         # Test and Save use the same central network/port/TLS policy.
         return jsonify(resolve(body['connector_type']).test_connection(_target(body)))
+    except AccessError as exc:
+        return jsonify(success=False, code=str(exc)), exc.status
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
@@ -149,9 +161,17 @@ def edit_connection(connection_id):
         if not body.get('password'):
             body.pop('password', None)
         return jsonify(success=True, data=store.update_connection(user_id, str(connection_id), body))
+    except AccessError as exc:
+        return jsonify(success=False, code=str(exc)), exc.status
     except PermissionError as exc:
         return _error(exc)
     except ValueError as exc:
         return jsonify(success=False, code=str(exc)), getattr(exc, 'http_status', 400)
     except Exception:
         return jsonify(success=False, code='METADATA_UNAVAILABLE'), 503
+
+
+@studio_connections_bp.after_request
+def prevent_private_cache(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response

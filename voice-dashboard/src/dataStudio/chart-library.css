@@ -410,6 +410,11 @@
 .ca-chart-chart-picker { overflow-y: auto; flex: 1; min-height: 0; padding: 9px 10px 18px; scrollbar-width: thin; }
 .ca-chart-type-group { margin-bottom: 14px; }
 .ca-chart-type-group h3 { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--ca-chart-muted); margin: 0 0 8px; }
+.ca-chart-type-search { padding: 10px 10px 2px; }
+.ca-chart-type-search input { box-sizing: border-box; width: 100%; min-width: 0; padding: 8px 10px; color: var(--ca-chart-text); background: transparent; border: 1px solid var(--ca-chart-line); border-radius: 6px; }
+.ca-chart-type-group-toggle { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 4px 0; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; background: none; border: 0; cursor: pointer; }
+.ca-chart-type-group-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.ca-chart-type-no-results { color: var(--ca-chart-muted); font-size: 12px; }
 .ca-chart-type-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 .ca-chart-library button.ca-chart-type-option { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 7px 4px; border-radius: 6px; background: transparent; min-width: 0; }
 .ca-chart-library button.ca-chart-type-option.is-selected { border-color: var(--ca-chart-accent); background: var(--ca-chart-light); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ca-chart-accent) 35%, transparent); }
@@ -576,3 +581,8 @@
 .ca-chart-loading-overlay small { color: var(--ca-chart-muted); }
 @keyframes ca-chart-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ca-chart-spinner { animation: none; border-color: var(--ca-chart-accent); } }
+.ca-filter-card-preview { width: min(100% - 48px, 440px); margin: auto; padding: 24px; border: 1px solid var(--ca-border, rgba(140,150,180,.35)); border-radius: 14px; }
+.ca-filter-card-preview label { display: grid; gap: 10px; font-weight: 600; }
+.ca-filter-card-preview select, .ca-filter-card-preview input { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--ca-border, rgba(140,150,180,.4)); border-radius: 8px; color: inherit; background: transparent; }
+.ca-filter-card-preview small { display: block; margin-top: 14px; opacity: .7; line-height: 1.5; }
+.ca-filter-date-fields { display: flex; align-items: center; gap: 8px; }

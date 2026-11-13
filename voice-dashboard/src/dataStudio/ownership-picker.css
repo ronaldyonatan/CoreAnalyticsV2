@@ -1,0 +1,131 @@
+.ownership-control{position:relative;display:inline-flex;align-items:center;z-index:2}
+.ownership-trigger{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border-radius:12px;border:1px solid var(--studio-border,var(--border-color,rgba(150,160,190,.28)));background:var(--studio-surface,var(--surface-raised,rgba(110,110,140,.13)));color:inherit;cursor:pointer;min-height:32px}
+.ownership-stack{display:inline-flex;align-items:center;padding-left:5px}.ownership-stack>.ownership-avatar{margin-left:-5px;border:2px solid var(--studio-panel,var(--surface,#181823))}
+.ownership-avatar{width:25px;height:25px;min-width:25px;display:inline-flex;align-items:center;justify-content:center;border-radius:100%;font-weight:750;font-size:9px;color:white;letter-spacing:.01em}
+.ownership-plus{font-size:19px;line-height:1;color:var(--studio-accent,currentColor)}.ownership-count{font-size:11px}
+.ownership-popover{position:absolute;top:calc(100% + 7px);right:0;width:min(340px,calc(100vw - 40px));max-height:min(530px,75vh);overflow-y:auto;border:1px solid var(--studio-border,var(--border-color,rgba(150,160,190,.28)));background:var(--studio-panel,var(--surface-raised,#171821));color:var(--studio-text,var(--text-primary,inherit));box-shadow:0 20px 46px rgba(0,0,0,.38);border-radius:15px;padding:13px;z-index:80}
+.ownership-popover-header,.ownership-entry{display:flex;align-items:center;gap:9px}.ownership-popover-header{justify-content:space-between;padding-bottom:11px;border-bottom:1px solid var(--studio-border,rgba(160,160,180,.2))}
+.ownership-popover-header button,.ownership-remove{border:0;background:transparent;color:inherit;cursor:pointer;font-size:20px}.ownership-entry{min-height:43px;padding:4px 2px}.ownership-person{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ownership-person strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:650}.ownership-person small,.ownership-note{opacity:.7;font-size:11px}.ownership-role{font-size:9px;opacity:.8}.ownership-label{font-size:10px;letter-spacing:.09em;font-weight:750;opacity:.65;margin:13px 0 7px}
+.ownership-search{width:100%;box-sizing:border-box;margin-bottom:7px;border:1px solid var(--studio-border,rgba(150,160,190,.3));background:var(--studio-surface,rgba(120,120,150,.12));color:inherit;border-radius:9px;padding:10px;outline-offset:1px}.ownership-people{max-height:215px;overflow:auto}.ownership-entry button:not(.ownership-remove),.ownership-entry select{cursor:pointer;color:inherit;background:var(--studio-surface,rgba(110,110,140,.2));border:1px solid var(--studio-border,rgba(150,160,190,.26));border-radius:7px;padding:6px;font-size:11px}.ownership-entry button:disabled,.ownership-entry select:disabled{opacity:.45;cursor:not-allowed}.ownership-error{color:var(--studio-danger,#fa8080);font-size:11px}.ownership-note{margin:12px 0 0;line-height:1.5}
+
+.datasets-ownership-panel{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 14px}.datasets-ownership-panel>small{font-size:11px;opacity:.65}
+
+/* Portal escapes overflow and transformed inspector ancestors. */
+.ownership-popover.ownership-popover-portal{position:fixed!important;right:auto!important;bottom:auto!important;width:min(340px,calc(100vw - 24px));box-sizing:border-box;z-index:2147483000!important;max-height:min(530px,75dvh);overflow:auto;overscroll-behavior:contain}
+.ownership-control{isolation:isolate}
+.ownership-owner-name{font-size:11px;max-width:95px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 2D.5.2 compact ClickUp/Schedule-inspired appearance; theme tokens retained. */
+.ownership-control{z-index:auto}
+.ownership-trigger{padding:3px 5px;min-height:31px;gap:4px;border-radius:999px;background:color-mix(in srgb,var(--studio-accent,currentColor) 8%,transparent)}
+.ownership-trigger:focus-visible{outline:2px solid var(--studio-accent,#36c7df);outline-offset:2px}
+.ownership-owner-name{display:none!important}
+.ownership-avatar{width:24px;height:24px;min-width:24px;font-size:9px}
+.ownership-plus{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;font-size:17px}
+.ownership-popover.ownership-popover-portal{width:min(310px,calc(100vw - 24px));max-height:min(440px,70dvh);padding:10px 12px;border-radius:12px;background:var(--studio-panel,var(--surface-raised,#142e39));border:1px solid var(--studio-border,rgba(72,180,208,.35));box-shadow:0 18px 50px rgba(0,0,0,.43);font-family:inherit}
+.ownership-popover-header{padding-bottom:8px}.ownership-popover-header strong{font-size:13px}.ownership-label{margin:10px 0 5px}.ownership-entry{min-height:35px;padding:3px 1px}.ownership-people{max-height:155px}.ownership-search{padding:8px 9px;margin-bottom:5px}.ownership-entry button:not(.ownership-remove),.ownership-entry select{padding:5px 7px}
+.ownership-popover .ownership-note{font-size:10px;line-height:1.4;margin:8px 0 0}.ownership-popover .ownership-error{font-size:10px}
+.ownership-popover .ownership-role{font-size:9px;white-space:nowrap}
+.ownership-popover .ownership-person strong{font-size:11px}
+
+/* Phase 2D.5.3 — global theme palette for body-portalled popup.
+   The portal lives outside .studio-window-content, so scoped --studio-*
+   variables are not inherited. Prefer --core-* tokens defined by every theme.
+   Keep this after the existing picker styles to override dark fallbacks. */
+.ownership-popover.ownership-popover-portal {
+  background: color-mix(in srgb, var(--core-bg, #102f3d) 74%, var(--core-panel, #143c4a) 26%) !important;
+  color: var(--core-text, #eefcff) !important;
+  border: 1px solid var(--core-border-strong, var(--core-border, rgba(89,232,245,.3))) !important;
+  box-shadow: 0 16px 42px rgba(0,0,0,.24), 0 0 0 1px color-mix(in srgb, var(--core-primary, #59e8f5) 5%, transparent) !important;
+  color-scheme: normal;
+}
+.ownership-popover.ownership-popover-portal .ownership-popover-header {
+  border-color: var(--core-border, rgba(89,232,245,.22));
+}
+.ownership-popover.ownership-popover-portal .ownership-popover-header strong,
+.ownership-popover.ownership-popover-portal .ownership-person strong {
+  color: var(--core-text, #eefcff);
+}
+.ownership-popover.ownership-popover-portal .ownership-popover-header button,
+.ownership-popover.ownership-popover-portal .ownership-remove {
+  color: var(--core-text-secondary, var(--core-text, #eefcff));
+}
+.ownership-popover.ownership-popover-portal .ownership-popover-header button:hover,
+.ownership-popover.ownership-popover-portal .ownership-remove:hover {
+  color: var(--core-primary, #59e8f5);
+}
+.ownership-popover.ownership-popover-portal .ownership-label,
+.ownership-popover.ownership-popover-portal .ownership-person small,
+.ownership-popover.ownership-popover-portal .ownership-note,
+.ownership-popover.ownership-popover-portal .ownership-role {
+  color: var(--core-text-secondary, var(--core-text, #eefcff));
+  opacity: 1;
+}
+.ownership-popover.ownership-popover-portal .ownership-search,
+.ownership-popover.ownership-popover-portal .ownership-entry button:not(.ownership-remove),
+.ownership-popover.ownership-popover-portal .ownership-entry select {
+  background: var(--core-control, var(--core-panel, #1b4454)) !important;
+  border-color: var(--core-border, rgba(89,232,245,.25)) !important;
+  color: var(--core-text, #eefcff) !important;
+  box-shadow: none;
+}
+.ownership-popover.ownership-popover-portal .ownership-search::placeholder {
+  color: var(--core-text-muted, var(--core-text-secondary, #b4d4dd));
+  opacity: 1;
+}
+.ownership-popover.ownership-popover-portal .ownership-search:focus-visible,
+.ownership-popover.ownership-popover-portal .ownership-entry select:focus-visible,
+.ownership-popover.ownership-popover-portal .ownership-entry button:focus-visible {
+  outline: 2px solid var(--core-primary, #59e8f5);
+  outline-offset: 2px;
+}
+.ownership-popover.ownership-popover-portal .ownership-entry button:not(.ownership-remove):hover:not(:disabled),
+.ownership-popover.ownership-popover-portal .ownership-entry select:hover:not(:disabled) {
+  background: var(--core-control-hover, var(--core-panel-hover, var(--core-control, #235064))) !important;
+  border-color: var(--core-primary, #59e8f5) !important;
+}
+.ownership-popover.ownership-popover-portal .ownership-error {
+  color: var(--core-danger-text, #fa8080) !important;
+}
+.ownership-control .ownership-trigger {
+  border-color: var(--core-border, rgba(89,232,245,.3));
+  background: var(--core-control, rgba(23,73,89,.58));
+  color: var(--core-text, #eefcff);
+}
+.ownership-control .ownership-trigger:hover {
+  border-color: var(--core-primary, #59e8f5);
+  background: var(--core-control-hover, var(--core-control, rgba(23,73,89,.58)));
+}
+.ownership-control .ownership-plus {
+  color: var(--core-primary, #59e8f5);
+}
+.ownership-control .ownership-stack > .ownership-avatar {
+  border-color: var(--core-bg, #102f3d);
+}
+
+/* Phase 2D.5.4 — compact one-line directory rows and icon-only Share. */
+.ownership-popover.ownership-popover-portal .ownership-people .ownership-entry {
+  display:flex; align-items:center; gap:9px; min-height:36px; padding:4px 1px;
+}
+.ownership-popover.ownership-popover-portal .ownership-people .ownership-person {
+  min-width:0; flex:1; display:block; line-height:1.25;
+}
+.ownership-popover.ownership-popover-portal .ownership-people .ownership-person strong {
+  display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px;
+}
+.ownership-popover.ownership-popover-portal .ownership-entry .ownership-share-icon-button {
+  display:inline-flex; align-items:center; justify-content:center;
+  flex:0 0 28px; width:28px; height:28px; min-height:28px;
+  padding:0!important; border:0!important; border-radius:7px;
+  color:var(--core-text-secondary,var(--core-text,inherit))!important;
+  background:transparent!important; box-shadow:none!important;
+}
+.ownership-popover.ownership-popover-portal .ownership-entry .ownership-share-icon-button:hover:not(:disabled) {
+  color:var(--core-primary,currentColor)!important;
+  background:color-mix(in srgb,var(--core-primary,currentColor) 12%,transparent)!important;
+  border:0!important;
+}
+.ownership-popover.ownership-popover-portal .ownership-entry .ownership-share-icon-button:focus-visible {
+  outline:2px solid var(--core-primary,currentColor); outline-offset:1px;
+}
+.ownership-popover.ownership-popover-portal .ownership-people {max-height:190px;}

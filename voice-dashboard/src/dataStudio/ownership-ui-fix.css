@@ -1,0 +1,17 @@
+/* Phase 2D.5.1: Dataset Explorer ownership and safer storage actions. */
+.explorer-page .ca-explorer-ownership{min-width:145px;max-width:none}
+.explorer-page .ca-explorer-ownership .ownership-trigger{min-height:30px}
+.explorer-page .ca-explorer-storage-actions{border:1px solid color-mix(in srgb,currentColor 16%,transparent);border-radius:9px;overflow:visible}
+.explorer-page .ca-explorer-storage-actions>summary{cursor:pointer;padding:9px 12px;font-size:12px;font-weight:650}
+.explorer-page .ca-explorer-storage-actions>summary span{font-size:11px;opacity:.65;font-weight:400;margin-left:8px}
+.explorer-page .ca-explorer-storage-danger{padding:12px;border-top:1px solid color-mix(in srgb,currentColor 14%,transparent);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.explorer-page .ca-explorer-storage-danger p{font-size:12px;opacity:.75;margin:0;flex:1 1 280px}
+.explorer-page .ca-explorer-storage-danger .ca-storage-delete-trigger{margin:0!important;flex:0 0 auto;width:auto!important;min-height:34px;padding:7px 12px!important;border:1px solid color-mix(in srgb,#d26868 65%,transparent)!important;background:transparent!important;color:#e99b9b!important;border-radius:8px!important;box-shadow:none!important;font-size:12px!important;white-space:nowrap}
+.explorer-page .ca-explorer-storage-danger .ca-storage-delete-trigger:disabled{opacity:.5;cursor:not-allowed}
+.explorer-page .ca-explorer-storage-danger .ca-storage-delete-reason{flex:1 1 100%;font-size:11px;opacity:.65}
+.explorer-page .ca-compact-info-row>.ca-compact-view{margin-left:auto}
+@media(max-width:700px){.explorer-page .ca-explorer-storage-actions>summary span{display:none}.explorer-page .ca-explorer-storage-danger{align-items:stretch}.explorer-page .ca-explorer-storage-danger .ca-storage-delete-trigger{width:100%!important}}
+
+/* Keep explorer header avatar-only, tooltip contains the member names. */
+.explorer-page .ca-explorer-ownership{min-width:0;max-width:94px}
+.explorer-page .ca-explorer-ownership .ownership-trigger{max-width:90px}

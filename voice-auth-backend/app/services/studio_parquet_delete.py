@@ -2,6 +2,7 @@
 
 Requires migration 024. Never accepts filesystem paths from the client.
 """
+from app.services.studio_object_access import require_access
 import json
 import os
 import re
@@ -40,9 +41,11 @@ def _resolve(owner,kind,target_id,run_id):
     if kind=='ETL_OUTPUT':
         # Resolve immutable owner-scoped output first; use the SQL-backed run id.
         record=pipeline_store.output(owner,target_id)
+        require_access(owner, 'PIPELINE', record.get('pipeline_id'), 'delete')
         run_id=_uuid(record['run_id'])
         return run_id,target_id
     if kind=='STORED':
+        require_access(owner, 'DATASET', target_id, 'delete')
         run_id=_uuid(run_id)
         # Owner-scoped ingest history. Require exact matching dataset + succeeded run.
         matches=[x for x in ingest_jobs(owner) if str(x.get('dataset_id','')).lower()==target_id
