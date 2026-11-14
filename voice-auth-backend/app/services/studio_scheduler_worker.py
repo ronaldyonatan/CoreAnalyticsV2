@@ -1,6 +1,7 @@
 """Small dedicated, manually launched scheduler poller.
 
-Only calls studio.spSchedulerDispatch; SQL handles atomic queueing, dedup and history.
+Uses studio.spSchedulerDispatch directly or through a signed BEAM gateway;
+SQL handles atomic queueing, dedup and history.
 Does NOT execute Spark, write Parquet, or start inside Flask.
 """
 import argparse
@@ -26,6 +27,9 @@ def connect():
 
 
 def tick(connection):
+    if os.environ.get('STUDIO_WORKER_TRANSPORT', 'sql').lower() == 'beam':
+        from app.services.studio_worker_beam import scheduler_tick
+        return scheduler_tick()
     cursor = connection.cursor()
     try:
         cursor.execute('EXEC studio.spSchedulerDispatch @Action=?', ('Tick',))
@@ -50,10 +54,13 @@ def main():
         parser.error('--poll-seconds must be between 5 and 3600')
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
+    transport = os.environ.get('STUDIO_WORKER_TRANSPORT', 'sql').lower()
+    if transport not in ('sql', 'beam'):
+        parser.error('STUDIO_WORKER_TRANSPORT must be sql or beam')
     print('SCHEDULER_START mode=' + args.mode, flush=True)
     while not STOP:
         try:
-            connection = connect()
+            connection = None if transport == 'beam' else connect()
             try:
                 # Each tick dispatches one due slot, never more than 50 per polling cycle.
                 # This avoids running unbounded work after downtime.
@@ -64,7 +71,8 @@ def main():
                     print('SCHEDULER_' + str(event.get('result', 'UNKNOWN')) + ' ' +
                           str(event.get('schedule_id', '')), flush=True)
             finally:
-                connection.close()
+                if connection is not None:
+                    connection.close()
         except Exception:
             # Do not log raw ODBC errors: some driver traces contain connection secrets.
             print('SCHEDULER_TICK_FAILED', file=sys.stderr, flush=True)

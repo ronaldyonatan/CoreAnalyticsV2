@@ -157,6 +157,19 @@ class DispatcherTests(unittest.TestCase):
     def test_child_secrets_whitelist(self):
         result=dispatch.driver_environment({'PATH':'/bin','BEAM_X_TOKEN':'private','STUDIO_CONNECTION_FERNET_KEY':'private','_SPARK_AUTH_SECRET':'cluster-secret','PYTHONPATH':'/backend','STUDIO_SPARK_MASTER':'spark://master'})
         self.assertEqual(set(result),{'PATH','_SPARK_AUTH_SECRET','STUDIO_SPARK_MASTER'})
+    def test_query_guard_configuration_does_not_forward_hmac_or_connection_secrets(self):
+        environment = {'STUDIO_DATASET_QUERY_SQLSERVER_ENABLED': 'true',
+                       'STUDIO_DATASET_QUERY_CONNECTION_ID': 'connection-id',
+                       'STUDIO_DATASET_QUERY_EXECUTION_LOGIN': 'restricted-login',
+                       'STUDIO_SQLSERVER_QUERY_GUARD_JAR': '/opt/guard.jar',
+                       'STUDIO_OBJECT_ACCESS_BEAM_HMAC_KEY_HEX': 'private',
+                       'STUDIO_CONNECTION_FERNET_KEY': 'private'}
+        result = dispatch.driver_environment(environment)
+        self.assertEqual(set(result), {'STUDIO_DATASET_QUERY_SQLSERVER_ENABLED',
+                                      'STUDIO_DATASET_QUERY_CONNECTION_ID',
+                                      'STUDIO_DATASET_QUERY_EXECUTION_LOGIN',
+                                      'STUDIO_SQLSERVER_QUERY_GUARD_JAR'})
+
     def test_local_driver_launch_is_explicit_and_isolated(self):
         with tempfile.TemporaryDirectory() as root:
             python=Path(root)/'python';python.touch()

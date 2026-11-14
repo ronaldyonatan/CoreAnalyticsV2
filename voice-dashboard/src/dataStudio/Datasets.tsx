@@ -1,11 +1,11 @@
 import OwnershipGrid from './OwnershipGrid';
 import './ownership-all-modules.css';
 import { UniverseHeader, UniverseToolbar, UniverseInspector } from '../design-system/components/universe';
-import { UniverseDatabaseMark } from '../design-system/components/universe/UniverseDatabaseMark';
+import { UniverseDatabaseMark, UniverseDatabaseSourceIcon } from '../design-system/components/universe/UniverseDatabaseMark';
 import './dataset-overview.css';
 import './datasets-compact.css';
 import './datasets-detail-layout-fix.css';
-import { loadDatasetCatalog, datasetSource, datasetKind, DATASET_KIND_INFO } from './datasetCatalog';
+import { loadDatasetCatalog, datasetSource, datasetKind, isQueryDataset, DATASET_KIND_INFO } from './datasetCatalog';
 import type { DatasetKind } from './datasetCatalog';
 import type { CatalogDataset as Dataset } from './datasetCatalog';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -19,17 +19,33 @@ import CompactCatalogFilters from './CompactCatalogFilters';
 import ParquetStorageDelete from './ParquetStorageDelete';
 import OwnershipPicker from './OwnershipPicker';
 import './datasets-ownership-compact.css';
+import './datasets-query-editor.css';
+import SqlQueryWorkbench from './SqlQueryWorkbench';
 
 type Connection = { connection_id: string; connection_name: string; database_name: string; is_active: boolean; connector_type?: string; connection_type?: string };
 type Source = { schema: string; name: string; type: string };
 type IngestJob = {dataset_id:string;run_id:string;status:string;created_at?:string|null;started_at?:string|null;finished_at?:string|null};
 type Mode = 'DIRECT' | 'STORED';
 const BASE = '/voice-api/api/studio/datasets';
+const DEV_QUERY_PROBE_CONNECTION = '4a8e1bd8-41fb-47ff-b1e9-310ca46a83b3';
 function csrf() { const item = document.cookie.split('; ').find(value => value.startsWith('core_csrf=')); return item ? decodeURIComponent(item.slice(10)) : ''; }
+function datasetErrorMessage(error: string) {
+  return error === 'QUERY_SQL_OBJECT_NOT_FOUND' ? 'Tabel atau view tidak ditemukan. Periksa nama, schema, database, dan izin akses.' : error === 'QUERY_SQL_COLUMN_NOT_FOUND' ? 'Nama kolom tidak ditemukan. Periksa nama kolom dan alias dalam query.' : error === 'QUERY_SQL_SYNTAX_ERROR' ? 'Sintaks SQL belum valid. Periksa query dan ingat bahwa pemisah GO belum didukung.' : error === 'QUERY_SQL_PERMISSION_DENIED' ? 'Izin untuk salah satu objek atau operasi dalam query ditolak.' : error === 'QUERY_SCRIPT_PREVIEW_FAILED' ? 'Preview query gagal. Periksa query dan koneksi sumber; perubahan yang dilakukan skrip mungkin sudah diterapkan.' : `Permintaan tidak dapat diselesaikan: ${error}.`;
+}
 async function api(url: string, signal?: AbortSignal, body?: unknown) {
   const response = await fetch(url, { method: body ? 'POST' : 'GET', credentials: 'include', cache: 'no-store', signal, headers: body ? { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() } : {}, body: body ? JSON.stringify(body) : undefined });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok || result.success === false) throw new Error(result.code || `HTTP_${response.status}`);
+  if (!response.ok || result.success === false) {
+    let code = result.code || `HTTP_${response.status}`;
+    if (url === `${BASE}/query-dev-probe` && result.diagnostic && typeof result.diagnostic === 'object') {
+      const {stage, error_type, sqlstate, native_error, location} = result.diagnostic;
+      const details = [stage, error_type, sqlstate].filter(value => typeof value === 'string' && /^[A-Za-z0-9_]{1,32}$/.test(value));
+      if (typeof native_error === 'number' && Number.isInteger(native_error)) details.push(String(native_error));
+      if (typeof location === 'string' && /^[A-Za-z_][A-Za-z0-9_]{0,60}:\d{1,6}$/.test(location)) details.push(location);
+      if (details.length) code += `; ${details.join(' / ')}`;
+    }
+    throw new Error(code);
+  }
   return result.data;
 }
 // Use distinct icon silhouettes; colors inherit existing theme tokens with fallbacks.
@@ -50,6 +66,7 @@ function DatasetKindMark({ dataset }: { dataset: Dataset }) {
   const info = DATASET_KIND_INFO[kind];
   const style = kindAppearance[kind];
   const connector = dataset.connector_type || dataset.connection_type || '';
+  if (isQueryDataset(dataset)) return <span className="dataset-query-mark" title="Dataset dari SQL Query"><UniverseDatabaseSourceIcon type={connector}/><small>QUERY</small></span>;
   const sourceLabel = kind === 'direct' && connector ? `${connector.toUpperCase()} · ${info.tooltip}` : info.tooltip;
   return kind === 'direct' ? <UniverseDatabaseMark type={connector} title={sourceLabel}/> : <span title={sourceLabel} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 35, height: 35, flexShrink: 0, borderRadius: 11, color: style.color, background: style.background, border: '1px solid color-mix(in srgb, currentColor 20%, transparent)' }}><DatasetKindIcon kind={kind}/></span>;
 }
@@ -82,6 +99,21 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
 
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
   const [connection, setConnection] = useState('');
+  const [queryProbeAvailable, setQueryProbeAvailable] = useState(false);
+  const [queryProbeStatus, setQueryProbeStatus] = useState('');
+  const [queryProbeBusy, setQueryProbeBusy] = useState(false);
+  const [queryFeatureAvailable, setQueryFeatureAvailable] = useState(false);
+  const [sqlScriptDevAvailable, setSqlScriptDevAvailable] = useState(false);
+  const [sqlScriptSaveAvailable, setSqlScriptSaveAvailable] = useState(false);
+  const [sqlScriptDevStatus, setSqlScriptDevStatus] = useState('');
+  const [sourceKind, setSourceKind] = useState<'table'|'query'>('table');
+  const [sourceSql, setSourceSql] = useState('');
+  const [sqlPreview, setSqlPreview] = useState<{columns:string[];rows:unknown[][];has_more:boolean}|null>(null);
+  const [sqlKnownColumns, setSqlKnownColumns] = useState<string[]>([]);
+  const [sqlSourceColumns, setSqlSourceColumns] = useState<Record<string, string[]>>({});
+  const [sqlPreviewBusy, setSqlPreviewBusy] = useState(false);
+  const sqlPreviewRevision = useRef(0);
+  const [queryProbeResult, setQueryProbeResult] = useState<{connection: string; message: string} | null>(null);
   const [sources, setSources] = useState<Source[]>([]);
   const [sourceIndex, setSourceIndex] = useState('');
   const [name, setName] = useState('');
@@ -101,6 +133,102 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
   const [connectionError, setConnectionError] = useState('');
   const [notice, setNotice] = useState('');
   const [scheduleTarget,setScheduleTarget]=useState<ScheduleTarget|null>(null);
+  const searchSqlColumns = useCallback(async (prefix: string, signal: AbortSignal) => {
+    if (!connection || !sqlScriptDevAvailable || !prefix) return [];
+    const params = new URLSearchParams({q:prefix});
+    const data = await api(`${BASE}/query-script-dev/column-search/${encodeURIComponent(connection)}?${params}`, signal);
+    if (!Array.isArray(data?.items)) return [];
+    return data.items.filter((item: {schema?:unknown;table?:unknown;name?:unknown}) =>
+      typeof item.schema === 'string' && typeof item.table === 'string' && typeof item.name === 'string') as {schema:string;table:string;name:string}[];
+  }, [connection, sqlScriptDevAvailable]);
+  useEffect(() => {
+    setQueryFeatureAvailable(false); setSourceKind('table'); setSqlPreview(null); setSqlKnownColumns([]); setSqlSourceColumns({}); sqlPreviewRevision.current++;
+    if (!creating || !connection) return;
+    const controller = new AbortController();
+    api(`${BASE}/query-feature/status?connection_id=${encodeURIComponent(connection)}`, controller.signal)
+      .then(result => { if (!controller.signal.aborted) setQueryFeatureAvailable(result?.available === true); })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [creating, connection]);
+
+  useEffect(() => {
+    if (!creating || sourceKind !== 'query' || !sqlScriptDevAvailable || !connection || !sourceSql.trim()) return;
+    const text = sourceSql.toLocaleLowerCase();
+    const targets = sources.filter(source => text.includes(source.name.toLocaleLowerCase())
+      && !Object.prototype.hasOwnProperty.call(sqlSourceColumns, `${source.schema.toLocaleLowerCase()}.${source.name.toLocaleLowerCase()}`)).slice(0, 4);
+    if (!targets.length) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      Promise.allSettled(targets.map(async source => {
+        const params = new URLSearchParams({schema:source.schema, name:source.name, type:source.type});
+        const data = await api(`${BASE}/query-script-dev/columns/${encodeURIComponent(connection)}?${params}`, controller.signal);
+        const columns = Array.isArray(data?.columns) ? data.columns.map((column: {name?:unknown}) => column.name).filter((name: unknown): name is string => typeof name === 'string') : [];
+        return {key:`${source.schema.toLocaleLowerCase()}.${source.name.toLocaleLowerCase()}`, columns};
+      })).then(results => {
+        if (controller.signal.aborted) return;
+        const found = results.filter((result): result is PromiseFulfilledResult<{key:string;columns:string[]}> => result.status === 'fulfilled').map(result => result.value);
+        if (found.length) setSqlSourceColumns(previous => ({...previous, ...Object.fromEntries(found.map(item => [item.key, item.columns]))}));
+      });
+    }, 650);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [creating, sourceKind, sqlScriptDevAvailable, connection, sourceSql, sources, sqlSourceColumns]);
+
+  useEffect(() => {
+    setSqlScriptDevAvailable(false); setSqlScriptSaveAvailable(false); setSqlScriptDevStatus('');
+    if (!import.meta.env.DEV || !creating || connection.toLowerCase() !== DEV_QUERY_PROBE_CONNECTION) return;
+    setSqlScriptDevStatus('loading');
+    const controller = new AbortController();
+    api(`${BASE}/query-script-dev/status?connection_id=${encodeURIComponent(connection)}`, controller.signal)
+      .then(result => { if (!controller.signal.aborted) { setSqlScriptDevAvailable(result?.available === true); setSqlScriptSaveAvailable(result?.save_available === true); setSqlScriptDevStatus(result?.available === true ? 'available' : 'unavailable'); } })
+      .catch(() => { if (!controller.signal.aborted) setSqlScriptDevStatus('unavailable'); });
+    return () => controller.abort();
+  }, [creating, connection]);
+
+  async function previewSql() {
+    if (!connection || !sourceSql.trim() || sqlPreviewBusy) return;
+    setSqlPreviewBusy(true); setError(''); setSqlPreview(null);
+    const revision = ++sqlPreviewRevision.current;
+    try {
+      const endpoint = queryFeatureAvailable ? 'query-feature' : 'query-script-dev';
+      const result = await api(`${BASE}/${endpoint}/preview`, undefined, {connection_id:connection, query:sourceSql});
+      if (revision === sqlPreviewRevision.current) { setSqlPreview(result); setSqlKnownColumns(Array.isArray(result?.columns) ? result.columns : []); }
+    } catch (err) { if (revision === sqlPreviewRevision.current) setError(err instanceof Error ? err.message : 'QUERY_PREVIEW_UNAVAILABLE'); }
+    finally { setSqlPreviewBusy(false); }
+  }
+  useEffect(() => {
+    setQueryProbeAvailable(false);
+    setQueryProbeStatus('');
+    if (!import.meta.env.DEV || !creating || connection.toLowerCase() !== DEV_QUERY_PROBE_CONNECTION) return;
+    setQueryProbeStatus('loading');
+    const controller = new AbortController();
+    api(`${BASE}/query-dev-probe/status?connection_id=${encodeURIComponent(connection)}`, controller.signal)
+      .then(result => {
+        if (!controller.signal.aborted) {
+          setQueryProbeAvailable(result?.available === true);
+          setQueryProbeStatus(result?.available === true ? 'available' : result?.reason || 'unavailable');
+        }
+      })
+      .catch(() => { if (!controller.signal.aborted) setQueryProbeStatus('backend_unavailable'); });
+    return () => controller.abort();
+  }, [creating, connection]);
+
+  async function runQueryProbe() {
+    if (!connection || queryProbeBusy) return;
+    const selectedConnection = connection;
+    setQueryProbeBusy(true);
+    setQueryProbeResult(null);
+    try {
+      const result = await api(`${BASE}/query-dev-probe`, undefined, { connection_id: selectedConnection });
+      setQueryProbeResult({ connection: selectedConnection, message: result?.status === 'QUERY_DEV_PROBE_PASSED'
+        ? 'Uji akses dengan query tetap berhasil. Ini belum menguji SQL yang Anda tulis.'
+        : 'Uji akses baca belum berhasil.' });
+    } catch (err) {
+      const code = err instanceof Error ? err.message : 'QUERY_DEV_PROBE_UNAVAILABLE';
+      setQueryProbeResult({ connection: selectedConnection, message: code === 'AUTH_REQUIRED'
+        ? 'Sesi login tidak tersedia atau tidak valid. Silakan login kembali, lalu ulangi uji.'
+        : `Uji akses baca gagal (${code}).` });
+    } finally { setQueryProbeBusy(false); }
+  }
   const reload = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     try {
@@ -160,12 +288,17 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
   async function save(event: React.FormEvent) {
     event.preventDefault();
     const source = sources[Number(sourceIndex)];
-    if (!source || !name.trim()) return;
+    if (!name.trim() || (sourceKind === 'table' && !source) || (sourceKind === 'query' && (!(queryFeatureAvailable || sqlScriptSaveAvailable) || !sourceSql.trim()))) return;
     setBusy(true); setError(''); setNotice('');
     try {
-      const created = await api(BASE, undefined, { connection_id: connection, dataset_name: name.trim(), description: description.trim(), source_schema: source.schema, source_name: source.name, source_type: source.type, access_mode: mode });
-      if (mode === 'STORED') { await api(`${BASE}/${encodeURIComponent(created.dataset_id)}/ingest`, undefined, {}); }
-      await reload(); setName(''); setDescription(''); setSourceIndex(''); setCreating(false); setNotice(mode === 'STORED' ? 'Dataset tersimpan. Job ingest telah masuk antrean; jalankan Stored Ingest Worker.' : 'Dataset Direct berhasil disimpan.');
+      const created = sourceKind === 'query'
+        ? await api(`${BASE}/${sqlScriptSaveAvailable ? 'query-script-dev' : 'query-feature'}`, undefined, {connection_id:connection, dataset_name:name.trim(), description:description.trim(), query:sourceSql})
+        : await api(BASE, undefined, { connection_id: connection, dataset_name: name.trim(), description: description.trim(), source_schema: source.schema, source_name: source.name, source_type: source.type, access_mode: mode });
+      if (sourceKind === 'query' || mode === 'STORED') {
+        try { await api(`${BASE}/${encodeURIComponent(created.dataset_id)}/ingest`, undefined, {}); }
+        catch { await reload(); setCreating(false); setNotice('Dataset tersimpan, tetapi ingest belum masuk antrean. Jalankan ulang dari katalog.'); return; }
+      }
+      await reload(); setName(''); setDescription(''); setSourceSql(''); setSourceIndex(''); setCreating(false); setNotice(sourceKind === 'query' || mode === 'STORED' ? 'Dataset tersimpan. Job ingest telah masuk antrean; jalankan Stored Ingest Worker.' : 'Dataset Direct berhasil disimpan.');
     } catch (err) { setError(err instanceof Error ? err.message : 'DATASET_CREATE_UNAVAILABLE'); }
     finally { setBusy(false); }
   }
@@ -190,8 +323,9 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
     setBusy(true);setError('');setNotice('');
     try {
       if(target.type==='STORED') {
-        await api(`${BASE}/${encodeURIComponent(target.id)}/ingest`,undefined,{});
-        setNotice(`Refresh ${item.dataset_name} masuk antrean STORED Worker.`);
+        const job = await api(`${BASE}/${encodeURIComponent(target.id)}/ingest`,undefined,{});
+        const run = typeof job?.run_id === 'string' ? ` ID job: ${job.run_id}.` : '';
+        setNotice(`Refresh ${item.dataset_name} masuk antrean STORED Worker.${run}`);
       } else {
         const pipelines=await pipelineApi<{pipeline_id:string;version:number}[]>('');
         const pipeline=pipelines.find(row=>row.pipeline_id.toLowerCase()===target.id.toLowerCase());
@@ -232,14 +366,14 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
       <div className="datasets-catalog-identity"><h1 id="datasets-title">Datasets <span className="datasets-count">CREATE</span></h1><span className="datasets-catalog-hint">Katalog sumber data / Dataset baru</span></div>
       <div className="datasets-catalog-actions"><button type="button" className="datasets-action datasets-create-back" onClick={() => { setCreating(false); setSelectedDataset(null); setError(''); setNotice(''); }}>← Kembali ke katalog</button></div>
     </UniverseHeader>}
-    {error && <p className="datasets-message" role="alert">Permintaan tidak dapat diselesaikan: {error}. Pastikan migrasi dataset dan mode BEAM telah tersedia.</p>}
+    {error && <p className="datasets-message" role="alert">{datasetErrorMessage(error)}</p>}
     {creating && connectionError && <p className="datasets-message" role="alert">{connectionError}</p>}
     {creating && catalogError && <p className="datasets-message" role="status">{catalogError} Pilihan koneksi tetap dapat dilihat jika layanan Connections tersedia.</p>}
     {!creating && catalogNotices.map(notice=><p key={notice} className="datasets-message" role="status">{notice}</p>)}
     {notice && <p className="datasets-message" role="status">{notice}</p>}
     {!creating ? <div className="datasets-catalog">
       <UniverseToolbar className="datasets-catalog-heading datasets-catalog-heading-compact">
-        <div className="datasets-catalog-identity"><h1 id="datasets-title">Datasets <span className="datasets-count">{loading ? '—' : datasets.length}</span></h1><span className="datasets-catalog-hint">Katalog sumber data</span></div>
+        <div className="datasets-catalog-identity"><h1 id="datasets-title">Datasets <span className="datasets-count">{loading ? '—' : datasets.length}</span></h1></div>
 
         <div className="datasets-catalog-actions">
           <button type="button" className="universe-refresh-icon datasets-action datasets-catalog-refresh" disabled={loading || busy} onClick={() => { setError(''); void reload().catch(err => setError(err instanceof Error ? err.message : 'DATASET_METADATA_UNAVAILABLE')); }} aria-label="Muat ulang" data-tooltip="Muat ulang">↻</button>
@@ -259,18 +393,35 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
           </button>
           <div className="studio-ownership-dataset">{item.access_mode === 'PARQUET' ? (item.pipeline_id ? <OwnershipGrid objectType="PIPELINE" objectId={item.pipeline_id}/> : <span title="Pipeline ID belum tersedia">—</span>) : <OwnershipGrid objectType="DATASET" objectId={item.dataset_id} fallbackOwner={item.owner_name}/>}</div><div className="datasets-row-actions">{action && <SchedulerClockMenu target={action} schedule={schedules.find(s=>s.target_type===action.type&&s.target_id.toLowerCase()===action.id.toLowerCase())} lastRun={item.access_mode==='STORED'?(()=>{const job=lastIngestByDataset.get(item.dataset_id.toLowerCase());return job?(job.started_at||job.finished_at||job.created_at||null):(item.run_id?'completed':null);})():(item.run_id?'completed':null)} disabled={busy} onRun={()=>void runNow(item)} onSchedule={()=>setScheduleTarget(action)} onDetails={()=>onSchedulerDetails?.(action)} onChange={()=>setScheduleRevision(v=>v+1)}/>}</div>
         </li>;
-      })}</ul><UniverseInspector className="datasets-detail">{currentDataset ? <><div className="ca-dataset-detail-header"><div className="ca-dataset-detail-actions"><span className="datasets-eyebrow">DATASET DETAILS</span><button type="button" className="datasets-action datasets-open-explorer" style={{ flexShrink: 0, minHeight: 32, padding: '6px 11px', whiteSpace: 'nowrap' }} onClick={() => onExplore(currentDataset.dataset_id, currentDataset.access_mode === 'PARQUET')} disabled={currentDataset.access_mode === 'STORED' && (currentDataset.storage_status !== 'READY' || !currentDataset.run_id)} title={currentDataset.access_mode === 'STORED' && currentDataset.storage_status !== 'READY' ? 'Jalankan dan selesaikan ingest terlebih dahulu.' : undefined}>Lihat data ↗</button>{resolveScheduleTarget(currentDataset) && <button type="button" className="datasets-action" onClick={()=>{const t=resolveScheduleTarget(currentDataset);if(t)onSchedulerDetails?.(t);}}>◷ Schedule & History</button>}</div></div><div className="ca-dataset-detail-body"><div className="deck-inspector-kicker">DATA INTELLIGENCE / INSPECTOR</div><div className="deck-inspector-title"><span className="deck-inspector-symbol" aria-hidden="true">◈</span><div><h2>{currentDataset.dataset_name}</h2><small>{currentDataset.connection_name || 'Data Studio'} · {DATASET_KIND_INFO[datasetKind(currentDataset)].label}</small></div></div><div className="deck-metrics"><div className="deck-metric"><span>ROWS</span><strong>{catalogRowCount(currentDataset)}</strong></div><div className="deck-metric"><span>DATA MODE</span><strong className="deck-status">{currentDataset.access_mode === 'PARQUET' ? 'ETL OUTPUT' : currentDataset.access_mode}</strong></div><div className="deck-metric"><span>STORAGE STATUS</span><strong className="deck-status">{currentDataset.storage_status || '—'}</strong></div><div className="deck-metric"><span>CONNECTION</span><strong style={{fontSize: '13px'}}>{currentDataset.connection_name || '—'}</strong></div></div><div className="deck-inspector-section">OWNERSHIP & SHARING</div><div className="datasets-ownership-panel">{currentDataset.access_mode === 'PARQUET' && currentDataset.pipeline_id ? <OwnershipPicker key={currentDataset.pipeline_id} objectType="PIPELINE" objectId={currentDataset.pipeline_id}/> : <OwnershipPicker key={currentDataset.dataset_id} objectType="DATASET" objectId={currentDataset.dataset_id} fallbackOwner={currentDataset.owner_name}/> }</div>{currentDataset.access_mode !== 'DIRECT' && <details className="datasets-inspector-storage-actions"><summary>Storage actions <span>Kelola output Parquet</span></summary><div className="datasets-inspector-storage-danger"><p>Tindakan ini menghapus output Parquet, bukan definisi dataset atau tabel sumber.</p><ParquetStorageDelete dataset={currentDataset} onDeleted={async()=>{await reload();setSelectedDataset(null);setNotice('Storage Parquet target berhasil dihapus. Definisi dataset tetap tersedia.');}}/></div></details>}<div className="deck-inspector-section">TECHNICAL DETAILS</div><dl><dt>{currentDataset.access_mode==='PARQUET' ? 'Pipeline':'Connection'}</dt><dd>{currentDataset.connection_name}</dd><dt>Source</dt><dd>{currentDataset.access_mode==='PARQUET' ? currentDataset.source_name:`${currentDataset.source_schema}.${currentDataset.source_name}`}</dd><dt>Jenis dataset</dt><dd>{DATASET_KIND_INFO[datasetKind(currentDataset)].label} · {DATASET_KIND_INFO[datasetKind(currentDataset)].detail}</dd><dt>Access mode</dt><dd>{currentDataset.access_mode === 'DIRECT' ? 'Direct access' : currentDataset.access_mode}</dd><dt>Status</dt><dd>{currentDataset.storage_status}</dd>{currentDataset.access_mode === 'STORED' && currentDataset.refresh_status && <><dt>Refresh terakhir</dt><dd>{currentDataset.refresh_status}</dd></>}<dt>Owner</dt><dd>{currentDataset.owner_name || 'Belum tersedia'}</dd><dt>Cards</dt><dd>Belum tersedia</dd><dt>Tags</dt><dd>Belum tersedia</dd>{currentDataset.run_id && <><dt>Run ID</dt><dd className="ca-id">{currentDataset.run_id}</dd></>}{datasetKind(currentDataset) !== 'direct' && catalogRowCount(currentDataset) !== '—' && <><dt>Jumlah baris</dt><dd>{catalogRowCount(currentDataset)}</dd></>}</dl></div></> : <div className="deck-empty"><span className="deck-empty-symbol" aria-hidden="true">◎</span><span className="deck-inspector-kicker">DATA INTELLIGENCE</span><h2>Explore your data</h2><p>Pilih dataset di sebelah kiri untuk melihat metrik, koneksi, status, dan tindakan yang tersedia.</p></div>}</UniverseInspector></div>}
+      })}</ul><UniverseInspector className="datasets-detail">{currentDataset ? <><div className="ca-dataset-detail-header"><div className="ca-dataset-detail-actions"><span className="datasets-eyebrow">DATASET DETAILS</span><button type="button" className="datasets-action datasets-open-explorer" style={{ flexShrink: 0, minHeight: 32, padding: '6px 11px', whiteSpace: 'nowrap' }} onClick={() => onExplore(currentDataset.dataset_id, currentDataset.access_mode === 'PARQUET')} disabled={currentDataset.access_mode === 'STORED' && (currentDataset.storage_status !== 'READY' || !currentDataset.run_id)} title={currentDataset.access_mode === 'STORED' && currentDataset.storage_status !== 'READY' ? 'Jalankan dan selesaikan ingest terlebih dahulu.' : undefined}>Lihat data ↗</button>{resolveScheduleTarget(currentDataset) && <button type="button" className="datasets-action" onClick={()=>{const t=resolveScheduleTarget(currentDataset);if(t)onSchedulerDetails?.(t);}}>◷ Schedule & History</button>}</div></div><div className="ca-dataset-detail-body"><div className="deck-inspector-kicker">DATA INTELLIGENCE / INSPECTOR</div><div className="deck-inspector-title"><span className="deck-inspector-symbol" aria-hidden="true">◈</span><div><h2>{currentDataset.dataset_name}</h2><small>{currentDataset.connection_name || 'Data Studio'} · {DATASET_KIND_INFO[datasetKind(currentDataset)].label}</small></div></div><div className="deck-metrics"><div className="deck-metric"><span>ROWS</span><strong>{catalogRowCount(currentDataset)}</strong></div><div className="deck-metric"><span>DATA MODE</span><strong className="deck-status">{currentDataset.access_mode === 'PARQUET' ? 'ETL OUTPUT' : currentDataset.access_mode}</strong></div><div className="deck-metric"><span>STORAGE STATUS</span><strong className="deck-status">{currentDataset.storage_status || '—'}</strong></div><div className="deck-metric"><span>CONNECTION</span><strong style={{fontSize: '13px'}}>{currentDataset.connection_name || '—'}</strong></div></div><div className="deck-inspector-section">OWNERSHIP & SHARING</div><div className="datasets-ownership-panel">{currentDataset.access_mode === 'PARQUET' && currentDataset.pipeline_id ? <OwnershipPicker key={currentDataset.pipeline_id} objectType="PIPELINE" objectId={currentDataset.pipeline_id}/> : <OwnershipPicker key={currentDataset.dataset_id} objectType="DATASET" objectId={currentDataset.dataset_id} fallbackOwner={currentDataset.owner_name}/> }</div>{currentDataset.access_mode !== 'DIRECT' && <details className="datasets-inspector-storage-actions"><summary>Storage actions <span>Kelola output Parquet</span></summary><div className="datasets-inspector-storage-danger"><p>Tindakan ini menghapus output Parquet, bukan definisi dataset atau tabel sumber.</p><ParquetStorageDelete dataset={currentDataset} onDeleted={async()=>{await reload();setSelectedDataset(null);setNotice('Storage Parquet target berhasil dihapus. Definisi dataset tetap tersedia.');}}/></div></details>}<div className="deck-inspector-section">TECHNICAL DETAILS</div><dl><dt>{currentDataset.access_mode==='PARQUET' ? 'Pipeline':'Connection'}</dt><dd>{currentDataset.connection_name}</dd><dt>Source</dt><dd>{isQueryDataset(currentDataset) ? 'SQL Query' : currentDataset.access_mode==='PARQUET' ? currentDataset.source_name:`${currentDataset.source_schema}.${currentDataset.source_name}`}</dd><dt>Jenis dataset</dt><dd>{DATASET_KIND_INFO[datasetKind(currentDataset)].label} · {DATASET_KIND_INFO[datasetKind(currentDataset)].detail}</dd><dt>Access mode</dt><dd>{currentDataset.access_mode === 'DIRECT' ? 'Direct access' : currentDataset.access_mode}</dd><dt>Status</dt><dd>{currentDataset.storage_status}</dd>{currentDataset.access_mode === 'STORED' && currentDataset.refresh_status && <><dt>Refresh terakhir</dt><dd>{currentDataset.refresh_status}</dd></>}<dt>Owner</dt><dd>{currentDataset.owner_name || 'Belum tersedia'}</dd><dt>Cards</dt><dd>Belum tersedia</dd><dt>Tags</dt><dd>Belum tersedia</dd>{currentDataset.run_id && <><dt>Run ID</dt><dd className="ca-id">{currentDataset.run_id}</dd></>}{datasetKind(currentDataset) !== 'direct' && catalogRowCount(currentDataset) !== '—' && <><dt>Jumlah baris</dt><dd>{catalogRowCount(currentDataset)}</dd></>}</dl></div></> : <div className="deck-empty"><span className="deck-empty-symbol" aria-hidden="true">◎</span><span className="deck-inspector-kicker">DATA INTELLIGENCE</span><h2>Explore your data</h2><p>Pilih dataset di sebelah kiri untuk melihat metrik, koneksi, status, dan tindakan yang tersedia.</p></div>}</UniverseInspector></div>}
     </div> : <form onSubmit={save} className="datasets-layout datasets-create-layout">
       <div className="datasets-main datasets-create-main">
         <section className="datasets-create-step datasets-create-step-source" aria-labelledby="ds52-source">
-          <div className="datasets-create-step-header"><span className="datasets-create-step-number">01</span><div><h2 id="ds52-source">Source</h2><p>Pilih koneksi aktif dan tabel atau view yang tersedia.</p></div></div>
+          <div className="datasets-create-step-header"><span className="datasets-create-step-number">01</span><div><h2 id="ds52-source">Source</h2><p>{sourceKind === 'query' ? 'Pilih koneksi dan tulis query untuk membentuk dataset.' : 'Pilih koneksi aktif dan tabel atau view yang tersedia.'}</p></div></div>
           <div className="datasets-fields-grid datasets-create-fields">
             <SearchPicker label="Connection" placeholder={loading ? 'Memuat koneksi…' : 'Cari koneksi aktif'} value={connection} options={connections.map(item => ({ value: item.connection_id, label: `${item.connection_name} · ${item.database_name}` }))} onSelect={value => { setConnection(value); setSourceLoading(Boolean(value)); setSources([]); setSourceIndex(''); setSourceSearch(''); setSourceHasMore(false); setSourceError(''); setError(''); }} disabled={loading} />
-            <SearchPicker key={connection} label="Tabel atau view" placeholder={!connection ? 'Pilih koneksi terlebih dahulu' : 'Cari schema, tabel, atau view'} value={sourceIndex} options={sources.map((item, index) => ({ value: String(index), label: `${item.schema}.${item.name}`, detail: item.type === 'VIEW' ? 'View' : 'Table' }))} onSelect={setSourceIndex} onSearch={value => { if (value !== sourceSearch) { setSourceSearch(value); setSources([]); setSourceHasMore(false); setSourceError(''); setSourceLoading(true); } }} disabled={!connection || !!sourceError} loading={sourceLoading} hasMore={sourceHasMore} onMore={() => void loadMoreSources()} />
+            {sourceKind === 'table' && <SearchPicker key={connection} label="Tabel atau view" placeholder={!connection ? 'Pilih koneksi terlebih dahulu' : 'Cari schema, tabel, atau view'} value={sourceIndex} options={sources.map((item, index) => ({ value: String(index), label: `${item.schema}.${item.name}`, detail: item.type === 'VIEW' ? 'View' : 'Table' }))} onSelect={setSourceIndex} onSearch={value => { if (value !== sourceSearch) { setSourceSearch(value); setSources([]); setSourceHasMore(false); setSourceError(''); setSourceLoading(true); } }} disabled={!connection || !!sourceError} loading={sourceLoading} hasMore={sourceHasMore} onMore={() => void loadMoreSources()} />}
           </div>
+          {(queryFeatureAvailable || sqlScriptDevAvailable) && <div className="datasets-query-editor">
+            <div className="datasets-query-choice" role="group" aria-label="Jenis sumber">
+              <button type="button" aria-pressed={sourceKind === 'table'} onClick={() => setSourceKind('table')}>Tabel / View</button>
+              <button type="button" aria-pressed={sourceKind === 'query'} onClick={() => {setSourceKind('query');setMode('STORED');}}>SQL Query</button>
+            </div>
+            {sourceKind === 'query' && <SqlQueryWorkbench value={sourceSql} onChange={value => {sqlPreviewRevision.current++; setSourceSql(value); setSqlPreview(null); setError('');}} onRun={() => void previewSql()} busy={sqlPreviewBusy} preview={sqlPreview} knownColumns={sqlKnownColumns} sourceColumns={sqlSourceColumns} sources={sources} searchColumns={searchSqlColumns} connectionType={connections.find(item => item.connection_id.toLowerCase() === connection.toLowerCase())?.connector_type || connections.find(item => item.connection_id.toLowerCase() === connection.toLowerCase())?.connection_type || (connection.toLowerCase() === DEV_QUERY_PROBE_CONNECTION ? 'sqlserver' : '')} error={error ? datasetErrorMessage(error) : ''} usesConnectionCredentials={!queryFeatureAvailable && sqlScriptDevAvailable} saveAvailable={sqlScriptSaveAvailable}/>}
+          </div>}
+          {sqlScriptDevStatus === 'unavailable' && !queryFeatureAvailable && <p className="datasets-message" role="status">Editor SQL Query DEV belum aktif atau akses koneksi tidak tersedia. Jalankan backend dengan scripts/start_dataset_query_probe_dev.sh, lalu refresh halaman dan pastikan Anda memiliki akses edit pada koneksi bi.</p>}
+          {import.meta.env.DEV && !sqlScriptDevAvailable && connection.toLowerCase() === DEV_QUERY_PROBE_CONNECTION && queryProbeStatus && <div className="datasets-query-dev-probe">
+            {queryProbeAvailable ? <>
+              <button type="button" className="datasets-action" disabled={queryProbeBusy} onClick={() => void runQueryProbe()}>{queryProbeBusy ? 'Menguji akses baca…' : 'Uji akses BI dengan query tetap (DEV)'}</button>
+              {queryProbeResult?.connection === connection && <p role="status">{queryProbeResult.message}</p>}
+            </> : <p role="status">{queryProbeStatus === 'loading' ? 'Memeriksa kesiapan uji query DEV…'
+              : queryProbeStatus === 'access_denied' ? 'Uji query DEV belum tersedia untuk akun ini. Periksa hak akses pada Connection bi.'
+              : queryProbeStatus === 'other_connection' ? 'Connection ini bukan target uji query DEV.'
+              : 'Uji query DEV belum aktif. Jalankan backend dengan scripts/start_dataset_query_probe_dev.sh, lalu refresh halaman.'}</p>}
+          </div>}
           {!loading && !connections.length && !connectionError && <p className="datasets-message">Belum ada koneksi aktif. Tambahkan atau aktifkan koneksi melalui Connections.</p>}
-          {sourceError && <div className="datasets-source-error" role="alert"><span>{sourceError === 'DATASET_CONNECTION_METADATA_UNAVAILABLE' ? 'Metadata koneksi belum tersedia dari BEAM. Periksa apakah mode dataset sudah diterapkan dan koneksi masih aktif.' : sourceError === 'HTTP_404' ? 'Endpoint dataset belum tersedia. Pastikan backend yang terbaru sudah dijalankan.' : `Daftar tabel belum dapat dimuat (${sourceError}). Periksa layanan dataset, kebijakan jaringan, dan akses akun SQL.`}</span><button type="button" onClick={() => { setSourceError(''); setSourceLoading(true); setSourceAttempt(value => value + 1); }}>Coba lagi</button></div>}
-          {connection && !sourceLoading && !sourceError && !sources.length && <p className="datasets-source-error">{sourceSearch ? 'Tidak ada tabel atau view yang cocok dengan pencarian.' : 'Tidak ada tabel atau view yang terlihat oleh akun SQL pada database ini.'}</p>}
+          {sourceKind === 'table' && sourceError && <div className="datasets-source-error" role="alert"><span>{sourceError === 'DATASET_CONNECTION_METADATA_UNAVAILABLE' ? 'Metadata koneksi belum tersedia dari BEAM. Periksa apakah mode dataset sudah diterapkan dan koneksi masih aktif.' : sourceError === 'HTTP_404' ? 'Endpoint dataset belum tersedia. Pastikan backend yang terbaru sudah dijalankan.' : `Daftar tabel belum dapat dimuat (${sourceError}). Periksa layanan dataset, kebijakan jaringan, dan akses akun SQL.`}</span><button type="button" onClick={() => { setSourceError(''); setSourceLoading(true); setSourceAttempt(value => value + 1); }}>Coba lagi</button></div>}
+          {sourceKind === 'table' && connection && !sourceLoading && !sourceError && !sources.length && <p className="datasets-source-error">{sourceSearch ? 'Tidak ada tabel atau view yang cocok dengan pencarian.' : 'Tidak ada tabel atau view yang terlihat oleh akun SQL pada database ini.'}</p>}
         </section>
         <section className="datasets-create-step datasets-create-step-identity" aria-labelledby="ds52-identity">
           <div className="datasets-create-step-header"><span className="datasets-create-step-number">02</span><div><h2 id="ds52-identity">Identity</h2><p>Berikan nama yang mudah dikenali di katalog.</p></div></div>
@@ -281,9 +432,9 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
         </section>
         <section className="datasets-create-step datasets-create-step-mode" aria-labelledby="ds52-mode">
           <div className="datasets-create-step-header"><span className="datasets-create-step-number">03</span><div><h2 id="ds52-mode">Access mode</h2><p>Pilih cara CoreAnalytics membaca data.</p></div></div>
-          <div className="datasets-modes" role="radiogroup" aria-label="Mode akses dataset">
-          <label className={`datasets-mode ${mode === 'DIRECT' ? 'is-selected' : ''}`}><input type="radio" name="dataset-mode" checked={mode === 'DIRECT'} onChange={() => setMode('DIRECT')} /><span className="datasets-mode-icon" aria-hidden="true">↗</span><span><strong>Direct access</strong><small>Mengakses sumber saat data dibutuhkan.</small></span></label>
-          <label className={`datasets-mode ${mode === 'STORED' ? 'is-selected' : ''}`}><input type="radio" name="dataset-mode" checked={mode === 'STORED'} onChange={() => setMode('STORED')} /><span className="datasets-mode-icon" aria-hidden="true">◈</span><span><strong>Store in CoreAnalytics</strong><small>Salin seluruh tabel/view ke Parquet melalui worker.</small></span></label>
+          <div className={`datasets-modes${sourceKind === 'query' ? ' datasets-modes--single' : ''}`} role="radiogroup" aria-label="Mode akses dataset">
+          {sourceKind !== 'query' && <label className={`datasets-mode ${mode === 'DIRECT' ? 'is-selected' : ''}`}><input type="radio" name="dataset-mode" checked={mode === 'DIRECT'} onChange={() => setMode('DIRECT')} /><span className="datasets-mode-icon" aria-hidden="true">↗</span><span><strong>Direct access</strong><small>Mengakses sumber saat data dibutuhkan.</small></span></label>}
+          <label className={`datasets-mode ${mode === 'STORED' ? 'is-selected' : ''}`}><input type="radio" name="dataset-mode" checked={mode === 'STORED'} onChange={() => setMode('STORED')} /><span className="datasets-mode-icon" aria-hidden="true">◈</span><span><strong>Store in CoreAnalytics</strong><small>{sourceKind === 'query' ? 'Simpan hasil query sebagai Parquet melalui worker.' : 'Salin seluruh tabel/view ke Parquet melalui worker.'}</small></span></label>
         </div>
         </section>
       </div>
@@ -296,11 +447,11 @@ export default function Datasets({ onExplore, onSchedulerDetails }: { onExplore:
         </div>
         <dl className="datasets-create-specs">
           <div><dt>Connection</dt><dd>{connections.find(item => item.connection_id === connection)?.connection_name || 'Belum dipilih'}</dd></div>
-          <div><dt>Table / View</dt><dd>{sourceIndex !== '' && sources[Number(sourceIndex)] ? `${sources[Number(sourceIndex)].schema}.${sources[Number(sourceIndex)].name}` : 'Belum dipilih'}</dd></div>
+          <div><dt>Source</dt><dd>{sourceKind === 'query' ? 'SQL Query' : sourceIndex !== '' && sources[Number(sourceIndex)] ? `${sources[Number(sourceIndex)].schema}.${sources[Number(sourceIndex)].name}` : 'Belum dipilih'}</dd></div>
           <div><dt>Access Mode</dt><dd className="datasets-create-mode-value">{mode === 'DIRECT' ? 'DIRECT' : 'STORED'}</dd></div>
         </dl>
         <p className="datasets-create-mode-note">{mode === 'DIRECT' ? 'Data tetap berada di sumber dan dibaca melalui Data Explorer.' : 'Dataset akan diingest ke Parquet melalui worker. Status awal dapat dipantau dari katalog.'}</p>
-        <div className="datasets-create-save-dock"><button type="submit" disabled={busy || !connection || sourceIndex === '' || !name.trim()}>{busy ? 'Menyimpan…' : 'Save dataset'}<span aria-hidden="true">↗</span></button><small>Konfigurasi dapat diperiksa kembali dari Dataset Details.</small></div>
+        <div className="datasets-create-save-dock"><button type="submit" disabled={busy || !connection || (sourceKind === 'table' ? sourceIndex === '' : !(queryFeatureAvailable || sqlScriptSaveAvailable) || !sourceSql.trim()) || !name.trim()}>{busy ? 'Menyimpan…' : sourceKind === 'query' ? 'Simpan & antrekan dataset' : 'Save dataset'}<span aria-hidden="true">↗</span></button><small>{sourceKind === 'query' && !(queryFeatureAvailable || sqlScriptSaveAvailable) ? 'Preview DEV tersedia; metadata atau gateway query belum siap.' : sourceKind === 'query' ? 'Simpan definisi dan antrekan ingest; worker menjalankan skrip.' : 'Konfigurasi dapat diperiksa kembali dari Dataset Details.'}</small></div>
       </aside>
     </form>}
     {scheduleTarget && <div className="datasets-schedule-overlay" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)setScheduleTarget(null);}} onKeyDown={event=>{event.stopPropagation();if(event.key==='Escape'){event.preventDefault();setScheduleTarget(null);}}}>
@@ -320,3 +471,4 @@ import './aurora-command-deck-v4.css';
 import './aurora-command-deck-v5.css';
 import './aurora-command-deck-v5-1.css';
 import './aurora-command-deck-v5-2.css';
+import './datasets-responsive-layout.css';

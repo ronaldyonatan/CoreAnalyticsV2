@@ -1,7 +1,8 @@
 """Dataset metadata and bounded connector discovery. No arbitrary SQL."""
 import base64
+import os
 import uuid
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from app.clients.core_api_client import core_api
 from app.routes.studio_connections_api import _principal, _mutating, _error
 from app.services.studio_connections import _cipher, _rows
@@ -58,6 +59,28 @@ def _spark_error(exc):
     payload = {'success': False, 'code': str(exc)}
     if isinstance(getattr(exc, 'detail', None), str) and exc.detail: payload['detail'] = exc.detail[:1000]
     return jsonify(payload), getattr(exc, 'http_status', 400)
+
+
+def _query_feature_error(exc):
+    # Database/driver exception text can contain SQL or credentials. Only
+    # expose our own fixed query-validation and feature-configuration codes.
+    safe = {'DATASET_QUERY_DISABLED', 'DATASET_QUERY_CONFIGURATION_INVALID',
+            'DATASET_QUERY_SECURITY_REVIEW_REQUIRED',
+            'QUERY_SCRIPT_DEV_DISABLED', 'QUERY_SCRIPT_DEV_CONFIGURATION_INVALID',
+            'QUERY_SCRIPT_DEV_CONNECTION_DENIED', 'QUERY_SCRIPT_SOURCE_UNSUPPORTED',
+            'QUERY_SCRIPT_PREVIEW_FAILED',
+            'QUERY_SQL_OBJECT_NOT_FOUND', 'QUERY_SQL_COLUMN_NOT_FOUND',
+            'QUERY_SQL_SYNTAX_ERROR', 'QUERY_SQL_PERMISSION_DENIED',
+            'DATASET_QUERY_CONNECTION_NOT_ALLOWED', 'DATASET_QUERY_INPUT_INVALID',
+            'DATASET_QUERY_NAME_INVALID', 'DATASET_QUERY_DESCRIPTION_INVALID',
+            'QUERY_INPUT_INVALID', 'QUERY_INGEST_SELECT_REQUIRED',
+            'QUERY_SELECT_REQUIRED', 'QUERY_UNSUPPORTED_OPERATION',
+            'QUERY_MULTIPLE_STATEMENTS', 'QUERY_UNTERMINATED_COMMENT',
+            'QUERY_UNTERMINATED_LITERAL', 'QUERY_TOKEN_UNSUPPORTED',
+            'QUERY_PREVIEW_UNAVAILABLE', 'DATASET_QUERY_METADATA_UNAVAILABLE',
+            'DATASET_QUERY_OPERATION_DENIED'}
+    code = str(exc)
+    return jsonify(success=False, code=code if code in safe else 'DATASET_QUERY_UNAVAILABLE'), 400
 
 
 @studio_datasets_bp.route('/science-models', methods=['GET', 'POST'])
@@ -266,6 +289,252 @@ def _target(user_id, connection_id, *, dataset_id=None):
     return _connector(kind).make_target({**row, 'server_port': int(row['server_port'] or default_port), 'password': password, 'connection_timeout_seconds': int(row['connection_timeout_seconds'] or 10)})
 
 
+@studio_datasets_bp.get('/query-dev-probe/status')
+def query_dev_probe_status():
+    """Expose the optional probe only for the configured authorized connection."""
+    from app.services.studio_source_query_dev_probe import validate_probe_request
+    try:
+        user = _principal()
+        connection_id = validate_probe_request(request.args.get('connection_id'))
+        _require_object_access(user, 'CONNECTION', connection_id, write=True)
+        return jsonify(success=True, data={'available': True})
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        reason = {
+            'QUERY_DEV_PROBE_DISABLED': 'disabled',
+            'QUERY_DEV_CONNECTION_NOT_ALLOWED': 'other_connection',
+            'QUERY_DEV_PROBE_CONFIGURATION_INVALID': 'configuration',
+        }.get(str(exc), 'unavailable')
+        return jsonify(success=True, data={'available': False, 'reason': reason})
+    except AccessError:
+        return jsonify(success=True, data={'available': False, 'reason': 'access_denied'})
+    except Exception:
+        return jsonify(success=True, data={'available': False, 'reason': 'unavailable'})
+
+
+@studio_datasets_bp.post('/query-dev-probe')
+def query_dev_probe():
+    """Opt-in DEV-only fixed query; never accepts SQL text or an execution login."""
+    from app.services.studio_source_query_dev_probe import validate_probe_request, run_fixed_probe
+    from app.services.studio_source_query_preview import QueryPreviewFailure, _safe_diagnostic
+    try:
+        user = _principal()
+        _mutating()
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict) or set(body) != {'connection_id'}:
+            return jsonify(success=False, code='QUERY_DEV_PROBE_INPUT_INVALID'), 400
+        try:
+            connection_id = validate_probe_request(body['connection_id'])
+        except ValueError as exc:
+            code = str(exc)
+            return jsonify(success=False, code=code), 403 if code == 'QUERY_DEV_CONNECTION_NOT_ALLOWED' else 503
+        _require_object_access(user, 'CONNECTION', connection_id, write=True)
+        result = run_fixed_probe(_target(user, connection_id))
+        response = jsonify(success=True, data=result)
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except QueryPreviewFailure as exc:
+        diagnostic = _safe_diagnostic(exc.diagnostic)
+        current_app.logger.error('Query DEV probe failed: %s', diagnostic)
+        return jsonify(success=False, code='QUERY_DEV_PROBE_UNAVAILABLE', diagnostic=diagnostic), 503
+    except Exception as exc:
+        # Log only execution locations and exception type; never log the
+        # exception text, source password, query or server name.
+        import traceback
+        frames = traceback.extract_tb(exc.__traceback__)
+        current_app.logger.error('Query DEV probe failed: stage=server type=%s frames=%s',
+                                 type(exc).__name__, ' -> '.join(f'{frame.name}:{frame.lineno}' for frame in frames))
+        last = frames[-1] if frames else None
+        safe_types = {'ValueError', 'RuntimeError', 'KeyError', 'TypeError', 'ImportError', 'AttributeError'}
+        return jsonify(success=False, code='QUERY_DEV_PROBE_UNAVAILABLE', diagnostic={
+            'stage': 'SERVER',
+            'error_type': type(exc).__name__ if type(exc).__name__ in safe_types else 'OTHER',
+            'location': f'{last.name}:{last.lineno}' if last else None,
+        }), 503
+
+
+@studio_datasets_bp.get('/query-feature/status')
+def query_feature_status():
+    from app.services.studio_dataset_query_feature import check_configuration
+    try:
+        user = _principal()
+        connection, _ = check_configuration(request.args.get('connection_id'))
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        response = jsonify(success=True, data={'available': True})
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except PermissionError as exc:
+        return _error(exc)
+    except (AccessError, ValueError):
+        return jsonify(success=True, data={'available': False})
+
+
+@studio_datasets_bp.get('/query-script-dev/status')
+def query_script_dev_status():
+    from app.services.studio_source_sql_script_dev import allowed_connection
+    try:
+        user = _principal()
+        connection = allowed_connection(request.args.get('connection_id'))
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        save_available = False
+        if os.getenv('STUDIO_SQL_SCRIPT_DATASET_DEV_ENABLED', '').strip().lower() == 'true':
+            try:
+                from app.services.studio_dataset_query_metadata import script_metadata_ready
+                save_available = script_metadata_ready(user)
+            except Exception:
+                save_available = False
+        response = jsonify(success=True, data={'available': True, 'save_available': save_available})
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except PermissionError as exc:
+        return _error(exc)
+    except (AccessError, ValueError):
+        return jsonify(success=True, data={'available': False})
+
+
+@studio_datasets_bp.post('/query-script-dev')
+def query_script_dev_create():
+    from app.services.studio_source_sql_script_dev import allowed_connection
+    from app.services.studio_dataset_query_metadata import create_script_definition
+    try:
+        user = _principal()
+        _mutating()
+        if os.getenv('STUDIO_SQL_SCRIPT_DATASET_DEV_ENABLED', '').strip().lower() != 'true':
+            raise ValueError('DATASET_QUERY_DISABLED')
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict) or set(body) != {'connection_id', 'dataset_name', 'description', 'query'}:
+            raise ValueError('DATASET_QUERY_INPUT_INVALID')
+        connection = allowed_connection(body['connection_id'])
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        data = create_script_definition(user, connection, body['dataset_name'], body['description'], body['query'])
+        response = jsonify(success=True, data=data)
+        response.headers['Cache-Control'] = 'no-store'
+        return response, 201
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return _query_feature_error(exc)
+    except Exception:
+        return jsonify(success=False, code='DATASET_QUERY_CREATE_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.get('/<uuid:dataset_id>/query-definition')
+def saved_query_definition(dataset_id):
+    """Return saved SQL only to users with execute/edit access to the dataset."""
+    from app.services.studio_dataset_query_metadata import read_script_definition
+    try:
+        user = _principal()
+        _require_object_access(user, 'DATASET', dataset_id, write=True)
+        data = read_script_definition(user, str(dataset_id))
+        response = jsonify(success=True, data=data)
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError:
+        return jsonify(success=False, code='DATASET_QUERY_UNAVAILABLE'), 400
+    except Exception:
+        return jsonify(success=False, code='DATASET_QUERY_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.post('/query-script-dev/preview')
+def query_script_dev_preview():
+    from app.services.studio_source_sql_script_dev import allowed_connection, preview
+    try:
+        user = _principal()
+        _mutating()
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict) or set(body) != {'connection_id', 'query'}:
+            raise ValueError('DATASET_QUERY_INPUT_INVALID')
+        connection = allowed_connection(body['connection_id'])
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        data = preview(_target(user, connection), body['query'])
+        response = jsonify(success=True, data=data)
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return _query_feature_error(exc)
+    except Exception:
+        return jsonify(success=False, code='QUERY_SCRIPT_PREVIEW_FAILED'), 503
+
+
+@studio_datasets_bp.post('/query-feature/preview')
+def query_feature_preview():
+    from app.services.studio_dataset_query_feature import check_configuration
+    from app.services.studio_source_query_validation import validate_stored_sqlserver_query
+    from app.services.studio_source_query_preview import run_isolated_preview
+    try:
+        user = _principal()
+        _mutating()
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict) or set(body) != {'connection_id', 'query'}:
+            raise ValueError('DATASET_QUERY_INPUT_INVALID')
+        connection, login = check_configuration(body['connection_id'])
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        validate_stored_sqlserver_query(body['query'])
+        result = run_isolated_preview(_target(user, connection), body['query'], login)
+        response = jsonify(success=True, data=result)
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return _query_feature_error(exc)
+    except Exception:
+        return jsonify(success=False, code='QUERY_PREVIEW_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.post('/query-feature')
+def query_feature_create():
+    from app.services.studio_dataset_query_feature import check_configuration
+    from app.services.studio_dataset_query_metadata import create_definition
+    from app.services.studio_source_query_preview import run_isolated_preview
+    from app.services.studio_source_query_validation import validate_stored_sqlserver_query
+    try:
+        user = _principal()
+        _mutating()
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict) or set(body) != {'connection_id', 'dataset_name', 'description', 'query'}:
+            raise ValueError('DATASET_QUERY_INPUT_INVALID')
+        if (not isinstance(body['dataset_name'], str) or not body['dataset_name'].strip()
+                or len(body['dataset_name'].strip()) > 150
+                or not isinstance(body['description'], str) or len(body['description']) > 1000):
+            raise ValueError('DATASET_QUERY_INPUT_INVALID')
+        connection, login = check_configuration(body['connection_id'])
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        validate_stored_sqlserver_query(body['query'])
+        # Validate the precise query immediately before saving. This does not
+        # replace server permissions or bound the cost of the source query.
+        run_isolated_preview(_target(user, connection), body['query'], login)
+        data = create_definition(user, connection, body['dataset_name'], body['description'], body['query'])
+        response = jsonify(success=True, data=data)
+        response.headers['Cache-Control'] = 'no-store'
+        return response, 201
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError as exc:
+        return _query_feature_error(exc)
+    except Exception:
+        return jsonify(success=False, code='DATASET_QUERY_CREATE_UNAVAILABLE'), 503
+
+
 @studio_datasets_bp.get('/sources/<uuid:connection_id>')
 def sources(connection_id):
     try:
@@ -287,6 +556,88 @@ def sources(connection_id):
         import traceback
         traceback.print_exc()
         return jsonify(success=False, code='DATASET_SOURCE_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.get('/query-script-dev/columns/<uuid:connection_id>')
+def query_script_dev_columns(connection_id):
+    """Read bounded SQL Server object metadata for DEV editor completion."""
+    from contextlib import closing
+    from app.connectors.sqlserver import SqlServerTarget, open_readonly_connection, _dataset_columns
+    from app.services.studio_source_sql_script_dev import allowed_connection
+    try:
+        user = _principal()
+        connection = allowed_connection(str(connection_id))
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        schema = request.args.get('schema', '')
+        name = request.args.get('name', '')
+        kind = request.args.get('type', '')
+        if (not schema.strip() or not name.strip() or len(schema) > 128 or len(name) > 128
+                or '\x00' in schema or '\x00' in name or kind not in ('BASE TABLE', 'VIEW')):
+            raise ValueError('DATASET_SOURCE_INVALID')
+        target = _target(user, connection)
+        if not isinstance(target, SqlServerTarget):
+            raise ValueError('DATASET_SOURCE_INVALID')
+        with closing(open_readonly_connection(target)) as db:
+            db.timeout = min(target.timeout, 30)
+            cursor = db.cursor()
+            try:
+                _, columns, _ = _dataset_columns(cursor, {'schema':schema, 'name':name, 'type':kind})
+            finally:
+                cursor.close()
+        response = jsonify(success=True, data={'columns':columns})
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError:
+        return jsonify(success=False, code='QUERY_METADATA_UNAVAILABLE'), 400
+    except Exception:
+        return jsonify(success=False, code='QUERY_METADATA_UNAVAILABLE'), 503
+
+
+@studio_datasets_bp.get('/query-script-dev/column-search/<uuid:connection_id>')
+def query_script_dev_column_search(connection_id):
+    """Search visible SQL Server column names without executing user SQL."""
+    from contextlib import closing
+    from app.connectors.sqlserver import SqlServerTarget, open_readonly_connection
+    from app.services.studio_source_sql_script_dev import allowed_connection
+    try:
+        user = _principal()
+        connection = allowed_connection(str(connection_id))
+        _require_object_access(user, 'CONNECTION', connection, write=True)
+        query = request.args.get('q', '')
+        if not 1 <= len(query) <= 128 or '\x00' in query:
+            raise ValueError('QUERY_METADATA_INVALID')
+        target = _target(user, connection)
+        if not isinstance(target, SqlServerTarget):
+            raise ValueError('QUERY_METADATA_INVALID')
+        escaped = query.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_').replace('[', '\\[')
+        with closing(open_readonly_connection(target)) as db:
+            db.timeout = min(target.timeout, 30)
+            cursor = db.cursor()
+            try:
+                cursor.execute("SELECT TOP (50) s.name,o.name,c.name FROM sys.columns AS c "
+                    "JOIN sys.objects AS o ON o.object_id=c.object_id "
+                    "JOIN sys.schemas AS s ON s.schema_id=o.schema_id "
+                    "WHERE o.type IN ('U','V') AND o.is_ms_shipped=0 "
+                    "AND s.name NOT IN ('sys','INFORMATION_SCHEMA') AND c.name LIKE ? ESCAPE '\\' "
+                    "ORDER BY c.name,s.name,o.name,c.column_id", escaped + '%')
+                rows = cursor.fetchmany(50)
+            finally:
+                cursor.close()
+        response = jsonify(success=True, data={'items':[{'schema':str(r[0]),'table':str(r[1]),'name':str(r[2])} for r in rows]})
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except AccessError as exc:
+        return _access_error(exc)
+    except PermissionError as exc:
+        return _error(exc)
+    except ValueError:
+        return jsonify(success=False, code='QUERY_METADATA_UNAVAILABLE'), 400
+    except Exception:
+        return jsonify(success=False, code='QUERY_METADATA_UNAVAILABLE'), 503
 
 
 @studio_datasets_bp.get('')

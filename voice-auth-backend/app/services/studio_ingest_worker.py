@@ -1,4 +1,4 @@
-"""Local-only Stored Dataset ingest worker. Separate SQL control plane; no BI or pipeline mutations.
+"""Local-only Stored Dataset ingest worker, with SQL or signed BEAM control plane.
 
 Launch explicitly; NEVER register in Flask startup. No automatic retries of claimed runs.
 """
@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 import uuid
+from contextlib import nullcontext
 from pathlib import Path
 
 from app.services.studio_dispatcher import driver_launch, terminate
@@ -29,8 +30,13 @@ def sql_connection():
 
 
 def rpc(connection, action, worker, run_id=None, **values):
-    if action not in {'Claim', 'Heartbeat', 'Complete', 'Fail'}:
+    if action not in {'Claim', 'ClaimSpecific', 'Heartbeat', 'Complete', 'Fail'}:
         raise ValueError('INGEST_WORKER_ACTION_INVALID')
+    if os.environ.get('STUDIO_WORKER_TRANSPORT', 'sql').lower() == 'beam':
+        from app.services.studio_worker_beam import ingest
+        return ingest(action, worker, run_id, **values)
+    if action == 'ClaimSpecific':
+        raise ValueError('INGEST_SPECIFIC_CLAIM_REQUIRES_BEAM')
     args = [action, worker, run_id, values.get('row_count'), values.get('schema_json'),
             values.get('storage_relative_path'), values.get('error_code')]
     cursor = connection.cursor()
@@ -59,6 +65,10 @@ def bind_source(owner, run_id, dataset_id):
              'nodes': [],
              'outputs': [{'id': 'output', 'name': 'Dataset', 'input': {'node': 'source', 'port': 'main'}}]}
     definitions = {dataset_id: metadata}
+    if str(metadata.get('source_schema') or '').casefold() == '__coreanalytics_query__':
+        # Explicit DEV opt-in; scripts use the Connection account's privileges.
+        from app.services.studio_sql_script_ingest_binding import bind_script_ingest
+        return bind_script_ingest(owner, run_id, graph, definitions, lambda actor, connection: _target(actor, connection, dataset_id=dataset_id))
     return bind_stored_ingest(owner, run_id, graph, definitions, lambda actor, connection: _target(actor, connection, dataset_id=dataset_id))
 
 
@@ -125,6 +135,13 @@ def run_driver(request, heartbeat, timeout):
         except (ValueError, UnicodeError):
             raise ValueError('INGEST_DRIVER_FAILED') from None
         if process.returncode != 0 or not isinstance(result, dict) or result.get('success') is not True:
+            safe_codes = {'QUERY_SOURCE_DISABLED','QUERY_SOURCE_CONFIGURATION_INVALID','QUERY_RESULT_COLUMN_INVALID',
+                'QUERY_RESULT_DECIMAL_UNSUPPORTED','QUERY_RESULT_TYPE_UNSUPPORTED','QUERY_RESULT_INVALID',
+                'QUERY_RESULT_DUPLICATE_COLUMN','QUERY_RESULT_ROW_LIMIT','QUERY_RESULT_TIMEZONE_UNSUPPORTED',
+                'QUERY_RESULT_REQUIRED','QUERY_SQL_OBJECT_NOT_FOUND','QUERY_SQL_COLUMN_NOT_FOUND',
+                'QUERY_SQL_SYNTAX_ERROR','QUERY_SQL_PERMISSION_DENIED','QUERY_SQL_TIMEOUT'}
+            if isinstance(result, dict) and result.get('code') in safe_codes:
+                print('INGEST_QUERY_FAILURE ' + result['code'], flush=True)
             raise ValueError('INGEST_DRIVER_FAILED')
     finally:
         if process.poll() is None:
@@ -132,8 +149,8 @@ def run_driver(request, heartbeat, timeout):
         writer.join(timeout=2)
 
 
-def once(connection, worker_id, root, timeout):
-    claimed = rpc(connection, 'Claim', worker_id)
+def once(connection, worker_id, root, timeout, target_run_id=None):
+    claimed = rpc(connection, 'ClaimSpecific', worker_id, target_run_id) if target_run_id else rpc(connection, 'Claim', worker_id)
     if not claimed:
         return False
     run_id = str(uuid.UUID(claimed['run_id']))
@@ -161,6 +178,11 @@ def once(connection, worker_id, root, timeout):
             raise ValueError('INGEST_PUBLISH_FAILED')
         print('INGEST_SUCCEEDED ' + run_id, flush=True)
     except Exception as exc:
+        if stage == 'INGEST_BIND_FAILED':
+            # Expose only fixed policy codes; never log connection or secret details.
+            from app.services.studio_dispatcher import PUBLIC_FAILURE_CODES
+            if str(exc) in PUBLIC_FAILURE_CODES:
+                print('INGEST_BIND_CAUSE ' + str(exc), flush=True)
         code = str(exc) if str(exc) in ALLOWED_FAILURES else stage
         print('INGEST_FAILED ' + json.dumps({'run_id': run_id, 'code': code}), flush=True)
         try:
@@ -181,10 +203,23 @@ def main():
     worker_id = str(uuid.uuid4())
     single = '--once' in sys.argv
     timeout = min(86400, max(30, int(os.environ.get('STUDIO_INGEST_TIMEOUT', '3600'))))
-    with sql_connection() as connection:
+    transport = os.environ.get('STUDIO_WORKER_TRANSPORT', 'sql').lower()
+    if transport not in ('sql', 'beam'):
+        raise SystemExit('STUDIO_WORKER_TRANSPORT must be sql or beam')
+    target_run_id = os.environ.get('STUDIO_INGEST_RUN_ID', '').strip()
+    if target_run_id:
+        if not single or transport != 'beam':
+            raise SystemExit('STUDIO_INGEST_RUN_ID requires --once and BEAM transport')
+        try:
+            target_run_id = str(uuid.UUID(target_run_id))
+        except ValueError:
+            raise SystemExit('STUDIO_INGEST_RUN_ID is invalid') from None
+    with (nullcontext(None) if transport == 'beam' else sql_connection()) as connection:
         while True:
-            processed = once(connection, worker_id, root, timeout)
+            processed = once(connection, worker_id, root, timeout, target_run_id)
             if single:
+                if target_run_id and not processed:
+                    print('INGEST_TARGET_NOT_CLAIMED', flush=True)
                 break
             if not processed:
                 time.sleep(3)

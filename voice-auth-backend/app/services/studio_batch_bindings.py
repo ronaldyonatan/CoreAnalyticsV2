@@ -12,6 +12,20 @@ from app.services.studio_graph_preview import validate_graph_request
 NATIVE_BATCH_STEPS=frozenset(('filter','select','combine','replace','split','string','format','calculate','date','formula','query','constant','duplicate','alter','schema','json','limit','series','meta_select','order','mapper','deduplicate','expression_filter','group','window','pivot','unpivot','append','join','split_join','split_filter'))
 
 
+def _reject_query_source(metadata, code):
+    """Fail closed until query-source JDBC schema discovery is sandboxed.
+
+    Spark opens a separate JDBC connection while resolving schema. A session
+    initializer on a later data-reading connection is not enough to ensure
+    query text cannot run as the original privileged connection login.
+    """
+    if (str(metadata.get('source_type') or '').upper() == 'QUERY'
+            or str(metadata.get('source_kind') or '').upper() == 'QUERY'
+            or str(metadata.get('source_schema') or '').casefold() == '__coreanalytics_query__'
+            or any(metadata.get(key) is not None for key in ('source_query', 'query_sql', 'query_text'))):
+        raise ValueError(code)
+
+
 def validate_batch_graph(graph):
     validate_graph_request(graph)
     for node in graph['nodes']:
@@ -31,6 +45,7 @@ def bind_run(owner,run_id,graph,definitions,target_resolver):
         metadata=definitions.get(identifier)
         if not metadata:raise PermissionError('DATASET_NOT_FOUND')
         if metadata.get('access_mode')!='DIRECT':raise ValueError('BATCH_SOURCE_NOT_AVAILABLE')
+        _reject_query_source(metadata, 'BATCH_QUERY_SOURCE_NOT_READY')
         approved[identifier]=metadata
     sources=[]
     for source in graph['sources']:
@@ -55,6 +70,7 @@ def bind_stored_ingest(owner, run_id, graph, definitions, target_resolver):
     metadata = definitions.get(identifier)
     if not metadata or metadata.get('access_mode') != 'STORED':
         raise ValueError('INGEST_BIND_FAILED')
+    _reject_query_source(metadata, 'INGEST_QUERY_SOURCE_NOT_READY')
     target = target_resolver(owner, metadata['connection_id'])
     kind = 'postgresql' if isinstance(target, PostgreSQLTarget) else 'sqlserver'
     spec = resolve(kind)

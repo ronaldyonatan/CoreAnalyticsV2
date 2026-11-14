@@ -4,6 +4,7 @@ import type { KeyboardEvent } from 'react';
 import Connections from './Connections';
 import Datasets from './Datasets';
 import ChartLibrary from './ChartLibrary';
+import DashboardCatalog from './DashboardCatalog';
 import DataExplorer from './DataExplorer';
 import ETLWorkspace from './ETLWorkspace';
 import Scheduler from './Scheduler';
@@ -16,6 +17,7 @@ import StudioIcon from './StudioIcon';
 import type { StudioModule, StudioModuleId } from './modules';
 import './data-studio-executive.css';
 import './data-universe-unified-v6.css';
+import './data-universe-guide-link.css';
 import '../design-system/components/universe/universe.css';
 
 function ComingSoon({ module }: { module: StudioModule }) {
@@ -25,6 +27,7 @@ function ComingSoon({ module }: { module: StudioModule }) {
 export default function DataStudioWorkspace() {
   const [selected, setSelected] = useState<StudioModuleId>('overview');
   const [connectionsOpened, setConnectionsOpened] = useState(false);
+  const [designerDirty, setDesignerDirty] = useState(false);
   const [explorerDataset, setExplorerDataset] = useState('');
   const [explorerParquet,setExplorerParquet]=useState(false);
   const [schedulerFocus,setSchedulerFocus]=useState<ScheduleTarget|null>(null);
@@ -75,6 +78,7 @@ export default function DataStudioWorkspace() {
   }, [selected]);
   const current = STUDIO_MODULES.find(module => module.id === selected)!;
   const selectModule = (id: StudioModuleId, origin?: HTMLElement) => {
+    if (id === 'overview' && selected === 'designer' && designerDirty && !window.confirm('Dashboard belum disimpan. Tutup editor dan buang perubahan?')) return;
     if (id === 'overview' && selected !== 'overview') {
       if (closingRef.current) return;
       const dialog = dialogRef.current;
@@ -126,7 +130,10 @@ export default function DataStudioWorkspace() {
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   };
   const workspace = <section className={`studio-workspace${fullPage ? ' is-full-page' : ''}`} aria-label="Data Studio workspace">
-    <header className="studio-workspace-header" inert={selected !== 'overview' || undefined}><button type="button" className="studio-header-button" aria-label={fullPage ? 'Kembali ke aplikasi' : 'Layar penuh'} onClick={() => setFullPage(value => !value)}><span aria-hidden="true">{fullPage ? '↙' : '↗'}</span><span>{fullPage ? 'Kembali ke aplikasi' : 'Layar penuh'}</span></button></header>
+    <header className="studio-workspace-header" inert={selected !== 'overview' || undefined}>
+      <a className="studio-header-button studio-guide-link" href={`${import.meta.env.BASE_URL}data-universe-guide.html`} target="_blank" rel="noopener noreferrer" aria-label="Buka panduan Data Universe di tab baru" title="Panduan Data Universe"><span className="studio-guide-icon" aria-hidden="true">?</span><span>Panduan</span></a>
+      <button type="button" className="studio-header-button" aria-label={fullPage ? 'Kembali ke aplikasi' : 'Layar penuh'} onClick={() => setFullPage(value => !value)}><span aria-hidden="true">{fullPage ? '↙' : '↗'}</span><span>{fullPage ? 'Kembali ke aplikasi' : 'Layar penuh'}</span></button>
+    </header>
     <main className="studio-content" aria-label="Data Studio command center" data-paused={selected !== 'overview' || undefined} inert={selected !== 'overview' || undefined}>
       <ComponentStyles name="login-gateway" /><LoginAtmosphere paused={selected !== 'overview'} /><DataStudioOverview onSelect={selectModule} paused={selected !== 'overview'} />
     </main>
@@ -136,6 +143,7 @@ export default function DataStudioWorkspace() {
         <div className="studio-window-content">
           {connectionsOpened && <div className="studio-connections" hidden={selected !== 'connections'}><Connections active={selected === 'connections'} /></div>}
           {selected === 'charts' && <ChartLibrary />}
+          {selected === 'designer' && <DashboardCatalog onDirtyChange={setDesignerDirty} />}
           {selected === 'datasets' && <Datasets onExplore={(datasetId,parquet=false) => { setExplorerDataset(datasetId);setExplorerParquet(parquet); originRectRef.current = null; setSelected('explorer'); }} onSchedulerDetails={target=>{setSchedulerFocus(target);originRectRef.current=null;setSelected('scheduler');}} />}
           {selected === 'explorer' && <DataExplorer initialDatasetId={explorerDataset} initialParquet={explorerParquet} onBackToDatasets={() => { originRectRef.current = null; setExplorerDataset(''); setExplorerParquet(false); setSelected('datasets'); }} />}
           {selected === 'pipelines' && <ETLWorkspace onSchedulerDetails={target=>{setSchedulerFocus(target);originRectRef.current=null;setSelected('scheduler');}} onExplore={id=>{setExplorerDataset(id);setExplorerParquet(true);originRectRef.current=null;setSelected('explorer');}} onExploreSource={(id,isParquet)=>{setExplorerDataset(id);setExplorerParquet(isParquet);originRectRef.current=null;setSelected('explorer');}} />}

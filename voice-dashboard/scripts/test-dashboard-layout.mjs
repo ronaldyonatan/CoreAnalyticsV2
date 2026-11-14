@@ -1,0 +1,87 @@
+import assert from 'node:assert/strict';
+import { FRAME_PRESETS, canApplyGridLayout, gridCollisions, repairGridCollisions, findFreePlacement, fitPresetWidths, isFreeGap, makeFrames, insertFrameRow, resizeAdjacentColumns, gridDropIntent, moveGridItem } from '../src/dataStudio/dashboardLayout.ts';
+for (const preset of FRAME_PRESETS) {
+  let id = 0;
+  const result = makeFrames(preset.widths, [{ y: 0, h: 6 }, { y: 4, h: 7 }], 5, () => String(id++));
+  assert.equal(result.reduce((sum, frame) => sum + frame.w, 0), 12);
+  assert.ok(result.every(frame => frame.y === 11 && frame.h === 5));
+  for (let i = 1; i < result.length; i++) assert.equal(result[i].x, result[i-1].x + result[i-1].w);
+}
+assert.throws(() => makeFrames([6, 5], [], 5, () => 'x'), /INVALID_LAYOUT_PRESET/);
+assert.throws(() => makeFrames([12], [], 2, () => 'x'), /INVALID_LAYOUT_PRESET/);
+const occupied = [{id:'a',x:0,y:0,w:6,h:5}, {id:'b',x:6,y:0,w:6,h:7}, {id:'c',x:0,y:7,w:12,h:4}];
+const inserted = insertFrameRow([6,6], occupied, 3, 3, () => crypto.randomUUID());
+assert.equal(inserted.y, 7);
+assert.deepEqual(inserted.items.map(item => item.y), [0,0,10]);
+assert.deepEqual(inserted.frames.map(item => item.y), [7,7]);
+assert.deepEqual(occupied.map(item => item.y), [0,0,7]);
+assert.deepEqual(insertFrameRow([12], occupied, 3, 0, () => 'frame').items.map(item => item.y), [3,3,10]);
+assert.equal(insertFrameRow([12], occupied, 3, 100, () => 'frame').y, 11);
+assert.throws(() => insertFrameRow([12], occupied, 3, NaN, () => 'frame'), /INVALID_LAYOUT_POSITION/);
+const row = [{i:'left',x:0,y:0,w:6,h:5}, {i:'right',x:6,y:0,w:6,h:5}];
+assert.deepEqual(gridCollisions(row), []);
+const overlap = [row[0], {...row[1],x:4,w:8}];
+assert.deepEqual(gridCollisions(overlap), ['left|right']);
+assert.equal(canApplyGridLayout(row, overlap), false);
+assert.equal(canApplyGridLayout(overlap, row), true);
+assert.deepEqual(repairGridCollisions(overlap).map(({i,x,y,w,h}) => ({i,x,y,w,h})), [row[0], {...overlap[1],y:5}]);
+assert.equal(canApplyGridLayout(row, [row[0],{...row[1],w:7}]), false);
+// A saved dashboard may already contain an overlapping chart and filter.
+// Repair keeps both instances and their data while moving only the later item.
+const damaged = [{i:'chart',x:0,y:3,w:6,h:5,chartId:'chart-a'}, {i:'filter',x:4,y:3,w:8,h:2,chartId:'chart-b'}, {i:'empty',x:6,y:5,w:6,h:3}];
+const repaired = repairGridCollisions(damaged);
+assert.deepEqual(gridCollisions(repaired), []);
+assert.deepEqual(new Set(repaired.map(item => item.i)), new Set(['chart','filter','empty']));
+assert.equal(repaired.find(item => item.i === 'filter').chartId,'chart-b');
+assert.equal(canApplyGridLayout(damaged,repaired), true);
+assert.equal(canApplyGridLayout(damaged,[damaged[0],damaged[1],{...damaged[2],x:2}]), false);
+const shrinkLeft = resizeAdjacentColumns(row, [{...row[0],w:3}, row[1]], 'left');
+assert.deepEqual(shrinkLeft.map(({x,w}) => [x,w]), [[0,3],[3,9]]);
+const shrinkRight = resizeAdjacentColumns(row, [row[0], {...row[1],w:3}], 'right');
+assert.deepEqual(shrinkRight.map(({x,w}) => [x,w]), [[0,9],[9,3]]);
+const movedByGrid = resizeAdjacentColumns(row, [{...row[0],w:10}, {...row[1],y:5}], 'left');
+assert.deepEqual(movedByGrid.map(({x,y,w}) => [x,y,w]), [[0,0,10],[10,0,2]]);
+const clamped = resizeAdjacentColumns(row, [{...row[0],w:12}, {...row[1],y:5}], 'left');
+assert.deepEqual(clamped.map(({x,w}) => [x,w]), [[0,11],[11,1]]);
+const uneven = [{i:'short',x:0,y:0,w:6,h:2},{i:'tall',x:6,y:0,w:6,h:5},{i:'below',x:0,y:2,w:6,h:3}];
+const unsafe = [{...uneven[0],w:3},uneven[1],uneven[2]];
+assert.deepEqual(resizeAdjacentColumns(uneven, unsafe, 'short'), unsafe);
+assert.deepEqual(resizeAdjacentColumns(row, [{...row[0],h:6},row[1]], 'left'), [{...row[0],h:6},row[1]]);
+const three = [{i:'a',x:0,y:0,w:6,h:4},{i:'b',x:6,y:0,w:6,h:4},{i:'c',x:0,y:4,w:12,h:4}];
+assert.deepEqual(gridDropIntent(three,'c',1,1), {targetId:'a',position:'left'});
+assert.deepEqual(gridDropIntent(three,'c',5,1), {targetId:'a',position:'right'});
+assert.deepEqual(gridDropIntent(three,'c',1,.2), {targetId:'a',position:'above'});
+assert.deepEqual(gridDropIntent(three,'c',1,3.8), {targetId:'a',position:'below'});
+assert.equal(gridDropIntent(three,'a',1,1), null);
+const geometry = items => Object.fromEntries(items.map(({i,x,y,w,h}) => [i,[x,y,w,h]]));
+const above = moveGridItem(three,'c',{targetId:'a',position:'above'});
+assert.deepEqual(geometry(above), {a:[0,4,6,4],b:[6,4,6,4],c:[0,0,12,4]});
+const beside = moveGridItem(three,'c',{targetId:'a',position:'right'});
+assert.deepEqual(geometry(beside), {a:[0,0,3,4],b:[6,0,6,4],c:[3,0,3,4]});
+const swap = moveGridItem(three,'a',{targetId:'b',position:'right'});
+assert.deepEqual(geometry(swap), {b:[0,0,6,4],c:[0,4,12,4],a:[6,0,6,4]});
+const below = moveGridItem(three,'a',{targetId:'c',position:'below'});
+assert.deepEqual(geometry(below), {b:[0,0,12,4],c:[0,4,12,4],a:[0,8,12,4]});
+const contentBefore = [{i:'chart',x:0,y:0,w:12,h:4,chartId:'kept'}, {i:'empty',x:0,y:4,w:12,h:4}];
+const contentAfter = moveGridItem(contentBefore,'chart',{targetId:'empty',position:'right'});
+assert.equal(contentAfter.find(item => item.i === 'chart').chartId, 'kept');
+const tooNarrow = [{i:'a',x:0,y:0,w:1,h:2},{i:'b',x:1,y:0,w:1,h:2},{i:'c',x:0,y:2,w:12,h:2}];
+assert.equal(moveGridItem(tooNarrow,'c',{targetId:'a',position:'left'}), null);
+assert.deepEqual(three.map(({x,y,w}) => [x,y,w]), [[0,0,6],[6,0,6],[0,4,12]]);
+// The left column has a short chart, with tall empty slots beside it and another row below.
+const gapLayout = [{i:'chart',x:0,y:0,w:3,h:2}, {i:'tall1',x:3,y:0,w:3,h:6}, {i:'tall2',x:6,y:0,w:6,h:6}, {i:'move',x:0,y:6,w:12,h:4}];
+assert.equal(isFreeGap(gapLayout, 1, 4), true);
+assert.equal(isFreeGap(gapLayout, 4, 4), false);
+assert.deepEqual(gridDropIntent(gapLayout, 'move', 1, 4), {targetId:null,position:'free',x:1,y:4});
+const gapResult = moveGridItem(gapLayout, 'move', {targetId:null,position:'free',x:1,y:4});
+assert.deepEqual(geometry(gapResult), {chart:[0,0,3,2],tall1:[3,0,3,6],tall2:[6,0,6,6],move:[0,2,3,4]});
+assert.deepEqual(findFreePlacement(gapLayout, {i:'new',x:0,y:0,w:12,h:4}, 1, 4), {i:'new',x:0,y:2,w:3,h:4});
+const alignedGap = [{i:'top',x:0,y:0,w:6,h:3},{i:'side',x:6,y:0,w:6,h:8},{i:'bottom',x:0,y:8,w:12,h:3}];
+// Regardless of pointer position or the dragged slot's former size, fill the
+// vacant column between the existing boundaries rather than float in the middle.
+assert.deepEqual(findFreePlacement(alignedGap, {i:'new',x:0,y:0,w:2,h:2}, 1, 6), {i:'new',x:0,y:3,w:6,h:5});
+assert.deepEqual(findFreePlacement(alignedGap, {i:'new',x:0,y:0,w:9,h:7}, 5, 4), {i:'new',x:0,y:3,w:6,h:5});
+assert.equal(findFreePlacement(alignedGap, {i:'new',x:0,y:0,w:2,h:2}, 7, 4), null);
+assert.deepEqual(fitPresetWidths([6,6], 3), [2,1]);
+assert.equal(fitPresetWidths([3,3,3,3], 3), null);
+console.log('Dashboard frame layout tests passed.');

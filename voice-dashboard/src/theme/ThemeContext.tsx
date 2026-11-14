@@ -104,3 +104,37 @@ export function useTheme() {
 
   return context;
 }
+
+/**
+ * Purely local marketing scene provider. No root dataset changes and no
+ * localStorage writes: the login and authenticated app keep their own theme.
+ */
+export function CosmicBlackVisualProvider({ children }: { children: React.ReactNode }) {
+  const value = useMemo<ThemeContextValue>(() => ({
+    themeId: 'cosmic-black',
+    theme: CORE_THEMES['cosmic-black'],
+    setTheme: () => undefined,
+    toggleTheme: () => undefined,
+    isLight: false,
+    isStaticTheme: false,
+    performanceMode: CORE_THEMES['cosmic-black'].performance,
+  }), []);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}
+
+/** Marketing-only local theme scope. Never changes documentElement or storage. */
+export function MarketingThemeVisualProvider({ themeId, children }: { themeId: CoreThemeId; children: React.ReactNode }) {
+  const value = useMemo<ThemeContextValue>(() => {
+    const theme = CORE_THEMES[themeId];
+    return {
+      themeId,
+      theme,
+      setTheme: () => undefined,
+      toggleTheme: () => undefined,
+      isLight: theme.appearance === 'light',
+      isStaticTheme: theme.performance === 'static',
+      performanceMode: theme.performance,
+    };
+  }, [themeId]);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+}

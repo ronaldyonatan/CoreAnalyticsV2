@@ -1,0 +1,5 @@
+.studio-workspace-header { display: flex; align-items: center; gap: 8px; }
+.studio-guide-link { text-decoration: none; }
+.studio-guide-icon { display: inline-grid; place-items: center; width: 18px; height: 18px; border: 1px solid currentColor; border-radius: 50%; font-size: 11px; line-height: 1; }
+.studio-guide-link:focus-visible { outline: 2px solid var(--core-border-strong); outline-offset: 3px; }
+@media (max-width: 480px) { .studio-guide-link { padding-inline: 10px; } .studio-guide-link > span:last-child { display: none; } }

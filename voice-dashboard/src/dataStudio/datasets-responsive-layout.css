@@ -1,0 +1,58 @@
+/* Fit the catalog to its actual folder height, including embedded workspaces. */
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog > :is(.datasets-catalog-heading, .ca-catalog-filter-bar) {
+  flex: 0 0 auto;
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog-grid {
+  flex: 1 1 auto;
+  min-height: 180px;
+  align-items: stretch;
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog-list,
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-detail {
+  position: relative;
+  align-self: stretch;
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+}
+.studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog-list {
+  overflow-y: auto;
+}
+
+/* When the folder itself is narrow, stack the panes and let the folder scroll. */
+@container (max-width: 900px) {
+  .studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog {
+    height: auto;
+    min-height: 100%;
+  }
+  .studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog {
+    flex: none;
+  }
+  .studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog-grid {
+    grid-template-columns: minmax(0, 1fr);
+    flex: none;
+  }
+  .studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-catalog-list {
+    height: auto;
+    max-height: 320px;
+  }
+  .studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-page-catalog .datasets-detail {
+    height: auto;
+    max-height: none;
+  }
+  .studio-window[data-aurora-deck="v5"] .studio-window-content .datasets-detail:has(.deck-inspector-title) > .ca-dataset-detail-body {
+    overflow-y: visible !important;
+  }
+}

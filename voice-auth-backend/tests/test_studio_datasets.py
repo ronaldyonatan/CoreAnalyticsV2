@@ -16,6 +16,9 @@ class DatasetApiTests(unittest.TestCase):
         app = Flask(__name__)
         app.register_blueprint(api.studio_datasets_bp)
         self.client = app.test_client()
+        access = patch.object(api, '_require_object_access', return_value='OWNER')
+        self.access = access.start()
+        self.addCleanup(access.stop)
         self.body = {'connection_id': CONNECTION, 'dataset_name': 'Revenue', 'description': '', 'source_schema': 'dbo', 'source_name': 'Revenue', 'source_type': 'VIEW', 'access_mode': 'DIRECT'}
 
     def test_authorization_denied_before_source_access(self):
@@ -112,11 +115,26 @@ class DatasetApiTests(unittest.TestCase):
 
     def test_store_is_not_falsely_reported_as_created(self):
         self.body['access_mode'] = 'STORED'
-        with patch.object(api, '_principal', return_value='user'), patch.object(api, '_mutating'), patch.object(api, '_target') as target:
+        with patch('app.services.studio_object_access.require_access', return_value='OWNER'), \
+             patch.object(api, '_principal', return_value='user'), patch.object(api, '_mutating'), \
+             patch.object(api, '_target', return_value='source'), \
+             patch.object(api, 'sqlserver_object_exists', return_value=True), \
+             patch.object(api.core_api, '_post_mode', return_value={'data': []}) as post:
             response = self.client.post('/api/studio/datasets', json=self.body)
             self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.json['code'], 'DATASET_STORAGE_NOT_AVAILABLE')
-            target.assert_not_called()
+            self.assertEqual(response.json['code'], 'DATASET_CREATE_FAILED')
+            self.assertEqual(post.call_args.args[0], 'CoreStudioStoredDatasetCreate')
+
+    def test_preview_access_denial_blocks_source_connection(self):
+        self.access.side_effect = api.AccessError('OBJECT_ACCESS_DENIED', 403)
+        dataset = {'dataset_id': CONNECTION, 'connection_id': CONNECTION, 'source_schema': 'dbo',
+                   'source_name': 'Revenue', 'source_type': 'VIEW', 'access_mode': 'DIRECT'}
+        with patch.object(api, '_principal', return_value='user'), \
+             patch.object(api.core_api, '_post_mode', return_value={'data': [dataset]}), \
+             patch.object(api, '_target') as target:
+            response = self.client.get('/api/studio/datasets/' + CONNECTION + '/preview')
+        self.assertEqual(response.status_code, 403)
+        target.assert_not_called()
 
     def test_injected_or_missing_source_is_rejected(self):
         self.body['source_name'] = 'Revenue]; DROP TABLE x;--'

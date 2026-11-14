@@ -31,8 +31,8 @@ const tooltipStyle = {
 };
 const legendStyle = { color: muted, fontSize: 11, paddingTop: 6 };
 
-export function SharedChart({ kind, rows, title = '', height = 370, properties }: {
-  kind: ChartKind; rows: ChartResultRow[]; title?: string; height?: number; properties?: ChartProperties;
+export function SharedChart({ kind, rows, title = '', height = 370, properties, onSelectDimension }: {
+  kind: ChartKind; rows: ChartResultRow[]; title?: string; height?: number; properties?: ChartProperties; onSelectDimension?: (value: string) => void;
 }) {
   const p = properties;
   const formatValue = (n: unknown) => formatChartValue(n, p);
@@ -155,7 +155,7 @@ export function SharedChart({ kind, rows, title = '', height = 370, properties }
   </div>;
   if (kind === 'table') return <div className="chart-table"><table><thead><tr>
     <th>Dimension</th>{dataKeys.map(k => <th key={k}>{k === 'value' ? 'Value' : k}</th>)}
-  </tr></thead><tbody>{table.map(row => <tr key={String(row.dimension)}>
+  </tr></thead><tbody>{table.map(row => <tr key={String(row.dimension)} onClick={() => onSelectDimension?.(String(row.dimension))}>
     <td>{row.dimension}</td>{dataKeys.map(k => <td key={k}>{fmt(row[k])}</td>)}
   </tr>)}</tbody></table></div>;
   if (kind === 'pie' || kind === 'donut') {
@@ -164,7 +164,7 @@ export function SharedChart({ kind, rows, title = '', height = 370, properties }
       <ResponsiveContainer width="100%" height="100%"><PieChart>
         <Pie data={values} dataKey="value" nameKey="name" cx="50%" cy="45%"
           innerRadius={kind === 'donut' ? '52%' : 0} outerRadius="72%" isAnimationActive={false}>
-          {values.map((v, i) => <Cell key={`${v.name}:${i}`} fill={colors[i % colors.length]} />)}
+          {values.map((v, i) => <Cell key={`${v.name}:${i}`} fill={colors[i % colors.length]} onClick={() => onSelectDimension?.(v.name)} />)}
         </Pie>
         {p?.showTooltip !== false && tooltip}{legend}
       </PieChart></ResponsiveContainer>
@@ -395,7 +395,7 @@ export function SharedChart({ kind, rows, title = '', height = 370, properties }
   if (kind === 'line' || kind === 'area' || kind === 'step') {
     const C = kind === 'area' ? AreaChart : LineChart;
     return <div role="img" aria-label={title || kind} style={{ width: '100%', height: chartHeight, minWidth: 0 }}>
-      <ResponsiveContainer width="100%" height="100%"><C data={table} margin={{ top: 18, right: 24, left: 14, bottom: 18 }}>
+      <ResponsiveContainer width="100%" height="100%"><C data={table} margin={{ top: 18, right: 24, left: 14, bottom: 18 }} onClick={state => { if (state?.activeLabel != null) onSelectDimension?.(String(state.activeLabel)); }}>
         {grid}{p?.showTooltip !== false && tooltip}{legend}
         {p?.showXAxis !== false && <XAxis dataKey="dimension" tick={chartTick} axisLine={axisLine} tickLine={false}
           label={p?.xAxisLabel ? { value: p.xAxisLabel, position: "insideBottom", offset: -6 } : undefined} tickFormatter={v => shorten(v, 14)} angle={-25} textAnchor="end" height={74}
@@ -432,6 +432,7 @@ export function SharedChart({ kind, rows, title = '', height = 370, properties }
             tickLine={false} tickFormatter={axisNumber} label={p?.yAxisLabel ? { value: p.yAxisLabel, angle: -90, position: "insideLeft" } : undefined} />}
         </>}
         {dataKeys.map((k, i) => <Bar key={k} name={k === 'value' ? 'Value' : k} dataKey={k}
+          onClick={(entry: { dimension?: string }) => { if (entry.dimension != null) onSelectDimension?.(String(entry.dimension)); }}
           stackId={kind === 'stacked' ? 'total' : undefined}
           fill={colors[i % colors.length]}
           radius={kind === 'stacked' ? 0 : (horizontal ? [0, 3, 3, 0] : [3, 3, 0, 0])}

@@ -4,12 +4,13 @@ import ParquetStorageDelete from './ParquetStorageDelete';
 import OwnershipPicker from './OwnershipPicker';
 import './ownership-picker.css';
 import './ownership-ui-fix.css';
-import { loadDatasetCatalog, parquetPreviewUrl } from './datasetCatalog';
+import { isQueryDataset, loadDatasetCatalog, parquetPreviewUrl } from './datasetCatalog';
 import type { CatalogDataset as Dataset } from './datasetCatalog';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import SearchPicker from './SearchPicker';
 import ColumnFilter from './ColumnFilter';
 import type { ColumnFilterValue, ColumnFilters } from './ColumnFilter';
+import SavedQueryDetails from './SavedQueryDetails';
 
 type Column = { name: string; type: string };
 type Sort = { column: string; direction: 'asc' | 'desc' };
@@ -19,6 +20,20 @@ async function get(url: string, signal: AbortSignal) {
   const result = await response.json().catch(() => ({}));
   if (!response.ok || result.success === false) throw new Error(result.code || `HTTP_${response.status}`);
   return result.data;
+}
+async function loadSavedQuery(id: string, signal: AbortSignal): Promise<{query:string;dialect:string}> {
+  return get(`/voice-api/api/studio/datasets/${encodeURIComponent(id)}/query-definition`, signal);
+}
+async function refreshSavedQuery(id: string): Promise<string | undefined> {
+  const csrf = document.cookie.split('; ').find(value => value.startsWith('core_csrf='));
+  const response = await fetch(`/voice-api/api/studio/datasets/${encodeURIComponent(id)}/ingest`, {
+    method: 'POST', credentials: 'include', cache: 'no-store',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf ? decodeURIComponent(csrf.slice(10)) : '' },
+    body: JSON.stringify({}),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || result.success === false) throw new Error(result.code || `HTTP_${response.status}`);
+  return typeof result.data?.run_id === 'string' ? result.data.run_id : undefined;
 }
 async function fetchPreview(id: string, page: number, filters: ColumnFilters, sort: Sort | null, parquet:boolean, stored:boolean, signal: AbortSignal) {
   if (parquet) return get(parquetPreviewUrl(id,page),signal);
@@ -36,7 +51,7 @@ export default function DataExplorer({ initialDatasetId = '', initialParquet = f
   const [catalogNotices,setCatalogNotices]=useState<string[]>([]);
   const [catalogQuery, setCatalogQuery] = useState('');
   const [preview, setPreview] = useState<Preview | null>(null);
-  const [tab, setTab] = useState<'overview'|'data'>('overview');
+  const [tab, setTab] = useState<'overview'|'data'|'sql'>('overview');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [sorting, setSorting] = useState(false);
@@ -98,10 +113,12 @@ export default function DataExplorer({ initialDatasetId = '', initialParquet = f
     {id && !loading && <UniverseTabs className="ca-dataset-tabs ca-compact-tabs" aria-label="Dataset detail tabs">
       <button type="button" className={tab === 'overview' ? 'active' : ''} aria-current={tab === 'overview' ? 'page' : undefined} onClick={() => setTab('overview')}>Overview</button>
       <button type="button" className={tab === 'data' ? 'active' : ''} aria-current={tab === 'data' ? 'page' : undefined} onClick={openData}>Data</button>
+      {selected && isQueryDataset(selected) && <button type="button" className={tab === 'sql' ? 'active' : ''} aria-current={tab === 'sql' ? 'page' : undefined} onClick={() => setTab('sql')}>SQL</button>}
     </UniverseTabs>}
+    {id && !loading && selected && isQueryDataset(selected) && tab === 'sql' && <SavedQueryDetails key={selected.dataset_id} datasetId={selected.dataset_id} load={loadSavedQuery} onRefresh={refreshSavedQuery} initiallyOpen />}
     {id && !loading && selected && tab === 'overview' && <section className="ca-compact-overview" aria-label="Dataset overview">
       <div className="ca-compact-info-row">
-        <span><small>Source</small><strong>{selected ? `${selected.source_schema}.${selected.source_name}` : '—'}</strong></span>
+        <span><small>Source</small><strong>{isQueryDataset(selected) ? 'SQL Query' : `${selected.source_schema}.${selected.source_name}`}</strong></span>
         <span><small>Run ID / Folder</small><strong className="ca-compact-mono" title={selected?.run_id ?? ''}>{selected?.run_id ?? (readOnly ? '—' : 'Direct SQL')}</strong></span>
         {selected?.run_id && <button type="button" className="ca-compact-copy" onClick={() => navigator.clipboard?.writeText(selected.run_id!)}>Copy ID</button>}
 
@@ -113,7 +130,7 @@ export default function DataExplorer({ initialDatasetId = '', initialParquet = f
         <div className="ca-overview-columns"><div className="ca-overview-panel"><h3>Source &amp; metadata</h3><dl>
           <dt>Mode akses</dt><dd>{readOnly ? 'Parquet (stored)' : 'Direct'}</dd>
           <dt>Connection / Pipeline</dt><dd>{selected?.connection_name ?? '—'}</dd>
-          <dt>Source</dt><dd>{selected ? `${selected.source_schema}.${selected.source_name}` : '—'}</dd>
+          <dt>Source</dt><dd>{isQueryDataset(selected) ? 'SQL Query' : `${selected.source_schema}.${selected.source_name}`}</dd>
           <dt>Dataset ID</dt><dd className="ca-id">{selected?.dataset_id ?? '—'}</dd>
           <dt>Tags</dt><dd>Belum tersedia dari API</dd>
         </dl></div><div className="ca-overview-panel"><h3>Storage information</h3><dl>

@@ -1,0 +1,15 @@
+.datasets-query-editor { margin-top: 16px; display: grid; gap: 12px; }
+.datasets-query-choice { display: inline-flex; width: fit-content; max-width: 100%; gap: 4px; padding: 4px; border: 1px solid var(--studio-border, #244151); border-radius: 11px; background: color-mix(in srgb, var(--studio-surface, #071a26) 75%, transparent); }
+.datasets-query-choice button { min-height: 36px; padding: 8px 18px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: inherit; cursor: pointer; font: inherit; }
+.datasets-query-choice button[aria-pressed="true"] { border-color: color-mix(in srgb, var(--studio-accent, #00c8ed) 60%, transparent); background: color-mix(in srgb, var(--studio-accent, #00c8ed) 15%, transparent); }
+.datasets-query-choice button:focus-visible { outline: 2px solid var(--studio-accent, #00c8ed); outline-offset: 2px; }
+.dataset-query-mark { position:relative; display:inline-flex; align-items:center; justify-content:center; width:39px; height:42px; padding-bottom:8px; flex:none; border-radius:10px; border:1px solid color-mix(in srgb, var(--studio-accent, #00c8ed) 30%, transparent); background:color-mix(in srgb, var(--studio-accent, #00c8ed) 10%, transparent); color:var(--studio-accent, #00c8ed); }
+.dataset-query-mark small { position:absolute; bottom:2px; font-size:7px; line-height:1; letter-spacing:.06em; font-weight:800; }
+.datasets-modes.datasets-modes--single { grid-template-columns:minmax(0, 1fr); }
+.datasets-query-editor textarea { width: 100%; min-height: 160px; resize: vertical; padding: 12px; border: 1px solid var(--studio-border, #244151); border-radius: 8px; color: inherit; background: var(--studio-surface, #071a26); font: 13px/1.5 ui-monospace, monospace; }
+.datasets-query-editor p { margin: 0; font-size: 12px; opacity: .8; }
+.datasets-query-editor > .datasets-action { justify-self: start; }
+.datasets-query-results { display: grid; gap: 8px; min-width: 0; }
+.datasets-query-table { overflow: auto; max-height: 240px; border: 1px solid var(--studio-border, #244151); border-radius: 8px; }
+.datasets-query-table table { border-collapse: collapse; font-size: 12px; width: 100%; }
+.datasets-query-table th, .datasets-query-table td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--studio-border, #244151); white-space: nowrap; }

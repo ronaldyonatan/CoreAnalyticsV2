@@ -1,11 +1,16 @@
 """Trusted source bindings produced by the server; never accepted directly from a browser."""
 import ipaddress
 import os
+import uuid
 from pathlib import Path
 from pyspark.sql.types import StructType,StructField,StringType
 from app.batch_graph import BatchError
 from app.batch_storage import contained
 from app.operation_common import schema,fields,text
+
+# Independent of runtime flags: the guarded JDBC source must stay closed until
+# database and linked-server execution identity have been reviewed end to end.
+QUERY_SECURITY_REVIEW_COMPLETE = False
 
 
 def read_sources(spark,definitions,root):
@@ -23,8 +28,31 @@ def read_sources(spark,definitions,root):
             path=contained(root,Path(root)/item['path'])
             if not path.is_dir():raise BatchError('SOURCE_NOT_FOUND')
             frame=spark.read.parquet(str(path))
-        elif kind=='sqlserver':
-            fields(item,'id kind address hostname port database schema table username password encrypt trust_server_certificate timeout')
+        elif kind in ('sqlserver','sqlserver_query'):
+            query_source = kind == 'sqlserver_query'
+            if query_source:
+                fields(item,'id kind address hostname port database username password encrypt trust_server_certificate timeout connection_id execution_login query')
+                if os.getenv('STUDIO_DATASET_QUERY_SQLSERVER_ENABLED','').strip().lower() != 'true':
+                    raise BatchError('QUERY_SOURCE_DISABLED')
+                if not QUERY_SECURITY_REVIEW_COMPLETE:
+                    raise BatchError('QUERY_SOURCE_SECURITY_REVIEW_REQUIRED')
+                try:
+                    requested = str(uuid.UUID(str(item['connection_id'])))
+                    allowed = str(uuid.UUID(os.getenv('STUDIO_DATASET_QUERY_CONNECTION_ID','')))
+                except (ValueError,TypeError,AttributeError):
+                    raise BatchError('QUERY_SOURCE_CONFIGURATION_INVALID') from None
+                login = os.getenv('STUDIO_DATASET_QUERY_EXECUTION_LOGIN','')
+                if requested != allowed or not login or item['execution_login'] != login:
+                    raise BatchError('QUERY_SOURCE_CONFIGURATION_INVALID')
+                query = text(item['query'],32000,True).strip()
+                # Spark wraps dbtable in a derived table. CTE support requires
+                # a separately designed prepareQuery path; do not guess it.
+                if len(query)<=6 or query[:6].upper() != 'SELECT' or not (query[6].isspace() or query[6]=='('):
+                    raise BatchError('QUERY_SOURCE_SELECT_REQUIRED')
+                if query.endswith(';'): query=query[:-1].rstrip()
+                if not query: raise BatchError('QUERY_SOURCE_SELECT_REQUIRED')
+            else:
+                fields(item,'id kind address hostname port database schema table username password encrypt trust_server_certificate timeout')
             # The server resolves and validates the address through its existing SQL host policy.
             try:
                 ip = ipaddress.ip_address(item['address'])
@@ -56,13 +84,18 @@ def read_sources(spark,definitions,root):
                 if item['port'] not in ports:
                     raise BatchError('INVALID_SQL_SOURCE')
             if type(item['port']) is not int or not 1<=item['port']<=65535 or type(item['timeout']) is not int or not 1<=item['timeout']<=120 or type(item['encrypt']) is not bool or type(item['trust_server_certificate']) is not bool:raise BatchError('INVALID_SQL_SOURCE')
-            for key in ('hostname','database','schema','table','username','password'):text(item[key],1024 if key=='password' else 255,True)
+            for key in (('hostname','database','username','password') if query_source else ('hostname','database','schema','table','username','password')):text(item[key],1024 if key=='password' else 255,True)
             if any(c in item['hostname'] for c in ';{}\r\n'):raise BatchError('INVALID_SQL_SOURCE')
             escape=lambda value:'{'+value.replace('}','}}')+'}'
             address='['+item['address']+']' if ':' in item['address'] else item['address']
             url='jdbc:sqlserver://'+address+':'+str(item['port'])+';databaseName='+escape(item['database'])+';encrypt='+str(item['encrypt']).lower()+';trustServerCertificate='+str(item['trust_server_certificate']).lower()+';hostNameInCertificate='+escape(item['hostname'])+';loginTimeout='+str(item['timeout'])
             quote=lambda name:'['+name.replace(']',']]')+']'
-            frame=spark.read.format('jdbc').option('url',url).option('dbtable',quote(item['schema'])+'.'+quote(item['table'])).option('driver','com.microsoft.sqlserver.jdbc.SQLServerDriver').option('user',item['username']).option('password',item['password']).option('fetchsize','10000').option('queryTimeout','300').load()
+            reader=spark.read.format('jdbc').option('url',url).option('user',item['username']).option('password',item['password']).option('fetchsize','10000').option('queryTimeout','300')
+            if query_source:
+                reader=reader.option('driver','com.coreanalytics.jdbc.GuardedSqlServerDriver').option('coreanalyticsExecutionLogin',login).option('dbtable','('+query+'\n) AS [ca_source]')
+            else:
+                reader=reader.option('driver','com.microsoft.sqlserver.jdbc.SQLServerDriver').option('dbtable',quote(item['schema'])+'.'+quote(item['table']))
+            frame=reader.load()
         elif kind=='postgresql':
             fields(item,'id kind address hostname port database schema table username password encrypt timeout')
             try:

@@ -7,6 +7,10 @@ export type CatalogDataset = {
  * use the ETL icon when the API exposes a pipeline/run association.
  * Do not infer transformations from an output's name. */
 export type DatasetKind = 'direct' | 'stored' | 'etl';
+export function isQueryDataset(dataset: CatalogDataset) {
+  return String(dataset.source_schema || '').toLowerCase() === '__coreanalytics_query__'
+    || String(dataset.origin_type || '').toUpperCase() === 'SQL_QUERY';
+}
 export function datasetKind(dataset: CatalogDataset): DatasetKind {
   const mode = String(dataset.access_mode || '').toUpperCase();
   if (mode === 'DIRECT') return 'direct';
@@ -44,7 +48,7 @@ export async function loadDatasetCatalog(signal?:AbortSignal):Promise<{items:Cat
   return {items,notices};
 }
 export function datasetSource(dataset:CatalogDataset) {
-  return dataset.access_mode==='PARQUET' ? `${dataset.connection_name} · ${dataset.source_name}`:`${dataset.connection_name} · ${dataset.source_schema}.${dataset.source_name}`;
+  return isQueryDataset(dataset) ? `${dataset.connection_name} · SQL Query` : dataset.access_mode==='PARQUET' ? `${dataset.connection_name} · ${dataset.source_name}`:`${dataset.connection_name} · ${dataset.source_schema}.${dataset.source_name}`;
 }
 export function parquetPreviewUrl(id:string,page:number) {
   return '/voice-api/api/studio/pipelines/outputs/'+encodeURIComponent(id)+'/preview?page='+page;

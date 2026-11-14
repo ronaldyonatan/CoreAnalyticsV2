@@ -10,3 +10,5 @@
 .studio-window-content .datasets-page-catalog .ca-dataset-detail-actions{align-items:stretch}
 .studio-window-content .datasets-page-catalog .ca-dataset-detail-actions>.datasets-action{min-width:0}
 @media(max-width:540px){.studio-window-content .datasets-page-catalog .datasets-inspector-storage-actions>summary span{display:none}}
+.datasets-query-dev-probe { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.datasets-query-dev-probe p { margin: 0; font-size: 12px; }

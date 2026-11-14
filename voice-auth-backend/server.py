@@ -20,6 +20,7 @@ from app.routes.studio_scheduler_api import studio_scheduler_bp
 from app.routes.studio_charts_api import studio_charts_bp
 from app.routes.studio_parquet_storage_api import studio_parquet_storage_bp
 from app.routes.studio_object_access_api import studio_object_access_bp
+from app.routes.studio_dashboard_designer_api import studio_dashboard_designer_bp
 
 app = Flask(__name__)
 CORS(app)  # Mengizinkan akses dari front-end React/Vite
@@ -35,6 +36,7 @@ app.register_blueprint(studio_scheduler_bp)
 app.register_blueprint(studio_charts_bp)
 app.register_blueprint(studio_parquet_storage_bp)
 app.register_blueprint(studio_object_access_bp)
+app.register_blueprint(studio_dashboard_designer_bp)
 
 # Pastikan folder penyimpanan profil suara tersedia
 os.makedirs("voice-profiles", exist_ok=True)
